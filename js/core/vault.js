@@ -29,9 +29,11 @@
     return new Uint8Array(await subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(0, 12) }, k, bytes.slice(12)));
   }
   async function fetchBytes(path) {
-    const r = await fetch(BASE + path);
+    // İkili dosya sunmayan önizleme sunucuları için kasanın base64 .txt kopyası (keys.json → b64: true)
+    const b64 = Boolean((await meta() || {}).b64);
+    const r = await fetch(BASE + path + (b64 ? '.txt' : ''));
     if (!r.ok) throw new Error('kasa-dosyasi-yok');
-    return new Uint8Array(await r.arrayBuffer());
+    return b64 ? unb64((await r.text()).trim()) : new Uint8Array(await r.arrayBuffer());
   }
   async function useRaw(raw, m) {
     key = await subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
