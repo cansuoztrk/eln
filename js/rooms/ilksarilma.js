@@ -184,7 +184,7 @@
             <p class="card-eyebrow">Sarılma Bankası · Hesap özeti</p>
             <h3 class="sub-h">Alacaklı: Prenses ${K.esc(C.herPet)} · Borçlu: ${K.esc(C.myPet)}</h3>
             <dl class="hb-rows" id="hbRows"></dl>
-            <button class="btn red" id="hbAdd">${A.icon('hug')} Bir sarılma daha yazdır</button>
+            <div class="actions"><button class="btn red" id="hbAdd">${A.icon('hug')} Bir sarılma daha yazdır</button>${K.voice ? K.voice.btn('sarilma', 'Sesli sarılma') : ''}</div>
           </div>
         </section>
         <section class="hp">

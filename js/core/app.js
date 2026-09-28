@@ -9,10 +9,11 @@
 
   // Kalenin kanatları: her oda kendi kanadını "wing" ile seçer
   const WINGS = [
-    { id: 'anilar', title: 'Anılar Kanadı', sub: 'Masalımız, sohbetlerimiz, Bakü\'deki izlerin, portrelerin ve bizim şarkımız', color: '#F0578F', icon: 'book' },
-    { id: 'kalp', title: 'Kalp Kanadı', sub: 'Mektuplar, sebepler ve henüz yaşanmamış o ilk sarılma', color: '#E3174D', icon: 'heart' },
-    { id: 'oyun', title: 'Oyun Kanadı', sub: 'gartic, Angela, Bakü\'ye uçuş, gökyüzü ve müzik kutusu', color: '#3FA37A', icon: 'palette' },
-    { id: 'hazine', title: 'Hazine Kanadı', sub: 'Mesafe, sınıf, hayaller, kuponlar, özel günler ve çıkartmalar', color: '#C98A12', icon: 'crown' },
+    { id: 'mevsim', title: 'Bu Günlere Özel', sub: 'Sadece bu günlerde açık olan odalar. Kaçırma!', color: '#8F73E6', icon: 'star' },
+    { id: 'anilar', title: 'Anılar Kanadı', sub: 'Masalımız, sohbetlerimiz, Bakü\'deki izlerin, portrelerin, o gecenin gökyüzü ve bizim şarkımız', color: '#F0578F', icon: 'book' },
+    { id: 'kalp', title: 'Kalp Kanadı', sub: 'Mektuplar, sesim, telsizimiz, sebepler, zaman kapsülü ve henüz yaşanmamış o ilk sarılma', color: '#E3174D', icon: 'heart' },
+    { id: 'oyun', title: 'Oyun Kanadı', sub: 'gartic, Angela, Bakü\'ye uçuş, film gecesi, gökyüzü ve müzik kutusu', color: '#3FA37A', icon: 'palette' },
+    { id: 'hazine', title: 'Hazine Kanadı', sub: 'Gazete, günün sorusu, özetimiz, mesafe, sınıf, hayaller, kuponlar, özel günler ve çıkartmalar', color: '#C98A12', icon: 'crown' },
   ];
 
   /* ---------------- Üst çubuk + ana salon + oda kabuğu ---------------- */
@@ -22,6 +23,7 @@
       <header class="topbar">
         <button class="brand" id="brand" aria-label="Ana salona dön">${A.kitty({ cls: 'brand-kitty', label: 'Kitty' })}<span class="brand-name">${K.esc(C.herName)}'in Krallığı</span></button>
         <div class="top-actions">
+          <a class="icon-btn mail-btn" href="#mektuplar" id="mailBtn" hidden aria-label="Yeni mektup var">${A.icon('letter')}<span class="count" id="mailCount">1</span></a>
           <a class="icon-btn" href="#album" aria-label="Çıkartma albümü">${A.icon('sticker')}<span class="count" id="topStickers">0</span></a>
           <button class="icon-btn" id="musicBtn" aria-pressed="false" aria-label="Müzik kutusunu aç ya da kapat">${A.ui('music')}</button>
         </div>
@@ -64,12 +66,14 @@
           <div class="hero-moon" id="heroMoon"></div>
           <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div>
           <div class="islands">${A.island('is1')}${A.island('is2')}${A.island('is3')}</div>
+          <div class="season" id="season"></div>
           <div class="rising">${Array.from({ length: 9 }, (_, i) => `<i style="left:${8 + i * 10.5}%;--d:${(i * 1.7) % 9}s;--x:${(i % 3) - 1}"></i>`).join('')}</div>
         </div>
         <div class="wrap hero-text">
           <p class="hero-clock"><span>${K.esc(C.herCity)} <b id="hBaku">--:--</b></span><span aria-hidden="true">·</span><span>${K.esc(C.myCity)} <b id="hIst">--:--</b></span></p>
           <h1 class="hero-greet"><span class="greet-word" id="greetWord">Merhaba</span><span class="greet-name">Prenses ${K.esc(C.herPet || C.herName)}</span></h1>
           <p class="hero-sub" id="greetSub"></p>
+          <a class="news-chip" id="newsChip" href="#gazete" hidden>${A.icon('news')}<span>Kitty Gazetesi kapına geldi</span></a>
         </div>
         <div class="hero-scene">
           <div class="scene-tower">${A.kizKulesi()}<span class="city-tag">${K.esc(C.myCity)} · <i>${K.esc(C.myPet || C.myNick)}</i></span></div>
@@ -77,6 +81,7 @@
             ${A.garland()}
             <button class="hero-kitty" id="heroKitty" aria-label="Kitty'ye dokun">${A.kitty({ crown: true, cls: 'hk' })}</button>
             <div class="kitty-say" id="kittySay" hidden></div>
+            <div class="kitty-ear" id="kittyEar" hidden></div>
           </div>
           <div class="scene-tower">${A.qizQalasi()}<span class="city-tag">${K.esc(C.herCity)} · <i>${K.esc(C.herPet || C.herNick)}</i></span></div>
           <div class="scene-sea" aria-hidden="true"></div>
@@ -115,6 +120,16 @@
             <p class="note-text" id="noteText"></p>
             <p class="note-sign">— ${K.esc(C.myPet || C.myName || '')}</p>
           </article>
+          <article class="card q-card" id="qCard" hidden>
+            <p class="card-eyebrow">Günün sorusu</p>
+            <p class="q-text" id="qText"></p>
+            <form class="q-form" id="qForm" autocomplete="off">
+              <textarea class="textarea" id="qAns" name="qAns" rows="2" maxlength="400" placeholder="Cevabın bana gelecek..."></textarea>
+              <button class="btn small" type="submit">${A.ui('send')} Gönder</button>
+            </form>
+            <div class="q-done" id="qDone" hidden></div>
+            <a class="q-more" href="#sorular">Bütün sorular ve cevapların</a>
+          </article>
           <article class="card fortune-card">
             <p class="card-eyebrow">Kitty şans kurabiyesi</p>
             <button class="cookie" id="cookie" aria-label="Şans kurabiyesini kır">${cookieSvg()}</button>
@@ -127,14 +142,15 @@
           </article>
         </div>
       </section>
+      <section class="wrap install" id="install" hidden></section>
       <section class="wrap sec castle">
         <h2 class="sec-title">Kalenin <span class="script">kanatları</span></h2>
-        <p class="sec-sub">Dört kanat, yirmiden fazla oda. Bazı kapılar sadece özel günlerde, bazıları sadece gece açılıyor, biri de iyi saklanmış. Acele etme; bu kale her gün biraz değişiyor.</p>
+        <p class="sec-sub" id="castleSub">Bazı kapılar sadece özel günlerde, bazıları sadece gece açılıyor, biri de iyi saklanmış. Acele etme; bu kale her gün biraz değişiyor.</p>
         <div id="wings"></div>
       </section>
       <footer class="foot">
         <div class="foot-tags"><span class="gtag">${K.esc(C.herPet || C.herNick)}</span><span class="foot-heart" aria-hidden="true">♥</span><span class="gtag">${K.esc(C.myPet || C.myNick)}</span></div>
-        <p>Bu masal ${T.fmt(C.metDate)}'te bir Instagram grubunda başladı.<br>Peri ${K.esc(C.friendName)}'e sonsuz teşekkürlerle.</p>
+        <p>Bu masal ${T.fmt(C.metDate)}'te bir Instagram grubunda başladı.<br>Devamını her gün birlikte yazıyoruz.</p>
         <p class="foot-small">Bu kaleye <b id="visitCount">1</b>. gelişin · <a href="#album">Çıkartmalar <b id="footStickers">0</b>/${K.stickers.total}</a></p>
         <button class="paw-secret no-burst" id="pawSecret" aria-label="Minicik bir pati izi">${A.icon('paw')}</button>
       </footer>`;
@@ -172,6 +188,8 @@
         <nav class="doors" aria-label="${K.esc(w.title)}">${rooms.map((r) => doorHTML(r, visited)).join('')}</nav>
       </section>`;
     }).join('');
+    const n = K.rooms.filter(visible).length;
+    K.$('#castleSub').textContent = `${WINGS.filter((w) => K.rooms.some((r) => (r.wing || 'hazine') === w.id && visible(r))).length} kanat, ${n} oda. Bazı kapılar sadece özel günlerde, bazıları sadece gece açılıyor, biri de iyi saklanmış. Acele etme; bu kale her gün biraz değişiyor.`;
     initTilt();
   }
   // Masaüstünde kapılar imlece doğru hafifçe eğilir
@@ -236,7 +254,151 @@
     K.$('#noteDate').textContent = `Günün notu · ${p.d} ${K.MONTHS[p.mo - 1]}, ${T.dayName(p)}`;
     K.$('#noteText').textContent = K.fill(K.daily(D.notes));
     dayPhoto();
+    dayQuestion();
+    kittyEar();
+    newsChip();
+    mailbox();
+    seasons();
     updateCounts();
+  }
+
+  /* ---------------- Günün sorusu (cevap onun telefonuna gider) ---------------- */
+  function dayQuestion() {
+    const card = K.$('#qCard');
+    if (!K.questions || !D.questions.length) return;
+    const q = K.questions.today();
+    card.hidden = false;
+    K.$('#qText').textContent = q.text;
+    const a = K.questions.answer(q.i);
+    K.$('#qForm').hidden = Boolean(a);
+    const done = K.$('#qDone');
+    done.hidden = !a;
+    if (a) done.innerHTML = `<p class="hand">"${K.esc(a.a)}"</p><p class="muted small">Cevabın ${K.esc(C.myName)}'e gitti. Yarın yeni bir soru.</p>`;
+  }
+  function initQuestion() {
+    K.$('#qForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ta = K.$('#qAns');
+      const text = ta.value.trim();
+      if (!text) return ta.focus();
+      const q = K.questions.today();
+      await K.questions.save(q.i, text);
+      ta.value = '';
+      K.audio.sfx.success();
+      const r = K.$('#qCard').getBoundingClientRect();
+      K.fx.burst(r.left + r.width / 2, r.top + 40, { count: 12, power: 5 });
+      dayQuestion();
+    });
+  }
+
+  /* ---------------- Kitty'nin kulağındaki ses ---------------- */
+  function kittyEar() {
+    const ear = K.$('#kittyEar');
+    if (!K.voice || !K.voice.any()) return (ear.hidden = true);
+    const h = T.baku().h;
+    const heard = K.voice.heard();
+    const today = T.todayKey();
+    let id = null;
+    if (K.voice.has('ilk-ses') && !heard['ilk-ses']) id = 'ilk-ses';
+    else if (h >= 5 && h < 11 && K.voice.has('gunaydin') && heard.gunaydin !== today) id = 'gunaydin';
+    else if ((h >= 21 || h < 5) && K.voice.has('iyi-geceler') && heard['iyi-geceler'] !== today) id = 'iyi-geceler';
+    else {
+      const special = D.voices.find((v) => v.lock && K.voice.has(v.id) && !heard[v.id]);
+      if (special) id = special.id;
+    }
+    ear.hidden = !id;
+    if (id) ear.innerHTML = `<button class="ear-chip no-burst" data-voice="${id}"><span class="vb-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Kitty'nin kulağında bir ses var</button>`;
+  }
+  K.on('voice-heard', () => kittyEar());
+
+  /* ---------------- Sabah gazetesi ---------------- */
+  function newsChip() {
+    const h = T.baku().h;
+    K.$('#newsChip').hidden = !(D.gazette.headlines.length && h >= 5 && h < 13 && K.store.get('newsRead') !== T.todayKey());
+  }
+
+  /* ---------------- Posta kutusu: sonradan eklenen mektuplar ---------------- */
+  function mailbox() {
+    const ids = D.letters.map((l) => l.id);
+    let known = K.store.get('lettersKnown');
+    if (!known) {
+      known = ids;
+      K.store.set('lettersKnown', known);
+    }
+    const fresh = ids.filter((id) => !known.includes(id));
+    K.newLetters = fresh;
+    const b = K.$('#mailBtn');
+    b.hidden = !fresh.length;
+    K.$('#mailCount').textContent = fresh.length;
+    const sig = fresh.join(',');
+    if (fresh.length && K.store.get('mailToast') !== sig) {
+      K.store.set('mailToast', sig);
+      setTimeout(() => K.fx.toast(`<b>Posta var!</b> Kaleye ${fresh.length} yeni mektup geldi.`, { icon: A.icon('letter'), duration: 5200 }), 3200);
+    }
+  }
+  K.markLettersKnown = () => {
+    K.store.set('lettersKnown', D.letters.map((l) => l.id));
+    mailbox();
+  };
+
+  /* ---------------- Mevsimler: kahraman bölümde yağan şeyler ---------------- */
+  function seasonName() {
+    const p = T.baku();
+    const md = `${K.pad(p.mo)}-${K.pad(p.d)}`;
+    if (md === C.herBirthday) return 'party';
+    if (p.mo === 12 || p.mo <= 2) return 'winter';
+    if (p.mo <= 5) return 'spring';
+    if (p.mo <= 8) return 'summer';
+    return 'autumn';
+  }
+  function seasons() {
+    const box = K.$('#season');
+    const name = seasonName();
+    if (box.dataset.s === name) return;
+    box.dataset.s = name;
+    const r = K.rng(K.hash(name));
+    const n = name === 'party' ? 10 : 16;
+    box.className = 'season s-' + name;
+    box.innerHTML = Array.from({ length: n }, (_, i) => `<i style="left:${(r() * 100).toFixed(1)}%;--d:${(-r() * 14).toFixed(1)}s;--t:${(9 + r() * 9).toFixed(1)}s;--s:${(0.6 + r() * 0.8).toFixed(2)};--x:${Math.round(r() * 80 - 40)}px;--c:${['#FF8FB8', '#FFD34E', '#8FD3FF', '#C9B6FF', '#7ED6A5'][i % 5]}"></i>`).join('');
+    document.body.classList.toggle('winter', name === 'winter');
+    document.body.classList.toggle('party', name === 'party');
+    const moon = A.moonPhase(T.now());
+    document.body.classList.toggle('fullmoon', moon.illum > 0.97);
+  }
+
+  /* ---------------- Telefona kurulum ---------------- */
+  let installEvt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    installEvt = e;
+    installCard();
+  });
+  function installCard() {
+    const box = K.$('#install');
+    if (!box) return;
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+    if (standalone || K.store.get('installHidden') || !(installEvt || ios)) return (box.hidden = true);
+    box.hidden = false;
+    box.innerHTML = `<div class="install-card">
+      <img src="assets/icons/icon-192.png" alt="" width="56" height="56">
+      <div><h3>Kaleyi telefonuna ekle</h3>
+      <p>${installEvt ? 'Ana ekranında Kitty simgesiyle dursun; tek dokunuşla, tam ekran açılsın.' : 'Safari\'de alttaki <b>Paylaş</b> düğmesine, sonra <b>Ana Ekrana Ekle</b>\'ye dokun. Kitty simgesiyle ana ekranında durur.'}</p></div>
+      <div class="install-actions">${installEvt ? '<button class="btn small" id="installGo">Ekle</button>' : ''}<button class="btn ghost small" id="installNo">Sonra</button></div>
+    </div>`;
+    const go = K.$('#installGo');
+    go &&
+      go.addEventListener('click', async () => {
+        installEvt.prompt();
+        const r = await installEvt.userChoice.catch(() => null);
+        installEvt = null;
+        if (r && r.outcome === 'accepted') K.fx.confetti({ count: 80 });
+        box.hidden = true;
+      });
+    K.$('#installNo').addEventListener('click', () => {
+      K.store.set('installHidden', true);
+      box.hidden = true;
+    });
   }
   function dayPhoto() {
     const card = K.$('#photoCard');
@@ -308,6 +470,7 @@
             <div class="actions" style="justify-content:center">
               ${letter ? `<button class="btn" data-letter="${letter.id}">${A.ui('heart')} "${K.esc(letter.title)}"</button>` : ''}
               ${room ? `<button class="btn soft" data-room="${room.id}">${K.esc(K.val(room.title))} odasına git</button>` : ''}
+              ${m.voice && K.voice ? K.voice.btn(m.voice, `${C.myPet}'un sesini dinle`) : ''}
             </div></div>`,
         });
         if (m.breathe) breathe(md);
@@ -399,6 +562,11 @@
   K.go = go;
   function route() {
     const id = decodeURIComponent(location.hash.slice(1));
+    const door = K.rooms.find((r) => r.id === id && r.unlockByLink);
+    if (door && !visible(door)) {
+      door.unlockByLink();
+      renderDoors();
+    }
     const room = K.rooms.find((r) => r.id === id && visible(r));
     if (room) openRoom(room);
     else closeRoom();
@@ -522,17 +690,23 @@
     if (C.firstMeetDate && T.todayKey() === C.firstMeetDate)
       out.push({ icon: 'hugs', title: 'Bugün o gün!', text: 'Aylarca ekranlardan sevdiğin kişi bugün karşında olacak. İlk Sarılma odasındaki mühürlü mektubun şifresini ondan iste.', room: 'ilk-sarilma', big: true });
     if (md === C.herBirthday)
-      out.push({ icon: 'cake', title: `İyi ki doğdun, Prenses ${C.herPet}!`, text: 'Bugün 23 Nisan. Özel Günler odasında mumlarını bekleyen bir pasta, Mektuplar odasında açılmayı bekleyen bir mektup var.', room: 'ozel', big: true });
+      out.push({ icon: 'cake', title: `İyi ki doğdun, Prenses ${C.herPet}!`, text: 'Bugün senin günün. Doğum Günü Sarayı açıldı: 23 hediye kutusu, mumlarını bekleyen bir pasta ve açılmayı bekleyen bir mektup.', room: 'saray', big: true });
     if (md === C.togetherDate.slice(5) && years > 0)
       out.push({ icon: 'heart', title: `Mutlu ${years}. yıldönümümüz!`, text: `Tam ${years} yıl önce bugün masalımızın adı kondu. Mektuplar odasında yıldönümü mektubun açıldı.`, room: 'mektuplar', big: true });
     else if (p.d === +C.togetherDate.slice(8) && T.monthsTogether() > 0)
-      out.push({ icon: 'calendar', title: `Bugün ${T.monthsTogether()}. ayımız!`, text: 'Her ayın 21\'i bizim küçük bayramımız. Kutlu olsun, şirinim.', room: 'ozel' });
+      out.push({ icon: 'story', title: `Bugün ${T.monthsTogether()}. ayımız!`, text: 'Her ayın 21\'i bizim küçük bayramımız. Bu ayın özeti hazır; bir hikâye gibi izle.', room: 'ozet' });
     if (C.notesDate && md === C.notesDate.slice(5) && p.y > +C.notesDate.slice(0, 4))
       out.push({ icon: 'note', title: 'Not duvarının yıldönümü', text: `${p.y - +C.notesDate.slice(0, 4)} yıl önce bugün ${C.herCity}'de bir duvara ikimizin adını yazdın. Daha sevgili bile değildik.`, room: 'izler', big: true });
     if (md === C.myBirthday)
-      out.push({ icon: 'cake', title: `Bugün ${C.myName}'nın doğum günü!`, text: 'Mektuplar odasında senin için bir mektup açıldı. Bir de ona "iyi ki doğdun" yazmayı unutma; ilk mesajı sen atacaktın, anlaşmıştık.', room: 'mektuplar', big: true });
+      out.push({ icon: 'party', title: `Bugün ${C.myName}'nın doğum günü!`, text: 'Ters Kale açık: Ona kendi kartını hazırla ve gönder. Mektuplar odasında da senin için bir mektup açıldı.', room: 'ters', big: true });
+    else if (T.nextAnnual(C.myBirthday).days <= 7)
+      out.push({ icon: 'party', title: `${T.nextAnnual(C.myBirthday).days} gün sonra ${C.myName}'nın doğum günü`, text: 'Kale bu hafta ters döndü: Bu sefer sürprizi sen hazırlıyorsun. Ters Kale\'ye gir, ona bir kart tasarla.', room: 'ters' });
     if (md === C.metDate.slice(5) && p.y > +C.metDate.slice(0, 4))
-      out.push({ icon: 'letter', title: 'Tanışma yıldönümümüz!', text: `${p.y - +C.metDate.slice(0, 4)} yıl önce bugün ${C.friendName} bizi aynı gruba ekledi.`, room: 'mektuplar', big: true });
+      out.push({ icon: 'letter', title: 'Tanışma yıldönümümüz!', text: `${p.y - +C.metDate.slice(0, 4)} yıl önce bugün aynı gruba eklendik. Kış Takvimi\'nin ilk kapısı ve bir mektup seni bekliyor.`, room: 'kis', big: true });
+    else if (p.mo === 12 && p.d > 6) out.push({ icon: 'snow', title: 'Kış Takvimi\'nde bugünün kapısı açıldı', text: 'Her gün bir kapı, yılın son gününe kadar.', room: 'kis' });
+    const moon = A.moonPhase(T.now());
+    if (moon.illum > 0.97)
+      out.push({ icon: 'moon', title: 'Bu gece dolunay', text: 'Başını kaldır ve aya bak. Aynı ay İstanbul\'dan da görünüyor. Mektuplar odasında dolunay mektubun açıldı.', room: 'mektuplar', action: 'moon' });
     if (md === '02-14') out.push({ icon: 'heart', title: 'Sevgililer Günü', text: 'Bugün sevgililer günüymüş. Bizim için her gün öyle ama yine de kutlu olsun.', room: 'son' });
     if (md === '01-01') out.push({ icon: 'star', title: 'Mutlu yıllar!', text: 'Yeni yılın ilk mesajı senin olsun. Bu yıl ilk sarılmamızın yılı olsun.', room: 'ilk-sarilma' });
     if (md === '11-01') out.push({ icon: 'bow', title: 'Bugün Hello Kitty\'nin doğum günü!', text: 'Kitty White bugün bir yaş daha büyüdü. Puantiyeli fiyonkunu ona ithaf et.', room: 'album' });
@@ -549,9 +723,17 @@
     box.innerHTML = list
       .map(
         (s) => `<div class="special-card">${A.icon(s.icon)}<div><h3>${K.esc(s.title)}</h3><p>${K.esc(s.text)}</p>
-          <a class="btn small" href="#${s.room}">Hemen git</a></div></div>`
+          <div class="special-actions"><a class="btn small" href="#${s.room}">Hemen git</a>${s.action === 'moon' ? `<button class="btn soft small" data-moon>${A.ui('heart')} Şu an aya bakıyorum</button>` : ''}</div></div></div>`
       )
       .join('');
+    const mb = K.$('[data-moon]', box);
+    mb &&
+      mb.addEventListener('click', async () => {
+        K.stickers.award('aykardesi');
+        K.fx.rain({ count: 40, shapes: ['star', 'heart'], colors: ['#FFF4C7', '#FFFFFF', '#C9B6FF'] });
+        const ok = await K.notify(`${C.herName} şu an aya bakıyor`, 'Sen de başını kaldır. Aynı ay, iki pencere.', ['crescent_moon']);
+        K.fx.toast(ok ? `${C.myName}'e haber verildi. O da şimdi aya bakıyor.` : 'Ay ikinizi de görüyor.', { icon: A.icon('moon') });
+      });
     const key = 'special-' + T.todayKey();
     if (!K.store.get(key)) {
       K.store.set(key, true);
@@ -672,8 +854,12 @@
     initHeroKitty();
     initNav();
     initKeys();
+    initQuestion();
+    installCard();
     K.fx.ambient();
     renderSpecials();
+    if ('serviceWorker' in navigator && location.protocol === 'https:' && !K.previewDate) navigator.serviceWorker.register('sw.js').catch(() => {});
+    K.emit('built');
     dayCount = visits();
     setInterval(tick, 1000);
     setInterval(() => {

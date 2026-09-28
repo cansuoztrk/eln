@@ -26,6 +26,8 @@ window.ELN = {
       'Son ipucu: İkimizin şirin adları, arada bir kalp.',
     ],
     ntfyTopic: '',
+    liveTopic: '',
+    voiceFiles: {},
   },
   // Aşağıdakiler kasadan dolar
   story: [],
@@ -57,4 +59,14 @@ window.ELN = {
   finalQuestion: '',
   noButtonTexts: ['Hayır'],
   secretLetter: [],
+  voices: [],
+  questions: [],
+  gazette: { headlines: [], stars: [], tips: [] },
+  advent: [],
+  birthdayGifts: [],
+  skies: [],
+  films: [],
+  giftDoor: { title: '', body: [], sign: '' },
+  wrapClosers: [],
+  capsules: [],
 };

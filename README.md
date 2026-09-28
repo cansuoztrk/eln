@@ -4,7 +4,7 @@
 
 İstanbul'un bir **Kız Kulesi**, Bakü'nün bir **Qız Qalası** var; aradaki 1.758 kilometre bu kalede kapanıyor. Siteye Hello Kitty'nin puantiyeli fiyonkuna dokunarak girilir; içeride dört kanatlı, yirmiden fazla odalı pembe bir kale var.
 
-Kurulum, sunucu ya da derleme gerekmez: düz HTML/CSS/JavaScript. Bütün çizimler kodla (SVG) çizildi, müzik ve sesler tarayıcıda üretiliyor.
+Telefona uygulama gibi kurulabilir (ana ekranda Kitty simgesi, çevrimdışı açılış). Kurulum, sunucu ya da derleme gerekmez: düz HTML/CSS/JavaScript. Bütün çizimler kodla (SVG) çizildi, müzik ve sesler tarayıcıda üretiliyor.
 
 ---
 
@@ -59,12 +59,26 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **İlk Sarılma**: İki Kitty'nin birbirine yaklaştığı sahne, geri sayım (tarih yoksa Eln hayalindeki tarihi seçer), **Sarılma Bankası** (borç her gün artar), o günün programı, bavul listesi ve ilk buluşmada şifresi söylenecek **mühürlü mektup**.
 - **Son Sayfa**: Uzun bir mektup ve kaçan "Hayır" düğmesi.
 
-**Oyun Kanadı**: Gartic Odası, Angela'nın Odası, Bakü'ye Uç (mini oyun), Dilek Gökyüzü, Müzik Kutusu.
+- **O Gecenin Gökyüzü** (Anılar): Özel gecelerin gerçek yıldız haritaları (gerçek yıldız ve ay konumları hesaplanır). Boğa ve Akrep takımyıldızları pembe. Poster olarak kaydedilebilir.
+- **Sesim** (Kalp): Sesli notlar. Ses dosyası eklenene kadar görünmez. Sabahları "günaydın", geceleri "iyi geceler" Kitty'nin kulağında belirir; ruh hâli pencerelerinde, mektuplarda, Sarılma Bankası'nda ses düğmeleri çıkar. Çalarken yazı sesle birlikte ilerler.
+- **Kale Telsizi** (Kalp): Canlı kanal. Senin telefonundan yazdığın mesaj Eln'in ekranında anında belirir; "kalp", "sarıl", "öp", "günaydın", "iyi geceler" kelimeleri kalenin havasını değiştirir (kalp yağmuru, titreşimli sarılma...). Eln de buradan kalp, sarılma, yazı ve **sesli not** gönderir.
+- **Zaman Kapsülü** (Kalp): Geleceğe mektuplar; açılış gününe kadar mühürlü. Senin iki kapsülün de içinde.
+- **Hediye Kapısı** (gizli): Sadece `…/#hediye-kutusu` adresiyle (ör. bir hediye kartındaki QR ile) açılır.
 
-**Hazine Kanadı**: Boğaz'dan Hazar'a (harita, saatler, hava, sanal sarılma), Öğretmen Eln'in Sınıfı (sözlük, **Azerbaycanca defter** ve "bana kelime öğret", ödev, aşk sınavı), Hayal Listesi, Aşk Kuponları, Özel Günler, Çıkartma Albümü ve **iyi saklanmış gizli bir kulübe**.
+**Oyun Kanadı**: Gartic Odası, Angela'nın Odası, Bakü'ye Uç (mini oyun), **Film Gecesi** (davet, ortak geri sayım, puan kartı), Dilek Gökyüzü, Müzik Kutusu.
+
+**Hazine Kanadı**: **Kitty Gazetesi** (her sabah yeni sayı: manşet, iki şehrin havası, Boğa & Akrep falı, bulmaca), **Soru Kutusu** (her gün bir soru; cevap sana gelir), **Bizim Özetimiz** (Wrapped tarzı hikâye), Boğaz'dan Hazar'a, Öğretmen Eln'in Sınıfı (sözlük, Azerbaycanca defter, ödev, aşk sınavı), Hayal Listesi, Aşk Kuponları, Özel Günler, Çıkartma Albümü ve **iyi saklanmış gizli bir kulübe** (içindeki dost her gün mamayla büyür: 5 seviye, seri, aksesuarlar).
+
+**Bu Günlere Özel** (sadece o tarihlerde görünür):
+- **Ters Kale**: Senin doğum gününden önceki hafta açılır; Eln sana kart tasarlar ve gönderir.
+- **Kış Takvimi**: 6–31 Aralık, her gün bir kapı (mektup, soru, kupon, fotoğraf).
+- **Doğum Günü Sarayı**: 23 Nisan haftası; o gün 23 hediye kutusu açılır.
 
 ### Kendiliğinden değişenler
 - İlk girişte bir kez oynayan **açılış filmi** (yıldızlı gece, iki şehir arasında uzayan bir iplik).
+- **Mevsimler**: Kahraman bölümde kışın kar, baharda yaprak, yazın ateş böceği, sonbaharda yaprak, doğum gününde balon.
+- **Posta kutusu**: Sonradan eklediğin mektuplar "Posta var!" diye gelir; Eln bir mektubu ilk kez açtığında sana bildirim düşer.
+- **Hava ve aya bağlı mektuplar**: Xəzri esince, Bakü'ye kar yağınca, dolunay gecesi açılanlar. Dolunayda ana salonda "Şu an aya bakıyorum" düğmesi çıkar.
 - Her gün yeni **günün fotoğrafı**, **günün notu** ve **şans kurabiyesi**.
 - Bakü saatiyle 21:00'den sonra **gece modu**: gökyüzü kararır, çiçek adaları parlar.
 - Özel günlerde ana salonda kutlama şeridi ve konfeti.
@@ -79,6 +93,14 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 </details>
 
 ---
+
+## Sesli notları eklemek
+
+Metinler `private/phase3.mjs` → `voices` içinde (her birinin yeri, tonu ve süresi yazılı). Kaydettiğin dosyaları `private/voices/` içine **id ile aynı adla** koy (`gunaydin.m4a`, `iyi-geceler.m4a`, `masal.m4a`...; m4a, mp3, ogg, webm, wav olur) ve `node tools/vault.mjs pack` çalıştır. Sesler de şifrelenir. Dosyası olmayan ses sitede hiç görünmez.
+
+## Kale Telsizi'ni kullanmak
+
+Eln'e canlı mesaj göndermek için tarayıcıda `https://ntfy.sh/<liveTopic>` sayfasını aç (konu adı `private/content.mjs` → `config.liveTopic`) ve mesaj yaz. Eln sitedeyse mesaj anında ekranında belirir; değilse bir sonraki gelişinde (12 saate kadar) görünür. Eln kaleye geldiğinde sana gelen "şu an kalede" bildirimine dokununca da bu sayfa açılır.
 
 ## Ayarlar (`private/content.mjs` → `config`)
 

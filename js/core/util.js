@@ -273,12 +273,12 @@
   };
   // ntfy.sh ile User155'in telefonuna bildirim (config.ntfyTopic boşsa hiçbir şey göndermez)
   K.canNotify = () => Boolean(C.ntfyTopic);
-  K.notify = async (title, message, tags) => {
+  K.notify = async (title, message, tags, extra) => {
     if (!C.ntfyTopic || K.previewDate) return false;
     try {
       const res = await fetch('https://ntfy.sh/', {
         method: 'POST',
-        body: JSON.stringify({ topic: C.ntfyTopic, title, message, tags: tags || ['heart'], priority: 4 }),
+        body: JSON.stringify(Object.assign({ topic: C.ntfyTopic, title, message, tags: tags || ['heart'], priority: 4 }, extra || {})),
       });
       return res.ok;
     } catch (e) {

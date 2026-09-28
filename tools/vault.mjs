@@ -10,6 +10,7 @@
     private/secrets.json     { "gate": ["kapı cevabı", ...], "sealed": { "ilk-sarilma": "şifre" } }
     private/content.mjs      sitenin bütün kişisel içeriği (yoksa private/content.json)
     private/photos/*.jpg     fotoğraflar (ad.jpg ve ad.thumb.jpg)
+    private/voices/*         sesli notlar (ad.m4a / .mp3 / .ogg / .webm / .wav; ad = içerikteki voices[].id)
     private/sealed/*.json    ayrı şifreyle mühürlü mektuplar
 
   Komutlar:
@@ -18,7 +19,7 @@
 
   Şifreleme: AES-GCM 256, anahtar türetme PBKDF2-SHA256.
 */
-import { webcrypto as crypto } from 'node:crypto';
+import { webcrypto as crypto, createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -59,6 +60,29 @@ async function decryptBytes(key, file) {
   return new Uint8Array(await subtle.decrypt({ name: 'AES-GCM', iv: file.slice(0, 12) }, key, file.slice(12)));
 }
 const readJSON = (p, d) => (fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : d);
+const AUDIO = { m4a: 'audio/mp4', mp4: 'audio/mp4', aac: 'audio/aac', mp3: 'audio/mpeg', ogg: 'audio/ogg', oga: 'audio/ogg', opus: 'audio/ogg', webm: 'audio/webm', wav: 'audio/wav' };
+const EXT = { 'audio/mp4': 'm4a', 'audio/aac': 'aac', 'audio/mpeg': 'mp3', 'audio/ogg': 'ogg', 'audio/webm': 'webm', 'audio/wav': 'wav' };
+const sha = (buf) => createHash('sha256').update(buf).digest('hex');
+
+// Değişmeyen dosyaları yeniden şifrelememek için yerel önbellek (private/ içinde, git'e girmez)
+function encryptFiles(content, kid, files, outDir, cache) {
+  const keep = new Set();
+  return Promise.all(
+    files.map(async ({ src, name }) => {
+      keep.add(name);
+      const buf = fs.readFileSync(src);
+      const h = sha(buf) + ':' + kid;
+      const out = path.join(outDir, name);
+      if (cache[out] === h && fs.existsSync(out)) return false;
+      fs.writeFileSync(out, await encryptBytes(content, new Uint8Array(buf)));
+      cache[out] = h;
+      return true;
+    })
+  ).then((r) => {
+    for (const f of fs.readdirSync(outDir)) if (!keep.has(f)) fs.unlinkSync(path.join(outDir, f));
+    return r.filter(Boolean).length;
+  });
+}
 
 async function pack() {
   const secrets = readJSON(path.join(PRIV, 'secrets.json'), null);
@@ -95,21 +119,28 @@ async function pack() {
   const meta = { v: 2, kid, iter: ITER, salt: b64(salt), wraps, sealed: {} };
   const content = await subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
 
+  const cachePath = path.join(PRIV, '.pack-cache.json');
+  const cache = readJSON(cachePath, {});
+  fs.mkdirSync(path.join(OUT, 'a'), { recursive: true });
+
+  // Sesli notlar: hangi seslerin var olduğu içerik verisine de yazılır
+  const voiceDir = path.join(PRIV, 'voices');
+  const voices = fs.existsSync(voiceDir) ? fs.readdirSync(voiceDir).filter((f) => AUDIO[f.split('.').pop().toLowerCase()]) : [];
+  const voiceFiles = {};
+  for (const f of voices) voiceFiles[f.replace(/\.[^.]+$/, '')] = AUDIO[f.split('.').pop().toLowerCase()];
+
   // Özel veri
   const modPath = path.join(PRIV, 'content.mjs');
   const priv = fs.existsSync(modPath) ? (await import(modPath + '?t=' + Date.now())).default : readJSON(path.join(PRIV, 'content.json'), {});
+  priv.config = Object.assign({}, priv.config, { voiceFiles });
   fs.writeFileSync(path.join(OUT, 'private.bin'), await encryptBytes(content, enc.encode(JSON.stringify(priv))));
 
-  // Fotoğraflar
+  // Fotoğraflar ve sesler
   const photoDir = path.join(PRIV, 'photos');
   const photos = fs.existsSync(photoDir) ? fs.readdirSync(photoDir).filter((f) => /\.jpe?g$/i.test(f)) : [];
-  const keep = new Set();
-  for (const f of photos) {
-    const name = f.replace(/\.jpe?g$/i, '') + '.bin';
-    keep.add(name);
-    fs.writeFileSync(path.join(OUT, 'p', name), await encryptBytes(content, new Uint8Array(fs.readFileSync(path.join(photoDir, f)))));
-  }
-  for (const f of fs.readdirSync(path.join(OUT, 'p'))) if (!keep.has(f)) fs.unlinkSync(path.join(OUT, 'p', f));
+  const nP = await encryptFiles(content, kid, photos.map((f) => ({ src: path.join(photoDir, f), name: f.replace(/\.jpe?g$/i, '') + '.bin' })), path.join(OUT, 'p'), cache);
+  const nA = await encryptFiles(content, kid, voices.map((f) => ({ src: path.join(voiceDir, f), name: f.replace(/\.[^.]+$/, '') + '.bin' })), path.join(OUT, 'a'), cache);
+  fs.writeFileSync(cachePath, JSON.stringify(cache));
 
   // Mühürlü mektuplar (her biri kendi şifresiyle)
   meta.sealed = {};
@@ -125,7 +156,7 @@ async function pack() {
     fs.writeFileSync(path.join(OUT, 's', id + '.bin'), await encryptBytes(k, new Uint8Array(fs.readFileSync(path.join(sealedDir, f)))));
   }
   fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2) + '\n');
-  console.log(`Kasa hazır: ${photos.length} fotoğraf, ${sealed.length} mühürlü mektup, özel veri ${Object.keys(priv).length} bölüm.`);
+  console.log(`Kasa hazır: ${photos.length} fotoğraf (${nP} yenilendi), ${voices.length} sesli not (${nA} yenilendi), ${sealed.length} mühürlü mektup, özel veri ${Object.keys(priv).length} bölüm.`);
 }
 
 async function unpack() {
@@ -149,6 +180,15 @@ async function unpack() {
   for (const f of fs.readdirSync(path.join(OUT, 'p'))) {
     const bytes = await decryptBytes(content, new Uint8Array(fs.readFileSync(path.join(OUT, 'p', f))));
     fs.writeFileSync(path.join(PRIV, 'photos', f.replace(/\.bin$/, '.jpg')), bytes);
+  }
+  const vf = (JSON.parse(fs.readFileSync(path.join(PRIV, 'content.json'), 'utf8')).config || {}).voiceFiles || {};
+  if (fs.existsSync(path.join(OUT, 'a'))) {
+    fs.mkdirSync(path.join(PRIV, 'voices'), { recursive: true });
+    for (const f of fs.readdirSync(path.join(OUT, 'a'))) {
+      const id = f.replace(/\.bin$/, '');
+      const bytes = await decryptBytes(content, new Uint8Array(fs.readFileSync(path.join(OUT, 'a', f))));
+      fs.writeFileSync(path.join(PRIV, 'voices', id + '.' + (EXT[vf[id]] || 'm4a')), bytes);
+    }
   }
   const secrets = { gate: pass, sealed: {} };
   for (const id of Object.keys(meta.sealed || {})) {

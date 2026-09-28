@@ -250,6 +250,7 @@
             <a class="btn" href="#ozel">Sıradaki sayfalar: Özel Günler</a>
             <a class="btn soft" href="#son">Son sayfaya git</a>
             <button class="btn ghost" id="bkFilm">${A.ui('play')} Açılış filmini tekrar izle</button>
+            ${K.voice ? K.voice.btn('masal', 'Masalı benim sesimden dinle') : ''}
           </div>
         </div>`;
       K.$('#bkPrev').addEventListener('click', () => goTo(page - 1));

@@ -67,7 +67,7 @@
       .map((w) => `<li class="az-e hw"><div class="az-w"><b>${K.esc(w.az)}</b><button class="say" data-lang="az" data-t="${K.esc(w.az)}" aria-label="Dinle">AZ</button></div><p class="az-tr">${K.esc(w.tr)}</p><p class="az-said muted">Öğretmenimin verdiği ödev · ${K.time.fmtShort(w.date)}</p></li>`)
       .join('');
     return `<div class="az-book">
-        <div class="az-cover"><span>Azərbaycan dili</span><b>${K.esc(C.myName)}'in defteri</b><small>Öğretmen: ${K.esc(C.herPet)}</small></div>
+        <div class="az-cover"><span>Azərbaycan dili</span><b>${K.esc(C.myName)}'in defteri</b><small>Öğretmen: ${K.esc(C.herPet)}</small>${K.voice ? K.voice.btn('sevirem', 'Telaffuzumu dinle (gülme)') : ''}</div>
         <ol class="az-list">${D.azNotebook.map(entry).join('')}${mine}</ol>
       </div>
       <form class="card az-teach" id="azTeach" autocomplete="off">

@@ -97,6 +97,17 @@
       }
       return urls[file];
     },
+    // Şifreli sesli notu çözüp çalınabilir bir adres döndürür
+    async audio(id) {
+      if (!key) throw new Error('kasa-kilitli');
+      const mime = ((V.data && V.data.config && V.data.config.voiceFiles) || {})[id];
+      if (!mime) throw new Error('ses-yok');
+      const file = 'a:' + id;
+      if (!urls[file]) {
+        urls[file] = (async () => URL.createObjectURL(new Blob([await decrypt(key, await fetchBytes('a/' + id + '.bin'))], { type: mime })))();
+      }
+      return urls[file];
+    },
     // <img data-vault="ad" data-thumb> etiketlerini doldurur
     fill(root) {
       if (!V.ok) return;
