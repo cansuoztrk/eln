@@ -7,7 +7,7 @@
   bunları tarayıcıda çözer.
 
   Kaynak klasör (git'e GİRMEZ, .gitignore'da):
-    private/secrets.json     { "gate": ["kapı cevabı", ...], "sealed": { "ilk-sarilma": "şifre" } }
+    private/secrets.json     { "gate": ["kapı cevabı", ...], "owner": ["kale sahibinin şifresi"], "sealed": { "ilk-sarilma": "şifre" } }
     private/content.mjs      sitenin bütün kişisel içeriği (yoksa private/content.json)
     private/photos/*.jpg     fotoğraflar (ad.jpg ve ad.thumb.jpg)
     private/voices/*         sesli notlar (ad.m4a / .mp3 / .ogg / .webm / .wav; ad = içerikteki voices[].id)
@@ -91,7 +91,8 @@ async function pack() {
   fs.mkdirSync(path.join(OUT, 's'), { recursive: true });
 
   // Kapı şifreleri (birden fazla olabilir). Hepsi aynı tuzla türetilir, her biri içerik anahtarını ayrı sarar.
-  const passes = [].concat(secrets.gate);
+  const passes = [].concat(secrets.gate, secrets.owner || []);
+  const roles = passes.map((_, i) => (i < [].concat(secrets.gate).length ? 'her' : 'me'));
   const metaPath = path.join(OUT, 'keys.json');
   const old = readJSON(metaPath, null);
   let raw = null;
@@ -116,7 +117,7 @@ async function pack() {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const wraps = [];
   for (const p of passes) wraps.push(b64(await encryptBytes(await deriveKey(p, salt), raw)));
-  const meta = { v: 2, kid, iter: ITER, salt: b64(salt), wraps, sealed: {} };
+  const meta = { v: 2, kid, iter: ITER, salt: b64(salt), wraps, roles, sealed: {} };
   const content = await subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
 
   const cachePath = path.join(PRIV, '.pack-cache.json');

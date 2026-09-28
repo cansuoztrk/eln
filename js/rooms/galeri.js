@@ -22,7 +22,8 @@
   const uploads = () => K.store.get('wallPhotos', []);
 
   function items() {
-    const photos = D.photos.map((p, i) => ({ kind: 'photo', id: 'p' + i, src: p.src, vault: p.vault, caption: p.caption || '', date: p.date || '' }));
+    const live = (D.cloudPhotos || []).slice().reverse().map((p, i) => ({ kind: 'photo', id: 'cp' + i, src: p.img, caption: p.caption || '', date: p.date || '' }));
+    const photos = live.concat(D.photos.map((p, i) => ({ kind: 'photo', id: 'p' + i, src: p.src, vault: p.vault, caption: p.caption || '', date: p.date || '' })));
     const mine = uploads().map((p) => ({ kind: 'upload', id: 'u' + p.id, src: p.img, caption: p.caption || '', date: p.date, uid: p.id }));
     const draws = K.store.get('drawings', []).map((d) => ({ kind: 'drawing', id: 'd' + d.id, src: d.img, caption: d.prompt || 'Çizimim', date: d.date }));
     const cards = MEMORIES().map((m, i) => ({ kind: 'scene', id: 's' + i, scene: m.scene, caption: m.caption, date: m.date || '' }));

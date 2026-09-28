@@ -1,5 +1,5 @@
 /* Eln'in Krallığı — çevrimdışı çalışma. Önce ağ, ağ yoksa son kaydedilen hâl. */
-const CACHE = 'eln-kale-v3';
+const CACHE = 'eln-kale-v4';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/vault/keys.json', 'assets/vault/private.bin'];
 
 self.addEventListener('install', (e) => {

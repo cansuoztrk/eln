@@ -54,7 +54,7 @@
         K.go('telsiz');
       });
     }
-    K.$('.tz-pop-from', pop).textContent = `${C.myPet} · telsiz · ${T.hm(C.tzBaku)}`;
+    K.$('.tz-pop-from', pop).textContent = `${K.otherName()} · telsiz · ${T.hm(C.tzBaku)}`;
     K.$('.tz-pop-msg', pop).textContent = m.title ? `${m.title}: ${m.text}` : m.text;
     pop.classList.remove('in');
     void pop.offsetWidth;
@@ -121,6 +121,7 @@
   function status(on) {
     const s = root && K.$('#tzStatus', root);
     if (!s) return;
+    on = on || Boolean(K.cloud && K.cloud.enabled);
     s.classList.toggle('on', on);
     s.textContent = on ? 'Kanal açık' : 'Kanal bekleniyor';
   }
@@ -136,8 +137,26 @@
     K.notify(`${C.herName} şu an kalede`, 'Telsizden bir mesaj gönder; ekranında anında belirir. (Bu bildirime dokun.)', ['castle'], { click: liveUrl(), priority: 3 });
   }
 
+  // Bulut varsa telsiz iki yönlü ve kalıcı: kayıtlar ikisinde de görünür
+  K.on('cloud', async (on) => {
+    if (!on) return;
+    const mineW = K.isOwner() ? 'me' : 'her';
+    const rows = await K.cloud.list('live', 80);
+    const list = inbox();
+    rows.forEach((r) => {
+      const id = 'c' + r.id;
+      if (!list.some((x) => x.id === id)) list.push({ id, t: r.at, dir: r.who === mineW ? 'out' : 'in', text: r.data.text, seen: true });
+    });
+    list.sort((a, b) => b.t - a.t);
+    K.store.set('liveInbox', list.slice(0, 80));
+    K.cloud.on('live', (r) => {
+      if (r.who === mineW) return;
+      receive({ id: 'c' + r.id, time: r.at / 1000, message: r.data.text }, true);
+    });
+  });
+
   K.on('built', () => {
-    if (!C.liveTopic || K.previewDate) return;
+    if (!C.liveTopic || K.previewDate || K.isOwner()) return;
     poll();
     listen();
     presence();
@@ -152,9 +171,19 @@
 
   /* ---------------- Oda ---------------- */
   async function send(text, tags, effect) {
-    const ok = await K.notify(`Telsiz · ${C.herName}`, text, tags, { click: liveUrl() });
+    let ok = false;
+    let id = 'o' + Date.now();
+    if (K.cloud.enabled) {
+      const r = await K.cloud.add('live', { text });
+      if (r) {
+        ok = true;
+        id = 'c' + r.id;
+      }
+    }
+    const pushed = await K.notify(`Telsiz · ${C.herName}`, text, tags, { click: liveUrl() });
+    ok = ok || pushed;
     const list = inbox();
-    list.unshift({ id: 'o' + Date.now(), t: Date.now(), dir: 'out', text, ok });
+    list.unshift({ id, t: Date.now(), dir: 'out', text, ok });
     K.store.set('liveInbox', list.slice(0, 80));
     K.stickers.award('telsiz');
     play(effect || effectOf(text));
@@ -169,10 +198,10 @@
           .slice(0, 40)
           .map((m) => {
             const p = T.baku(new Date(m.t));
-            return `<li class="tz-m ${m.dir}"><p>${K.esc(m.title ? m.title + ': ' : '')}${K.esc(m.text)}</p><span>${m.dir === 'in' ? K.esc(C.myPet) : 'Sen'} · ${p.d} ${K.MONTHS[p.mo - 1].slice(0, 3)} ${K.pad(p.h)}:${K.pad(p.mi)}${m.dir === 'out' && m.ok === false ? ' · gönderilemedi' : ''}</span></li>`;
+            return `<li class="tz-m ${m.dir}"><p>${K.esc(m.title ? m.title + ': ' : '')}${K.esc(m.text)}</p><span>${m.dir === 'in' ? K.esc(K.otherName()) : 'Sen'} · ${p.d} ${K.MONTHS[p.mo - 1].slice(0, 3)} ${K.pad(p.h)}:${K.pad(p.mi)}${m.dir === 'out' && m.ok === false ? ' · gönderilemedi' : ''}</span></li>`;
           })
           .join('')
-      : `<li class="tz-empty">Henüz telsiz sessiz. ${K.esc(C.myPet)} bir mesaj yolladığında burada, ekranının köşesinde anında belirecek.</li>`;
+      : `<li class="tz-empty">Henüz telsiz sessiz. ${K.esc(K.otherName())} bir mesaj yolladığında burada, ekranının köşesinde anında belirecek.</li>`;
     const changed = list.some((m) => m.dir === 'in' && !m.seen);
     if (changed && K.activeRoom === 'telsiz') {
       list.forEach((m) => (m.seen = true));
@@ -212,7 +241,7 @@
         const url = URL.createObjectURL(blob);
         box.classList.remove('rec');
         btn.innerHTML = `${A.ui('mic')} Yeniden kaydet`;
-        out.innerHTML = `<audio controls src="${url}"></audio><div class="actions"><button class="btn small" id="tzRecSend">${A.ui('send')} ${K.esc(C.myPet)}'a gönder</button></div>`;
+        out.innerHTML = `<audio controls src="${url}"></audio><div class="actions"><button class="btn small" id="tzRecSend">${A.ui('send')} ${K.esc(K.otherName())}'a gönder</button></div>`;
         K.$('#tzRecSend', out).addEventListener('click', async () => {
           const ext = (blob.type.includes('mp4') ? 'm4a' : blob.type.includes('ogg') ? 'ogg' : 'webm');
           const file = new File([blob], `${K.norm(C.herPet).replace(/ /g, '')}-sesli-not.${ext}`, { type: blob.type });
@@ -243,7 +272,7 @@
     id: 'telsiz',
     wing: 'kalp',
     title: 'Kale Telsizi',
-    sub: () => (C.liveTopic ? `${C.myPet} ile canlı kanal` : 'Canlı kanal'),
+    sub: () => (C.liveTopic || (K.cloud && K.cloud.enabled) ? `${K.otherName()} ile canlı kanal` : 'Canlı kanal'),
     icon: 'radio',
     color: '#FFD6E5',
     badge: () => (unread() ? `${unread()} yeni` : ''),
@@ -257,17 +286,17 @@
               <div class="tz-screen"><span class="tz-status" id="tzStatus">Kanal bekleniyor</span><b>${K.esc(C.herPet)} ↔ ${K.esc(C.myPet)}</b></div>
               <div class="tz-grill" aria-hidden="true">${'<i></i>'.repeat(12)}</div>
             </div>
-            <p class="room-intro">Bu telsiz iki telefonu birbirine bağlıyor. ${K.esc(C.myPet)} telefonundan bir şey yazdığında kalede anında belirir; "kalp", "sarıl", "öp", "günaydın" gibi kelimeler kalenin havasını da değiştirir. Sen de aşağıdan ona dokunuşlar yolla.</p>
+            <p class="room-intro">Bu telsiz iki telefonu birbirine bağlıyor. ${K.esc(K.otherName())} bir şey yazdığında ekranında anında belirir; "kalp", "sarıl", "öp", "günaydın" gibi kelimeler kalenin havasını da değiştirir. Sen de aşağıdan ona dokunuşlar yolla.</p>
           </div>
           <div class="tz-quick">${QUICK.map(([id, label]) => `<button class="tz-q" data-q="${id}">${label}</button>`).join('')}</div>
           <form class="row tz-form" id="tzForm" autocomplete="off"><input class="input" id="tzText" name="tzText" maxlength="300" placeholder="Telsizden bir şey yaz..."><button class="btn" type="submit">${A.ui('send')} Gönder</button></form>
           <ol class="tz-chat" id="tzChat"></ol>
           <section class="card tz-rec" id="tzRec">
-            <p class="card-eyebrow">${K.esc(C.myPet)}'a sesli not</p>
+            <p class="card-eyebrow">${K.esc(K.otherName())}'a sesli not</p>
             <div class="row"><button class="btn red" id="tzRecBtn" type="button">${A.ui('mic')} Kaydet</button><span class="tz-rec-dot"></span><span class="tnum" id="tzRecTime">0:00</span></div>
             <div id="tzRecOut"></div>
           </section>
-          <label class="tz-presence"><input type="checkbox" id="tzPresence" ${K.store.get('presence', true) ? 'checked' : ''}> Kaleye geldiğimde ${K.esc(C.myPet)}'a haber ver</label>
+          ${K.isOwner() ? '' : `<label class="tz-presence"><input type="checkbox" id="tzPresence" ${K.store.get('presence', true) ? 'checked' : ''}> Kaleye geldiğimde ${K.esc(C.myPet)}'a haber ver</label>`}
         </div>`;
       K.$('.tz-quick', el).addEventListener('click', (e) => {
         const b = e.target.closest('[data-q]');
@@ -282,9 +311,10 @@
         K.$('#tzText', el).value = '';
         send(t, ['speech_balloon']);
       });
-      K.$('#tzPresence', el).addEventListener('change', (e) => K.store.set('presence', e.target.checked));
+      const pr = K.$('#tzPresence', el);
+      pr && pr.addEventListener('change', (e) => K.store.set('presence', e.target.checked));
       recorder();
-      status(Boolean(es && es.readyState === 1));
+      status(Boolean((es && es.readyState === 1) || (K.cloud && K.cloud.enabled)));
     },
     enter() {
       renderChat();

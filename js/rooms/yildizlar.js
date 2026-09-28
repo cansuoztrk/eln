@@ -236,6 +236,9 @@
     if (r !== 'shared' && r !== 'cancelled') K.download(url, 'o-gecenin-gokyuzu.png');
   }
 
+  // Kale Kitabı da aynı posteri kullanır
+  K.skyPoster = (sk) => poster(sk).svg;
+
   K.room({
     id: 'yildizlar',
     wing: 'anilar',

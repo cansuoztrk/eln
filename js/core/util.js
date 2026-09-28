@@ -168,6 +168,9 @@
   };
   // Sarılma borcu: birlikte geçen her gün bir sarılma + uzaktan gönderilen her sarılma
   K.hugDebt = () => Math.max(0, T.daysSince(C.togetherDate)) + K.store.get('hugs', 0);
+  // Kale sahibi (Arda) kendi şifresiyle girdiyse
+  K.isOwner = () => Boolean(K.vault && K.vault.who === 'me');
+  K.otherName = () => (K.isOwner() ? C.herPet : C.myPet);
   // Oda başlıkları metin ya da fonksiyon olabilir
   K.val = (v) => (typeof v === 'function' ? v() : v);
 
@@ -202,6 +205,26 @@
   K.daily = (arr, salt = 0) => arr[(T.dayNumber(T.now()) + salt) % arr.length];
 
   /* ---------- Türkçe/Azerbaycanca metin karşılaştırma ---------- */
+  // Türkçe ek, ünlü uyumuyla: K.ek('Arda', 'in') → Arda'nın, K.ek('Bakü', 'e') → Bakü'ye
+  K.ek = (w, t) => {
+    const s = String(w || '');
+    const low = s.toLocaleLowerCase('tr');
+    const vs = low.match(/[aeıioöuü]/g) || ['e'];
+    const v = vs[vs.length - 1];
+    const endV = /[aeıioöuü]$/.test(low);
+    const two = 'aıou'.includes(v) ? 'a' : 'e';
+    const four = { a: 'ı', ı: 'ı', o: 'u', u: 'u', e: 'i', i: 'i', ö: 'ü', ü: 'ü' }[v];
+    const hard = /[çfhkpsşt]$/.test(low);
+    const x = {
+      in: (endV ? 'n' : '') + four + 'n',
+      e: (endV ? 'y' : '') + two,
+      i: (endV ? 'y' : '') + four,
+      de: (hard ? 't' : 'd') + two,
+      den: (hard ? 't' : 'd') + two + 'n',
+      le: (endV ? 'y' : '') + 'l' + two,
+    }[t];
+    return `${s}'${x == null ? t : x}`;
+  };
   K.norm = (s) =>
     String(s)
       .toLocaleLowerCase('tr')

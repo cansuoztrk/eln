@@ -119,7 +119,7 @@
         K.stickers.award('kapsul');
         render();
         const ok = await K.notify(`${C.herName} bir zaman kapsülü gömdü`, `Açılış: ${T.fmt(di.value)}\nBaşlık: ${title}\n\n${text}`, ['hourglass_flowing_sand']);
-        K.fx.toast(ok ? `Kavanoz kapandı. Kopyası ${K.esc(C.myName)}'de saklanıyor.` : 'Kavanoz kapandı.', { icon: A.icon('jar') });
+        K.fx.toast(ok ? `Kavanoz kapandı. Kopyası ${K.esc(K.ek(C.myName, 'de'))} saklanıyor.` : 'Kavanoz kapandı.', { icon: A.icon('jar') });
       });
       K.$('#kcList', el).addEventListener('click', (e) => {
         const b = e.target.closest('[data-read]');

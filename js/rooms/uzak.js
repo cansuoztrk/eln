@@ -212,7 +212,7 @@
       sendHeartOnMap();
       if (K.canNotify()) {
         const ok = await K.notify(`${C.herName} seni düşünüyor`, `Bugün ${s.n}. kez. Kalbi Bakü'den İstanbul'a uçtu.`, ['heart', 'sparkles']);
-        K.fx.toast(ok ? `Kalbin ${C.myCity}'a ulaştı, ${C.myName}'in telefonu titredi.` : 'Kalbin yola çıktı ama şu an ulaşamadı. Biraz sonra tekrar dene.', { icon: A.icon('heart') });
+        K.fx.toast(ok ? `Kalbin ${C.myCity}'a ulaştı, ${K.ek(C.myName, 'in')} telefonu titredi.` : 'Kalbin yola çıktı ama şu an ulaşamadı. Biraz sonra tekrar dene.', { icon: A.icon('heart') });
       }
     });
 
@@ -302,7 +302,7 @@
             <p class="card-eyebrow">Seni düşünüyorum butonu</p>
             <button class="think-btn" id="thinkBtn" aria-label="Seni düşünüyorum">${A.ui('heart')}</button>
             <p class="love-note" id="thinkCount"></p>
-            <p class="muted small">${K.canNotify() ? `Her bastığında ${C.myName}'in telefonuna bir kalp gider.` : 'Her bastığında haritada Bakü\'den İstanbul\'a bir kalp uçar.'}</p>
+            <p class="muted small">${K.canNotify() ? `Her bastığında ${K.ek(C.myName, 'in')} telefonuna bir kalp gider.` : 'Her bastığında haritada Bakü\'den İstanbul\'a bir kalp uçar.'}</p>
           </div>
           <div class="card love-card">
             <p class="card-eyebrow">Sanal sarılma</p>

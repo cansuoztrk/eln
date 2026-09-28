@@ -85,7 +85,7 @@
       const r = await K.share({ title: 'Doğum günü kartı', text, file });
       if (r !== 'shared' && r !== 'cancelled') K.download(url, 'dogum-gunu-karti.png');
     }
-    K.fx.toast(ok ? `Kartın ${K.esc(C.myName)}'in telefonuna gitti.` : 'Kart hazır; resmini ona gönderebilirsin.', { icon: A.icon('party') });
+    K.fx.toast(ok ? `Kartın ${K.esc(K.ek(C.myName, 'in'))} telefonuna gitti.` : 'Kart hazır; resmini ona gönderebilirsin.', { icon: A.icon('party') });
   }
 
   K.room({

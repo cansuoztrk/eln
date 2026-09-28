@@ -67,7 +67,7 @@
       K.stickers.award('film');
       K.audio.sfx.chime();
       const ok = await K.notify(`Film gecesi daveti: ${title}`, `${C.herName} seni film gecesine çağırıyor!\nBaşlangıç: ${C.herCity} ${hm(start, C.tzBaku)} · ${C.myCity} ${hm(start, C.tzIstanbul)}\nOynat tuşuna aynı saniyede basın.`, ['clapper', 'popcorn'], { priority: 5 });
-      K.fx.toast(ok ? `Davet ${K.esc(C.myName)}'in telefonunda.` : 'Davet kaydedildi; saati ona yaz.', { icon: A.icon('film') });
+      K.fx.toast(ok ? `Davet ${K.esc(K.ek(C.myName, 'in'))} telefonunda.` : 'Davet kaydedildi; saati ona yaz.', { icon: A.icon('film') });
       render();
     });
   }

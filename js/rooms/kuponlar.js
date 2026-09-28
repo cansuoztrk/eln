@@ -155,11 +155,11 @@
     const text = `${C.herName} bir aşk kuponu kullandı: "${K.fill(c.title)}"${wish ? ` — Dileği: ${wish}` : ''}. ${K.fill(c.text)}`;
     if (K.canNotify()) {
       const ok = await K.notify('Aşk kuponu kullanıldı', text, ['ticket']);
-      if (ok) return K.fx.toast(`Kupon ${C.myName}'e bildirildi. Yerine getirilecek!`, { icon: A.icon('ticket') });
+      if (ok) return K.fx.toast(`Kupon ${K.ek(C.myName, 'e')} bildirildi. Yerine getirilecek!`, { icon: A.icon('ticket') });
     }
     const r = await K.share({ title: 'Aşk kuponu', text });
-    if (r === 'copied') K.fx.toast(`Kupon metni kopyalandı. ${C.myName}'e mesaj olarak gönder, yerine getirilsin.`, { icon: A.icon('ticket') });
-    else if (r !== 'shared') K.fx.toast(`Ekran görüntüsünü alıp ${C.myName}'e gönder, yerine getirilsin.`, { icon: A.icon('ticket') });
+    if (r === 'copied') K.fx.toast(`Kupon metni kopyalandı. ${K.ek(C.myName, 'e')} mesaj olarak gönder, yerine getirilsin.`, { icon: A.icon('ticket') });
+    else if (r !== 'shared') K.fx.toast(`Ekran görüntüsünü alıp ${K.ek(C.myName, 'e')} gönder, yerine getirilsin.`, { icon: A.icon('ticket') });
   }
 
   K.room({

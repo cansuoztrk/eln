@@ -598,7 +598,7 @@
     K.$('#dDownload', root).addEventListener('click', () => K.download(dcv.toDataURL('image/png'), `eln-cizim-${K.time.todayKey()}.png`));
     K.$('#dShare', root).addEventListener('click', async () => {
       const file = await K.dataUrlToFile(dcv.toDataURL('image/png'), 'eln-cizim.png');
-      const r = await K.share({ title: 'Sana bir çizim', text: `${C.herName}'den ${C.myName}'e bir çizim`, file });
+      const r = await K.share({ title: 'Sana bir çizim', text: `${C.herName}'den ${K.ek(C.myName, 'e')} bir çizim`, file });
       if (r === 'failed' || r === 'copied') K.fx.toast('Bu cihaz doğrudan paylaşamıyor. "İndir" ile kaydedip gönderebilirsin.', { icon: A.icon('palette') });
     });
   }
@@ -811,7 +811,7 @@
               </div>
               <div class="d-row">
                 <button class="btn" id="dSave">${A.ui('heart')} Duvara as</button>
-                <button class="btn soft" id="dShare">${A.ui('share')} ${K.esc(C.myName)}'e gönder</button>
+                <button class="btn soft" id="dShare">${A.ui('share')} ${K.esc(K.ek(C.myName, 'e'))} gönder</button>
                 <button class="btn ghost" id="dDownload">${A.ui('download')} İndir</button>
               </div>
             </div>

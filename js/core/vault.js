@@ -35,12 +35,13 @@
     if (!r.ok) throw new Error('kasa-dosyasi-yok');
     return b64 ? unb64((await r.text()).trim()) : new Uint8Array(await r.arrayBuffer());
   }
-  async function useRaw(raw, m) {
-    key = await subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+  async function useRaw(raw, m, who) {
+    key = await subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
     const data = JSON.parse(dec.decode(await decrypt(key, await fetchBytes('private.bin'))));
     V.data = data;
     V.ok = true;
-    K.store.set('vault', { kid: m.kid, k: b64(raw) });
+    V.who = who || 'her';
+    K.store.set('vault', { kid: m.kid, k: b64(raw), who: V.who });
     K.emit('unlocked', data);
     return true;
   }
@@ -48,6 +49,25 @@
   const V = (K.vault = {
     ok: false,
     data: null,
+    who: 'her',
+    // Buluta giden her şey içerik anahtarıyla şifrelenir; sunucu sadece anlamsız metin görür
+    async seal(obj) {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const ct = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj))));
+      const out = new Uint8Array(12 + ct.length);
+      out.set(iv);
+      out.set(ct, 12);
+      let s = '';
+      for (let i = 0; i < out.length; i += 0x8000) s += String.fromCharCode.apply(null, out.subarray(i, i + 0x8000));
+      return btoa(s);
+    },
+    async unseal(str) {
+      try {
+        return JSON.parse(dec.decode(await decrypt(key, unb64(str))));
+      } catch (e) {
+        return null;
+      }
+    },
     // Kasa bu ortamda var mı? (keys.json okunabiliyor ve tarayıcı şifre çözebiliyor mu)
     async available() {
       return Boolean(subtle && (await meta()));
@@ -59,7 +79,7 @@
       const saved = K.store.get('vault');
       if (!m || !subtle || !saved || saved.kid !== m.kid) return false;
       try {
-        return await useRaw(unb64(saved.k), m);
+        return await useRaw(unb64(saved.k), m, saved.who);
       } catch (e) {
         K.store.del('vault');
         return false;
@@ -75,12 +95,12 @@
       const tries = [...new Set(cands)].filter((x) => x.length >= 3).slice(0, 6);
       for (const t of tries) {
         const k = await derive(t, m.salt, m.iter);
-        for (const wrap of m.wraps) {
+        for (let wi = 0; wi < m.wraps.length; wi++) {
           let raw = null;
           try {
-            raw = await decrypt(k, unb64(wrap));
+            raw = await decrypt(k, unb64(m.wraps[wi]));
           } catch (e) {}
-          if (raw) return useRaw(raw, m);
+          if (raw) return useRaw(raw, m, (m.roles || [])[wi] || 'her');
         }
       }
       return false;

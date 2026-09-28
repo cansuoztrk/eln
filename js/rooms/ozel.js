@@ -25,7 +25,7 @@
     const annN = ann.year - ty;
     const list = [
       { id: 'herbd', title: `${C.herName}'in doğum günü`, icon: 'cake', ...T.nextAnnual(C.herBirthday), note: 'Türkiye\'de bayram, benim için daha da büyük bayram.' },
-      { id: 'mybd', title: `${C.myName}'in doğum günü`, icon: 'cake', ...T.nextAnnual(C.myBirthday), note: 'O gün ilk mesajı sen atacaksın, anlaşmıştık.' },
+      { id: 'mybd', title: `${K.ek(C.myName, 'in')} doğum günü`, icon: 'cake', ...T.nextAnnual(C.myBirthday), note: 'O gün ilk mesajı sen atacaksın, anlaşmıştık.' },
       { id: 'met', title: 'Tanışma yıldönümümüz', icon: 'letter', ...T.nextAnnual(C.metDate.slice(5)), note: `${C.friendName}'in bizi aynı gruba eklediği gün.` },
       { id: 'ann', title: annN === 1 ? 'İlk yıldönümümüz' : `${annN}. yıldönümümüz`, icon: 'heart', ...ann, note: `${+C.togetherDate.slice(8)} ${K.MONTHS[+C.togetherDate.slice(5, 7) - 1]}: takvimdeki en sevdiğim gün.` },
       { id: 'month', title: `${monthN}. ayımız`, icon: 'calendar', days: T.daysUntil(monthKey), date: T.at(monthKey), note: `Her ayın ${+C.togetherDate.slice(8)}'i bizim küçük bayramımız.` },

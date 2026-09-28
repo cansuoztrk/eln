@@ -67,13 +67,13 @@
       .map((w) => `<li class="az-e hw"><div class="az-w"><b>${K.esc(w.az)}</b><button class="say" data-lang="az" data-t="${K.esc(w.az)}" aria-label="Dinle">AZ</button></div><p class="az-tr">${K.esc(w.tr)}</p><p class="az-said muted">Öğretmenimin verdiği ödev · ${K.time.fmtShort(w.date)}</p></li>`)
       .join('');
     return `<div class="az-book">
-        <div class="az-cover"><span>Azərbaycan dili</span><b>${K.esc(C.myName)}'in defteri</b><small>Öğretmen: ${K.esc(C.herPet)}</small>${K.voice ? K.voice.btn('sevirem', 'Telaffuzumu dinle (gülme)') : ''}</div>
+        <div class="az-cover"><span>Azərbaycan dili</span><b>${K.esc(K.ek(C.myName, 'in'))} defteri</b><small>Öğretmen: ${K.esc(C.herPet)}</small>${K.voice ? K.voice.btn('sevirem', 'Telaffuzumu dinle (gülme)') : ''}</div>
         <ol class="az-list">${D.azNotebook.map(entry).join('')}${mine}</ol>
       </div>
       <form class="card az-teach" id="azTeach" autocomplete="off">
         <p class="card-eyebrow">Bana yeni bir kelime öğret</p>
         <div class="row"><input class="input" id="azWord" name="azWord" placeholder="Azerbaycanca" maxlength="60"><input class="input" id="azMean" name="azMean" placeholder="Anlamı" maxlength="80"><button class="btn" type="submit">${A.ui('send')} Öğret</button></div>
-        <p class="muted small">Öğrettiğin kelime deftere yazılır ve ${K.esc(C.myName)}'in telefonuna ödev olarak düşer.</p>
+        <p class="muted small">Öğrettiğin kelime deftere yazılır ve ${K.esc(K.ek(C.myName, 'in'))} telefonuna ödev olarak düşer.</p>
       </form>`;
   }
   function initAz() {
@@ -90,7 +90,7 @@
       sec.innerHTML = azHTML();
       K.audio.sfx.success();
       const ok = await K.notify(`Öğretmen ${C.herName}'den yeni kelime`, `${az} = ${tr}\nBir dahaki mesajında kullanman bekleniyor.`, ['pencil2']);
-      K.fx.toast(ok ? `Kelime deftere yazıldı ve ${C.myName}'e ödev olarak gitti.` : 'Kelime deftere yazıldı.', { icon: A.icon('pencil') });
+      K.fx.toast(ok ? `Kelime deftere yazıldı ve ${K.ek(C.myName, 'e')} ödev olarak gitti.` : 'Kelime deftere yazıldı.', { icon: A.icon('pencil') });
     });
   }
 

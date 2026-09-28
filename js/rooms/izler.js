@@ -144,7 +144,7 @@
       K.audio.sfx.paper();
       K.stickers.award('duvar');
       const ok = await K.notify(`${C.herName} duvara not yapıştırdı`, text, ['memo']);
-      K.fx.toast(ok ? `Notun duvara yapıştı ve ${C.myName}'in telefonuna ulaştı.` : 'Notun duvara yapıştı.', { icon: A.icon('note') });
+      K.fx.toast(ok ? `Notun duvara yapıştı ve ${K.ek(C.myName, 'in')} telefonuna ulaştı.` : 'Notun duvara yapıştı.', { icon: A.icon('note') });
     });
     K.$('#nwBoard', root).addEventListener('click', (e) => {
       const d = e.target.closest('[data-del]');
@@ -169,7 +169,7 @@
         <section class="nw">
           <div class="nw-head">
             <h3 class="sub-h">Bu sefer duvar burada</h3>
-            <p class="muted">Senin notlarına cevaplarım bu duvarda. Sen de bir not yapıştır; ${K.esc(C.myName)}'in telefonuna da düşer.</p>
+            <p class="muted">Senin notlarına cevaplarım bu duvarda. Sen de bir not yapıştır; ${K.esc(K.ek(C.myName, 'in'))} telefonuna da düşer.</p>
           </div>
           <div class="nw-board" id="nwBoard"></div>
           <form class="nw-form card" id="nwForm" autocomplete="off">

@@ -51,7 +51,9 @@
 
   function render() {
     const r = read();
-    K.$('#envGrid', root).innerHTML = D.letters
+    // Buluttan gelen canlı mektuplar en önde, en yenisi ilk
+    const list = D.letters.filter((l) => l.live).reverse().concat(D.letters.filter((l) => !l.live));
+    K.$('#envGrid', root).innerHTML = list
       .map((l) => {
         const lk = lockState(l);
         const fresh = (K.newLetters || []).includes(l.id);
@@ -140,14 +142,14 @@
         K.fx.toast('Önce birkaç satır yaz.');
         return ta.focus();
       }
-      const full = `${C.myName}'e, ${C.herName}'den bir mektup:\n\n${text}`;
+      const full = `${K.ek(C.myName, 'e')}, ${C.herName}'den bir mektup:\n\n${text}`;
       let sentNtfy = false;
       if (K.canNotify()) sentNtfy = await K.notify(`${C.herName}'den mektup var`, text.slice(0, 3000), ['love_letter']);
       const r = sentNtfy ? 'ntfy' : await K.share({ title: 'Sana bir mektup', text: full });
       const msg = {
-        ntfy: `Mektubun ${C.myName}'in telefonuna ulaştı.`,
+        ntfy: `Mektubun ${K.ek(C.myName, 'in')} telefonuna ulaştı.`,
         shared: 'Mektubun gönderilmeye hazır.',
-        copied: `Mektubun panoya kopyalandı. Şimdi ${C.myName}'e mesaj olarak yapıştır.`,
+        copied: `Mektubun panoya kopyalandı. Şimdi ${K.ek(C.myName, 'e')} mesaj olarak yapıştır.`,
         cancelled: 'Gönderme iptal edildi. Taslağın duruyor.',
         failed: 'Bu cihaz paylaşamıyor. Metni seçip kopyalayarak gönderebilirsin.',
       }[r];
@@ -159,6 +161,9 @@
       }
     });
   }
+
+  // Oda açıkken canlı mektup gelirse hemen zarflara eklensin
+  K.on('cloud', (on) => on && K.cloud.on('letter', () => setTimeout(() => K.activeRoom === 'mektuplar' && render(), 0)));
 
   K.room({
     id: 'mektuplar',
@@ -176,7 +181,7 @@
         <div class="env-grid" id="envGrid"></div>
         <div class="card reply">
           <p class="card-eyebrow">Sen de bana yaz</p>
-          <h3 class="sub-h" style="margin:0 0 8px">${K.esc(C.myName)}'e mektup</h3>
+          <h3 class="sub-h" style="margin:0 0 8px">${K.esc(K.ek(C.myName, 'e'))} mektup</h3>
           <textarea class="textarea hand-area" id="replyText" name="replyText" placeholder="Sevgili ${K.esc(C.myName)}..."></textarea>
           <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
             <button class="btn" id="replySend">${A.ui('send')} Gönder</button>

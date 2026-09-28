@@ -176,7 +176,7 @@
             : `<form class="card dream" id="dreamForm">
           <label class="card-eyebrow" for="dreamDate">Hayalindeki tarih</label>
           <div class="row"><input class="input" type="date" id="dreamDate" name="dreamDate" min="${T.todayKey()}"><button class="btn" type="submit">${A.ui('heart')} Bu gün olsun</button></div>
-          <p class="muted small">Seçtiğin tarih ${K.esc(C.myName)}'e de iletilir. Belki bir işaret olur.</p>
+          <p class="muted small">Seçtiğin tarih ${K.esc(K.ek(C.myName, 'e'))} de iletilir. Belki bir işaret olur.</p>
         </form>`
         }
         <section class="hb">

@@ -65,7 +65,11 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **Zaman Kapsülü** (Kalp): Geleceğe mektuplar; açılış gününe kadar mühürlü. Senin iki kapsülün de içinde.
 - **Hediye Kapısı** (gizli): Sadece `…/#hediye-kutusu` adresiyle (ör. bir hediye kartındaki QR ile) açılır.
 
-**Oyun Kanadı**: Gartic Odası, Angela'nın Odası, Bakü'ye Uç (mini oyun), **Film Gecesi** (davet, ortak geri sayım, puan kartı), Dilek Gökyüzü, Müzik Kutusu.
+- **Bizim Defter** (Kalp, bulut): İkinizin birlikte yazdığı günlük. Onun mürekkebi pembe, seninki mavi; biri yazınca öbürünün ekranına anında düşer. Aynı gün ikiniz de yazınca "Bugün ikiniz de yazdınız" çıkar.
+- **Birlikte** (Kalp, bulut): İkiniz aynı anda kaledeyken: iki yıldız birleşir, **iki kişilik sarılma** (kalp sadece ikiniz birlikte basılı tutarken dolar), ekrandan ekrana **dokunuş** ve kalenin her yerinde hissedilen **kalp atışı**.
+- **Kale Kitabı** (Anılar): Masal, sohbetler, açılmış mektuplar, sebepler, portreler, notlar, gökyüzü haritaları, soru defteri ve Bizim Defter tek bir A5 kitapta. "Yazdır → PDF olarak kaydet" ile saklanır ya da bastırılır.
+
+**Oyun Kanadı**: Gartic Odası, **Ortak Tahta** (bulut: aynı tahtaya canlı çizim; biri çizer öbürü tahmin eder, skor saklanır), Angela'nın Odası, Bakü'ye Uç (mini oyun), **Film Gecesi** (davet, ortak geri sayım, puan kartı), Dilek Gökyüzü, Müzik Kutusu.
 
 **Hazine Kanadı**: **Kitty Gazetesi** (her sabah yeni sayı: manşet, iki şehrin havası, Boğa & Akrep falı, bulmaca), **Soru Kutusu** (her gün bir soru; cevap sana gelir), **Bizim Özetimiz** (Wrapped tarzı hikâye), Boğaz'dan Hazar'a, Öğretmen Eln'in Sınıfı (sözlük, Azerbaycanca defter, ödev, aşk sınavı), Hayal Listesi, Aşk Kuponları, Özel Günler, Çıkartma Albümü ve **iyi saklanmış gizli bir kulübe** (içindeki dost her gün mamayla büyür: 5 seviye, seri, aksesuarlar).
 
@@ -102,6 +106,35 @@ Metinler `private/phase3.mjs` → `voices` içinde (her birinin yeri, tonu ve s�
 
 Eln'e canlı mesaj göndermek için tarayıcıda `https://ntfy.sh/<liveTopic>` sayfasını aç (konu adı `private/content.mjs` → `config.liveTopic`) ve mesaj yaz. Eln sitedeyse mesaj anında ekranında belirir; değilse bir sonraki gelişinde (12 saate kadar) görünür. Eln kaleye geldiğinde sana gelen "şu an kalede" bildirimine dokununca da bu sayfa açılır.
 
+## İki kişilik kale (bulut)
+
+Bizim Defter, Birlikte, Ortak Tahta, canlı posta ve iki taraflı Soru Kutusu için ücretsiz bir [Supabase](https://supabase.com) projesi kullanılır. Buluta giden **her kayıt ve her canlı mesaj kasa anahtarıyla şifrelenir**; sunucu sadece anlamsız metin görür. Bulut ayarı yoksa bu odalar hiç görünmez, site eskisi gibi çalışır.
+
+1. supabase.com'da ücretsiz hesap aç → **New project** (bölge: Frankfurt ya da yakın bir yer).
+2. Proje açılınca **SQL Editor → New query**: `tools/supabase.sql` dosyasının içeriğini yapıştır → **Run**.
+3. **Project Settings → API** sayfasından **Project URL** ve **anon public** anahtarını al.
+4. `private/content.mjs` → `config` içine ekle ve paketle:
+   ```js
+   cloud: { url: 'https://xxxx.supabase.co', key: 'anon-anahtar', space: 'kale' },
+   ```
+   ```bash
+   node tools/vault.mjs pack
+   ```
+
+Bu ayar da kasanın içinde şifreli durur. (anon anahtarı zaten tarayıcıya açık olmak için yapılmıştır; asıl koruma içeriğin şifreli olması.)
+
+### Kale sahibi modu
+
+Kapıya Eln'in cevabı yerine **sahip şifresini** (`private/secrets.json` → `owner`) yazınca kale seni tanır: başlıkta "Kale sahibi" rozeti çıkar, bildirimler kendine gönderilmez ve **Kale Paneli** açılır. Panelden kod yazmadan:
+- **Canlı posta**: Mektup yaz; onun Mektuplar odasına anında düşer ("Posta var!"). Tarih seçersen o güne kadar mühürlü kalır.
+- **Günün sorusu**: Sen de cevapla; ikiniz de cevaplayınca yan yana görünür.
+- **Günün notu**: Seçtiğin günün ana salondaki notunu yaz.
+- **Fotoğraf**: Anı Duvarı'na şifreli fotoğraf as.
+- **İlk buluşma tarihi**: Belli olunca yaz; geri sayım ve kutlama kendiliğinden başlar.
+- Onun son hareketleri: cevaplar, defter sayfaları, telsiz mesajları.
+
+Sahip şifresi Eln'le paylaşılmamalı. Bulutu denemek için adresin sonuna `?bulut=deneme` eklersen aynı tarayıcıdaki iki sekme arasında çalışan sahte bir bulut açılır.
+
 ## Ayarlar (`private/content.mjs` → `config`)
 
 - `firstMeetDate`: İlk buluşma tarihi belli olunca `'YYYY-MM-DD'` yaz ve paketle. İlk Sarılma odasında gerçek geri sayım başlar, iki Kitty yaklaşmaya başlar; o gün ana salonda kutlama çıkar.
@@ -123,7 +156,7 @@ Adresin sonuna `?tarih=2027-01-01` (ya da `?tarih=2027-01-01T00:30`) ekleyerek s
 Şifre çözme `https://` gerektirir; GitHub Pages bunu sağlar. Mikrofon (Angela, mum üfleme) de `https://` ister.
 
 ## Teknik notlar
-- Bağımlılık yok. Yazı tipleri Google Fonts'tan (Fredoka, Great Vibes, Caveat, Nunito).
+- Derleme yok. Tek dış kütüphane `js/vendor/supabase.js` (supabase-js, MIT), sadece bulut ayarı varsa yüklenir. Yazı tipleri Google Fonts'tan (Fredoka, Great Vibes, Caveat, Nunito).
 - Hava durumu: [Open-Meteo](https://open-meteo.com/) (anahtarsız). Ulaşılamazsa site sessizce idare eder.
 - Telefon için tasarlandı; masaüstünde de çalışır. Hareket azaltma tercihine uyar.
 

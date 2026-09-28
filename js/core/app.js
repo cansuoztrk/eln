@@ -9,6 +9,7 @@
 
   // Kalenin kanatları: her oda kendi kanadını "wing" ile seçer
   const WINGS = [
+    { id: 'sahip', title: 'Kale Sahibi', sub: 'Bunu sadece sen görüyorsun: canlı posta, cevaplar, fotoğraflar ve ayarlar', color: '#4A2138', icon: 'key' },
     { id: 'mevsim', title: 'Bu Günlere Özel', sub: 'Sadece bu günlerde açık olan odalar. Kaçırma!', color: '#8F73E6', icon: 'star' },
     { id: 'anilar', title: 'Anılar Kanadı', sub: 'Masalımız, sohbetlerimiz, Bakü\'deki izlerin, portrelerin, o gecenin gökyüzü ve bizim şarkımız', color: '#F0578F', icon: 'book' },
     { id: 'kalp', title: 'Kalp Kanadı', sub: 'Mektuplar, sesim, telsizimiz, sebepler, zaman kapsülü ve henüz yaşanmamış o ilk sarılma', color: '#E3174D', icon: 'heart' },
@@ -21,7 +22,7 @@
     const app = document.getElementById('app');
     app.innerHTML = `
       <header class="topbar">
-        <button class="brand" id="brand" aria-label="Ana salona dön">${A.kitty({ cls: 'brand-kitty', label: 'Kitty' })}<span class="brand-name">${K.esc(C.herName)}'in Krallığı</span></button>
+        <button class="brand" id="brand" aria-label="Ana salona dön">${A.kitty({ cls: 'brand-kitty', label: 'Kitty' })}<span class="brand-name">${K.esc(C.herName)}'in Krallığı</span>${K.isOwner() ? '<span class="owner-badge">Kale sahibi</span>' : ''}</button>
         <div class="top-actions">
           <a class="icon-btn mail-btn" href="#mektuplar" id="mailBtn" hidden aria-label="Yeni mektup var">${A.icon('letter')}<span class="count" id="mailCount">1</span></a>
           <a class="icon-btn" href="#album" aria-label="Çıkartma albümü">${A.icon('sticker')}<span class="count" id="topStickers">0</span></a>
@@ -74,6 +75,7 @@
           <h1 class="hero-greet"><span class="greet-word" id="greetWord">Merhaba</span><span class="greet-name">Prenses ${K.esc(C.herPet || C.herName)}</span></h1>
           <p class="hero-sub" id="greetSub"></p>
           <a class="news-chip" id="newsChip" href="#gazete" hidden>${A.icon('news')}<span>Kitty Gazetesi kapına geldi</span></a>
+          <a class="here-chip" id="hereChip" href="#birlikte" hidden><i></i><span></span></a>
         </div>
         <div class="hero-scene">
           <div class="scene-tower">${A.kizKulesi()}<span class="city-tag">${K.esc(C.myCity)} · <i>${K.esc(C.myPet || C.myNick)}</i></span></div>
@@ -252,7 +254,7 @@
     }
     const p = T.baku();
     K.$('#noteDate').textContent = `Günün notu · ${p.d} ${K.MONTHS[p.mo - 1]}, ${T.dayName(p)}`;
-    K.$('#noteText').textContent = K.fill(K.daily(D.notes));
+    K.$('#noteText').textContent = K.fill((K.noteOverride || {})[T.todayKey()] || K.daily(D.notes));
     dayPhoto();
     dayQuestion();
     kittyEar();
@@ -273,7 +275,8 @@
     K.$('#qForm').hidden = Boolean(a);
     const done = K.$('#qDone');
     done.hidden = !a;
-    if (a) done.innerHTML = `<p class="hand">"${K.esc(a.a)}"</p><p class="muted small">Cevabın ${K.esc(C.myName)}'e gitti. Yarın yeni bir soru.</p>`;
+    const other = a && K.questions.other ? K.questions.other(q.i) : '';
+    if (a) done.innerHTML = `<p class="hand">"${K.esc(a.a)}"</p>${other ? `<p class="q-other"><b>${K.esc(K.otherName())}:</b> <span class="hand">"${K.esc(other)}"</span></p>` : `<p class="muted small">Cevabın ${K.esc(K.otherName())}'a gitti. Yarın yeni bir soru.</p>`}`;
   }
   function initQuestion() {
     K.$('#qForm').addEventListener('submit', async (e) => {
@@ -310,6 +313,7 @@
     if (id) ear.innerHTML = `<button class="ear-chip no-burst" data-voice="${id}"><span class="vb-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Kitty'nin kulağında bir ses var</button>`;
   }
   K.on('voice-heard', () => kittyEar());
+  K.on('answered', () => K.$('#qCard') && dayQuestion());
 
   /* ---------------- Sabah gazetesi ---------------- */
   function newsChip() {
@@ -318,7 +322,13 @@
   }
 
   /* ---------------- Posta kutusu: sonradan eklenen mektuplar ---------------- */
-  function mailbox() {
+  function mailbox(quiet) {
+    if (K.isOwner()) {
+      // Kale sahibi bütün mektupları zaten biliyor
+      K.newLetters = [];
+      K.$('#mailBtn').hidden = true;
+      return;
+    }
     const ids = D.letters.map((l) => l.id);
     let known = K.store.get('lettersKnown');
     if (!known) {
@@ -333,6 +343,7 @@
     const sig = fresh.join(',');
     if (fresh.length && K.store.get('mailToast') !== sig) {
       K.store.set('mailToast', sig);
+      if (quiet) return;
       setTimeout(() => K.fx.toast(`<b>Posta var!</b> Kaleye ${fresh.length} yeni mektup geldi.`, { icon: A.icon('letter'), duration: 5200 }), 3200);
     }
   }
@@ -732,7 +743,7 @@
         K.stickers.award('aykardesi');
         K.fx.rain({ count: 40, shapes: ['star', 'heart'], colors: ['#FFF4C7', '#FFFFFF', '#C9B6FF'] });
         const ok = await K.notify(`${C.herName} şu an aya bakıyor`, 'Sen de başını kaldır. Aynı ay, iki pencere.', ['crescent_moon']);
-        K.fx.toast(ok ? `${C.myName}'e haber verildi. O da şimdi aya bakıyor.` : 'Ay ikinizi de görüyor.', { icon: A.icon('moon') });
+        K.fx.toast(ok ? `${K.ek(C.myName, 'e')} haber verildi. O da şimdi aya bakıyor.` : 'Ay ikinizi de görüyor.', { icon: A.icon('moon') });
       });
     const key = 'special-' + T.todayKey();
     if (!K.store.get(key)) {
@@ -885,7 +896,62 @@
     const { config, ...rest } = data || {};
     Object.assign(C, config || {});
     Object.assign(D, rest);
+    if (K.isOwner()) {
+      // Kale sahibi kendi telefonuna bildirim göndermesin
+      K.notify = async () => false;
+      document.body.classList.add('owner');
+    }
     buildApp();
+  });
+
+  /* ---------------- Bulut: canlı posta, fotoğraflar, ayarlar, varlık ---------------- */
+  D.cloudPhotos = [];
+  K.noteOverride = {};
+  function addLetter(r, fresh) {
+    const id = 'c-' + r.id;
+    if (D.letters.some((l) => l.id === id)) return;
+    const d = r.data;
+    D.letters.push({ id, title: d.title, body: d.body || [], sign: d.sign, color: d.color || '#FFE9B8', lock: d.open && T.daysUntil(d.open) > 0 ? { date: d.open } : undefined, live: true, cloudId: r.id });
+    if (fresh && !K.isOwner()) {
+      K.audio.sfx.chime();
+      K.fx.toast(`<b>Posta var!</b> ${K.esc(C.myPet)} az önce bir mektup gönderdi: "${K.esc(d.title)}"`, { icon: A.icon('letter'), duration: 6000 });
+    }
+  }
+  function applyConfig(rows) {
+    const last = rows[rows.length - 1];
+    if (!last) return;
+    if ('firstMeetDate' in last.data) C.firstMeetDate = last.data.firstMeetDate || '';
+  }
+  K.on('cloud', async (on) => {
+    if (!on) return;
+    const [letters, photos, cfg, notes] = await Promise.all(['letter', 'photo', 'config', 'note'].map((k) => K.cloud.list(k)));
+    letters.forEach((r) => addLetter(r));
+    D.cloudPhotos = photos.map((r) => Object.assign({ cloudId: r.id }, r.data));
+    applyConfig(cfg);
+    notes.forEach((r) => (K.noteOverride[r.data.date] = r.data.text));
+    K.cloud.on('letter', (r) => {
+      addLetter(r, true);
+      mailbox(true);
+    });
+    K.cloud.on('photo', (r) => D.cloudPhotos.push(Object.assign({ cloudId: r.id }, r.data)));
+    K.cloud.on('config', (r) => applyConfig([r]));
+    K.cloud.on('note', (r) => (K.noteOverride[r.data.date] = r.data.text));
+    K.cloud.on('deleted', ({ id }) => {
+      D.letters = D.letters.filter((l) => l.cloudId !== id);
+      D.cloudPhotos = D.cloudPhotos.filter((p) => p.cloudId !== id);
+    });
+    if (!K.activeRoom) renderDoors();
+    dailyBits();
+  });
+  K.on('presence', (here) => {
+    const chip = K.$('#hereChip');
+    if (!chip) return;
+    chip.hidden = !here;
+    K.$('span', chip).textContent = K.isOwner() ? `${C.herPet} şu an kalede` : `${C.myPet} şu an kalede`;
+    if (here) {
+      K.audio.sfx.sparkle();
+      K.fx.toast(`<b>${K.esc(K.isOwner() ? C.herPet : C.myPet)} şu an kalede!</b> Birlikte odasında el ele verebilirsiniz.`, { icon: A.icon('hugs'), duration: 5000 });
+    }
   });
 
   /* ---------------- Kapı ---------------- */

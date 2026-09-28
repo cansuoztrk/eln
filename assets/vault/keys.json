@@ -2,14 +2,20 @@
   "v": 2,
   "kid": "5oV9FS00",
   "iter": 250000,
-  "salt": "7SppXqXFoJYxqZVXS4FmBg==",
+  "salt": "0gosBOHCTX+whbpyEFAMwA==",
   "wraps": [
-    "iXHlBbjUPMor+Cs31pV8CU/0OMxNMAEIGyXwqJet8MfE+L1DXvyX8hIWK6ZMfYDxiVI72hCaIdECClNz",
-    "NVwzK6ReExQ+RrH8cCpnGNi5MQIxzgBaO0YLZp6mCwTuCVKwMt1Y+y/PQA58JtrRNLHDN9vXTpGHQt2e"
+    "QdKiCBT2CZmHbXsngwlnCwF8S5y34g3CRfxD3MJ5Ap5DQe+0wsT1myN5g7Gdlsjt0LPBiVd18fWlmM/p",
+    "q4IcYAdeOid0hYmMPB+anqZQUd8i0FKHzqqNVPnwURNt5om5ndeDZ0uHE7DIdETyxNVI9DkD3cK0TEcd",
+    "F+897z/JWmwBKV3bl6ES1GuBiLMhet/Ulu1k1tQjPaHA06IFllsTM2+1po8tVeBX9uLqO8hYRYEg71i3"
+  ],
+  "roles": [
+    "her",
+    "her",
+    "me"
   ],
   "sealed": {
     "ilk-sarilma": {
-      "salt": "O6i9W8L6VrG60GmHkdDefQ=="
+      "salt": "QmVqytP+MNVS0Hh2X5Sugw=="
     }
   }
 }
