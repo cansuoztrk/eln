@@ -338,7 +338,7 @@
     K.stickers.award('pilot');
     K.audio.sfx.chime();
     K.fx.confetti({ count: 150 });
-    panel(`<h3>Kavuştuk!</h3>
+    panel(`<h3>${K.esc(C.herCity)}'ye indin!</h3>
       <p>${K.num(TOTAL)} kilometreyi aştın ve yol boyunca <b>${g.hearts}</b> kalp topladın. Hepsi senin.</p>
       <p class="hand" style="font-size:22px">Bir gün bu yolculuğu gerçekten yapacağım. Pencereden bakınca Qız Qalası'nı görüp seni düşüneceğim.</p>
       <p class="muted small">Bakü'ye ${wins}. inişin.</p>
@@ -363,6 +363,7 @@
 
   K.room({
     id: 'oyun',
+    wing: 'oyun',
     title: 'Bakü\'ye Uç',
     sub: 'Kitty uçağıyla 1.758 km',
     icon: 'plane',

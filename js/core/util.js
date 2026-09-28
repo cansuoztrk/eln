@@ -69,7 +69,7 @@
   const DAYS = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
   K.MONTHS = MONTHS;
 
-  // ?tarih=2027-04-23 ya da ?tarih=2027-04-23T23:30 ile (Bakü saatine göre) tarih önizlemesi
+  // ?tarih=2027-01-01 ya da ?tarih=2027-01-01T23:30 ile (Bakü saatine göre) tarih önizlemesi
   let offsetMs = 0;
   try {
     const q = new URLSearchParams(location.search).get('tarih');
@@ -164,7 +164,12 @@
     bakuTime: () => T.hm(C.tzBaku),
     istTime: () => T.hm(C.tzIstanbul),
     km: () => K.num(C.distanceKm),
+    hugs: () => K.num(K.hugDebt()),
   };
+  // Sarılma borcu: birlikte geçen her gün bir sarılma + uzaktan gönderilen her sarılma
+  K.hugDebt = () => Math.max(0, T.daysSince(C.togetherDate)) + K.store.get('hugs', 0);
+  // Oda başlıkları metin ya da fonksiyon olabilir
+  K.val = (v) => (typeof v === 'function' ? v() : v);
 
   /* ---------- Rastgelelik ---------- */
   K.hash = (str) => {
@@ -269,7 +274,7 @@
   // ntfy.sh ile User155'in telefonuna bildirim (config.ntfyTopic boşsa hiçbir şey göndermez)
   K.canNotify = () => Boolean(C.ntfyTopic);
   K.notify = async (title, message, tags) => {
-    if (!C.ntfyTopic) return false;
+    if (!C.ntfyTopic || K.previewDate) return false;
     try {
       const res = await fetch('https://ntfy.sh/', {
         method: 'POST',

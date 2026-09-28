@@ -281,6 +281,7 @@
 
   K.room({
     id: 'uzak',
+    wing: 'hazine',
     title: 'Boğaz\'dan Hazar\'a',
     sub: `${K.num(C.distanceKm)} km, 1 saat, 1 kalp`,
     icon: 'map',

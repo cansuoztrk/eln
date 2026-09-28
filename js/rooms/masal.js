@@ -67,10 +67,55 @@
         <text x="46" y="104" font-family="Nunito, sans-serif" font-size="8" fill="#fff">selam :)</text>
         <rect x="14" y="118" width="58" height="18" rx="9" fill="#fff" stroke="#F6C9DA"/>
         ${heart(28, 128, 0.45)}${heart(40, 128, 0.45)}${heart(52, 128, 0.45)}
-        <text x="50" y="160" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="8" font-weight="600" fill="#F0578F">6 Aralık 2025</text>
+        <text x="50" y="160" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="8" font-weight="600" fill="#F0578F">${K.time.fmt(C.metDate)}</text>
       </g>
       ${place(A.kitty({ cls: 'is-happy' }), 10, 118, 90, 76)}
       <path d="M232 170 q10 -40 40 -46" fill="none" stroke="#C9B6FF" stroke-width="3" stroke-dasharray="3 6"/>${heart(276, 118, 1.3, '#FF6FA3')}`,
+    crush: () => `${sky('#FFE6EF', '#FFF7E6')}
+      ${sparkle(34, 30, 0.8)}${sparkle(292, 40, 0.7, '#fff')}${sparkle(160, 16, 0.9)}
+      <g transform="translate(24 22)">
+        <path d="M0 10 Q0 0 10 0 H118 Q128 0 128 10 V50 Q128 60 118 60 H40 L22 76 L26 60 H10 Q0 60 0 50 Z" fill="#fff" stroke="#4A2138" stroke-width="3"/>
+        ${heart(40, 32, 1.1, '#E3174D')}${heart(64, 32, 1.1, '#FF6FA3')}${heart(88, 32, 1.1, '#FFB3CE')}
+      </g>
+      <g transform="translate(180 60)">
+        <path d="M0 10 Q0 0 10 0 H106 Q116 0 116 10 V44 Q116 54 106 54 H86 L96 70 L68 54 H10 Q0 54 0 44 Z" fill="#FFD0E1" stroke="#4A2138" stroke-width="3"/>
+        <text x="58" y="34" text-anchor="middle" font-family="Caveat, cursive" font-size="22" font-weight="700" fill="#4A2138">hmm...</text>
+      </g>
+      ${place(A.kitty({ cls: 'is-heart', bow: '#4FA3E3' }), 16, 108, 110, 90)}
+      ${place(A.kitty({ cls: 'is-wink', crown: true }), 196, 110, 110, 90)}
+      <g class="blushpulse">${heart(160, 150, 1.2, '#FF8FB8')}</g>`,
+    notes: () => {
+      const r = K.rng(508);
+      const cols = ['#FFE08A', '#FFB3CE', '#A9DDFF', '#A8E6C4', '#D9CCFF', '#FFC9A8', '#fff'];
+      const bits = Array.from({ length: 64 }, (_, i) => {
+        const x = (i % 11) * 30 - 6 + r() * 10,
+          y = Math.floor(i / 11) * 34 - 4 + r() * 10;
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="28" height="28" rx="2" fill="${cols[i % cols.length]}" transform="rotate(${(r() * 16 - 8).toFixed(1)} ${x + 14} ${y + 14})" opacity=".92"/>`;
+      }).join('');
+      return `<rect width="320" height="200" fill="#EFE3D6"/>${bits}
+      <rect width="320" height="200" fill="#4A2138" opacity=".18"/>
+      <g transform="translate(160 100) rotate(-4)" class="note-glow">
+        <rect x="-44" y="-40" width="88" height="80" rx="4" fill="#8FD3FF" stroke="#4A2138" stroke-width="3"/>
+        <text x="0" y="4" text-anchor="middle" font-family="Caveat, cursive" font-size="30" font-weight="700" fill="#2B2F6B">${K.esc(C.notesMark || '♡')}</text>
+        <text x="0" y="28" text-anchor="middle" font-family="Caveat, cursive" font-size="13" font-weight="700" fill="#2B2F6B">${K.esc(C.notesDate ? C.notesDate.split('-').reverse().join('.') : '')}</text>
+      </g>
+      ${sparkle(106, 52, 1.1, '#fff')}${sparkle(214, 150, 0.9, '#FFD34E')}${sparkle(222, 56, 0.6, '#fff')}`;
+    },
+    azeri: () => `${sky('#E1F4FF', '#FFF3F7')}
+      <g transform="translate(40 34)">
+        <path d="M0 8 Q60 -6 120 8 V150 Q60 136 0 150 Z" fill="#fff" stroke="#4A2138" stroke-width="3"/>
+        <path d="M120 8 Q180 -6 240 8 V150 Q180 136 120 150 Z" fill="#FFFDF4" stroke="#4A2138" stroke-width="3"/>
+        <path d="M120 8 V150" stroke="#4A2138" stroke-width="3"/>
+        <g stroke="#CFE3F2" stroke-width="1.5">${[40, 62, 84, 106, 128].map((y) => `<path d="M12 ${y} H110 M130 ${y} H228"/>`).join('')}</g>
+        <text x="60" y="56" text-anchor="middle" font-family="Caveat, cursive" font-size="17" font-weight="700" fill="#E3174D">Mən səni</text>
+        <text x="60" y="78" text-anchor="middle" font-family="Caveat, cursive" font-size="17" font-weight="700" fill="#E3174D">sevirəm</text>
+        <text x="60" y="118" text-anchor="middle" font-family="Caveat, cursive" font-size="15" fill="#4A6B8A">Ürəyim ♡</text>
+        <text x="180" y="56" text-anchor="middle" font-family="Caveat, cursive" font-size="16" fill="#4A2138">Gözəlim</text>
+        <text x="180" y="82" text-anchor="middle" font-family="Caveat, cursive" font-size="16" fill="#4A2138">Əzizim</text>
+        <text x="180" y="118" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="20" font-weight="700" fill="#3FA37A">A+</text>
+      </g>
+      <g transform="translate(262 128) rotate(24)"><rect x="-4" y="-34" width="8" height="50" rx="2" fill="#FFD34E" stroke="#4A2138" stroke-width="2.5"/><path d="M-4 16 L0 26 L4 16 Z" fill="#FFE2C4" stroke="#4A2138" stroke-width="2.5" stroke-linejoin="round"/></g>
+      ${place(A.kitty({ cls: 'is-happy', crown: true }), 4, 128, 84, 70)}`,
     question: () => `${sky('#FFF3C4', '#FFE6EF')}
       <text x="160" y="118" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="110" font-weight="700" fill="#FFD0E1">?</text>
       ${place(A.kitty({}), 18, 84, 120, 100)}
@@ -93,7 +138,7 @@
         <path d="M-70 26 q14 12 23 0 t23 0 t23 0 t23 0 t23 0 t23 0" fill="none" stroke="#fff" stroke-width="4"/>
         ${[-24, 0, 24].map((x) => `<rect x="${x - 3}" y="-44" width="6" height="20" rx="2" fill="#8FD3FF" stroke="#4A2138" stroke-width="2"/><path class="flame" d="M${x} -58 c-5 6 -5 10 0 12 c5 -2 5 -6 0 -12 z" fill="#FFB547"/>`).join('')}
       </g>
-      <text x="160" y="40" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="30" font-weight="700" fill="#E3174D">23 Nisan</text>`,
+      <text x="160" y="40" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="30" font-weight="700" fill="#E3174D">${+C.herBirthday.slice(3)} ${K.MONTHS[+C.herBirthday.slice(0, 2) - 1]}</text>`,
     together: () => `${sky('#FFD0E1', '#FFF3F7')}
       ${Array.from({ length: 22 }, (_, i) => `<circle cx="${(i * 71) % 320}" cy="${(i * 43) % 200}" r="${2 + (i % 3)}" fill="${['#FF8FB8', '#FFD34E', '#C9B6FF', '#8FD3FF'][i % 4]}"/>`).join('')}
       <g transform="translate(160 100)">
@@ -172,6 +217,7 @@
 
   K.room({
     id: 'masal',
+    wing: 'anilar',
     title: 'İki Kule Masalı',
     sub: 'Hikâyemiz, bir masal kitabında',
     icon: 'book',
@@ -203,9 +249,11 @@
           <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
             <a class="btn" href="#ozel">Sıradaki sayfalar: Özel Günler</a>
             <a class="btn soft" href="#son">Son sayfaya git</a>
+            <button class="btn ghost" id="bkFilm">${A.ui('play')} Açılış filmini tekrar izle</button>
           </div>
         </div>`;
       K.$('#bkPrev').addEventListener('click', () => goTo(page - 1));
+      K.$('#bkFilm', el).addEventListener('click', () => K.prologue && K.prologue.play(D.prologue));
       K.$('#bkNext').addEventListener('click', () => goTo(page === D.story.length - 1 ? 0 : page + 1));
       K.$$('.book-dots button', el).forEach((b, i) => b.addEventListener('click', () => goTo(i)));
       // Kaydırarak sayfa çevirme

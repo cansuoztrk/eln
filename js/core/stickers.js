@@ -27,7 +27,14 @@
     { id: 'yirmibir', name: 'Ayın 21\'i', hint: 'Herhangi bir ayın 21\'inde uğra', icon: 'calendar', color: '#FFD6E5' },
     { id: 'gizli', name: 'Gizli Kapı', hint: 'Kalede saklı bir sırrı bul', icon: 'key', color: '#D6F1FF' },
     { id: 'son', name: 'Sonsuza Kadar', hint: 'Son Sayfa\'daki soruya cevap ver', icon: 'heart', color: '#FFE0E0' },
+    { id: 'arsiv', name: 'Sohbet Arşivcisi', hint: 'Sohbetimizden\'in bütün bölümlerini izle', icon: 'chat', color: '#E6DCFF' },
+    { id: 'duvar', name: 'Duvar Yazarı', hint: 'Bakü\'deki İzlerin odasında duvara not as', icon: 'note', color: '#FFF3C4' },
+    { id: 'portre', name: 'Galeri Gezgini', hint: 'Bütün portrelere yakından bak', icon: 'frame', color: '#FFE9B8' },
+    { id: 'anilar', name: 'Anılar', hint: 'Bizim şarkımızı çal', icon: 'vinyl', color: '#FFD6E5' },
+    { id: 'kopus', name: 'Gizli Kulübe', hint: 'Kalede saklı bir kulübe var...', icon: 'paw', color: '#FFE0E0' },
+    { id: 'muhur', name: 'Kırılan Mühür', hint: 'Bu çıkartma ilk buluşmada açılır', icon: 'hugs', color: '#FFD6E5', bonus: true },
   ];
+  const REQUIRED = DEFS.filter((d) => !d.bonus);
 
   const got = () => K.store.get('stickers', {});
 
@@ -45,7 +52,7 @@
     K.audio.sfx.chime();
     K.fx.toast(`<b>Yeni çıkartma!</b> ${K.esc(def.name)}`, { icon: art(def, 'mini'), cls: 'toast-sticker', duration: 4200 });
     K.emit('sticker', id);
-    if (Object.keys(all).length === DEFS.length) {
+    if (!def.bonus && REQUIRED.every((d) => all[d.id])) {
       setTimeout(() => {
         K.fx.confetti({ count: 160 });
         K.fx.toast('<b>Bütün çıkartmaları topladın!</b> Albümde gizli bir mektup açıldı.', { icon: K.art.icon('key'), duration: 6000 });
@@ -64,5 +71,6 @@
   }
   const count = (key) => K.store.get('counts', {})[key] || 0;
 
-  K.stickers = { DEFS, got, has: (id) => Boolean(got()[id]), award, bump, count, art, total: DEFS.length };
+  const done = () => REQUIRED.filter((d) => got()[d.id]).length;
+  K.stickers = { DEFS, got, has: (id) => Boolean(got()[id]), award, bump, count, art, total: REQUIRED.length, done, complete: () => done() === REQUIRED.length };
 })();

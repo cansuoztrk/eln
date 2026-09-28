@@ -55,6 +55,45 @@
       <p class="muted small" style="margin-top:12px">Azerbaycanca ses her cihazda olmayabilir; olmadığında Türkçe sesle okunur. Telaffuzu düzeltmek sana düşüyor, öğretmenim.</p>`;
   }
 
+  /* ---------------- Azerbaycanca defterim ---------------- */
+  const taught = () => K.store.get('taughtWords', []);
+  function azHTML() {
+    const entry = (e, i) => `<li class="az-e ${e.reply ? '' : 'next'}" style="--d:${i * 0.05}s">
+        <div class="az-w"><b>${K.esc(e.az)}</b><button class="say" data-lang="az" data-t="${K.esc(e.az)}" aria-label="Dinle">AZ</button></div>
+        <p class="az-tr">${K.esc(e.tr)}</p>
+        ${e.reply ? `<p class="az-said"><span>Ben:</span> ${K.esc(e.said)}</p><p class="az-reply"><span>Sen:</span> ${K.esc(e.reply)}</p>` : `<p class="az-said muted">${K.esc(e.said)}</p>`}
+      </li>`;
+    const mine = taught()
+      .map((w) => `<li class="az-e hw"><div class="az-w"><b>${K.esc(w.az)}</b><button class="say" data-lang="az" data-t="${K.esc(w.az)}" aria-label="Dinle">AZ</button></div><p class="az-tr">${K.esc(w.tr)}</p><p class="az-said muted">Öğretmenimin verdiği ödev · ${K.time.fmtShort(w.date)}</p></li>`)
+      .join('');
+    return `<div class="az-book">
+        <div class="az-cover"><span>Azərbaycan dili</span><b>${K.esc(C.myName)}'in defteri</b><small>Öğretmen: ${K.esc(C.herPet)}</small></div>
+        <ol class="az-list">${D.azNotebook.map(entry).join('')}${mine}</ol>
+      </div>
+      <form class="card az-teach" id="azTeach" autocomplete="off">
+        <p class="card-eyebrow">Bana yeni bir kelime öğret</p>
+        <div class="row"><input class="input" id="azWord" name="azWord" placeholder="Azerbaycanca" maxlength="60"><input class="input" id="azMean" name="azMean" placeholder="Anlamı" maxlength="80"><button class="btn" type="submit">${A.ui('send')} Öğret</button></div>
+        <p class="muted small">Öğrettiğin kelime deftere yazılır ve ${K.esc(C.myName)}'in telefonuna ödev olarak düşer.</p>
+      </form>`;
+  }
+  function initAz() {
+    const sec = K.$('[data-tab="az"]', root);
+    sec.addEventListener('submit', async (e) => {
+      if (!e.target.closest('#azTeach')) return;
+      e.preventDefault();
+      const az = K.$('#azWord', sec).value.trim();
+      const tr = K.$('#azMean', sec).value.trim();
+      if (!az || !tr) return;
+      const list = taught();
+      list.push({ az, tr, date: K.time.todayKey() });
+      K.store.set('taughtWords', list.slice(-40));
+      sec.innerHTML = azHTML();
+      K.audio.sfx.success();
+      const ok = await K.notify(`Öğretmen ${C.herName}'den yeni kelime`, `${az} = ${tr}\nBir dahaki mesajında kullanman bekleniyor.`, ['pencil2']);
+      K.fx.toast(ok ? `Kelime deftere yazıldı ve ${C.myName}'e ödev olarak gitti.` : 'Kelime deftere yazıldı.', { icon: A.icon('pencil') });
+    });
+  }
+
   /* ---------------- Ödev ---------------- */
   function essayHTML() {
     const src = K.fill(D.essay.text);
@@ -251,8 +290,9 @@
 
   K.room({
     id: 'sinif',
+    wing: 'hazine',
     title: 'Öğretmen Eln\'in Sınıfı',
-    sub: 'Sözlük, ödev ve bir aşk sınavı',
+    sub: 'Sözlük, defter, ödev ve bir aşk sınavı',
     icon: 'board',
     color: '#D8F5E8',
     init(el) {
@@ -261,16 +301,18 @@
         <p class="room-intro">Bu sınıfın öğretmeni sensin. Hello Kitty de Londralı, yani o da İngilizce konuşuyor; bence o da senin öğrencin olmak isterdi.</p>
         <div class="tabs" role="tablist">
           <button class="chip" role="tab" data-t="dict" aria-selected="true">Aşk sözlüğü</button>
+          <button class="chip" role="tab" data-t="az" aria-selected="false">Azerbaycanca defterim</button>
           <button class="chip" role="tab" data-t="essay" aria-selected="false">Ödevimi kontrol et</button>
           <button class="chip" role="tab" data-t="quiz" aria-selected="false">Aşk sınavı</button>
         </div>
         <section data-tab="dict">${dictHTML()}</section>
+        <section data-tab="az" hidden>${azHTML()}</section>
         <section data-tab="essay" hidden>
           <p class="room-intro">Öğrencin ${K.esc(C.myName)} İngilizce ödevini teslim etti. İçinde <b>${essayHTML().total}</b> hata var. Hatalı kelimelere dokun, kırmızı kalemle düzelt, sonra notunu ver.</p>
           <div id="essay"></div>
         </section>
         <section data-tab="quiz" hidden>
-          <p class="room-intro">Bu sefer sınava giren sensin, öğretmenim. On soru, bir karne. Kopya çekmek serbest.</p>
+          <p class="room-intro">Bu sefer sınava giren sensin, öğretmenim. ${D.quiz.length} soru, bir karne. Kopya çekmek serbest.</p>
           <div id="quiz"></div>
         </section>`;
       K.$$('.tabs .chip', el).forEach((c) => c.addEventListener('click', () => tab(c.dataset.t)));
@@ -288,6 +330,7 @@
         }
       });
       initEssay();
+      initAz();
       renderQ();
       if (window.speechSynthesis) window.speechSynthesis.getVoices();
     },

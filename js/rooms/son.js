@@ -96,6 +96,7 @@
 
   K.room({
     id: 'son',
+    wing: 'kalp',
     title: 'Son Sayfa',
     sub: 'Sana mektubum',
     icon: 'heart',

@@ -211,6 +211,7 @@
 
   K.room({
     id: 'gokyuzu',
+    wing: 'oyun',
     title: 'Dilek Gökyüzü',
     sub: 'Takımyıldızımız ve dileklerin',
     icon: 'moon',

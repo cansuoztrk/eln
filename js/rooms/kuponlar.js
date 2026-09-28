@@ -164,6 +164,7 @@
 
   K.room({
     id: 'kuponlar',
+    wing: 'hazine',
     title: 'Aşk Kuponları',
     sub: 'Kazı, aç, kullan',
     icon: 'ticket',

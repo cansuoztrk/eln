@@ -117,8 +117,9 @@
 
   K.room({
     id: 'sebepler',
+    wing: 'kalp',
     title: 'Seni Sevmemin Sebepleri',
-    sub: `${D.reasons.length} sebep ve sayılmayan binlercesi`,
+    sub: () => `${D.reasons.length} sebep ve sayılmayan binlercesi`,
     icon: 'cards',
     color: '#E6DCFF',
     badge: () => `${seen().size}/${D.reasons.length}`,

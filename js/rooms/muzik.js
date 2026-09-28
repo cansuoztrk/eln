@@ -188,6 +188,7 @@
 
   K.room({
     id: 'muzik',
+    wing: 'oyun',
     title: 'Müzik Kutusu',
     sub: 'Senin valsin ve bir Kitty piyanosu',
     icon: 'music',

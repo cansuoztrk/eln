@@ -262,6 +262,7 @@
 
   K.room({
     id: 'angela',
+    wing: 'oyun',
     title: 'Angela\'nın Odası',
     sub: 'Dokun, konuş, sor, giydir',
     icon: 'angela',

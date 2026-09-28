@@ -49,6 +49,7 @@
 
   K.room({
     id: 'hayaller',
+    wing: 'hazine',
     title: 'Hayal Listesi',
     sub: 'Birlikte yapacaklarımız',
     icon: 'list',

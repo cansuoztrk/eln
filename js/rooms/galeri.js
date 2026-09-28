@@ -8,11 +8,11 @@
   const T = K.time;
 
   let root;
-  const MEMORIES = [
-    { scene: 'nehir', caption: 'Peri Nehir işbaşında', date: C.metDate },
+  const MEMORIES = () => [
+    { scene: 'nehir', caption: `Peri ${C.friendName} işbaşında`, date: C.metDate },
     { scene: 'winter', caption: 'Gruptaki ilk "merhaba"', date: C.metDate },
     { scene: 'question', caption: 'Adı konmamış günler' },
-    { scene: 'birthday', caption: 'Senin 23 Nisan\'ın', date: '2026-04-23' },
+    { scene: 'birthday', caption: 'Senin doğum günün', date: `2026-${C.herBirthday}` },
     { scene: 'together', caption: 'Sevgili olduğumuz gün', date: C.togetherDate },
     { scene: 'istanbul', caption: 'gartic.io geceleri' },
     { scene: 'distance', caption: `${K.num(C.distanceKm)} km ve bir kalp` },
@@ -22,16 +22,19 @@
   const uploads = () => K.store.get('wallPhotos', []);
 
   function items() {
-    const photos = D.photos.map((p, i) => ({ kind: 'photo', id: 'p' + i, src: p.src, caption: p.caption || '', date: p.date || '' }));
+    const photos = D.photos.map((p, i) => ({ kind: 'photo', id: 'p' + i, src: p.src, vault: p.vault, caption: p.caption || '', date: p.date || '' }));
     const mine = uploads().map((p) => ({ kind: 'upload', id: 'u' + p.id, src: p.img, caption: p.caption || '', date: p.date, uid: p.id }));
     const draws = K.store.get('drawings', []).map((d) => ({ kind: 'drawing', id: 'd' + d.id, src: d.img, caption: d.prompt || 'Çizimim', date: d.date }));
-    const cards = MEMORIES.map((m, i) => ({ kind: 'scene', id: 's' + i, scene: m.scene, caption: m.caption, date: m.date || '' }));
+    const cards = MEMORIES().map((m, i) => ({ kind: 'scene', id: 's' + i, scene: m.scene, caption: m.caption, date: m.date || '' }));
     return { photos: photos.concat(mine), draws, cards };
   }
 
+  // Kasadaki fotoğraflar şifreli: <img data-vault> olarak basılır, K.vault.fill çözer
+  const imgTag = (it, thumb) =>
+    it.vault ? `<img data-vault="${K.esc(it.vault)}" ${thumb ? 'data-thumb' : ''} alt="${K.esc(it.caption)}">` : `<img src="${K.esc(it.src)}" alt="${K.esc(it.caption)}" ${thumb ? 'loading="lazy"' : ''}>`;
   function polaroid(it, i) {
     const rot = [-4, 3, -2, 5, -3, 2, -5, 4][i % 8];
-    const media = it.kind === 'scene' ? `<svg viewBox="0 0 320 200" aria-hidden="true">${K.scenes[it.scene] ? K.scenes[it.scene]() : ''}</svg>` : `<img src="${K.esc(it.src)}" alt="${K.esc(it.caption)}" loading="lazy">`;
+    const media = it.kind === 'scene' ? `<svg viewBox="0 0 320 200" aria-hidden="true">${K.scenes[it.scene] ? K.scenes[it.scene]() : ''}</svg>` : imgTag(it, true);
     return `<button class="polaroid" data-id="${it.id}" style="--rot:${rot}deg;--d:${(i % 5) * 0.2}s">
       <span class="pin">${A.bow(['#E3174D', '#FF6FA3', '#8F73E6', '#4FC3D9'][i % 4])}</span>
       <span class="pol-media">${media}</span>
@@ -53,6 +56,7 @@
       (photos.length ? row('Fotoğraflarımız', photos) : '') +
       row('Masal kartları', cards, photos.length ? '' : 'Bu ipte şimdilik masalımızdan resimler var. Fotoğraflarımız da yakında buraya asılacak.') +
       row('Senin çizimlerin', draws, 'Gartic Odası\'nda "Duvara as" dediğin her çizim buraya gelir.');
+    K.vault.fill(root);
   }
 
   function lightbox(id) {
@@ -64,7 +68,7 @@
     const show = () => {
       const it = flat[i];
       armed = false;
-      const media = it.kind === 'scene' ? `<svg viewBox="0 0 320 200" aria-hidden="true">${K.scenes[it.scene]()}</svg>` : `<img src="${K.esc(it.src)}" alt="${K.esc(it.caption)}">`;
+      const media = it.kind === 'scene' ? `<svg viewBox="0 0 320 200" aria-hidden="true">${K.scenes[it.scene]()}</svg>` : imgTag(it, false);
       box.innerHTML = `<div class="lb-frame">${media}</div>
         <p class="lb-cap hand">${K.esc(it.caption)}</p>
         ${it.date ? `<p class="muted">${T.fmt(it.date)}</p>` : ''}
@@ -74,6 +78,7 @@
           <button class="icon-btn" data-nav="1" aria-label="Sonraki">${A.ui('next')}</button>
           ${it.kind === 'upload' ? `<button class="btn ghost small" data-del>${A.ui('trash')} Duvardan indir</button>` : ''}
         </div>`;
+      K.vault.fill(box);
     };
     show();
     box.addEventListener('click', (e) => {
@@ -148,6 +153,7 @@
 
   K.room({
     id: 'galeri',
+    wing: 'anilar',
     title: 'Anı Duvarı',
     sub: 'İpe asılı anılarımız',
     icon: 'camera',

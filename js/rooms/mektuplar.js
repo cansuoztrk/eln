@@ -81,7 +81,7 @@
         <article class="la-paper">
           <p class="la-kicker">${K.esc(l.title)}</p>
           <div class="la-text">${K.paras(l.body)}</div>
-          <p class="la-sign">— ${K.esc(C.myName)}</p>
+          <p class="la-sign">— ${K.esc(l.sign || C.myName)}</p>
           <p class="la-date">${first ? 'İlk kez açıldı: bugün' : 'İlk açılış: ' + T.fmt(r[id])}</p>
         </article>
       </div>`,
@@ -140,6 +140,7 @@
 
   K.room({
     id: 'mektuplar',
+    wing: 'kalp',
     title: 'Açılınca Oku',
     sub: 'Sana yazdığım mektuplar',
     icon: 'letter',

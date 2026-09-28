@@ -262,7 +262,7 @@
   }
 
   const NEHIR_GUESSES = ['patates', 'bulut', 'uzaylı', 'dinozor', 'brokoli', 'ördek', 'pizza', 'tost', 'ayakkabı', 'balina', 'şemsiye', 'kaktüs', 'kurbağa', 'makarna', 'ahtapot'];
-  const PROMPTS = ['İlk tanıştığımız gün', 'Hello Kitty prenses', 'Beni nasıl hayal ediyorsun?', 'Bakü\'den bir manzara', 'Şu anki ruh hâlin', 'Bizim geleceğimiz', 'Angela için yeni bir kıyafet', '{myName}\'in portresi (acımadan)', 'En sevdiğin yemek', 'Birlikte gitmek istediğin yer', 'Qız Qalası', 'Bir sonraki buluşmamız', 'Kalbin şu an', 'Nehir peri kılığında'];
+  const PROMPTS = ['İlk tanıştığımız gün', 'Hello Kitty prenses', 'Beni nasıl hayal ediyorsun?', 'Bakü\'den bir manzara', 'Şu anki ruh hâlin', 'Bizim geleceğimiz', 'Angela için yeni bir kıyafet', '{myName}\'in portresi (acımadan)', 'En sevdiğin yemek', 'Birlikte gitmek istediğin yer', 'Qız Qalası', 'Bir sonraki buluşmamız', 'Kalbin şu an', '{friendName} peri kılığında'];
   const PALETTE = ['#000000', '#666666', '#AAAAAA', '#FFFFFF', '#0050CD', '#26C9FF', '#017420', '#11B03C', '#990000', '#FF0013', '#FF7829', '#FFC126', '#964112', '#B0701C', '#99004E', '#FF008F', '#FF8FB8', '#FEAFA8', '#C9B6FF', '#E3174D'];
 
   let root;
@@ -751,6 +751,7 @@
 
   K.room({
     id: 'gartic',
+    wing: 'oyun',
     title: 'Gartic Odası',
     sub: `${C.myNick} çiziyor, ${C.herNick} tahmin ediyor`,
     icon: 'palette',

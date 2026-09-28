@@ -11,7 +11,7 @@
 
   function render() {
     const got = K.stickers.got();
-    const n = Object.keys(got).length;
+    const n = K.stickers.done();
     const total = K.stickers.total;
     const all = n >= total;
     K.$('#albumHead', root).innerHTML = `<div class="bk-ring" style="--p:${Math.round((n / total) * 100)}"><span>${n}/${total}</span></div>
@@ -19,10 +19,10 @@
       <p class="muted">${all ? 'Gizli mektup artık senin.' : 'Hepsini topladığında albümün son sayfasında gizli bir mektup açılacak. İpuçları boş yerlerin altında.'}</p></div>`;
     K.$('#albumGrid', root).innerHTML = K.stickers.DEFS.map((d, i) => {
       const date = got[d.id];
-      return `<div class="slot ${date ? 'has' : ''}" style="--r:${[-6, 4, -3, 7, -5, 2][i % 6]}deg">
+      return `<div class="slot ${date ? 'has' : ''} ${d.bonus ? 'bonus' : ''}" style="--r:${[-6, 4, -3, 7, -5, 2][i % 6]}deg">
         ${date ? K.stickers.art(d) : `<span class="sticker ghost">${A.icon(d.icon)}</span>`}
         <b>${date ? K.esc(d.name) : '?'}</b>
-        <small>${date ? T.fmt(date) : K.esc(d.hint)}</small>
+        <small>${date ? T.fmt(date) : K.esc(d.hint)}</small>${d.bonus ? '<span class="slot-bonus">Bonus</span>' : ''}
       </div>`;
     }).join('');
     const s = K.$('#albumSecret', root);
@@ -44,11 +44,12 @@
 
   K.room({
     id: 'album',
+    wing: 'hazine',
     title: 'Çıkartma Albümü',
     sub: 'Kalede topladıkların',
     icon: 'sticker',
     color: '#FFF3C4',
-    badge: () => `${Object.keys(K.stickers.got()).length}/${K.stickers.total}`,
+    badge: () => `${K.stickers.done()}/${K.stickers.total}`,
     init(el) {
       root = el;
       el.innerHTML = `

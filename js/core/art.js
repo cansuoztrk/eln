@@ -45,12 +45,19 @@
     return Object.values(sets).join('');
   }
 
-  function bowShape(color, stroke = INK) {
+  // Eln'in kırmızı puantiyeli tokasından: bütün fiyonklar puantiyeli
+  const DOTS = [
+    [-40, -12, 3.4], [-28, -17, 3], [-17, -7, 2.6], [-39, 3, 3], [-27, 1, 3.2],
+  ];
+  function bowShape(color, stroke = INK, dots = true) {
+    const dot = dots
+      ? `<g fill="#fff" opacity=".92">${DOTS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/><circle cx="${-x}" cy="${y}" r="${r}"/>`).join('')}</g>`
+      : `<g fill="#fff" opacity=".35"><ellipse cx="-34" cy="-12" rx="7" ry="4" transform="rotate(-20 -34 -12)"/><ellipse cx="34" cy="-12" rx="7" ry="4" transform="rotate(20 34 -12)"/></g>`;
     return `<g stroke="${stroke}" stroke-width="6" stroke-linejoin="round" fill="${color}">
       <path d="M0 0 C-12 -30 -52 -36 -52 -8 C-52 18 -20 16 0 0 Z"/>
       <path d="M0 0 C12 -30 52 -36 52 -8 C52 18 20 16 0 0 Z"/>
     </g>
-    <g fill="#fff" opacity=".35"><ellipse cx="-34" cy="-12" rx="7" ry="4" transform="rotate(-20 -34 -12)"/><ellipse cx="34" cy="-12" rx="7" ry="4" transform="rotate(20 34 -12)"/></g>
+    ${dot}
     <g fill="none" stroke="${stroke}" stroke-width="4" stroke-linecap="round"><path d="M-14 -5 C-24 -13 -34 -15 -41 -11"/><path d="M14 -5 C24 -13 34 -15 41 -11"/></g>
     <ellipse cx="0" cy="0" rx="13" ry="12" fill="${color}" stroke="${stroke}" stroke-width="6"/>`;
   }
@@ -147,6 +154,59 @@
       <g data-zone="paw" fill="${FUR}" stroke="${OUT}" stroke-width="6"><ellipse cx="90" cy="410" rx="31" ry="16"/><ellipse cx="150" cy="410" rx="31" ry="16"/></g>
       <g fill="#FFB3C7"><circle cx="80" cy="412" r="4"/><circle cx="90" cy="415" r="4"/><circle cx="100" cy="412" r="4"/><circle cx="140" cy="412" r="4"/><circle cx="150" cy="415" r="4"/><circle cx="160" cy="412" r="4"/></g>
       <g class="a-headwrap">${head}</g>
+    </svg>`;
+  }
+
+  /* ---------------- Köpekçik (puantiyeli fiyonk, pembe tasma) ---------------- */
+  function kopus(opt = {}) {
+    const { cls = '', label = 'Köpekçik' } = opt;
+    const O = '#5A3A48';
+    return `<svg class="kopus ${cls}" viewBox="0 0 240 250" role="img" aria-label="${label}">
+      <g class="kp-tail"><path d="M168 196 C206 190 214 158 200 142" fill="none" stroke="${O}" stroke-width="20" stroke-linecap="round"/><path d="M168 196 C206 190 214 158 200 142" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/></g>
+      <g class="kp-body"><path d="M70 170 C54 214 70 244 120 244 C170 244 186 214 170 170 Z" fill="#fff" stroke="${O}" stroke-width="6" stroke-linejoin="round"/>
+        <ellipse cx="120" cy="212" rx="28" ry="24" fill="#FFF1F6"/>
+        <g class="kp-paw-l"><ellipse cx="96" cy="240" rx="20" ry="11" fill="#fff" stroke="${O}" stroke-width="5"/></g>
+        <g class="kp-paw-r"><ellipse cx="144" cy="240" rx="20" ry="11" fill="#fff" stroke="${O}" stroke-width="5"/></g>
+      </g>
+      <g class="kp-head">
+        <g class="kp-ear-l"><path d="M58 70 C26 72 18 128 34 150 C46 164 64 150 70 124 Z" fill="#FFE6EF" stroke="${O}" stroke-width="6" stroke-linejoin="round"/></g>
+        <g class="kp-ear-r"><path d="M182 70 C214 72 222 128 206 150 C194 164 176 150 170 124 Z" fill="#FFE6EF" stroke="${O}" stroke-width="6" stroke-linejoin="round"/></g>
+        <ellipse cx="120" cy="104" rx="66" ry="60" fill="#fff" stroke="${O}" stroke-width="6"/>
+        <path d="M86 52 Q120 36 154 52" fill="none" stroke="#F4E3EA" stroke-width="8" stroke-linecap="round"/>
+        <g class="kp-eyes"><ellipse cx="94" cy="100" rx="10" ry="12" fill="#2A1B24"/><ellipse cx="146" cy="100" rx="10" ry="12" fill="#2A1B24"/><circle cx="90" cy="95" r="4" fill="#fff"/><circle cx="142" cy="95" r="4" fill="#fff"/></g>
+        <g class="kp-happy" fill="none" stroke="#2A1B24" stroke-width="5" stroke-linecap="round"><path d="M84 102 Q94 90 104 102"/><path d="M136 102 Q146 90 156 102"/></g>
+        <ellipse cx="120" cy="124" rx="13" ry="9" fill="#2A1B24"/><ellipse cx="116" cy="121" rx="4" ry="2.5" fill="#fff" opacity=".6"/>
+        <path d="M120 133 Q112 146 102 140 M120 133 Q128 146 138 140" fill="none" stroke="${O}" stroke-width="4" stroke-linecap="round"/>
+        <path class="kp-tongue" d="M112 142 Q120 162 128 142 Z" fill="#FF7FA2" stroke="${O}" stroke-width="2.5"/>
+        <g fill="#FF9EBB" opacity=".55"><ellipse cx="76" cy="126" rx="12" ry="7"/><ellipse cx="164" cy="126" rx="12" ry="7"/></g>
+        <g transform="translate(168 52) rotate(18) scale(.52)">${bowShape('#E3174D', O)}</g>
+      </g>
+      <path d="M72 166 Q120 188 168 166" fill="none" stroke="#FF6FA3" stroke-width="12" stroke-linecap="round"/>
+      <g transform="translate(120 184)"><circle r="11" fill="#FFD34E" stroke="${O}" stroke-width="3"/><text y="5" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="12" fill="${O}">K</text></g>
+    </svg>`;
+  }
+  // Köpekçiğin kulübesi
+  function doghouse(cls = '', name = '') {
+    const O = '#5A3A48';
+    return `<svg class="doghouse ${cls}" viewBox="0 0 260 220" aria-hidden="true">
+      <path d="M30 100 L130 20 L230 100 Z" fill="#FF8FB8" stroke="${O}" stroke-width="6" stroke-linejoin="round"/>
+      <g fill="#fff" opacity=".85">${[[92, 70], [130, 50], [168, 70], [110, 88], [150, 88]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="6"/>`).join('')}</g>
+      <rect x="48" y="96" width="164" height="112" rx="8" fill="#FFF1D6" stroke="${O}" stroke-width="6"/>
+      <path d="M100 208 V160 Q130 124 160 160 V208 Z" fill="#5A3A48"/>
+      <rect x="92" y="104" width="76" height="24" rx="6" fill="#fff" stroke="${O}" stroke-width="4"/>
+      <text x="130" y="122" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="15" fill="#E3174D">${K.esc(String(name).toLocaleUpperCase("tr"))}</text>
+      <g transform="translate(130 20) scale(.5)">${bowShape('#E3174D', O)}</g>
+    </svg>`;
+  }
+  // Instagram sohbet temamızdaki gibi uçan çiçek adası
+  function island(cls = '') {
+    const flowers = [[30, 14, '#FF8FB8'], [52, 8, '#fff'], [74, 12, '#FF6FA3'], [98, 6, '#FFD6E5'], [120, 12, '#FF8FB8'], [142, 9, '#fff'], [60, 18, '#FFB3CE'], [110, 18, '#FF6FA3']];
+    return `<svg class="island ${cls}" viewBox="0 0 170 80" aria-hidden="true">
+      <path d="M8 22 C40 14 130 12 162 22 C150 44 120 70 86 76 C54 70 22 46 8 22 Z" fill="#D9A4C2"/>
+      <path d="M8 22 C40 14 130 12 162 22 C150 30 120 34 86 34 C50 34 22 30 8 22 Z" fill="#7FB88F"/>
+      <g stroke="#5E9B6E" stroke-width="2">${flowers.map(([x, y]) => `<path d="M${x} ${y + 12} V${y + 4}"/>`).join('')}</g>
+      ${flowers.map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="4.5" fill="${c}"/><circle cx="${x}" cy="${y}" r="1.6" fill="#FFD34E"/>`).join('')}
+      <g fill="#FFF4C7" class="island-glow"><circle cx="40" cy="4" r="1.6"/><circle cx="132" cy="2" r="1.4"/><circle cx="90" cy="0" r="1.2"/></g>
     </svg>`;
   }
 
@@ -252,6 +312,12 @@
     star: `<path d="M32 5 L39.5 21 L57 23 L44 35 L47.5 52.5 L32 44 L16.5 52.5 L20 35 L7 23 L24.5 21 Z" fill="#FFE08A" ${s}/><path d="M54 48 L55.4 51.6 L59 53 L55.4 54.4 L54 58 L52.6 54.4 L49 53 L52.6 51.6 Z" fill="#fff" stroke="${LINE}" stroke-width="1.8"/>`,
     apple: `<path d="M32 18 C22 10 8 16 10 32 C12 48 22 58 32 52 C42 58 52 48 54 32 C56 16 42 10 32 18 Z" fill="#E3174D" ${s}/><path d="M32 18 Q32 10 36 6" fill="none" ${s}/><path d="M36 12 Q44 6 48 12 Q42 16 36 12 Z" fill="#7ED6A5" ${s} stroke-width="2.2"/><ellipse cx="22" cy="28" rx="4" ry="6" fill="#fff" opacity=".45"/>`,
     pencil: `<path d="M12 52 L16 38 L44 10 L54 20 L26 48 Z" fill="#FFD34E" ${s}/><path d="M12 52 L16 38 L26 48 Z" fill="#FFE2C4" ${s}/><path d="M40 14 L50 24" ${s}/><path d="M44 10 L54 20 L58 16 C60 14 60 12 58 10 L54 6 C52 4 50 4 48 6 Z" fill="#FF8FB8" ${s}/>`,
+    chat: `<path d="M8 12 H44 A6 6 0 0 1 50 18 V36 A6 6 0 0 1 44 42 H22 L12 50 V42 H14 A6 6 0 0 1 8 36 Z" fill="#E6DCFF" ${s}/><path d="M26 22 H56 A4 4 0 0 1 60 26 V42 A4 4 0 0 1 56 46 H54 V54 L46 46 H30 A4 4 0 0 1 26 42 Z" fill="#FFB3CE" ${s}/>${heartPath(43, 37, 0.6)}`,
+    note: `<rect x="10" y="12" width="36" height="36" rx="3" transform="rotate(-8 28 30)" fill="#8FD3FF" ${s}/><rect x="20" y="18" width="36" height="36" rx="3" transform="rotate(6 38 36)" fill="#FFE08A" ${s}/><text x="38" y="38" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="14" fill="${LINE}" transform="rotate(6 38 36)">♡</text>${heartPath(38, 47, 0.45)}`,
+    frame: `<rect x="8" y="8" width="48" height="48" rx="4" fill="#FFD34E" ${s}/><rect x="15" y="15" width="34" height="34" rx="2" fill="#FFD6E5" ${s} stroke-width="2.4"/><circle cx="32" cy="28" r="6" fill="#fff" ${s} stroke-width="2"/><path d="M22 46 Q32 34 42 46" fill="#fff" ${s} stroke-width="2"/><circle cx="8" cy="8" r="3" fill="#FFD34E" ${s} stroke-width="2"/><circle cx="56" cy="8" r="3" fill="#FFD34E" ${s} stroke-width="2"/><circle cx="8" cy="56" r="3" fill="#FFD34E" ${s} stroke-width="2"/><circle cx="56" cy="56" r="3" fill="#FFD34E" ${s} stroke-width="2"/>`,
+    vinyl: `<circle cx="32" cy="32" r="26" fill="#2B2024" ${s}/><circle cx="32" cy="32" r="18" fill="none" stroke="#5A4A54" stroke-width="1.5"/><circle cx="32" cy="32" r="13" fill="none" stroke="#5A4A54" stroke-width="1.5"/><circle cx="32" cy="32" r="9" fill="#FF8FB8"/><circle cx="32" cy="32" r="2.2" fill="#2B2024"/><path d="M50 10 L58 18 L44 34" fill="none" ${s}/>`,
+    paw: `<ellipse cx="32" cy="42" rx="13" ry="11" fill="#FF8FB8" ${s}/><ellipse cx="17" cy="27" rx="6" ry="7.5" fill="#FF8FB8" ${s}/><ellipse cx="27" cy="18" rx="6" ry="7.5" fill="#FF8FB8" ${s}/><ellipse cx="38" cy="18" rx="6" ry="7.5" fill="#FF8FB8" ${s}/><ellipse cx="47" cy="27" rx="6" ry="7.5" fill="#FF8FB8" ${s}/>`,
+    hugs: `<g transform="translate(-2 6)"><circle cx="20" cy="28" r="12" fill="#fff" ${s}/><circle cx="44" cy="28" r="12" fill="#fff" ${s}/><circle cx="16" cy="26" r="1.8" fill="${LINE}"/><circle cx="24" cy="26" r="1.8" fill="${LINE}"/><circle cx="40" cy="26" r="1.8" fill="${LINE}"/><circle cx="48" cy="26" r="1.8" fill="${LINE}"/><path d="M26 18 Q20 10 14 16 M38 18 Q44 10 50 16" fill="#E3174D" ${s} stroke-width="2"/><path d="M8 40 Q32 58 56 40" fill="none" ${s}/></g>${heartPath(32, 12, 0.7)}`,
     owl: `<path d="M38 8 A24 24 0 1 0 56 44 A19 19 0 1 1 38 8 Z" fill="#C9B6FF" ${s}/><text x="44" y="26" font-family="Fredoka, sans-serif" font-weight="700" font-size="11" fill="${LINE}">z</text><text x="50" y="16" font-family="Fredoka, sans-serif" font-weight="700" font-size="8" fill="${LINE}">z</text>`,
   };
   function icon(name, cls = '') {
@@ -331,5 +397,5 @@
     });
   }
 
-  K.art = { kitty, bow, bowShape, angela, kizKulesi, qizQalasi, flameTowers, garland, icon, ui, moonPhase, moonSvg, toImage, heartPath, ICONS };
+  K.art = { kitty, bow, bowShape, angela, kopus, doghouse, island, kizKulesi, qizQalasi, flameTowers, garland, icon, ui, moonPhase, moonSvg, toImage, heartPath, ICONS };
 })();

@@ -26,13 +26,15 @@
     const list = [
       { id: 'herbd', title: `${C.herName}'in doğum günü`, icon: 'cake', ...T.nextAnnual(C.herBirthday), note: 'Türkiye\'de bayram, benim için daha da büyük bayram.' },
       { id: 'mybd', title: `${C.myName}'in doğum günü`, icon: 'cake', ...T.nextAnnual(C.myBirthday), note: 'O gün ilk mesajı sen atacaksın, anlaşmıştık.' },
-      { id: 'met', title: 'Tanışma yıldönümümüz', icon: 'letter', ...T.nextAnnual(C.metDate.slice(5)), note: 'Nehir\'in bizi aynı gruba eklediği gün.' },
-      { id: 'ann', title: annN === 1 ? 'İlk yıldönümümüz' : `${annN}. yıldönümümüz`, icon: 'heart', ...ann, note: '21 Mayıs: takvimdeki en sevdiğim gün.' },
-      { id: 'month', title: `${monthN}. ayımız`, icon: 'calendar', days: T.daysUntil(monthKey), date: T.at(monthKey), note: 'Her ayın 21\'i bizim küçük bayramımız.' },
+      { id: 'met', title: 'Tanışma yıldönümümüz', icon: 'letter', ...T.nextAnnual(C.metDate.slice(5)), note: `${C.friendName}'in bizi aynı gruba eklediği gün.` },
+      { id: 'ann', title: annN === 1 ? 'İlk yıldönümümüz' : `${annN}. yıldönümümüz`, icon: 'heart', ...ann, note: `${+C.togetherDate.slice(8)} ${K.MONTHS[+C.togetherDate.slice(5, 7) - 1]}: takvimdeki en sevdiğim gün.` },
+      { id: 'month', title: `${monthN}. ayımız`, icon: 'calendar', days: T.daysUntil(monthKey), date: T.at(monthKey), note: `Her ayın ${+C.togetherDate.slice(8)}'i bizim küçük bayramımız.` },
       { id: 'val', title: 'Sevgililer Günü', icon: 'heart', ...T.nextAnnual('02-14'), note: 'Bizim için her gün, ama olsun.' },
       { id: 'ny', title: 'Yeni yıl', icon: 'star', ...T.nextAnnual('01-01'), note: 'Yeni yılın ilk mesajı senin.' },
       { id: 'hk', title: 'Hello Kitty\'nin doğum günü', icon: 'bow', ...T.nextAnnual('11-01'), note: 'Kitty White, 1 Kasım. Senin kadar olmasa da önemli.' },
     ];
+    if (C.notesDate) list.push({ id: 'notes', title: 'Not duvarının yıldönümü', icon: 'note', ...T.nextAnnual(C.notesDate.slice(5)), note: `${C.herCity}'de bir duvara ikimizin adını yazdığın gün. Daha sevgili bile değildik.` });
+    if (C.firstMeetDate && T.daysUntil(C.firstMeetDate) >= 0) list.push({ id: 'meet', title: 'İlk sarılmamız', icon: 'hugs', days: T.daysUntil(C.firstMeetDate), date: T.at(C.firstMeetDate), note: 'Ekranların bittiği gün.' });
     return list.sort((a, b) => a.days - b.days);
   }
 
@@ -180,6 +182,7 @@
 
   K.room({
     id: 'ozel',
+    wing: 'hazine',
     title: 'Özel Günler',
     sub: 'Geri sayımlar ve bir pasta',
     icon: 'cake',
