@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>OG kartı</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fredoka:wght@400;500;600;700&family=Great+Vibes&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,500&display=swap">
+<link rel="stylesheet" href="../css/base.css">
+<style>
+  /* Paylaşım önizleme görseli (assets/og.png) bu sayfanın 1200×630 ekran görüntüsüdür. */
+  html, body { width: 1200px; height: 630px; margin: 0; overflow: hidden; }
+  body { background: linear-gradient(180deg, #ffd0e1, #fff3f7); position: relative; font-family: var(--font-display); }
+  .ist, .baku { position: absolute; bottom: 0; width: 250px; }
+  .ist { left: 40px; } .baku { right: 40px; }
+  .ist svg, .baku svg { width: 100%; height: auto; display: block; }
+  .garland { position: absolute; top: -34px; left: 120px; width: 960px; height: 120px; }
+  .center { position: absolute; inset: 0; display: grid; justify-items: center; align-content: center; gap: 4px; text-align: center; }
+  .eyebrow { font: 700 22px/1 var(--font-display); letter-spacing: .18em; text-transform: uppercase; color: #f0578f; }
+  h1 { font: 400 124px/1 var(--font-script); color: #e3174d; margin: 6px 0 0; text-shadow: 0 4px 0 #fff; }
+  .kitty { width: 250px; height: auto; filter: drop-shadow(0 14px 16px rgba(176,45,96,.25)); }
+  .sub { font: 600 26px/1.2 var(--font-display); color: #86566f; }
+  .sea { position: absolute; left: 0; right: 0; bottom: 0; height: 30px; background: radial-gradient(circle at 20px -8px, transparent 16px, #bfe6ff 17px) 0 0 / 40px 30px repeat-x; }
+</style>
+</head>
+<body>
+<div id="g"></div>
+<div class="ist" id="ist"></div>
+<div class="baku" id="baku"></div>
+<div class="sea"></div>
+<div class="center">
+  <p class="eyebrow">Boğaz'dan Hazar'a bir Hello Kitty masalı</p>
+  <div id="k"></div>
+  <h1>Prenses Eln'e</h1>
+  <p class="sub">Kapının anahtarı Kitty'nin fiyonkunda</p>
+</div>
+<script src="../js/data.js"></script>
+<script src="../js/core/util.js"></script>
+<script src="../js/core/art.js"></script>
+<script>
+  document.getElementById('g').outerHTML = K.art.garland();
+  document.getElementById('ist').innerHTML = K.art.kizKulesi();
+  document.getElementById('baku').innerHTML = K.art.qizQalasi();
+  document.getElementById('k').innerHTML = K.art.kitty({ crown: true, eyes: 'heart' });
+</script>
+</body>
+</html>
