@@ -11,6 +11,7 @@
   const WINGS = [
     { id: 'sahip', title: 'Kale Sahibi', sub: 'Bunu sadece sen görüyorsun: canlı posta, cevaplar, fotoğraflar ve ayarlar', color: '#4A2138', icon: 'key' },
     { id: 'mevsim', title: 'Bu Günlere Özel', sub: 'Sadece bu günlerde açık olan odalar. Kaçırma!', color: '#8F73E6', icon: 'star' },
+    { id: 'zaman', title: 'Zaman Kanadı', sub: 'Kilerdeki kapı, yedi günlük bir zaman yolculuğu ve 22 saatte uçan güvercinler', color: '#B07A4F', icon: 'hourglass' },
     { id: 'anilar', title: 'Anılar Kanadı', sub: 'Masalımız, sohbetlerimiz, Bakü\'deki izlerin, portrelerin, o gecenin gökyüzü ve bizim şarkımız', color: '#F0578F', icon: 'book' },
     { id: 'kalp', title: 'Kalp Kanadı', sub: 'Mektuplar, sesim, telsizimiz, sebepler, zaman kapsülü ve henüz yaşanmamış o ilk sarılma', color: '#E3174D', icon: 'heart' },
     { id: 'oyun', title: 'Oyun Kanadı', sub: 'gartic, Angela, Bakü\'ye uçuş, film gecesi, gökyüzü ve müzik kutusu', color: '#3FA37A', icon: 'palette' },
@@ -76,6 +77,7 @@
           <p class="hero-sub" id="greetSub"></p>
           <a class="news-chip" id="newsChip" href="#gazete" hidden>${A.icon('news')}<span>Kitty Gazetesi kapına geldi</span></a>
           <a class="here-chip" id="hereChip" href="#birlikte" hidden><i></i><span></span></a>
+          <a class="where-chip" id="whereChip" href="#takvim" hidden>${A.icon('week')}<span></span></a>
         </div>
         <div class="hero-scene">
           <div class="scene-tower">${A.kizKulesi()}<span class="city-tag">${K.esc(C.myCity)} · <i>${K.esc(C.myPet || C.myNick)}</i></span></div>
@@ -122,6 +124,7 @@
             <p class="note-text" id="noteText"></p>
             <p class="note-sign">— ${K.esc(C.myPet || C.myName || '')}</p>
           </article>
+          <article class="card lily-card" id="lilyCard" hidden></article>
           <article class="card q-card" id="qCard" hidden>
             <p class="card-eyebrow">Günün sorusu</p>
             <p class="q-text" id="qText"></p>
@@ -153,6 +156,7 @@
       <footer class="foot">
         <div class="foot-tags"><span class="gtag">${K.esc(C.herPet || C.herNick)}</span><span class="foot-heart" aria-hidden="true">♥</span><span class="gtag">${K.esc(C.myPet || C.myNick)}</span></div>
         <p>Bu masal ${T.fmt(C.metDate)}'te bir Instagram grubunda başladı.<br>Devamını her gün birlikte yazıyoruz.</p>
+        <div class="foot-theme" id="footTheme"></div>
         <p class="foot-small">Bu kaleye <b id="visitCount">1</b>. gelişin · <a href="#album">Çıkartmalar <b id="footStickers">0</b>/${K.stickers.total}</a></p>
         <button class="paw-secret no-burst" id="pawSecret" aria-label="Minicik bir pati izi">${A.icon('paw')}</button>
       </footer>`;
@@ -918,9 +922,9 @@
     }
   }
   function applyConfig(rows) {
-    const last = rows[rows.length - 1];
-    if (!last) return;
-    if ('firstMeetDate' in last.data) C.firstMeetDate = last.data.firstMeetDate || '';
+    rows.forEach((r) => {
+      if ('firstMeetDate' in r.data) C.firstMeetDate = r.data.firstMeetDate || '';
+    });
   }
   K.on('cloud', async (on) => {
     if (!on) return;

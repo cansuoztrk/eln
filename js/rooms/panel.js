@@ -10,7 +10,8 @@
 
   let root;
   const COLORS = ['#FFD6E5', '#D6F1FF', '#FFF3C4', '#E6DCFF', '#D8F5E8', '#FFE0E0'];
-  const KIND_TEXT = { answer: 'soruyu cevapladı', page: 'deftere yazdı', live: 'telsizden yazdı', hug: 'birlikte sarıldınız', drawing: 'tahtada çizdi', round: 'tahtada oynadı' };
+  const KIND_TEXT = { answer: 'soruyu cevapladı', page: 'deftere yazdı', live: 'telsizden yazdı', hug: 'birlikte sarıldınız', drawing: 'tahtada çizdi', round: 'tahtada oynadı', pigeon: 'güvercin uçurdu', classes: 'ders programını güncelledi' };
+  const CLASS_MODES = [['on', 'Dersler devam ediyor'], ['off', 'Tatildeyim'], ['sinav', 'Sınav haftası']];
 
   function sec(id, title, sub, body) {
     return `<section class="card pn-sec" id="${id}"><p class="card-eyebrow">${title}</p>${sub ? `<p class="muted small">${sub}</p>` : ''}${body}</section>`;
@@ -55,10 +56,13 @@
         K.fx.toast('Cevabın kaleye yazıldı; o cevaplayınca yan yana görünecek.', { icon: A.icon('question') });
         renderLists();
       });
-    const last = cfg[cfg.length - 1];
+    const last = cfg.filter((r) => 'firstMeetDate' in r.data).pop();
     K.$('#pnMeetNow', root).textContent = last && last.data.firstMeetDate ? `Şu an: ${T.fmt(last.data.firstMeetDate)}` : 'Şu an: tarih yok (o kendi hayal tarihini seçebiliyor)';
+    const mode = (cfg.filter((r) => 'classMode' in r.data).pop() || { data: { classMode: 'on' } }).data.classMode;
+    const cm = K.$('#pnClassModes', root);
+    cm && K.$$('[data-cm]', cm).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cm === mode)));
     // Onun son hareketleri
-    const feedKinds = ['answer', 'page', 'live', 'hug', 'round'];
+    const feedKinds = ['answer', 'page', 'live', 'hug', 'round', 'pigeon', 'classes'];
     const all = (await Promise.all(feedKinds.map((k) => K.cloud.list(k, 60)))).flat().filter((r) => r.who === 'her');
     all.sort((a, b) => b.at - a.at);
     K.$('#pnFeed', root).innerHTML = all.length
@@ -146,6 +150,22 @@
       K.fx.toast(v ? `İlk buluşma: ${T.fmt(v)}. Geri sayım başladı.` : 'Tarih kaldırıldı.', { icon: A.icon('hugs') });
       renderLists();
     });
+    K.$('#pnLilyForm', el).addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const n = +K.$('#pnLilyN', el).value;
+      const r = await K.sendBouquet(n, K.$('#pnLilyNote', el).value.trim());
+      if (!r) return K.fx.toast('Gönderilemedi. Bulut bağlı mı?');
+      K.$('#pnLilyNote', el).value = '';
+      K.fx.rain({ count: 30, colors: ['#FF8FB8', '#FFD0E1', '#FFFFFF'] });
+      K.fx.toast(`${n} zambak yola çıktı.`, { icon: A.icon('lily') });
+    });
+    K.$('#pnClassModes', el).addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-cm]');
+      if (!b) return;
+      await K.cloud.add('config', { classMode: b.dataset.cm });
+      K.$$('[data-cm]', el).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      K.fx.toast(`Ders durumu: ${b.textContent}`, { icon: A.icon('week') });
+    });
     el.addEventListener('click', async (e) => {
       const d = e.target.closest('[data-del]');
       if (!d) return;
@@ -193,6 +213,10 @@
             <div class="pn-photos" id="pnPhotos"></div>`)}
           ${sec('pnMeet', 'İlk buluşma tarihi', 'Belli olduğunda buraya yaz: İlk Sarılma odasında gerçek geri sayım başlar, o gün kale kutlamaya döner.', `
             <form class="row" id="pnMeetForm"><input class="input" type="date" id="pnMeet" name="pnMeet" min="${T.todayKey()}"><button class="btn small" type="submit">${A.ui('check')} Kaydet</button></form><p class="muted small" id="pnMeetNow"></p>`)}
+          ${sec('pnLily', 'Zambak gönder', 'Onun çiçeği zambak. Gönderdiğin zambaklar Zambak Bahçesi\'ndeki vazoya düşer; kaledeyse ekranına çiçek yağar.', `
+            <form class="pn-form" id="pnLilyForm" autocomplete="off"><div class="row"><select class="input" id="pnLilyN" name="pnLilyN" aria-label="Kaç zambak">${[1, 3, 7, 12, 21].map((n) => `<option value="${n}" ${n === 7 ? 'selected' : ''}>${n} zambak</option>`).join('')}</select><input class="input" id="pnLilyNote" name="pnLilyNote" maxlength="200" placeholder="Kartın üstüne (isteğe bağlı)"></div><button class="btn red small" type="submit">${A.icon('lily')} Gönder</button></form>`)}
+          ${sec('pnClass', 'Ders durumun', 'İki Takvim ve ana salondaki "Ardoş şu an..." bilgisi buna göre değişir. Resmî tatillerde kendiliğinden "tatilde" görünür.', `
+            <div class="kc-presets" id="pnClassModes">${CLASS_MODES.map(([k, t]) => `<button type="button" class="chip" data-cm="${k}" aria-pressed="${k === 'on'}">${t}</button>`).join('')}</div>`)}
           ${sec('pnAct', 'Onun son hareketleri', 'Buluta düşen cevaplar, defter sayfaları, telsiz mesajları.', '<ul class="pn-feed" id="pnFeed"></ul>')}
         </div>`;
       bind(el);

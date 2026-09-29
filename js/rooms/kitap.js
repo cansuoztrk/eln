@@ -16,6 +16,8 @@
     ['portre', 'Portreler'],
     ['iz', 'Bakü\'deki İzlerin'],
     ['gok', 'O Gecenin Gökyüzü'],
+    ['zaman', 'Zaman Yolcusu'],
+    ['zambak', 'Zambak Notları'],
     ['soru', 'Soru Defteri'],
     ['defter', 'Bizim Defter'],
     ['son', 'Son Sayfa'],
@@ -82,6 +84,22 @@
     if (ch.gok && K.skyPoster) {
       out.push(opener('O Gecenin Gökyüzü', 'Özel gecelerimizin yıldız haritaları'));
       D.skies.slice(0, 3).forEach((sk) => out.push(page('kb-sky', K.skyPoster(sk))));
+    }
+    if (ch.zaman && D.zaman) {
+      const solved = K.store.get('zyDone', []);
+      const list = D.zaman.chapters.filter((c) => K.isOwner() || solved.includes(c.id));
+      if (list.length) {
+        out.push(opener('Zaman Yolcusu', 'Geçmişe inilen anlar, İstanbul tarafından'));
+        list.forEach((c) => out.push(page('kb-letter', `<p class="kb-kicker">${K.esc(c.date)} · ${K.esc(c.title)}</p><div class="kb-lt">${K.paras(c.reveal || [])}</div>`)));
+      }
+    }
+    if (ch.zambak && D.zambak) {
+      const blooms = K.store.get('lily', { blooms: [] }).blooms;
+      if (blooms.length) {
+        out.push(opener('Zambak Notları', `${blooms.length} zambak, ${blooms.length} not`));
+        for (let i = 0; i < blooms.length; i += 4)
+          out.push(page('kb-qa', blooms.slice(i, i + 4).map((b, k) => `<div class="kb-q"><p class="kb-qq">${K.num(i + k + 1)}. zambak · ${T.fmt(b.day)}</p><p class="hand her">${K.esc(K.fill(D.zambak.notes[b.note] || ''))}</p></div>`).join('')));
+      }
     }
     if (ch.soru) {
       const local = K.store.get('answers', {});

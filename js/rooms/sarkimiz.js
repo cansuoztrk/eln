@@ -6,11 +6,13 @@
   const D = window.ELN;
   const C = D.config;
 
-  let root, playing = false;
+  let root, playing = false, side = 'A';
+  // Plağın A yüzü bizim şarkımız, B yüzü onun şarkısı
+  const cur = () => (side === 'B' && C.song2 ? C.song2 : C.song || {});
   const CAS = ['#FF8FB8', '#FFD34E', '#8FD3FF', '#C9B6FF', '#7ED6A5', '#FFB3CE', '#FFC9A8'];
 
   function turntable() {
-    const s = C.song || {};
+    const s = cur();
     const grooves = [96, 88, 80, 72, 64, 56, 48].map((r) => `<circle cx="150" cy="130" r="${r}" fill="none" stroke="#3A2E36" stroke-width="1.2"/>`).join('');
     return `<svg class="tt" viewBox="0 0 360 262" role="img" aria-label="Pikap: ${K.esc(s.title || '')}">
       <defs><radialGradient id="ttShine" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
@@ -81,13 +83,20 @@
   }
 
   function setPlaying(on) {
-    const s = C.song || {};
+    const s = cur();
     playing = on;
     const tt = K.$('.tt-wrap', root);
     tt.classList.toggle('playing', on);
     const btn = K.$('#ttPlay', root);
-    btn.innerHTML = on ? `${A.ui('pause')} Durdur` : `${A.ui('play')} Şarkımızı çal`;
+    btn.innerHTML = on ? `${A.ui('pause')} Durdur` : `${A.ui('play')} ${side === 'B' ? 'Onun şarkısını çal' : 'Şarkımızı çal'}`;
     const tv = K.$('#ttVideo', root);
+    if (on && !s.youtube) {
+      // B yüzü: şarkı YouTube/Spotify'da açılır, pikap dönmeye devam eder
+      if (K.audio.music.on) K.audio.music.stop(false);
+      window.open(s.youtubeUrl || s.spotifyUrl, '_blank', 'noopener');
+      K.stickers.award('bside');
+      return;
+    }
     if (on) {
       if (K.audio.music.on) K.audio.music.stop(false);
       tv.hidden = false;
@@ -116,19 +125,20 @@
             <div class="tt-notes" aria-hidden="true"><i>♪</i><i>♫</i><i>♪</i><i>♥</i></div>
           </div>
           <div class="song-side">
-            <p class="card-eyebrow">Şu an pikapta</p>
-            <h3 class="song-title">${K.esc(s.title || '')}</h3>
-            <p class="song-artist">${K.esc(s.artist || '')}</p>
+            <p class="card-eyebrow" id="ttSide">Şu an pikapta · A yüzü</p>
+            <h3 class="song-title" id="ttTitle">${K.esc(s.title || '')}</h3>
+            <p class="song-artist" id="ttArtist">${K.esc(s.artist || '')}</p>
             <div class="actions">
               <button class="btn red" id="ttPlay">${A.ui('play')} Şarkımızı çal</button>
+              ${C.song2 ? `<button class="btn soft" id="ttFlip">${A.ui('refresh')} Plağı çevir</button>` : ''}
             </div>
-            <p class="muted small">Açılmazsa: <a href="${K.esc(s.youtubeUrl || '#')}" target="_blank" rel="noopener">YouTube'da aç</a> · <a href="${K.esc(s.spotifyUrl || '#')}" target="_blank" rel="noopener">Spotify'da ara</a></p>
+            <p class="muted small" id="ttLinks">Açılmazsa: <a href="${K.esc(s.youtubeUrl || '#')}" target="_blank" rel="noopener">YouTube'da aç</a> · <a href="${K.esc(s.spotifyUrl || '#')}" target="_blank" rel="noopener">Spotify'da ara</a></p>
           </div>
         </div>
         <div class="tt-video" id="ttVideo" hidden></div>
         <article class="liner">
           <p class="card-eyebrow">Plak kapağının içinden</p>
-          <div class="liner-text">${K.paras(D.songLetter)}</div>
+          <div class="liner-text" id="ttLiner">${K.paras(D.songLetter)}</div>
           <p class="hand liner-sign">— ${K.esc(C.myPet)}</p>
         </article>
         <section class="tapes">
@@ -143,6 +153,27 @@
         setPlaying(!playing);
       });
       K.$('.tt-knob', el).addEventListener('click', () => setPlaying(!playing));
+      const flip = K.$('#ttFlip', el);
+      flip &&
+        flip.addEventListener('click', () => {
+          if (playing) setPlaying(false);
+          side = side === 'A' ? 'B' : 'A';
+          const s2 = cur();
+          const wrap = K.$('.tt-wrap', el);
+          wrap.classList.add('flipping');
+          K.audio.sfx.whoosh();
+          setTimeout(() => {
+            K.$('.tt', el).outerHTML = turntable();
+            K.$('.tt-knob', el).addEventListener('click', () => setPlaying(!playing));
+            wrap.classList.remove('flipping');
+          }, 350);
+          K.$('#ttSide', el).textContent = `Şu an pikapta · ${side} yüzü${side === 'B' ? ': onun şarkısı' : ''}`;
+          K.$('#ttTitle', el).textContent = s2.title || '';
+          K.$('#ttArtist', el).textContent = s2.artist || '';
+          K.$('#ttPlay', el).innerHTML = `${A.ui('play')} ${side === 'B' ? 'Onun şarkısını çal' : 'Şarkımızı çal'}`;
+          K.$('#ttLinks', el).innerHTML = `${side === 'B' ? '' : 'Açılmazsa: '}<a href="${K.esc(s2.youtubeUrl || '#')}" target="_blank" rel="noopener">YouTube'da aç</a> · <a href="${K.esc(s2.spotifyUrl || '#')}" target="_blank" rel="noopener">Spotify'da ${side === 'B' ? 'aç' : 'ara'}</a>${side === 'B' ? ' · <a href="#labirent">Bu şarkının labirenti</a>' : ''}`;
+          K.$('#ttLiner', el).innerHTML = K.paras(side === 'B' ? s2.note || [] : D.songLetter);
+        });
       K.$('#casShelf', el).addEventListener('click', (e) => {
         const b = e.target.closest('.cas');
         if (b) insert(+b.dataset.i);
