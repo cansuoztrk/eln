@@ -57,6 +57,25 @@
           <section class="gz-box" id="gzWx"><h4>Hava durumu</h4><p class="muted small">Gökyüzüne bakılıyor...</p></section>
           <section class="gz-box"><h4>Aşk falı · ${K.esc(C.herSign || 'Boğa')} & ${K.esc(C.mySign || 'Akrep')}</h4><p>${K.esc(K.fill(star))}</p></section>
           <section class="gz-box"><h4>Kitty'nin tavsiyesi</h4><p>${K.esc(K.fill(tip))}</p></section>
+          ${(() => {
+            // Ardoş'un bugünkü dersleri (Bakü saatiyle)
+            const sc = C.schedule;
+            if (!sc || !sc.classes) return '';
+            const ist = T.ist();
+            const gap = (C.tzBaku - C.tzIstanbul) * 60;
+            const at = (s) => {
+              const [h, m] = s.split(':').map(Number);
+              const x = h * 60 + m + gap;
+              return `${K.pad(Math.floor(x / 60) % 24)}:${K.pad(x % 60)}`;
+            };
+            const list = sc.classes.filter((c) => c.day === ist.wd);
+            const holiday = (sc.holidays || []).includes(T.key(ist)) || C.classMode === 'off';
+            return `<section class="gz-box"><h4>${K.esc(C.myPet)}'un günü</h4>${
+              holiday || !list.length
+                ? `<p>Bugün ${K.esc(C.myPet)}'un hiç dersi yok. Muhabirimiz bunun bir telefon için mükemmel bir gün olduğunu düşünüyor.</p>`
+                : `<ul class="gz-classes">${list.map((c) => `<li><b>${at(c.from)}–${at(c.to)}</b> ${K.esc(c.name)}${c.online ? ' (çevrimiçi)' : ''}</li>`).join('')}</ul><p class="muted small">Saatler Bakü saatiyle. Teneffüsler her saatin son on dakikası.</p>`
+            }</section>`;
+          })()}
         </aside>
       </div>
       <div class="gz-row">
