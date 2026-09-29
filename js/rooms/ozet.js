@@ -52,7 +52,7 @@
     if (!K.cloud || !K.cloud.enabled) return null;
     const kinds = ['dvoice', 'tale', 'page', 'postcard', 'song', 'kacisbest', 'kphoto', 'pigeon', 'answer', 'nvwish'];
     const got = await Promise.all(kinds.map((k) => K.cloud.list(k, 2000)));
-    await Promise.all([K.kabin, K.sofra].map((x) => x && x.load && x.load()));
+    await Promise.all([K.kabin, K.sofra, K.ilkler, K.ev, K.randevu].map((x) => x && x.load && x.load()));
     const m = Object.fromEntries(kinds.map((k, i) => [k, got[i]]));
     const by = (list, w) => list.filter((r) => r.who === w).length;
     const photos = m.kphoto;
@@ -83,6 +83,9 @@
       strips: K.kabin ? K.kabin.count() : 0,
       nerd: K.nerd ? K.nerd.score() : null,
       tables: K.sofra ? K.sofra.count() : 0,
+      firsts: K.ilkler ? K.ilkler.opened() : 0,
+      home: K.ev ? K.ev.count() : 0,
+      q36: K.randevu ? K.randevu.both36() : 0,
     };
   }
   const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -105,6 +108,9 @@
       out.push({ bg: 'f', kicker: 'Nərd', big: `${t.me} – ${t.her}`, unit: `${C.myPet} – ${C.herPet}`, text: `${K.num(g.me + g.her)} oyun. ${t.her > t.me ? `Şampiyon ${C.herPet}. Rövanş devam ediyor.` : t.me > t.her ? `Bu yıl ${C.myPet} önde. Seneye bakarız.` : 'Berabere. Tabii ki.'}` });
     }
     if (c.tables) out.push({ bg: 'a', kicker: 'Aynı Sofra', big: K.num(c.tables), unit: 'sofra', text: `${K.num(C.distanceKm)} km uzunluğunda bir masada, aynı akşam, aynı yemek.` });
+    if (c.firsts) out.push({ bg: 'b', kicker: 'İlklerimiz', big: K.num(c.firsts), unit: 'ilk', text: 'İkimiz de kendi hatırladığımız gibi yazdık. Bazen aynı şeyi, bazen bambaşka şeyleri hatırlamışız.' });
+    if (c.q36) out.push({ bg: 'c', kicker: 'Randevu Gecesi', big: K.num(c.q36), unit: '/ 36 soru', text: c.q36 === 36 ? 'Aşık olmak için yazılmış 36 sorunun hepsi. Zaten aşıktık.' : 'Aşık olmak için yazılmış sorular. Zaten aşıktık.' });
+    if (c.home) out.push({ bg: 'f', kicker: 'Hayalimizdeki Ev', big: K.num(c.home), unit: 'eşya', text: 'Henüz anahtarı olmayan bir ev. Ama perdeleri bile seçildi.' });
     if (c.best) out.push({ bg: 'd', kicker: 'Kilitli Kule', big: mmss(c.best), unit: 'en hızlı kaçışımız', text: `${K.num(c.escapes)} kez birlikte kaçtık. Biri renkleri gördü, öbürü kilidi çevirdi.` });
     return out;
   }

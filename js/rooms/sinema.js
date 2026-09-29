@@ -588,6 +588,10 @@
     if (sf) items.push({ t: `${sf} kez aynı sofraya oturdular; aralarında ${K.num(C.distanceKm)} km vardı.` });
     const st = K.dakika && K.dakika.stars ? K.dakika.stars().length : 0;
     if (st) items.push({ t: `Her akşam 21:21'de ${st} yıldız yaktılar.` });
+    const q36 = K.randevu && K.randevu.both36 ? K.randevu.both36() : 0;
+    if (q36) items.push({ t: q36 === 36 ? 'Aşık olmak için yazılmış 36 sorunun hepsini cevapladılar. Zaten aşıktılar.' : `Aşık olmak için yazılmış 36 sorudan ${q36} tanesini cevapladılar.` });
+    const ev = K.ev && K.ev.count ? K.ev.count() : 0;
+    if (ev) items.push({ t: `Henüz anahtarı olmayan bir eve ${ev} eşya koydular.` });
     if (!items.length) {
       layer(`<p class="sn-text">${words(F().usEmpty || 'Bu bölüm henüz boş.')}</p>`);
       return wait(7000);
@@ -599,6 +603,18 @@
     }
   }
   async function userScenes() {
+    // İlklerimiz: ikisinin de yazdığı ilkler, iki hatıra yan yana
+    const firsts = K.ilkler && K.ilkler.scenes ? K.ilkler.scenes() : [];
+    if (firsts.length) {
+      layer(`<p class="sn-kicker">İlklerimiz</p><p class="sn-text">${words(`${firsts.length} ilk. Her birini ikisi de kendi hatırladığı gibi yazdı.`)}</p>`);
+      await wait(4200);
+    }
+    const q = (r, w) => (r ? `<div class="sn-first ${w}"><small>${K.esc(nameOf(w))}</small>${r.data.forgot ? '<p><em>Hatırlamıyor.</em></p>' : `<p>${K.esc(r.data.text.length > 220 ? r.data.text.slice(0, 217) + '...' : r.data.text)}</p>`}</div>` : '');
+    for (const f of firsts) {
+      if (film.cut || film.dead) return;
+      layer(`<p class="sn-kicker">${K.esc(f.title)}${f.date ? ` · ${K.esc(T.fmt(f.date))}` : ''}</p><div class="sn-firsts">${q(f.me, 'me')}${q(f.her, 'her')}</div>`, 'firsts');
+      await wait(7400);
+    }
     const list = scenesUser.slice().sort((a, b) => (a.data.date || '').localeCompare(b.data.date || ''));
     for (const r of list) {
       if (film.cut || film.dead) return;

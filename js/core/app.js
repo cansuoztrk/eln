@@ -645,6 +645,8 @@
     document.title = `${C.herName}'in Krallığı`;
     renderDoors();
     dailyBits();
+    // Odadayken gelen bulut kayıtları ana salon kartlarını değiştirmiş olabilir
+    renderSpecials();
     window.scrollTo(0, homeScroll);
     setTimeout(() => {
       if (!K.activeRoom) view.hidden = true;
