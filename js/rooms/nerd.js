@@ -163,7 +163,7 @@
     }
     return v;
   }
-  function botPlan(s, w, dice) {
+  function botPlan(s, w, dice, left, first = true) {
     const memo = {};
     const plans = [];
     const seen = {};
@@ -182,14 +182,14 @@
         const mm = Object.assign({}, m);
         rec(apply(st, mm, w), left.slice(0, k).concat(left.slice(k + 1)), path.concat([mm]), false);
       });
-    })(s, expand(dice), [], true);
+    })(s, left ? left.slice() : expand(dice), [], first);
     plans.sort((a, b) => b.v - a.v);
     if (plans.length > 1 && Math.random() < 0.22) return plans[1].path;
     return plans.length ? plans[0].path : [];
   }
 
   /* ---------- Durum ---------- */
-  let root, mode = K.store.get('nerdMode', 'duo'), rows = [], wins = [], game = null, live = null;
+  let root, mode = K.store.get('nerdMode', null), rows = [], wins = [], game = null, live = null;
   let turn = null, sel = null, anim = false, botT = null;
   let bot = K.store.get('nerdBot', null);
   const side = () => mine();
@@ -203,7 +203,65 @@
     const maxN = Math.max(...gs.map((r) => r.data.n));
     return gs.filter((r) => r.data.n === maxN).sort((a, b) => a.at - b.at)[0];
   }
-  const cur = () => (mode === 'bot' ? bot && bot.st : game && game.data.st);
+  const cur = () => (mode === 'okul' ? okul.st : mode === 'bot' ? bot && bot.st : game && game.data.st);
+
+  /* ---------- Nərd Okulu: tahtada kısa dersler (hane numaraları oyuncunun gözünden, 1 = evin en içi) ---------- */
+  const START = { mine: { 24: 2, 13: 5, 8: 3, 6: 5 }, op: { 1: 2, 12: 5, 17: 3, 19: 5 } };
+  const LESSONS = [
+    { id: 'yon', dice: [3, 1], mine: START.mine, op: START.op, goal: (s) => ptCnt(s, 5) >= 2 },
+    { id: 'cift', dice: [4, 4], mine: START.mine, op: START.op, goal: (s, t) => t.moves.length === 4 },
+    { id: 'kapi', dice: [3, 5], mine: { 12: 1, 13: 3, 8: 3, 6: 8 }, op: { 9: 2, 1: 2, 17: 3, 19: 5, 21: 3 }, goal: (s) => ptCnt(s, 12) === 0 && ptCnt(s, 7) >= 1 },
+    { id: 'kir', dice: [4, 2], mine: { 13: 4, 8: 3, 6: 8 }, op: { 9: 1, 1: 2, 12: 4, 17: 3, 19: 5 }, goal: (s) => s.bar[opp(side())] >= 1 },
+    { id: 'bar', dice: [4, 3], bar: 1, mine: { 13: 5, 8: 3, 6: 4, 24: 2 }, op: { 22: 2, 20: 2, 19: 3, 17: 2, 12: 4, 1: 2 }, goal: (s) => s.bar[side()] === 0 },
+    { id: 'topla', dice: [6, 5], off: 2, mine: { 6: 2, 5: 3, 3: 4, 2: 3, 1: 1 }, op: { 20: 5, 22: 5, 23: 5 }, goal: (s) => s.off[side()] >= 4 },
+    { id: 'son' },
+  ];
+  const okul = { n: 0, st: null, ok: false };
+  const ptIdx = (pt) => (side() === 'me' ? pt - 1 : 24 - pt);
+  const ptOf = (i) => (side() === 'me' ? i + 1 : 24 - i);
+  const ptCnt = (s, pt) => cnt(s, ptIdx(pt), side());
+  const okulDone = () => K.store.get('nerdOkul', 0) >= LESSONS.length;
+  function lessonState(L) {
+    const w = side(), o = opp(w);
+    const s = { p: new Array(24).fill(0), bar: { me: 0, her: 0 }, off: { me: 0, her: 0 }, turn: w, dice: null, winner: null };
+    Object.entries(L.mine || {}).forEach(([pt, n]) => (s.p[ptIdx(+pt)] += (w === 'me' ? 1 : -1) * n));
+    Object.entries(L.op || {}).forEach(([pt, n]) => (s.p[ptIdx(+pt)] += (o === 'me' ? 1 : -1) * n));
+    s.bar[w] = L.bar || 0;
+    s.off[w] = L.off || 0;
+    return s;
+  }
+  function startLesson(n) {
+    okul.n = K.clamp(n, 0, LESSONS.length - 1);
+    okul.ok = false;
+    const L = LESSONS[okul.n];
+    turn = null;
+    sel = null;
+    if (!L.dice) {
+      okul.st = fresh();
+      return;
+    }
+    okul.st = lessonState(L);
+    beginTurn(okul.st, L.dice);
+  }
+  function checkLesson() {
+    const L = LESSONS[okul.n];
+    if (mode !== 'okul' || okul.ok || !turn || !L.goal) return;
+    if (L.goal(turn.st, turn)) {
+      okul.ok = true;
+      K.store.set('nerdOkul', Math.max(K.store.get('nerdOkul', 0), okul.n + 1));
+      K.audio.sfx.success();
+      K.fx.confetti({ count: 60, shapes: ['star', 'heart'] });
+    }
+  }
+  function hint() {
+    if (!turn || anim || !turn.legal.length) return;
+    const plan = botPlan(turn.st, side(), turn.dice, turn.left, turn.moves.length === 0);
+    const m = plan[0] || turn.legal[0];
+    sel = m.from;
+    render();
+    const where = (x) => (x === 'bar' ? 'bardaki pulu' : `${ptOf(x)} numaralı hanedeki pulu`);
+    K.fx.toast(`<b>İpucu:</b> ${where(m.from)} ${m.to === 'off' ? 'topla' : `${ptOf(m.to)} numaralı haneye götür`}.`, { icon: A.icon('dice'), duration: 5000 });
+  }
   const myTurn = () => {
     const s = cur();
     return Boolean(s && !s.winner && s.turn === side());
@@ -350,6 +408,7 @@
       K.vibrate(20);
     }
     if (mode === 'duo') K.cloud.send('nd', { t: 'mv', gid: game.data.gid, n: game.data.n, mv: turn.moves, dice: turn.dice });
+    checkLesson();
     render();
   }
   function undo() {
@@ -535,6 +594,8 @@
     if (mode === 'duo') {
       const { t, g } = score2();
       sc.innerHTML = `<span class="me">${K.esc(C.myPet)} <b>${t.me}</b></span><span class="vs">${g.me + g.her} oyun</span><span class="her"><b>${t.her}</b> ${K.esc(C.herPet)}</span>`;
+    } else if (mode === 'okul') {
+      sc.innerHTML = `<span class="vs">Ders ${okul.n + 1} / ${LESSONS.length}</span>`;
     } else {
       const b = K.store.get('nerdBotScore', { me: 0, bot: 0 });
       sc.innerHTML = `<span class="${side()}">Sen <b>${b.me}</b></span><span class="vs">alıştırma</span><span class="${botSide()}"><b>${b.bot}</b> Kitty</span>`;
@@ -565,6 +626,18 @@
     else if (mode === 'bot' && bot && bot.last && bot.last.by !== w && !s0.winner) Object.assign(ui, { dice: bot.last.dice, diceBy: bot.last.by, used: [true, true] });
     const shown = mode === 'duo' && live && game && live.n === game.data.n && !turn ? live.st : s0;
     board.innerHTML = boardSVG(shown, ui);
+    const hintBtn = turn && turn.legal.length && !(mode === 'okul' && okul.ok) ? `<button type="button" class="btn soft small" data-nd-hint>${A.ui('sparkle')} İpucu</button>` : '';
+    if (mode === 'okul') {
+      const L = LESSONS[okul.n];
+      const tx = (ND().lessons || {})[L.id] || {};
+      const fail = turn && !okul.ok && !turn.legal.length;
+      info.innerHTML = `<div class="nd-lesson ${okul.ok ? 'ok' : ''}"><b>${K.esc(tx.title || '')}</b><p>${K.esc(K.fill(okul.ok ? tx.done || 'Oldu!' : fail ? 'Olmadı; baştan dene. İstersen İpucu\'na bas.' : tx.text || ''))}</p></div>`;
+      const last = okul.n === LESSONS.length - 1;
+      acts.innerHTML = last
+        ? `<button type="button" class="btn red" data-nd-diploma>${A.icon('cap')} Diplomamı al</button>`
+        : `${turn && turn.moves.length && !okul.ok ? `<button type="button" class="btn ghost small" data-nd-undo>${A.ui('undo')} Geri al</button>` : ''}${hintBtn}${fail || okul.ok ? `<button type="button" class="btn ghost small" data-nd-again>${A.ui('refresh')} Baştan</button>` : ''}${okul.ok ? `<button type="button" class="btn red" data-nd-next>Sonraki ders ${A.ui('next')}</button>` : ''}`;
+      return;
+    }
     // Bilgi ve düğmeler
     const s = cur();
     const oName = mode === 'bot' ? 'Kitty' : nameOf(opp(w));
@@ -576,7 +649,7 @@
     } else if (turn) {
       const noMove = !turn.legal.length;
       txt = `<p><b>${K.esc(call(turn.dice))}.</b> ${noMove ? (turn.moves.length ? 'Hamlen tamam.' : 'Oynayacak hamle yok, sıra geçer.') : turn.st.bar[w] ? 'Önce kırılan pulunu oyuna sok.' : sel == null ? 'Oynatacağın pula dokun.' : 'Nereye gideceğine dokun.'}</p>`;
-      btns = `${turn.moves.length ? `<button type="button" class="btn ghost small" data-nd-undo>${A.ui('undo')} Geri al</button>` : ''}${noMove ? `<button type="button" class="btn red" data-nd-end>${turn.moves.length ? 'Hamleyi bitir' : 'Sırayı geçir'}</button>` : ''}`;
+      btns = `${turn.moves.length ? `<button type="button" class="btn ghost small" data-nd-undo>${A.ui('undo')} Geri al</button>` : ''}${hintBtn}${noMove ? `<button type="button" class="btn red" data-nd-end>${turn.moves.length ? 'Hamleyi bitir' : 'Sırayı geçir'}</button>` : ''}`;
     } else if (s.turn === w) {
       const pre = s.dice;
       txt = pre ? `<p>Açılış zarı senin: <b>${K.esc(call(pre))}</b>.</p>` : `<p><b>Sıra sende.</b>${mode === 'duo' && game.data.mv && game.data.mv.length ? ` ${K.esc(oName)} ${K.esc(call(game.data.dice))} attı.` : ''}</p>`;
@@ -585,11 +658,12 @@
       txt = mode === 'bot' ? '<p>Kitty düşünüyor...</p>' : `<p><b>Sıra ${K.esc(K.ek(oName, 'de'))}.</b> ${K.cloud.otherHere() ? 'Şu an kalede; hamlesini canlı göreceksin.' : 'Oynayınca burada görürsün; istersen kapatıp sonra gel.'}</p>`;
     }
     const pips = `<p class="nd-pip">Pip: sen ${pip(shown, w)} · ${K.esc(oName)} ${pip(shown, opp(w))}</p>`;
-    info.innerHTML = txt + pips;
+    const tip = !K.isOwner() && !okulDone() ? `<p class="nd-okul-tip">Kuralları unuttuysan: Nərd Okulu'nda yedi kısa ders var, üç dakika sürer. <button type="button" class="btn soft small" data-nd-mode="okul">${A.icon('cap')} Okula git</button></p>` : '';
+    info.innerHTML = tip + txt + pips;
     acts.innerHTML = btns + (s.winner ? '' : `<button type="button" class="btn ghost small nd-resign" data-nd-resign>Pes et</button>`);
   }
   function tap(pt) {
-    if (!turn || anim) return;
+    if (!turn || anim || (mode === 'okul' && okul.ok)) return;
     const p = pt === 'bar' || pt === 'off' ? pt : Number(pt);
     const forced = turn.st.bar[side()] > 0;
     if (forced) sel = 'bar';
@@ -718,7 +792,7 @@
     init(el) {
       root = el;
       el.innerHTML = `<div class="room-intro">${K.paras(ND().intro)}</div>
-        <div class="nd-top"><div class="seg" role="group" aria-label="Rakip"><button type="button" data-nd-mode="duo">${K.esc(K.otherName())} ile</button><button type="button" data-nd-mode="bot">Kitty ile</button></div>
+        <div class="nd-top"><div class="seg" role="group" aria-label="Rakip"><button type="button" data-nd-mode="duo">${K.esc(K.otherName())} ile</button><button type="button" data-nd-mode="bot">Kitty ile</button><button type="button" data-nd-mode="okul">Okul</button></div>
           <p class="nd-score" id="ndScore"></p></div>
         <div class="nd-wrap"><div id="ndBoard"></div><div class="nd-call" id="ndCall" aria-live="polite"></div></div>
         <div class="nd-info" id="ndInfo"></div>
@@ -739,7 +813,9 @@
           if (mode === 'duo') {
             const saved = K.store.get('nerdRoll', null);
             if (game && saved && saved.gid === game.data.gid && saved.n === game.data.n && myTurn() && !game.data.st.dice) beginTurn(game.data.st, saved.dice);
-          } else if (bot && !bot.st.winner && bot.st.turn === botSide()) botT = setTimeout(botTurn, 600);
+          } else if (mode === 'okul') startLesson(Math.min(K.store.get('nerdOkul', 0), LESSONS.length - 1));
+          else if (bot && !bot.st.winner && bot.st.turn === botSide()) botT = setTimeout(botTurn, 600);
+          K.$('.nd-top', root).scrollIntoView({ block: 'start', behavior: K.reduced ? 'auto' : 'smooth' });
           return render();
         }
         if (e.target.closest('[data-nd-new]')) return newGame();
@@ -754,6 +830,29 @@
           return render();
         }
         if (e.target.closest('[data-nd-undo]')) return undo();
+        if (e.target.closest('[data-nd-hint]')) return hint();
+        if (e.target.closest('[data-nd-again]')) {
+          startLesson(okul.n);
+          return render();
+        }
+        if (e.target.closest('[data-nd-next]')) {
+          startLesson(okul.n + 1);
+          return render();
+        }
+        if (e.target.closest('[data-nd-diploma]')) {
+          K.store.set('nerdOkul', LESSONS.length);
+          K.stickers.award('okul');
+          K.fx.confetti({ count: 160, shapes: ['star', 'heart', 'bow'] });
+          K.audio.sfx.success();
+          clearTimeout(botT);
+          mode = 'bot';
+          K.store.set('nerdMode', mode);
+          turn = null;
+          if (!bot || bot.st.winner) newGame();
+          else render();
+          K.fx.toast('Diploma senin! Şimdi Kitty ile bir maç: kaybetsen de sayılmaz.', { icon: A.icon('cap'), duration: 6000 });
+          return;
+        }
         if (e.target.closest('[data-nd-end]')) return endTurn();
         const rs = e.target.closest('[data-nd-resign]');
         if (rs) {
@@ -767,13 +866,17 @@
       });
     },
     enter() {
+      // İlk girişte: Eln kuralları unuttu, önce okul; kale sahibi doğrudan maç
+      if (!mode) mode = K.isOwner() ? 'duo' : 'okul';
       if (mode === 'duo' && !(K.cloud && K.cloud.enabled)) mode = 'bot';
+      if (mode === 'okul' && !okul.st) startLesson(Math.min(K.store.get('nerdOkul', 0), LESSONS.length - 1));
       render();
       if (mode === 'bot' && bot && !bot.st.winner && bot.st.turn === botSide()) botT = setTimeout(botTurn, 800);
     },
     leave() {
       clearTimeout(botT);
       if (mode === 'bot') turn = null;
+      if (mode === 'okul') okul.st = null;
       anim = false;
     },
   });

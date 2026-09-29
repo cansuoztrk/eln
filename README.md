@@ -163,7 +163,7 @@ Kapıya Eln'in cevabı yerine **sahip şifresini** (`private/secrets.json` → `
 - **Gerçek zambaklar**: Bahçesindeki zambak sayısı, çiçekçi bilgileri, "sipariş verdim / teslim edildi".
 - **Altın Bilet**: Basılı kitap, pembe kutu, iki kulenin bileti: hazırlanıyor / yolda / teslim edildi.
 - **Bilet Kumbarası**: Hedef ve AZN kuru.
-- **Büyük açılış** (panelin en üstünde): kalenin ona verileceği gün, geri sayım, **Töreni önizle** ve açılışa hazırlık listesi.
+- **Teslim** (panelin en üstünde): canlı kontroller (bulut uyanık mı, bildirim konusu ve **Dene** düğmesi, kasadaki ses sayısı), ona göndereceğin hazır mesaj (**Mesajı kopyala**), **Töreni önizle**, **Kale turunu önizle** ve teslim listesi. Kurdeleyi kestiğinde burada tarihiyle yazar ve sana bildirim gelir.
 - **Biniş Kartı**: Bileti alınca uçuş günü, kalkış (İstanbul) ve varış (Bakü) saati, uçuş no, koltuk, dönüş günü ve karta bir not. **Zarfı önizle** ile onun göreceği anı önceden görürsün; "Kartı geri al" ile kaldırılır.
 - **Gerçek zambaklar** bölümünde çiçekçi için hazır Azerbaycanca sipariş mesajı.
 - **Bulut bağlantısı**: Supabase adresini ve anahtarını dener, bu telefonda açar ya da onun telefonu için şifreli bir bağlantı linki üretir.
@@ -184,6 +184,16 @@ Sahip şifresi Eln'le paylaşılmamalı. Dizinin sonunu bilmeyen kale sahibi iç
 Adresin sonuna `?tarih=2027-01-01` (ya da `?tarih=2027-01-01T00:30`) ekleyerek siteyi o güne ışınlayabilirsin. Bu modda bildirim gönderilmez. Bu linki Eln'e gönderme.
 
 ---
+
+## Kaleyi teslim etmek
+
+1. Panel → **Teslim**: bulut satırı yeşil mi, 19/19 ses kasada mı? ntfy uygulamasında yazan konuya abone ol ve **Dene**'ye bas.
+2. Kendi telefonunda bir kez **Töreni önizle** ve **Kale turunu önizle**.
+3. **Mesajı kopyala** ve gönder. Kapıda Kitty, Bakü'deki not duvarına ikinizin adını nasıl yazdığını sorar; cevap büyük-küçük harf, boşluk, kalp ya da "ve" ile farklı yazılsa da kabul edilir, iki yanlıştan sonra ipucu gelir.
+4. O kurdeleyi kesince bildirim gelir. Tören mektubu teslim gününe göre değil, tanışma yıldönümüne göre seçilir: 6 Aralık'ta girerse yıldönümü mektubu, başka her gün genel mektup. Açılış filminden sonra Kitty ona ana salonu gezdirir (spot ışığıyla dokuz adım; "Sonra" derse turu başlatan bir kart kalır). İlk 45 gün ana salonda her gün **Bugünün keşfi**: henüz girmediği odalardan bir öneri (masal, sebepler, sesin, Günün Sesi, 21:21, Fotoğraf Kabini, Nərd Okulu, çikolata sofrası...).
+5. 6 Aralık yine bir sürpriz: buket ve QR'lı kart gizli Hediye Kapısı'nı açar; aynı sabah "Tanışmamızın ilk yılı" sesi ve Kış Takvimi başlar.
+
+Nərd'e ilk girişinde onu **Nərd Okulu** karşılar (tavlayı unuttuğu için): tahtada yedi kısa ders (yön ve zar, çift zar, kapalı hane, kırmak, bardan giriş, toplamak, kazanmak ve mars), her dersin küçük bir görevi var; bitirince diploma çıkartması ve Kitty ile ilk maç. Her oyunda **İpucu** düğmesi en iyi hamleyi gösterir. Aynı Sofra'da **çikolata sofrası** (mozaik pasta & kartoşka, ikisi de fırınsız) "Elnoş'un favorisi" olarak en başta durur.
 
 ## Yayınlama (Netlify)
 

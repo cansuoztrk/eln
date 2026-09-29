@@ -748,7 +748,7 @@
     box.innerHTML = list
       .map(
         (s) => `<div class="special-card">${A.icon(s.icon)}<div><h3>${K.esc(s.title)}</h3><p>${K.esc(s.text)}</p>
-          <div class="special-actions"><a class="btn small" href="#${s.room}">Hemen git</a>${s.action === 'moon' ? `<button class="btn soft small" data-moon>${A.ui('heart')} Şu an aya bakıyorum</button>` : ''}</div></div></div>`
+          <div class="special-actions"><a class="btn small" href="#${s.room}">${K.esc(s.cta || 'Hemen git')}</a>${s.action === 'moon' ? `<button class="btn soft small" data-moon>${A.ui('heart')} Şu an aya bakıyorum</button>` : ''}</div></div></div>`
       )
       .join('');
     const mb = K.$('[data-moon]', box);

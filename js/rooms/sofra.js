@@ -145,7 +145,9 @@
       wake(false);
       const d = pick && dishOf(pick);
       box.innerHTML = `<h3 class="sf-h">Bu akşam ne pişiriyoruz?</h3><div class="sf-dishes">${SF()
-        .dishes.map((x) => `<button type="button" class="sf-dish ${pick === x.id ? 'on' : ''}" data-dish="${x.id}" style="--c:${x.color || '#FFE7F0'}"><span class="sf-when">${K.esc(x.title)}</span><b>${K.esc(x.me.name)}</b><span class="sf-amp">&amp;</span><b>${K.esc(x.her.name)}</b><small>${K.esc(x.time || '')} · ${K.esc(x.level || '')}</small></button>`)
+        .dishes.slice()
+        .sort((a, b) => (b.fav ? 1 : 0) - (a.fav ? 1 : 0))
+        .map((x) => `<button type="button" class="sf-dish ${pick === x.id ? 'on' : ''} ${x.fav ? 'fav' : ''}" data-dish="${x.id}" style="--c:${x.color || '#FFE7F0'}">${x.fav ? `<span class="sf-fav">${K.esc(K.ek(C.herPet, 'in'))} favorisi</span>` : ''}<span class="sf-when">${K.esc(x.title)}</span><b>${K.esc(x.me.name)}</b><span class="sf-amp">&amp;</span><b>${K.esc(x.her.name)}</b><small>${K.esc(x.time || '')} · ${K.esc(x.level || '')}</small></button>`)
         .join('')}</div>
         ${d ? `<div class="sf-pick"><p>${K.esc(d.note || '')}</p><p class="small muted">${K.esc(C.myCity)}: ${K.esc(d.me.name)} · ${K.esc(C.herCity)}: ${K.esc(d.her.name)}</p><button type="button" class="btn red" data-sf-start="${d.id}">${A.icon('pot')} Sofrayı kur</button></div>` : '<p class="muted small">Bir yemek seç; ikiniz de kendi şehrinizin tarifini yapacaksınız.</p>'}`;
       gallery();

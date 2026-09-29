@@ -11,7 +11,8 @@
   function ceremony(done, preview) {
     const A = K.art;
     const AC = D.acilis || {};
-    const onDay = C.openingDate && T.todayKey() === C.openingDate;
+    // Tanışma yıldönümünde girerse yıldönümü mektubu; başka her gün genel mektup (teslim tarihi ne olursa olsun)
+    const onDay = C.metDate && T.todayKey() > C.metDate && T.todayKey().slice(5) === C.metDate.slice(5);
     const lines = (onDay ? AC.onDay : AC.other) || [];
     const el = K.el(`<div class="ac" role="dialog" aria-modal="true" aria-label="${K.esc(AC.title || 'Açılış')}">
       <div class="ac-sky" aria-hidden="true">${Array.from({ length: 40 }, (_, i) => `<i style="left:${(i * 37) % 100}%;top:${(i * 53) % 60}%;--d:${(i % 9) * 0.4}s"></i>`).join('')}</div>
@@ -90,7 +91,13 @@
     const orig = K.prologue.play;
     K.prologue.play = (lines, done) => {
       if (K.isOwner() || !D.acilis || K.store.get('acilis')) return orig(lines, done);
-      ceremony(() => orig(lines, done));
+      // Törenden ve açılış filminden sonra Kitty kaleyi gezdirir
+      ceremony(() =>
+        orig(lines, () => {
+          done && done();
+          setTimeout(() => K.tour && K.tour.offer(), 900);
+        })
+      );
     };
     K.prologue.__acilis = true;
   };

@@ -253,31 +253,46 @@
         .join('')}</ul>`;
   }
 
-  /* ---------------- Büyük açılış: tarih, geri sayım, hazırlık listesi ---------------- */
-  function renderOpening() {
+  /* ---------------- Teslim: canlı kontroller, gönderilecek mesaj, hazırlık listesi ---------------- */
+  let opened = null;
+  async function renderOpening() {
     const box = root && K.$('#pnOpenBody', root);
     if (!box) return;
-    const date = C.openingDate || '';
-    const left = date ? T.daysUntil(date) : null;
     const done = K.store.get('hazirlik', {});
     const list = D.hazirlik || [];
     const n = list.filter(([id]) => done[id]).length;
+    const vs = D.voices || [];
+    const vn = vs.filter((v) => voiceState(v.id)[0] !== 'yok').length;
+    const msg = (D.teslim && D.teslim.message ? D.teslim.message : []).map((l) => K.fill(l).replace('{link}', location.origin + location.pathname.replace(/index\.html$/, ''))).join('\n');
     box.innerHTML = `
-      <div class="pn-od"><b class="tnum">${left == null ? '—' : left > 0 ? K.num(left) : left === 0 ? 'Bugün' : 'Açıldı'}</b><span>${left > 0 ? 'gün kaldı' : ''}</span></div>
-      <p>${date ? `Kale ona <b>${T.fmt(date, true)}</b> verilecek.` : 'Açılış tarihi yok.'} ${date === '2026-12-06' ? 'Tanışmanızın birinci yılı; aynı sabah Kış Takvimi\'nin ilk kapısı ve "Tanışmamızın ilk yılı" sesli notu da açılıyor.' : ''}</p>
-      <form class="row" id="pnOdForm"><input class="input" type="date" id="pnOdDate" name="pnOdDate" value="${K.esc(date)}" aria-label="Açılış tarihi"><button class="btn small" type="submit">${A.ui('check')} Tarihi kaydet</button><button class="btn soft small" type="button" id="pnOdPreview">${A.icon('bow')} Töreni önizle</button></form>
-      <p class="card-eyebrow" style="margin-top:6px">Hazırlık listesi · ${n}/${list.length}</p>
+      <div class="pn-od ${opened ? 'ok' : ''}"><b>${opened ? A.icon('bow') : A.icon('gift')}</b><span>${opened ? `<b>${K.esc(C.herPet)} kurdeleyi kesti.</b> ${K.esc(T.fmt(new Date(opened.at), true))}` : 'Kale teslime hazır. Kurdele henüz kesilmedi.'}</span></div>
+      <ul class="pn-checks" id="pnChecks">
+        <li data-ck="cloud"><i></i><span><b>Bulut</b><small>Kontrol ediliyor...</small></span></li>
+        <li data-ck="ntfy" class="${C.ntfyTopic ? '' : 'bad'}"><i></i><span><b>Sana gelen bildirimler</b><small>${C.ntfyTopic ? `Telefonuna ntfy uygulamasını kur, <b>${K.esc(C.ntfyTopic)}</b> konusuna abone ol; sonra Dene'ye bas.` : 'Bildirim konusu ayarlanmamış.'}</small></span>${C.ntfyTopic ? `<button type="button" class="btn soft small" id="pnNtfy">${A.ui('send')} Dene</button>` : ''}</li>
+        <li data-ck="voice" class="${vn === vs.length ? 'ok' : ''}"><i></i><span><b>Sesli notlar</b><small>${vn} / ${vs.length} ses kasada</small></span></li>
+        <li data-ck="site" class="${location.protocol === 'https:' ? 'ok' : ''}"><i></i><span><b>Adres</b><small>${K.esc(location.host || 'yerel')}</small></span></li>
+      </ul>
+      ${msg ? `<p class="card-eyebrow" style="margin-top:10px">Ona göndereceğin mesaj</p><textarea class="textarea pn-msg" id="pnMsg" readonly rows="6">${K.esc(msg)}</textarea>
+      <div class="actions"><button class="btn red small" type="button" id="pnMsgCopy">${A.ui('copy')} Mesajı kopyala</button><button class="btn soft small" type="button" id="pnOdPreview">${A.icon('bow')} Töreni önizle</button><button class="btn soft small" type="button" id="pnTourPreview">${A.icon('crown')} Kale turunu önizle</button></div>` : ''}
+      <p class="card-eyebrow" style="margin-top:12px">Hazırlık listesi · ${n}/${list.length}</p>
       <ul class="pn-prep">${list.map(([id, t, d]) => `<li class="${done[id] ? 'ok' : ''}"><label><input type="checkbox" data-prep="${K.esc(id)}" ${done[id] ? 'checked' : ''}><span><b>${K.esc(t)}</b><small>${K.esc(K.fill(d))}</small></span></label></li>`).join('')}</ul>`;
-    K.$('#pnOdForm', box).addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const v = K.$('#pnOdDate', box).value;
-      C.openingDate = v;
-      K.store.set('openingDate', v);
-      if (K.cloud.enabled) await K.cloud.add('config', { openingDate: v });
-      K.fx.toast(v ? `Açılış: ${T.fmt(v)}` : 'Açılış tarihi kaldırıldı.', { icon: A.icon('bow') });
-      renderOpening();
+    const pv = K.$('#pnOdPreview', box);
+    pv && pv.addEventListener('click', () => K.acilis && K.acilis.play(null, true));
+    const tp = K.$('#pnTourPreview', box);
+    tp && tp.addEventListener('click', () => {
+      location.hash = '';
+      setTimeout(() => K.tour && K.tour.start(), 500);
     });
-    K.$('#pnOdPreview', box).addEventListener('click', () => K.acilis && K.acilis.play(null, true));
+    const cp = K.$('#pnMsgCopy', box);
+    cp && cp.addEventListener('click', async () => K.fx.toast((await K.copy(K.$('#pnMsg', box).value)) ? 'Mesaj kopyalandı. WhatsApp\'a yapıştır.' : 'Kopyalanamadı; metni basılı tutup kopyala.', { icon: A.ui('copy') }));
+    const nt = K.$('#pnNtfy', box);
+    nt && nt.addEventListener('click', async () => {
+      const ok = await K.notify('Kale sana ulaşıyor', 'Bu bir deneme. Kurdele kesilince de böyle haber gelecek.', ['bell']);
+      const li = K.$('[data-ck="ntfy"]', box);
+      li.classList.toggle('ok', ok);
+      li.classList.toggle('bad', !ok);
+      K.fx.toast(ok ? 'Gönderildi. Telefonuna geldi mi?' : 'Gönderilemedi. İnterneti kontrol et.', { icon: A.ui('send') });
+    });
     box.addEventListener('change', (e) => {
       const c = e.target.closest('[data-prep]');
       if (!c) return;
@@ -286,6 +301,24 @@
       K.store.set('hazirlik', d);
       renderOpening();
     });
+    // Bulut uyanık mı? (Supabase 7 gün kullanılmazsa uyur)
+    const li = K.$('[data-ck="cloud"]', box);
+    if (!K.cloud.enabled) {
+      li.classList.add('bad');
+      K.$('small', li).textContent = 'Bağlı değil.';
+      return;
+    }
+    const t0 = performance.now();
+    const rows = await K.cloud.list('opened', 5).catch(() => null);
+    if (!li.isConnected) return;
+    const ok = Array.isArray(rows);
+    li.classList.add(ok ? 'ok' : 'bad');
+    K.$('small', li).textContent = ok ? `Uyanık, ${Math.round(performance.now() - t0)} ms'de cevap verdi.` : 'Cevap vermedi. Supabase uyuduysa panelinden "Restore" de.';
+    const o = ok && rows.filter((r) => r.who === 'her').pop();
+    if (o && !opened) {
+      opened = o;
+      renderOpening();
+    }
   }
   // Açılış tarihi buluttan ya da bu cihazdan
   K.on('built', () => {
@@ -297,7 +330,12 @@
     const rows = (await K.cloud.list('config')).filter((r) => 'openingDate' in r.data);
     if (rows.length) C.openingDate = rows[rows.length - 1].data.openingDate;
     K.cloud.on('config', (r) => 'openingDate' in r.data && (C.openingDate = r.data.openingDate));
-    K.cloud.on('opened', (r) => K.isOwner() && r.who === 'her' && K.fx.toast(`<b>${K.esc(C.herPet)} kurdeleyi kesti!</b> Kale onun artık.`, { icon: A.icon('bow'), duration: 10000 }));
+    K.cloud.on('opened', (r) => {
+      if (!K.isOwner() || r.who !== 'her') return;
+      opened = r;
+      K.fx.toast(`<b>${K.esc(C.herPet)} kurdeleyi kesti!</b> Kale onun artık.`, { icon: A.icon('bow'), duration: 10000 });
+      if (K.activeRoom === 'panel') renderOpening();
+    });
   });
 
   /* ---------------- Biniş Kartı: bilet alınınca uçuşu gir ---------------- */
@@ -365,7 +403,7 @@
         ${wizard('pnCfg')}`;
       bindWizard(off, 'pnCfg');
       const main = K.$('#pnMain', el);
-      main.insertAdjacentHTML('afterbegin', `<section class="card pn-sec pn-open" id="pnOpenDay"><p class="card-eyebrow">Büyük açılış</p><div id="pnOpenBody"></div></section>`);
+      main.insertAdjacentHTML('afterbegin', `<section class="card pn-sec pn-open" id="pnOpenDay"><p class="card-eyebrow">Teslim</p><div id="pnOpenBody"></div></section>`);
       renderOpening();
       main.insertAdjacentHTML(
         'beforeend',
