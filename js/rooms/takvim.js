@@ -81,7 +81,7 @@
     return { state: 'free', icon: 'heart', text: `${C.herPet} şu an derste değil`, sub: '' };
   }
   // Ana salon için: kale sahibine onu, ona Ardoş'u anlatır
-  K.where = () => (K.isOwner() ? elnos() : (K.bilet && K.bilet.where()) || arda());
+  K.where = () => (K.isOwner() ? elnos() : (K.bilet && K.bilet.where()) || (K.gunluk && K.gunluk.where()) || arda());
   K.whereArda = arda;
 
   /* ---------- Ortak boş saatler (Bakü saatiyle, 09:00–24:00) ---------- */

@@ -58,6 +58,8 @@
     { id: 'duvar', name: 'Kilit Ekranı', hint: 'Kendi kilit ekranını kaydet', icon: 'frame', color: '#E8E0FF', bonus: true },
     { id: 'gunses', name: 'Günün Sesi', hint: 'Günün Sesi\'ne ilk sesini bırak', icon: 'mic', color: '#FFE0EC' },
     { id: 'novruz', name: 'Novruz', hint: 'Bayram sabahı səməniye kırmızı kurdeleyi bağla', icon: 'lily', color: '#DDF5E6', bonus: true },
+    { id: 'kacis', name: 'Kuleden Kaçış', hint: 'Kilitli Kule\'yi birlikte aç', icon: 'key', color: '#E6E0FF' },
+    { id: 'gunluk', name: 'Bakü Günlüğü', hint: 'Bakü Günlüğü\'ne ilk fotoğrafı ekle', icon: 'camera', color: '#FFE9D6', bonus: true },
     { id: 'ses', name: 'İlk Ses', hint: 'Kalede bir sesli not bul ve dinle', icon: 'mic', color: '#FFE0E0', bonus: true },
     { id: 'aykardesi', name: 'Aynı Ay', hint: 'Bir dolunay gecesi aya bak', icon: 'moon', color: '#FFF3C4', bonus: true },
     { id: 'film', name: 'Film Gecesi', hint: 'Bir film gecesi başlat', icon: 'film', color: '#E0DBFF', bonus: true },

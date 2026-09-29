@@ -21,6 +21,7 @@
     ['zambak', 'Zambak Notları'],
     ['soru', 'Soru Defteri'],
     ['defter', 'Bizim Defter'],
+    ['gunluk', 'Bakü Günlüğü'],
     ['son', 'Son Sayfa'],
   ];
   const chosen = () => K.store.get('bookChapters', Object.fromEntries(CHAPTERS.map(([k]) => [k, true])));
@@ -146,6 +147,16 @@
             )
           );
       }
+    }
+    if (ch.gunluk !== false && K.gunluk && K.gunluk.book()) {
+      const b = K.gunluk.book();
+      out.push(opener('Bakü Günlüğü', `${T.fmtShort(b.w.from)} – ${T.fmt(b.w.to)}`));
+      b.letters.forEach((l) => out.push(page('kb-letter', `<p class="kb-kicker">Kavuşunca açılan mektup · ${K.esc(l.who === 'me' ? C.myPet : C.herPet)}</p><div class="kb-lt">${K.paras(String(l.data.text).split(/\n+/))}</div>`)));
+      b.days.forEach((d, i) => {
+        const ps = d.photos;
+        for (let j = 0; j < Math.max(1, ps.length); j += 4)
+          out.push(page('kb-gunluk', `<p class="kb-kicker">${i + 1}. gün · ${T.fmt(d.d, true)}</p>${j === 0 ? d.notes.map((n) => `<p class="hand ${n.who}">"${K.esc(n.data.text)}" <small>— ${K.esc(n.who === 'me' ? C.myPet : C.herPet)}</small></p>`).join('') : ''}<div class="kb-ph4">${ps.slice(j, j + 4).map((p) => `<figure><img src="${p.data.thumb}" alt="">${p.data.cap ? `<figcaption>${K.esc(p.data.cap)}</figcaption>` : ''}</figure>`).join('')}</div>`));
+      });
     }
     if (ch.son) {
       out.push(opener('Son Sayfa', ''));

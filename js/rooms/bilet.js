@@ -222,7 +222,13 @@
       if (ph.k === 'board') return { state: 'soon', room: 'bilet', chipIcon: 'plane', text: `${C.myPet} havalimanında`, chipSub: `kalkış ${f.dep}` };
       if (ph.k === 'air') return { state: 'class', room: 'bilet', chipIcon: 'plane', text: `${C.myPet} uçakta`, chipSub: over(ph.q) };
       if (ph.k === 'landed') return { state: 'after', room: 'bilet', chipIcon: 'heart', text: `${C.myPet} Bakü'de`, chipSub: 'kapıya bak' };
+      if (ph.k === 'together') return { state: 'after', room: D.gunluk ? 'gunluk' : 'bilet', chipIcon: 'heart', text: 'Aynı şehirdeyiz', chipSub: '0 km' };
       return null;
+    },
+    // Uçağın Bakü'ye iniş anı (ms); Bakü Günlüğü'nün mühürlü mektupları bu anda açılır
+    arrival() {
+      const f = cur();
+      return f ? times(f).arr : null;
     },
   };
 

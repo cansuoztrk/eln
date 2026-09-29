@@ -202,6 +202,7 @@
   K.on('cloud', async (on) => {
     if (!on) return;
     [rows, tgts] = await Promise.all([K.cloud.list('mdays', 400), K.cloud.list('mtarget', 200)]);
+    if (K.homeChip && !K.activeRoom) K.homeChip();
     K.cloud.on('mdays', (r) => {
       if (rows.some((x) => x.id === r.id)) return;
       rows.push(r);

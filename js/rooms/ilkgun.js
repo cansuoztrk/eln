@@ -47,7 +47,7 @@
         .map((p) => {
           const h = hearts(p.id);
           const s = slotOf(p);
-          const cls = [h.length === 2 ? 'both' : h.length ? 'one' : '', s ? 'slotted' : '', sel === p.id ? 'sel' : ''].join(' ');
+          const cls = [h.length === 2 ? 'both' : h.length ? 'one' : '', s ? 'slotted' : '', sel === p.id ? 'sel' : '', visited()[p.id] ? 'visited' : ''].join(' ');
           return `<g class="ig-pin ${cls}" data-pin="${K.esc(p.id)}" transform="translate(${(+p.x || 50).toFixed(1)} ${(+p.y || 50).toFixed(1)})" tabindex="0" role="button" aria-label="${K.esc(p.name)}">
             <circle r="3.4" class="ig-halo"/><path d="M0 2.4 C-3.6 -0.4 -3.6 -4.2 -1.5 -4.2 C-0.5 -4.2 0 -3.3 0 -2.8 C0 -3.3 0.5 -4.2 1.5 -4.2 C3.6 -4.2 3.6 -0.4 0 2.4 Z" class="ig-heart"/>
           </g>`;
@@ -62,12 +62,16 @@
       })()}
     </svg>`;
   }
+  // Bakü Günlüğü'nde bu yere iğnelenmiş fotoğraflar (gittiğimiz yerler)
+  const visited = () => (K.gunluk ? K.gunluk.visited() : {});
   function card(p) {
     const h = hearts(p.id);
+    const v = visited()[p.id];
     const s = slotOf(p);
     const my = h.includes(mine());
     return `<article class="ig-card ${sel === p.id ? 'sel' : ''}" data-card="${K.esc(p.id)}">
-      <header><b>${K.esc(p.name)}</b>${p.custom ? `<span class="ig-by">${K.esc(p.custom === 'me' ? C.myPet : C.herPet)} ekledi</span>` : ''}</header>
+      <header><b>${K.esc(p.name)}</b>${v ? '<span class="ig-went">Gittik ✓</span>' : ''}${p.custom ? `<span class="ig-by">${K.esc(p.custom === 'me' ? C.myPet : C.herPet)} ekledi</span>` : ''}</header>
+      ${v ? `<div class="ig-thumbs">${v.slice(0, 4).map((t) => `<img src="${t}" alt="">`).join('')}</div>` : ''}
       <p class="hand">${K.esc(K.fill(p.text || ''))}</p>
       <div class="ig-acts">
         <button type="button" class="chip ${my ? 'on' : ''}" data-heart="${K.esc(p.id)}" aria-pressed="${my}">${A.ui('heart')} ${h.length === 2 ? 'İkimiz de' : h.length ? (h[0] === 'me' ? C.myPet : C.herPet) : 'Kalp at'}</button>
@@ -103,6 +107,7 @@
   K.on('built', () => {
     if (!cloudOn()) rows = K.store.get('ilkgun', []);
   });
+  K.on('gunluk', () => K.activeRoom === 'ilkgun' && render());
   K.on('cloud', async (on) => {
     if (!on) return;
     const kinds = ['igheart', 'igslot', 'igplace'];

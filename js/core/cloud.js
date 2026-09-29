@@ -70,6 +70,11 @@
         if (error) throw error;
         return (await Promise.all(data.map(decodeRow))).filter(Boolean);
       },
+      async get(id) {
+        const { data, error } = await client.from('kale').select('*').eq('space', space).eq('id', id).maybeSingle();
+        if (error) throw error;
+        return data ? decodeRow(data) : null;
+      },
       async add(kind, obj) {
         const { data, error } = await client.from('kale').insert({ space, kind, author: who(), data: await K.vault.seal(obj) }).select().single();
         if (error) throw error;
@@ -125,6 +130,10 @@
       async list(kind) {
         return (await Promise.all(rows().filter((r) => r.kind === kind).map(decodeRow))).filter(Boolean);
       },
+      async get(id) {
+        const r = rows().find((x) => x.id === id);
+        return r ? decodeRow(r) : null;
+      },
       async add(kind, obj) {
         const row = { id: 'r' + Date.now() + Math.random().toString(36).slice(2, 6), kind, author: who(), created_at: new Date().toISOString(), data: await K.vault.seal(obj) };
         const all = rows();
@@ -149,6 +158,8 @@
     people: [],
     // Bir türdeki kayıtlar (eskiden yeniye)
     list: async (kind, limit) => (adapter ? adapter.list(kind, limit).catch(() => []) : []),
+    // Tek bir kayıt (büyük fotoğraflar gibi, sadece gerektiğinde)
+    get: async (id) => (adapter && adapter.get ? adapter.get(id).catch(() => null) : null),
     async add(kind, obj) {
       const row = adapter ? await adapter.add(kind, obj).catch(() => null) : null;
       emitRow(row);
