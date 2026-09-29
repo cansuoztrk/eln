@@ -726,8 +726,17 @@
     if (md === '02-14') out.push({ icon: 'heart', title: 'Sevgililer Günü', text: 'Bugün sevgililer günüymüş. Bizim için her gün öyle ama yine de kutlu olsun.', room: 'son' });
     if (md === '01-01') out.push({ icon: 'star', title: 'Mutlu yıllar!', text: 'Yeni yılın ilk mesajı senin olsun. Bu yıl ilk sarılmamızın yılı olsun.', room: 'ilk-sarilma' });
     if (md === '11-01') out.push({ icon: 'bow', title: 'Bugün Hello Kitty\'nin doğum günü!', text: 'Kitty White bugün bir yaş daha büyüdü. Puantiyeli fiyonkunu ona ithaf et.', room: 'album' });
+    // Odaların eklediği günlük kartlar (sınav günü gibi; bulut verisi gelince yeniden çizilir)
+    const extra = [];
+    (K.specialHooks || []).forEach((fn) => {
+      try {
+        extra.push(...(fn() || []));
+      } catch (e) {}
+    });
+    out.unshift(...extra);
     return out;
   }
+  K.renderSpecials = () => K.$('#special') && renderSpecials();
   function renderSpecials() {
     const list = specials();
     const box = K.$('#special');

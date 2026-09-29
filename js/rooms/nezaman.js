@@ -81,7 +81,8 @@
   /* ---------- Çizim ---------- */
   const marks = () => Object.fromEntries((NZ().marks || []).map(([k, t]) => [k, t]));
   // Okul takvimi şeritleri: [başlangıç, bitiş, not, kimin]
-  const rangesOn = (k) => (NZ().ranges || []).filter(([a, b]) => k >= a && k <= b);
+  // Sınav Kalkanı'na girilen sınavlar da (tek günlük, kesikli çizgi)
+  const rangesOn = (k) => (NZ().ranges || []).concat(K.kalkan ? K.kalkan.ranges() : []).filter(([a, b]) => k >= a && k <= b);
   function month(y, m, ctx) {
     const first = new Date(Date.UTC(y, m - 1, 1));
     const lead = (first.getUTCDay() + 6) % 7; // pazartesi başlar

@@ -118,7 +118,7 @@
     for (const f of Array.from(files).slice(0, 10)) {
       msg(`Hazırlanıyor ${n + 1}/${Math.min(10, files.length)}...`);
       const full = await shrink(f, 1600, 0.84);
-      const thumb = await shrink(f, 480, 0.78);
+      const thumb = await shrink(f, 380, 0.72);
       if (!full || !thumb) continue;
       if (full.data.length > 3500000) continue;
       const big = await K.cloud.add('kfull', { img: full.data });

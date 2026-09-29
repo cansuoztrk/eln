@@ -198,7 +198,9 @@
           b.disabled = false;
           return msg('Kayıt çok büyük. Biraz daha kısa kaydet ya da daha küçük bir dosya seç (yaklaşık 2 MB).');
         }
-        const r = await K.cloud.add('voice', { id: v.id, mime: blob.type || 'audio/mp4', b64 });
+        // Ses ayrı kayıtta durur; 'voice' kaydı sadece onu gösterir (kale her açılışta sesleri indirmesin)
+        const au = await K.cloud.add('vaudio', { b64, mime: blob.type || 'audio/mp4' });
+        const r = au && (await K.cloud.add('voice', { id: v.id, mime: blob.type || 'audio/mp4', audio: au.id }));
         if (!r) {
           b.disabled = false;
           return msg('Yüklenemedi. İnterneti kontrol edip tekrar dene.');

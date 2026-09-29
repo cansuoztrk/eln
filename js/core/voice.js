@@ -103,12 +103,8 @@
     }
     let url;
     try {
-      if (cloudV[id] && !(C.voiceFiles || {})[id]) {
-        const bin = atob(cloudV[id].b64);
-        const bytes = new Uint8Array(bin.length);
-        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-        url = URL.createObjectURL(new Blob([bytes], { type: cloudV[id].mime || 'audio/mp4' }));
-      } else url = await K.vault.audio(id);
+      url = await srcOf(id);
+      if (!url) throw new Error('ses-yok');
     } catch (e) {
       K.$('.vp-lines', el).insertAdjacentHTML('afterbegin', '<p class="muted">Ses şu an açılamadı. İnternetini kontrol edip tekrar dene.</p>');
       el.classList.remove('loading');
@@ -174,10 +170,11 @@
   document.addEventListener('keydown', (e) => e.key === 'Escape' && el && !el.hidden && close());
 
   // Bulut: kale sahibinin yüklediği en son kayıt geçerli
+  // Kayıt ya sesi içinde taşır (eski: b64) ya da ayrı bir 'vaudio' kaydını gösterir (audio); ses ancak çalınınca iner
   const take = (r) => {
-    if (r.who !== 'me' || !r.data || !r.data.id || !r.data.b64) return;
+    if (r.who !== 'me' || !r.data || !r.data.id || !(r.data.b64 || r.data.audio)) return;
     const prev = cloudV[r.data.id];
-    if (!prev || prev.at <= r.at) cloudV[r.data.id] = { mime: r.data.mime, b64: r.data.b64, at: r.at, row: r.id };
+    if (!prev || prev.at <= r.at) cloudV[r.data.id] = { mime: r.data.mime, b64: r.data.b64, audio: r.data.audio, at: r.at, row: r.id };
   };
   K.on('cloud', async (on) => {
     if (!on) return;
@@ -192,16 +189,25 @@
       K.emit('cloud-voice');
     });
   });
-
-  // Sesin çalınabilir adresi (kasadan ya da buluttan); oynatıcı açmadan çalmak için
-  async function url(id) {
-    if (cloudV[id] && !(C.voiceFiles || {})[id]) {
-      const bin = atob(cloudV[id].b64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      return URL.createObjectURL(new Blob([bytes], { type: cloudV[id].mime || 'audio/mp4' }));
+  const b64url = (b64, mime) => {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return URL.createObjectURL(new Blob([bytes], { type: mime || 'audio/mp4' }));
+  };
+  async function srcOf(id) {
+    const cv = cloudV[id];
+    if (cv && !(C.voiceFiles || {})[id]) {
+      if (!cv.b64 && cv.audio) {
+        const a = await K.cloud.get(cv.audio);
+        if (a && a.data && a.data.b64) cv.b64 = a.data.b64;
+      }
+      return cv.b64 ? b64url(cv.b64, cv.mime) : null;
     }
     return K.vault.audio(id);
   }
+
+  // Sesin çalınabilir adresi (kasadan ya da buluttan); oynatıcı açmadan çalmak için
+  const url = (id) => srcOf(id);
   K.voice = { def, has, exists, unlocked, list, any, heard, btn, play, url, stop: close, cloud: cloudV };
 })();

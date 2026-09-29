@@ -65,10 +65,13 @@
       if (status === 'SUBSCRIBED') ch.track({ who: who(), at: Date.now() });
     });
     return {
-      async list(kind, limit = 300) {
-        const { data, error } = await client.from('kale').select('*').eq('space', space).eq('kind', kind).order('created_at', { ascending: true }).limit(limit);
+      // En yeni `limit` kayıt, eskiden yeniye sıralı (before: bu andan öncekiler; eski arşiv için)
+      async list(kind, limit = 500, opt = {}) {
+        let q = client.from('kale').select('*').eq('space', space).eq('kind', kind);
+        if (opt.before) q = q.lt('created_at', new Date(opt.before).toISOString());
+        const { data, error } = await q.order('created_at', { ascending: false }).limit(limit);
         if (error) throw error;
-        return (await Promise.all(data.map(decodeRow))).filter(Boolean);
+        return (await Promise.all(data.reverse().map(decodeRow))).filter(Boolean);
       },
       async get(id) {
         const { data, error } = await client.from('kale').select('*').eq('space', space).eq('id', id).maybeSingle();
@@ -127,8 +130,9 @@
       }
     };
     return {
-      async list(kind) {
-        return (await Promise.all(rows().filter((r) => r.kind === kind).map(decodeRow))).filter(Boolean);
+      async list(kind, limit = 500, opt = {}) {
+        const all = rows().filter((r) => r.kind === kind && (!opt.before || new Date(r.created_at).getTime() < opt.before));
+        return (await Promise.all(all.slice(-limit).map(decodeRow))).filter(Boolean);
       },
       async get(id) {
         const r = rows().find((x) => x.id === id);
@@ -157,7 +161,7 @@
     ready,
     people: [],
     // Bir türdeki kayıtlar (eskiden yeniye)
-    list: async (kind, limit) => (adapter ? adapter.list(kind, limit).catch(() => []) : []),
+    list: async (kind, limit, opt) => (adapter ? adapter.list(kind, limit, opt).catch(() => []) : []),
     // Tek bir kayıt (büyük fotoğraflar gibi, sadece gerektiğinde)
     get: async (id) => (adapter && adapter.get ? adapter.get(id).catch(() => null) : null),
     async add(kind, obj) {

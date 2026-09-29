@@ -73,7 +73,7 @@
   }
 
   /* ---------- Dinleme ---------- */
-  function play(id) {
+  async function play(id) {
     const r = rows.find((x) => x.id === id);
     if (!r) return;
     if (playing) {
@@ -81,6 +81,12 @@
       const same = playing.id === id;
       playing = null;
       if (same) return render();
+    }
+    // Ses ayrı kayıtta: sadece dinlenirken iner (eski kayıtlarda içindedir)
+    if (!r.data.b64 && r.data.audio) {
+      const a = await K.cloud.get(r.data.audio);
+      if (!a || !a.data || !a.data.b64) return K.fx.toast('Ses şu an açılamadı.');
+      r.data.b64 = a.data.b64;
     }
     const bin = atob(r.data.b64);
     const bytes = new Uint8Array(bin.length);
@@ -160,7 +166,8 @@
     if (!rec || !rec.blob) return;
     const b64 = await toB64(rec.blob);
     if (!b64 || b64.length > MAX_B64) return K.fx.toast('Kayıt çok büyük; biraz daha kısa dene.');
-    const r = await K.cloud.add('dvoice', { day: T.todayKey(), mime: rec.blob.type || 'audio/webm', b64, dur: Math.round(rec.dur * 10) / 10 });
+    const au = await K.cloud.add('dvaudio', { b64, mime: rec.blob.type || 'audio/webm' });
+    const r = au && (await K.cloud.add('dvoice', { day: T.todayKey(), mime: rec.blob.type || 'audio/webm', audio: au.id, dur: Math.round(rec.dur * 10) / 10 }));
     if (!r) return K.fx.toast('Gönderilemedi. İnterneti kontrol et.');
     rec = null;
     K.$('#gsRecOut', root).innerHTML = '';
@@ -174,7 +181,7 @@
 
   K.on('cloud', async (on) => {
     if (!on) return;
-    rows = await K.cloud.list('dvoice', 400);
+    rows = await K.cloud.list('dvoice', 800);
     K.cloud.on('dvoice', (r) => {
       if (rows.some((x) => x.id === r.id)) return;
       rows.push(r);
@@ -227,6 +234,8 @@
             x.classList.add('armed');
             return;
           }
+          const del = rows.find((r) => r.id === x.dataset.del);
+          if (del && del.data.audio) await K.cloud.remove(del.data.audio);
           await K.cloud.remove(x.dataset.del);
           render();
         }

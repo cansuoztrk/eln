@@ -8,7 +8,8 @@
   const C = D.config;
   const T = K.time;
 
-  let root, rows = [];
+  let root, rows = [], more = false;
+  const PAGE = 120;
   const KP = () => D.kartpostal || { intro: [], prompts: [] };
   const mine = () => (K.isOwner() ? 'me' : 'her');
   const cityOf = (w) => (w === 'me' ? C.myCity : C.herCity);
@@ -38,7 +39,7 @@
       return `<article class="kp-card kp-sealed ${r.who}"><div class="kp-env">${A.icon('letter')}<p><b>${K.esc(nameOf(r.who))}'un bugünkü kartı geldi.</b></p><p class="small">Zarf, sen kendi kartını gönderince açılacak.</p></div></article>`;
     return `<article class="kp-card ${r.who}" tabindex="0" aria-label="${K.esc(cityOf(r.who))}'dan kartpostal">
       <div class="kp-inner">
-        <figure class="kp-front"><img src="${r.data.img}" alt="${K.esc(r.data.text || '')}"><figcaption>${K.esc(cityOf(r.who))}'dan sevgiler</figcaption></figure>
+        <figure class="kp-front"><img src="${r.data.img || r.data.thumb}" data-full="${K.esc(r.data.full || '')}" alt="${K.esc(r.data.text || '')}"><figcaption>${K.esc(cityOf(r.who))}'dan sevgiler</figcaption></figure>
         <div class="kp-back">
           <div class="kp-msg"><p class="kp-prompt">${K.esc(r.data.prompt || '')}</p><p class="hand">${K.esc(r.data.text || '')}</p><p class="kp-from">— ${K.esc(nameOf(r.who))}</p></div>
           <div class="kp-side">${stamp(r.who)}${postmark(r)}<p class="kp-to">${K.esc(nameOf(r.who === 'me' ? 'her' : 'me'))}<br>${K.esc(cityOf(r.who === 'me' ? 'her' : 'me'))}</p></div>
@@ -69,9 +70,10 @@
       : `<p class="muted">Henüz kartpostal yok. İlkini sen gönder.</p>`;
     const both = days.filter((d) => rows.some((r) => r.who === 'her' && dayOf(r) === d) && rows.some((r) => r.who === 'me' && dayOf(r) === d)).length;
     K.$('#kpCount', root).textContent = `${K.num(rows.length)} kartpostal · ${K.num(both)} gün ikimiz de gönderdik`;
+    K.$('#kpMore', root).hidden = !more;
   }
 
-  function resize(file, max = 1100) {
+  function resize(file, max = 1100, q = 0.8) {
     return new Promise((res) => {
       const url = URL.createObjectURL(file);
       const img = new Image();
@@ -82,7 +84,7 @@
         c.height = Math.round(img.height * k);
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         URL.revokeObjectURL(url);
-        res(c.toDataURL('image/jpeg', 0.8));
+        res(c.toDataURL('image/jpeg', q));
       };
       img.onerror = () => res(null);
       img.src = url;
@@ -91,7 +93,8 @@
 
   K.on('cloud', async (on) => {
     if (!on) return;
-    rows = await K.cloud.list('postcard');
+    rows = await K.cloud.list('postcard', PAGE);
+    more = rows.length >= PAGE;
     K.cloud.on('postcard', (r) => {
       if (!rows.some((x) => x.id === r.id)) rows.push(r);
       if (r.who !== mine()) K.fx.toast(`<b>${K.esc(nameOf(r.who))}'dan kartpostal!</b> ${K.esc(cityOf(r.who))}'dan bir kart geldi.`, { icon: A.icon('letter') });
@@ -133,19 +136,24 @@
           <p class="kp-sent" id="kpSent" hidden>${A.ui('check')} Bugünün kartını gönderdin. Yarın yeni bir ilham gelecek.</p>
         </section>
         <p class="muted small" id="kpCount"></p>
-        <div class="kp-wall" id="kpWall"></div>`;
+        <div class="kp-wall" id="kpWall"></div>
+        <div class="actions"><button type="button" class="btn soft small" id="kpMore" hidden>Daha eski kartlar</button></div>`;
       let img = null;
       K.$('#kpFile', el).addEventListener('change', async (e) => {
         const f = e.target.files && e.target.files[0];
         if (!f) return;
-        img = await resize(f);
-        if (img) K.$('#kpPrev', el).innerHTML = `<img src="${img}" alt="">`;
+        const full = await resize(f);
+        const thumb = full && (await resize(f, 420, 0.72));
+        img = full && thumb ? { full, thumb } : null;
+        if (img) K.$('#kpPrev', el).innerHTML = `<img src="${thumb}" alt="">`;
       });
       K.$('#kpForm', el).addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!img) return K.fx.toast('Önce bir fotoğraf seç.');
         const text = K.$('#kpText', el).value.trim();
-        const r = await K.cloud.add('postcard', { img, text, prompt: prompt() });
+        // Büyük fotoğraf ayrı kayıtta; kart kaydında sadece küçük önizleme (duvar hızlı açılsın)
+        const big = await K.cloud.add('pcimg', { img: img.full });
+        const r = big && (await K.cloud.add('postcard', { thumb: img.thumb, full: big.id, text, prompt: prompt() }));
         if (!r) return K.fx.toast('Kart gönderilemedi. İnterneti kontrol et.');
         img = null;
         K.$('#kpText', el).value = '';
@@ -155,9 +163,25 @@
         if (!K.isOwner()) K.notify(`${C.herName}'dan kartpostal`, `${C.herCity}'den bugünün kartı geldi: "${prompt()}"`, ['postbox']);
         render();
       });
-      el.addEventListener('click', (e) => {
+      el.addEventListener('click', async (e) => {
+        if (e.target.closest('#kpMore')) {
+          const older = await K.cloud.list('postcard', PAGE, { before: rows.length ? rows[0].at : Date.now() });
+          more = older.length >= PAGE;
+          rows = older.filter((r) => !rows.some((x) => x.id === r.id)).concat(rows);
+          return render();
+        }
         const c = e.target.closest('.kp-card:not(.kp-sealed)');
-        if (c) c.classList.toggle('flip');
+        if (c) {
+          c.classList.toggle('flip');
+          // İlk dokunuşta büyük fotoğrafı getir
+          const im = K.$('.kp-front img', c);
+          if (im && im.dataset.full) {
+            const id = im.dataset.full;
+            im.dataset.full = '';
+            const big = await K.cloud.get(id);
+            if (big && big.data && big.data.img) im.src = big.data.img;
+          }
+        }
       });
       el.addEventListener('keydown', (e) => {
         const c = e.target.closest && e.target.closest('.kp-card:not(.kp-sealed)');
