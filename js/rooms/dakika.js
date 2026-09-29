@@ -137,6 +137,8 @@
     floater();
   });
 
+  K.dakika = { stars: () => stars(), names: () => DK().names || [] };
+
   K.room({
     id: 'dakika',
     wing: 'kalp',

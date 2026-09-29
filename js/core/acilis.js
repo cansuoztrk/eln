@@ -24,7 +24,7 @@
       </div>
       <div class="ac-scissors" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="16" cy="48" r="9" fill="none" stroke="#fff" stroke-width="5"/><circle cx="36" cy="54" r="9" fill="none" stroke="#fff" stroke-width="5"/><path class="ac-b1" d="M22 42 L56 8" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path class="ac-b2" d="M30 47 L58 14" stroke="#FFD0E1" stroke-width="5" stroke-linecap="round"/></svg></div>
       <p class="ac-hint">${K.esc(AC.hint || 'Kurdeleye dokun.')}</p>
-      <div class="ac-letter" hidden>${lines.map((l, i) => `<p style="--d:${0.3 + i * 1.1}s">${K.esc(K.fill(l))}</p>`).join('')}<p class="ac-sign" style="--d:${0.3 + lines.length * 1.1}s">— ${K.esc(K.fill(AC.sign || '{myPet}'))}</p><button class="btn red big ac-go" style="--d:${0.8 + lines.length * 1.1}s">Kaleye gir</button></div>
+      <div class="ac-letter" hidden>${lines.map((l, i) => `<p style="--d:${0.3 + i * 1.1}s">${K.esc(K.fill(l))}</p>`).join('')}<p class="ac-sign" style="--d:${0.3 + lines.length * 1.1}s">— ${K.esc(K.fill(AC.sign || '{myPet}'))}</p>${K.voice && K.voice.has('acilis') ? `<div class="ac-voice" style="--d:${0.6 + lines.length * 1.1}s">${K.voice.btn('acilis', 'Sesimle dinle')}</div>` : ''}<button class="btn red big ac-go" style="--d:${0.8 + lines.length * 1.1}s">Kaleye gir</button></div>
     </div>`);
     document.body.appendChild(el);
     document.body.classList.add('has-modal');

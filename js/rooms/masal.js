@@ -188,6 +188,7 @@
       K.$('#bkNext').innerHTML = last ? `Baştan oku ${A.ui('refresh')}` : page === 0 ? `Masalı aç ${A.ui('next')}` : `Sonraki ${A.ui('next')}`;
       K.$$('.book-dots button', root).forEach((d, i) => d.setAttribute('aria-current', i === page ? 'true' : 'false'));
       K.$('.book-end', root).hidden = !last;
+      K.$('#bkDevam', root).hidden = !(K.devam && K.devam.enabled());
       if (last) {
         K.stickers.award('masal');
         K.store.set('masalDone', true);
@@ -247,6 +248,7 @@
         <div class="book-end card" hidden>
           <p class="hand" style="font-size:24px">Masal burada bitmiyor. Her gün bir sayfa daha yazıyoruz.</p>
           <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+            <a class="btn red" href="#devam" id="bkDevam" hidden>${A.icon('pencil')} Devamını birlikte yaz</a>
             <a class="btn" href="#ozel">Sıradaki sayfalar: Özel Günler</a>
             <a class="btn soft" href="#son">Son sayfaya git</a>
             <button class="btn ghost" id="bkFilm">${A.ui('play')} Açılış filmini tekrar izle</button>

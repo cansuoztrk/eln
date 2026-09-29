@@ -10,6 +10,7 @@
   let root;
   const CHAPTERS = [
     ['masal', 'İki Kule Masalı'],
+    ['devam', 'Masalın Devamı'],
     ['sohbet', 'Sohbetimizden'],
     ['mektup', 'Mektuplar'],
     ['sebep', 'Seni Sevmemin Sebepleri'],
@@ -47,6 +48,13 @@
     if (ch.masal) {
       out.push(opener('İki Kule Masalı', 'Hikâyemiz, bir masal kitabında'));
       D.story.forEach((p) => out.push(page('kb-story', `<div class="kb-scene"><svg viewBox="0 0 320 200">${K.scenes[p.scene] ? K.scenes[p.scene]() : ''}</svg></div><h3>${K.esc(K.fill(p.title))}</h3>${K.paras(p.text)}`)));
+    }
+    if (ch.devam !== false && K.devam && K.devam.enabled()) {
+      const chs = K.devam.chapters();
+      if (chs.length) {
+        out.push(opener('Masalın Devamı', 'İki kalemle, cümle cümle'));
+        chs.forEach((c) => out.push(page('kb-story kb-devam', `<div class="kb-scene"><svg viewBox="0 0 320 200">${K.scenes[c.scene] ? K.scenes[c.scene]() : ''}</svg></div><h3>Bölüm ${c.roman}${c.name ? `: ${K.esc(c.name)}` : ''}</h3>${c.pages.map((p) => `<p class="${p.who}">${K.esc(K.fill(p.data.text))}</p>`).join('')}`)));
+      }
     }
     if (ch.sohbet) {
       out.push(opener('Sohbetimizden', 'Mesajlarımız, yazıldıkları gibi'));
@@ -193,7 +201,7 @@
           <div class="kb-mock" aria-hidden="true"><div class="kb-mock-cover">${A.kitty({ crown: true, eyes: 'heart' })}<b>${K.esc(C.herName)}'in Krallığı</b><small>Boğaz'dan Hazar'a bir masal</small></div><div class="kb-mock-pages"></div></div>
           <div>
             <p class="room-intro">Bu kaledeki her şey bir gün bir rafta durabilsin diye: masalımız, sohbetlerimiz, mektuplar, yüz sebep, portrelerin, notların, gökyüzümüz ve birlikte yazdıklarımız. Kitabı hazırla, sonra "Yazdır"dan PDF olarak kaydet ya da bir kırtasiyede bastır.</p>
-            <div class="kb-ch">${CHAPTERS.map(([k, t]) => `<label><input type="checkbox" data-k="${k}" ${ch[k] ? 'checked' : ''}> ${K.esc(t)}</label>`).join('')}</div>
+            <div class="kb-ch">${CHAPTERS.map(([k, t]) => `<label><input type="checkbox" data-k="${k}" ${ch[k] !== false ? 'checked' : ''}> ${K.esc(t)}</label>`).join('')}</div>
             <button class="btn red big" id="kbMake">${A.icon('book')} Kitabı hazırla</button>
             <p class="muted small">${K.isOwner() ? 'Kale sahibi olarak bütün mektuplar kitaba girer (kilitliler dahil); onun kitabında sadece açtığı mektuplar olur.' : 'Mektuplardan sadece açtıkların kitaba girer; kilitli olanlar sürpriz kalır.'}</p>
           </div>

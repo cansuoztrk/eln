@@ -69,6 +69,13 @@
     K.$('#kbFly', root).innerHTML = `${flight(p)}${c.label ? `<p class="kmb-label">${K.esc(c.label)}</p>` : ''}`;
     K.$('#kbSum', root).innerHTML = `<b>${fmt(sum)}</b> / ${fmt(c.target)}`;
     K.$('#kbLeft', root).textContent = sum >= c.target ? 'Kumbara doldu!' : `Bilete ${fmt(c.target - sum)} kaldı`;
+    const fc = forecast();
+    const tg = K.nezaman && K.nezaman.target();
+    K.$('#kbFc', root).innerHTML = fc && !fc.done
+      ? `Bu hızla (günde ~${K.num(Math.round(fc.perDay))} ${K.esc(c.currency)}) <b>${K.esc(T.fmt(new Date(fc.eta)))}</b> civarı dolar.${tg ? (fc.onTrack ? ` Hedefe (${K.esc(T.fmtShort(tg.from))}) rahat yetişiyor.` : ` Hedef ${K.esc(T.fmtShort(tg.from))} için bilet iki hafta önce alınmalı: günde <b>${K.num(Math.ceil(fc.need))} ${K.esc(c.currency)}</b> gerekiyor.`) : ''} <a href="#nezaman">Takvime bak</a>`
+      : tg
+      ? `Hedef: <b>${K.esc(T.fmtShort(tg.from))} – ${K.esc(T.fmt(tg.to))}</b>. <a href="#nezaman">Takvim</a>`
+      : '';
     const by = { her: 0, me: 0 };
     rows.forEach((r) => (by[r.who] = (by[r.who] || 0) + toTL(r)));
     K.$('#kbSplit', root).innerHTML = `<span class="her"><i style="width:${sum ? (by.her / sum) * 100 : 50}%"></i></span><small>${K.esc(C.herPet)} ${fmt(by.her)} · ${K.esc(C.myPet)} ${fmt(by.me)}</small>`;
@@ -121,7 +128,27 @@
       if (K.activeRoom === 'kumbara') render();
     });
   });
-  K.kumbara = { cfg, total };
+  // Bu hızla ne zaman dolar? (ilk atıştan bu yana günlük ortalama; en az bir haftalık pencere)
+  function forecast() {
+    const c = cfg();
+    const sum = total();
+    if (!rows.length) return null;
+    if (sum >= c.target) return { done: true };
+    const now = T.now().getTime();
+    const first = Math.min(...rows.map((r) => r.at));
+    const perDay = sum / Math.max(7, (now - first) / 864e5);
+    if (!(perDay > 0)) return null;
+    const left = c.target - sum;
+    const out = { perDay, left, eta: now + (left / perDay) * 864e5 };
+    const tg = K.nezaman && K.nezaman.target();
+    if (tg) {
+      out.need = left / Math.max(1, T.daysUntil(tg.from) - 14);
+      out.onTrack = out.eta <= T.at(tg.from).getTime() - 14 * 864e5;
+    }
+    return out;
+  }
+  K.kumbara = { cfg, total, forecast };
+  K.on('nezaman', () => K.activeRoom === 'kumbara' && render());
 
   K.room({
     id: 'kumbara',
@@ -145,6 +172,7 @@
           <div class="kmb-stats">
             <p class="kmb-sum" id="kbSum"></p>
             <p class="kmb-left" id="kbLeft"></p>
+            <p class="kmb-fc" id="kbFc"></p>
             <div class="kmb-split" id="kbSplit"></div>
             <div id="kbMile"></div>
           </div>

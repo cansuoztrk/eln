@@ -1,0 +1,103 @@
+/* Eln'in Krallığı — 9. aşama: Ne Zaman?, Masalın Devamı, Kilit Ekranı */
+
+/* ---------- Ne Zaman? ---------- */
+.nz-fc { display: flex; gap: 12px; align-items: center; }
+.nz-fc > svg { width: 42px; height: 42px; flex: none; }
+.nz-fc p { margin: 0; font-size: 15px; line-height: 1.45; }
+.nz-agreed, .nz-prop { margin: 12px 0; padding: 14px 16px; border-radius: 18px; background: linear-gradient(135deg, #fff4c7, #ffe1ec); border: 2px solid #f5b83d; }
+.nz-prop { background: #fff; border-color: var(--rose); display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.nz-prop p { margin: 0; }
+.nz-big { margin: 2px 0 4px; font: 700 26px/1.15 var(--font-display); color: var(--bow); }
+.nz-tools { display: grid; gap: 8px; margin: 12px 0; }
+.nz-brushes { display: flex; flex-wrap: wrap; gap: 6px; }
+.nz-b i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.nz-b.ok i { background: #3fa37a; }
+.nz-b.maybe i { background: #f5b83d; }
+.nz-b.no i { background: #b58ba1; }
+.nz-b.clear i { background: #fff; border: 2px solid #b58ba1; }
+.nz-range svg { width: 16px; height: 16px; vertical-align: -3px; }
+.nz-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--plum-soft); }
+.nz-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.nz-legend svg { width: 18px; height: 18px; }
+.nz-legend i, .nz-stat i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; }
+.nz-legend i.her, .nz-stat i.her { background: #ff6fa3; }
+.nz-legend i.me, .nz-stat i.me { background: #4fa3e3; }
+.nz-legend .lg-both { border-radius: 4px; background: linear-gradient(#ffe1ec, #ffb3cb); border: 1.5px solid var(--bow); }
+.nz-legend .lg-tgt { border-radius: 4px; background: #fff; box-shadow: 0 0 0 2.5px #f5b83d; }
+.nz-stat { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.nz-stat span { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font: 600 12.5px/1.2 var(--font-display); color: var(--plum-soft); }
+.nz-stat .both { color: var(--bow); border-color: var(--rose); }
+.nz-stat svg { width: 16px; height: 16px; }
+.nz-cal { display: grid; gap: 18px; }
+@media (min-width: 760px) { .nz-cal { grid-template-columns: 1fr 1fr; } }
+.nz-month h3 { margin: 0 0 6px; font: 700 18px/1.2 var(--font-display); color: var(--plum); }
+.nz-wd, .nz-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.nz-wd span { text-align: center; font: 700 10.5px/1 var(--font-display); letter-spacing: 0.06em; color: var(--plum-faint); padding-bottom: 4px; }
+.nz-c { position: relative; display: grid; place-items: center; align-content: center; gap: 3px; aspect-ratio: 1 / 1.08; min-width: 0; padding: 2px; border-radius: 11px; border: 1px solid var(--line); background: #fff; color: var(--plum); font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.12s; }
+.nz-c:active { transform: scale(0.94); }
+.nz-c.pad { border: 0; background: none; cursor: default; }
+.nz-c b { font: 700 14px/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.nz-c.past { opacity: 0.32; cursor: default; }
+.nz-c.today { border: 2px solid var(--plum); }
+.nz-c.win { box-shadow: inset 0 0 0 2px #ffb3cb; }
+.nz-c.both { background: linear-gradient(160deg, #ffe1ec, #ffb3cb); border-color: var(--bow); }
+.nz-c.both b { color: var(--bow); }
+.nz-c.no { background: #f6f0f3; }
+.nz-c.tgt { box-shadow: 0 0 0 3px #f5b83d; z-index: 1; }
+.nz-c.anchor { background: #fff4c7; border-color: #f5b83d; }
+.nz-dots { display: flex; gap: 3px; }
+.nz-dots i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid #eadde3; box-sizing: border-box; }
+.nz-dots i.her.ok { background: #ff6fa3; border-color: #ff6fa3; }
+.nz-dots i.me.ok { background: #4fa3e3; border-color: #4fa3e3; }
+.nz-dots i.her.maybe { border-color: #ff6fa3; background: linear-gradient(90deg, #ff6fa3 50%, transparent 50%); }
+.nz-dots i.me.maybe { border-color: #4fa3e3; background: linear-gradient(90deg, #4fa3e3 50%, transparent 50%); }
+.nz-dots i.no { border-color: #b58ba1; background: linear-gradient(45deg, transparent 42%, #b58ba1 42%, #b58ba1 58%, transparent 58%); }
+.nz-plane { position: absolute; top: -7px; right: -6px; width: 22px; height: 22px; filter: drop-shadow(0 2px 2px rgba(74, 33, 56, 0.25)); }
+.nz-plane svg { width: 100%; height: 100%; }
+.nz-star { position: absolute; top: 2px; left: 4px; font-size: 10px; line-height: 1; color: #f5b83d; }
+.nz-best { margin-top: 18px; }
+.nz-best ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.nz-best li { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.nz-best li div { display: grid; gap: 2px; min-width: 0; }
+.nz-best li b { font: 700 16px/1.2 var(--font-display); color: var(--plum); }
+.nz-best li small { color: var(--plum-soft); font-size: 12.5px; }
+
+/* ---------- Masalın Devamı ---------- */
+.dv-book { display: grid; gap: 18px; margin: 8px 0 16px; }
+.dv-ch { padding: 16px 18px 12px; border-radius: 22px; border: 1.5px solid var(--line); box-shadow: var(--shadow-s); background: repeating-linear-gradient(#fffdf8 0 33px, #f6e3ea 33px 34px); }
+.dv-head { display: grid; gap: 4px; margin-bottom: 10px; }
+.dv-scene { border-radius: 16px; overflow: hidden; background: #fff; border: 1.5px solid var(--line); }
+.dv-scene svg { display: block; width: 100%; height: auto; max-height: 190px; }
+.dv-head h3 { margin: 0; font: 700 22px/1.2 var(--font-display); color: var(--plum); }
+.dv-p { margin: 0 0 12px; font: 600 23px/1.42 var(--font-hand); }
+.dv-p.her { color: #d23f78; }
+.dv-p.me { color: #2f6fb3; }
+.dv-p small { display: block; margin-top: 2px; font: 600 11.5px/1.2 var(--font-display); color: var(--plum-faint); }
+.dv-p.first .dv-t::first-letter { float: left; margin: 4px 8px 0 0; font: 700 58px/0.8 var(--font-display); color: var(--bow); }
+.dv-x { border: 0; background: none; padding: 0 2px; color: var(--plum-faint); cursor: pointer; vertical-align: -3px; }
+.dv-x svg { width: 14px; height: 14px; }
+.dv-x.armed { color: var(--bow); }
+.dv-pen { display: grid; gap: 8px; }
+.dv-in { min-height: 88px; resize: vertical; font: 600 20px/1.35 var(--font-hand); }
+.dv-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.dv-wait { display: flex; gap: 12px; align-items: center; }
+.dv-wait svg { width: 38px; height: 38px; flex: none; }
+.dv-wait p { margin: 0; }
+.kb-devam p.her { color: #b3325f; }
+.kb-devam p.me { color: #2a5f99; }
+
+/* ---------- Kilit Ekranı ---------- */
+.dw-wrap { display: grid; gap: 16px; align-items: start; }
+@media (min-width: 720px) { .dw-wrap { grid-template-columns: auto minmax(0, 1fr); } }
+.dw-phone { position: relative; justify-self: center; width: min(270px, 74vw); aspect-ratio: 1170 / 2532; border-radius: 38px; overflow: hidden; border: 8px solid #2b2024; background: #120d2a; box-shadow: 0 24px 50px -24px rgba(74, 33, 56, 0.65); }
+.dw-phone canvas { display: block; width: 100%; height: 100%; }
+.dw-clock { position: absolute; top: 9%; left: 0; right: 0; display: grid; justify-items: center; gap: 2px; color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25); pointer-events: none; }
+.dw-clock small { font: 600 11px/1 var(--font-display); opacity: 0.9; }
+.dw-clock b { font: 600 54px/1 var(--font-display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.dw-ctrl { display: grid; gap: 10px; min-width: 0; }
+.dw-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dw-f { display: grid; gap: 4px; }
+.dw-f > span { font: 700 11px/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--plum-faint); }
+.dw-f .input, .dw-ctrl > .input { width: 100%; min-width: 0; }
+.kmb-fc { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--plum-soft); }
+.kmb-fc b { color: var(--plum); }

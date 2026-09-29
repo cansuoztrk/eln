@@ -44,7 +44,8 @@
 .ac-letter { position: absolute; inset: auto 16px calc(20px + env(safe-area-inset-bottom, 0px)); margin: 0 auto; max-width: 520px; padding: 20px; border-radius: 22px; background: rgba(255, 253, 248, 0.97); color: #4a2138; text-align: left; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6); max-height: 62vh; overflow: auto; cursor: auto; }
 .ac-letter p { margin: 0 0 10px; font: 500 21px/1.4 var(--font-hand); opacity: 0; animation: zyIn 0.9s ease forwards; animation-delay: var(--d); }
 .ac-letter .ac-sign { text-align: right; font: 400 28px/1 var(--font-script); color: #e3174d; }
-.ac-letter .ac-go { opacity: 0; animation: zyIn 0.8s ease forwards; animation-delay: var(--d); }
+.ac-letter .ac-go, .ac-letter .ac-voice { opacity: 0; animation: zyIn 0.8s ease forwards; animation-delay: var(--d); }
+.ac-letter .ac-voice { margin: 0 0 12px; }
 @media (pointer: coarse) { .ac, .ac-ribbon { cursor: auto; } }
 @media (prefers-reduced-motion: reduce) { .ac-scissors { animation: none; } .ac-door, .ac-rl, .ac-rr, .ac-bow { transition-duration: 0.2s; } }
 

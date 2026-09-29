@@ -154,9 +154,7 @@
     K.$('#bkStatus', root).innerHTML = status(f, ph);
     K.$('#bkNote', root).innerHTML = f.sample
       ? `<p class="muted small">Bu bir örnek. Bileti alınca <a href="#panel">Kale Paneli → Biniş Kartı</a>'ndan uçuşu gir; onun kalesinde gerçek kart zarfıyla açılır.</p>`
-      : f.note
-      ? `<p class="hand">"${K.esc(f.note)}" <small>— ${K.esc(C.myPet)}</small></p>`
-      : '';
+      : (f.note ? `<p class="hand">"${K.esc(f.note)}" <small>— ${K.esc(C.myPet)}</small></p>` : '') + (K.voice && K.voice.has('binis') ? K.voice.btn('binis', 'Sesimle dinle') : '');
     const mine = acks.filter((r) => r.data.flight === f.id);
     K.$('#bkAck', root).innerHTML = K.isOwner()
       ? mine.length
@@ -176,7 +174,7 @@
       <p class="bk-rev-top">${K.esc(K.fill(BK().revealTop || 'Kale Havayolları\'ndan bir zarf'))}</p>
       <button class="bk-env no-burst" type="button" aria-label="Zarfı aç"><span class="bk-flap"></span><span class="bk-seal">${A.icon('heart')}</span><span class="bk-card">${pass(f)}</span></button>
       <p class="bk-rev-hint">Zarfa dokun</p>
-      <div class="bk-rev-text" hidden><p>${K.esc(K.fill(BK().revealLine || 'Kumbara doldu. Bilet alındı. {myPet} geliyor.'))}</p><p class="hand">${K.esc(T.fmt(f.date, true))}</p><button class="btn red big">Kartı gör</button></div>
+      <div class="bk-rev-text" hidden><p>${K.esc(K.fill(BK().revealLine || 'Kumbara doldu. Bilet alındı. {myPet} geliyor.'))}</p><p class="hand">${K.esc(T.fmt(f.date, true))}</p>${K.voice && K.voice.has('binis') ? K.voice.btn('binis', 'Sesimle dinle') : ''}<button class="btn red big">Kartı gör</button></div>
     </div>`);
     document.body.appendChild(el);
     document.body.classList.add('has-modal');
