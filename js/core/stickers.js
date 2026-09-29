@@ -48,6 +48,8 @@
     { id: 'kulup', name: 'Kulüp Üyesi', hint: 'İzleme Kulübü\'nde sekiz bölümün hepsini birlikte bitir', icon: 'film', color: '#E4E0F7' },
     { id: 'gece', name: 'Uykucu Prenses', hint: 'Gece Lambası\'nda "uyuyorum" de', icon: 'moon', color: '#DCD6F7' },
     { id: 'hazine', name: 'Hazine Avcısı', hint: 'Dokuz altın anahtarı bul, sandığı aç', icon: 'key', color: '#FFF1C9' },
+    { id: 'kartpostal', name: 'Kartpostalcı', hint: 'Bir kartpostal gönder', icon: 'frame', color: '#FFE9D6' },
+    { id: 'kumbara', name: 'Bilet Hazır', hint: 'Bilet Kumbarası\'nı birlikte doldurun', icon: 'plane', color: '#E6F4FF', bonus: true },
     { id: 'ses', name: 'İlk Ses', hint: 'Kalede bir sesli not bul ve dinle', icon: 'mic', color: '#FFE0E0', bonus: true },
     { id: 'aykardesi', name: 'Aynı Ay', hint: 'Bir dolunay gecesi aya bak', icon: 'moon', color: '#FFF3C4', bonus: true },
     { id: 'film', name: 'Film Gecesi', hint: 'Bir film gecesi başlat', icon: 'film', color: '#E0DBFF', bonus: true },

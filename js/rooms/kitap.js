@@ -87,7 +87,7 @@
     }
     if (ch.zaman && D.zaman) {
       const solved = K.store.get('zyDone', []);
-      const list = D.zaman.chapters.filter((c) => K.isOwner() || solved.includes(c.id));
+      const list = D.zaman.chapters.filter((c) => (K.isOwner() || solved.includes(c.id)) && !(c.spoiler && K.spoilerOk && !K.spoilerOk()));
       if (list.length) {
         out.push(opener('Zaman Yolcusu', 'Geçmişe inilen anlar, İstanbul tarafından'));
         list.forEach((c) => out.push(page('kb-letter', `<p class="kb-kicker">${K.esc(c.date)} · ${K.esc(c.title)}</p><div class="kb-lt">${K.paras(c.reveal || [])}</div>`)));

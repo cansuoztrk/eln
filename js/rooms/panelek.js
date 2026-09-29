@@ -228,8 +228,27 @@
     const last = real[real.length - 1];
     box.innerHTML = `<p>Bahçesinde şu an <b>${K.num(n)}</b> zambak açtı. Her ${every} zambakta bir gerçek buket: ${due > 0 ? `<b class="pn-due">şu an ${due} buket borcun var!</b>` : `sıradaki ${K.num((Math.floor(n / every) + 1) * every)}. zambakta.`}</p>
       ${f.name ? `<p class="muted small">${K.esc(f.name)} · ${K.esc(f.hours || '')} · <a href="tel:${K.esc((f.phone || '').replace(/\s/g, ''))}">${K.esc(f.phone || '')}</a> · <a href="${K.esc(f.url)}" target="_blank" rel="noopener">Instagram</a></p>` : ''}
+      ${f.bouquet ? `<p class="small"><b>Önerim:</b> ${K.esc(f.bouquet)}</p>` : ''}
+      ${f.order ? `<details><summary>Sipariş mesajı (Azerbaycanca, Instagram'dan yazmak için)</summary><textarea class="textarea pn-order" readonly rows="7">${K.esc(f.order.map((l) => l.replace('{card}', f.card || '')).join('\n'))}</textarea><div class="actions"><button class="btn small" type="button" data-copy-order>${A.ui('copy')} Kopyala</button></div><p class="muted small">Adresi ve saati sen ekle. Kart yazısı Türkçe kalsın; o okusun diye.</p></details>` : ''}
       <div class="actions"><button class="btn soft small" type="button" data-real="yolda">Sipariş verdim</button><button class="btn red small" type="button" data-real="teslim">Teslim edildi</button></div>
       ${last ? `<p class="muted small">Son durum: ${last.data.status === 'teslim' ? 'teslim edildi' : 'yolda (o görmüyor, sürpriz)'} · ${T.fmt(new Date(last.at))}</p>` : ''}`;
+  }
+
+  /* ---------------- Altın Bilet ---------------- */
+  async function renderPromise() {
+    const box = root && K.$('#pnPromiseBody', root);
+    if (!box || !K.hunt) return;
+    const [opens, rows] = await Promise.all([K.cloud.list('huntopen'), K.cloud.list('promise')]);
+    const opened = opens.some((r) => r.who === 'her');
+    const state = (id) => (rows.filter((r) => r.who === 'me' && r.data.id === id).pop() || { data: { state: 'hazirlaniyor' } }).data.state;
+    box.innerHTML = `<p class="muted small">${opened ? 'Sandığı açtı. Bu üç söz artık onun biletinde; durumlarını buradan güncelle.' : 'Hazine Avı\'nın sandığı henüz açılmadı. Açıldığında sana haber gelecek; bu üç sözü şimdiden hazırlamaya başlayabilirsin.'}</p>
+      <ul class="pn-list pn-promises">${K.hunt
+        .promises()
+        .map((p) => `<li><b>${K.esc(p.title)}</b><small>${K.esc(K.fill(p.text))}</small><div class="kc-presets">${K.hunt
+          .steps()
+          .map(([k, t]) => `<button type="button" class="chip" data-promise="${K.esc(p.id)}" data-state="${k}" aria-pressed="${state(p.id) === k}">${K.esc(t)}</button>`)
+          .join('')}</div></li>`)
+        .join('')}</ul>`;
   }
 
   /* ---------------- Panele yerleştir ---------------- */
@@ -250,14 +269,47 @@
           <p class="muted small">Sesli notların metinleri burada. Birine dokun, metni okuyarak kaydet (ya da telefonundaki bir ses dosyasını seç). Şifrelenip onun kalesine düşer; o dinleyince sana haber gelir. <b id="pnVoiceCount"></b></p>
           <ul class="pn-voices" id="pnVoices"></ul></section>
         <section class="card pn-sec" id="pnReal"><p class="card-eyebrow">Gerçek zambaklar</p><div id="pnRealBody"></div></section>
+        <section class="card pn-sec" id="pnPromise"><p class="card-eyebrow">Altın Bilet</p><div id="pnPromiseBody"></div></section>
+        <section class="card pn-sec" id="pnKumbara"><p class="card-eyebrow">Bilet Kumbarası</p>
+          <p class="muted small">Hedef (bir gidiş-dönüş bilet ve biraz fazlası) ve AZN kuru. Kumbara TL üzerinden sayar.</p>
+          <form class="row" id="pnKbForm" autocomplete="off"><input class="input" id="pnKbTarget" name="pnKbTarget" type="number" min="100" step="50" placeholder="Hedef TL" aria-label="Hedef"><input class="input" id="pnKbRate" name="pnKbRate" type="number" min="1" step="0.1" placeholder="1 AZN = ? TL" aria-label="AZN kuru"><button class="btn small" type="submit">${A.ui('check')} Kaydet</button></form></section>
         <section class="card pn-sec" id="pnCloud"><p class="card-eyebrow">Bulut bağlantısı</p>
           <p class="muted small">${C.cloud && C.cloud.url ? 'Ayarlar kasada kayıtlı; iki telefon da kendiliğinden bağlanıyor.' : 'Bu telefon bağlı. Onun telefonu henüz bağlı değilse aynı bilgilerle bir bağlantı linki üret.'}</p>
           <details><summary>Yeniden dene / bağlantı linki üret</summary>${wizard('pnCfg2')}</details></section>`
       );
       bindWizard(K.$('#pnCloud', main), 'pnCfg2');
+      const kbf = K.$('#pnKbForm', main);
+      if (K.kumbara) {
+        const c = K.kumbara.cfg();
+        K.$('#pnKbTarget', main).value = c.target;
+        K.$('#pnKbRate', main).value = c.azn;
+      }
+      kbf.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const target = Math.round(+K.$('#pnKbTarget', main).value);
+        const azn = +K.$('#pnKbRate', main).value;
+        if (!(target > 0) || !(azn > 0)) return K.fx.toast('Hedef ve kur sıfırdan büyük olmalı.');
+        await K.cloud.add('kumbaracfg', { target, azn });
+        K.fx.toast(`Kumbara hedefi ${K.num(target)} TL.`, { icon: A.icon('jar') });
+      });
       main.addEventListener('click', async (e) => {
         const r = e.target.closest('[data-rec]');
         if (r) studio(r.dataset.rec);
+        if (e.target.closest('[data-copy-order]')) {
+          const ta = K.$('.pn-order', main);
+          try {
+            await navigator.clipboard.writeText(ta.value);
+            K.fx.toast('Kopyalandı.');
+          } catch (err) {
+            ta.select();
+          }
+        }
+        const pr = e.target.closest('[data-promise]');
+        if (pr) {
+          await K.cloud.add('promise', { id: pr.dataset.promise, state: pr.dataset.state });
+          K.fx.toast('Güncellendi. Onun biletinde de değişti.', { icon: A.icon('key') });
+          renderPromise();
+        }
         const rb = e.target.closest('[data-real]');
         if (rb) {
           const status = rb.dataset.real;
@@ -272,6 +324,7 @@
     if (await K.cloud.ready) {
       renderVoices();
       renderReal();
+      renderPromise();
     }
   });
   K.on('cloud-voice', renderVoices);

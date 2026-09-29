@@ -1,0 +1,95 @@
+/* =========================================================
+   Eln'in Krallığı — yedinci kat: Altın Bilet, Kartpostal, Bilet Kumbarası, sipariş mesajı
+   ========================================================= */
+
+/* ---------- Altın Bilet ---------- */
+.hv-ticket { margin-top: 16px; padding: 18px; border-radius: 20px; background: linear-gradient(135deg, #fff4c7, #ffe08a); color: #5a3a18; box-shadow: 0 0 0 3px #fff, 0 0 0 5px #e0a91c, 0 16px 30px -18px rgba(138, 90, 0, 0.7); position: relative; }
+.hv-ticket::before, .hv-ticket::after { content: ''; position: absolute; top: 50%; width: 22px; height: 22px; margin-top: -11px; border-radius: 50%; background: var(--blush); box-shadow: inset 0 0 0 2px #e0a91c; }
+.hv-ticket::before { left: -13px; }
+.hv-ticket::after { right: -13px; }
+.hv-tk-head { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; }
+.hv-tk-head svg { width: 44px; height: 44px; }
+.hv-tk-head h3 { margin: 0; font: 700 19px/1.2 var(--font-display); }
+.hv-tk-head .card-eyebrow { color: #8a5a00; }
+.hv-promises { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 12px; }
+.hv-promises li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.72); border: 1px dashed #d9a93a; }
+.hv-pic .ic { width: 40px; height: 40px; }
+.hv-promises b { font: 700 16px/1.25 var(--font-display); }
+.hv-promises p { margin: 2px 0 8px; font-size: 14.5px; }
+.hv-track { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto; column-gap: 4px; }
+.hv-track i { grid-row: 1; height: 6px; border-radius: 3px; background: #f0dca3; }
+.hv-track i.on { background: #e3174d; }
+.hv-track small { grid-row: 2; font: 600 11px/1.6 var(--font-display); color: #a0826b; }
+.hv-track small.now { color: #e3174d; }
+.st-teslim { border-style: solid !important; border-color: #3fa37a !important; }
+.pn-promises .kc-presets { margin-top: 6px; }
+.pn-order { font: 400 13px/1.45 ui-monospace, monospace; }
+
+/* ---------- Kartpostal ---------- */
+.kp-new { display: grid; gap: 10px; }
+.kp-today { font: 700 22px/1.25 var(--font-display); color: var(--plum); margin: 0; }
+.kp-form { display: grid; gap: 10px; }
+.kp-form .btn { justify-self: start; }
+.kp-pick { display: grid; place-items: center; min-height: 150px; border-radius: 16px; border: 2px dashed var(--rose); background: var(--petal); cursor: pointer; overflow: hidden; }
+.kp-pick span { display: grid; justify-items: center; gap: 6px; color: var(--rose-deep); font: 600 15px/1 var(--font-display); }
+.kp-pick svg { width: 34px; height: 34px; }
+.kp-pick img { width: 100%; max-height: 260px; object-fit: cover; display: block; }
+.kp-sent { display: flex; gap: 8px; align-items: center; margin: 0; color: var(--mint-deep); font: 600 15px/1.4 var(--font-display); }
+.kp-sent svg { width: 20px; height: 20px; }
+.kp-wall { display: grid; gap: 22px; margin-top: 12px; }
+.kp-date { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; margin: 0 0 8px; font: 700 13px/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--plum-soft); }
+.kp-date span { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--plum-faint); }
+.kp-pair { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
+.kp-card { position: relative; aspect-ratio: 3 / 2; max-width: 100%; perspective: 1200px; cursor: pointer; outline: none; }
+.kp-card:focus-visible { box-shadow: 0 0 0 3px var(--butter); border-radius: 10px; }
+.kp-inner { position: absolute; inset: 0; transition: transform 0.7s cubic-bezier(0.3, 1.3, 0.5, 1); transform-style: preserve-3d; }
+.kp-card.flip .kp-inner { transform: rotateY(180deg); }
+.kp-front, .kp-back { position: absolute; inset: 0; margin: 0; border-radius: 8px; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 10px 22px -14px rgba(74, 33, 56, 0.6); overflow: hidden; }
+.kp-front { background: #fff; padding: 8px; }
+.kp-front img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
+.kp-front figcaption { position: absolute; left: 16px; bottom: 14px; padding: 4px 10px; border-radius: 6px; background: rgba(255, 255, 255, 0.88); font: 700 20px/1 var(--font-hand); color: #c7386f; }
+.kp-back { transform: rotateY(180deg); background: #fffdf6; display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; padding: 14px; background-image: linear-gradient(90deg, transparent calc(58% - 1px), #e8d9c6 calc(58% - 1px), #e8d9c6 58%, transparent 58%); }
+.kp-msg { display: grid; align-content: start; gap: 4px; min-width: 0; overflow: hidden; }
+.kp-prompt { margin: 0; font: 700 10.5px/1.3 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: #b58ba1; }
+.kp-msg .hand { margin: 0; font-size: 19px; line-height: 1.25; color: #4a2138; overflow-wrap: anywhere; }
+.kp-from { margin: 0; font: 700 18px/1 var(--font-hand); color: #c7386f; }
+.kp-side { position: relative; display: grid; align-content: space-between; justify-items: end; }
+.kp-stamp { width: 58px; padding: 4px; background: #fff; border: 2px dashed #e0c6b0; display: grid; justify-items: center; transform: rotate(4deg); }
+.kp-stamp-in { width: 100%; background: #ffe1ec; display: grid; place-items: center; }
+.kp-stamp.her .kp-stamp-in { background: #e0f0ff; }
+.kp-stamp svg { width: 44px; height: auto; }
+.kp-stamp small { font: 700 7px/1.4 var(--font-display); letter-spacing: 0.08em; color: #8b5e6b; text-transform: uppercase; }
+.kp-mark { position: absolute; right: 44px; top: 58px; width: 70px; color: rgba(74, 33, 56, 0.45); transform: rotate(-12deg); pointer-events: none; }
+.kp-to { margin: 0; font: 600 14px/1.3 var(--font-hand); color: #4a2138; text-align: right; border-bottom: 1px solid #e8d9c6; padding-bottom: 2px; }
+.kp-sealed, .kp-empty { display: grid; place-items: center; border-radius: 8px; text-align: center; }
+.kp-sealed { aspect-ratio: 3 / 2; }
+.kp-empty { min-height: 88px; align-self: start; }
+.kp-env { display: grid; justify-items: center; gap: 6px; padding: 16px; }
+.kp-env .ic { width: 52px; height: 52px; animation: hvfloat 2.6s ease-in-out infinite; }
+.kp-sealed { background: linear-gradient(135deg, #ffe1ec 0 50%, #ffd0e1 50%); box-shadow: inset 0 0 0 2px #ffb3ce; cursor: default; }
+.kp-empty { border: 2px dashed var(--line); color: var(--plum-faint); font: 600 14px/1.3 var(--font-display); padding: 12px; }
+@media (prefers-reduced-motion: reduce) { .kp-inner { transition: none; } }
+
+/* ---------- Bilet Kumbarası ---------- */
+.kmb-top { display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 18px; align-items: center; margin: 8px 0 14px; }
+.kmb-jar { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 12px 18px rgba(74, 33, 56, 0.2)); }
+.kmb-stats { display: grid; gap: 8px; min-width: 0; }
+.kmb-sum { margin: 0; font: 500 18px/1.2 var(--font-display); color: var(--plum-soft); font-variant-numeric: tabular-nums; }
+.kmb-sum b { display: block; font: 700 36px/1 var(--font-display); color: var(--bow); }
+.kmb-left { margin: 0; font: 600 15px/1.3 var(--font-display); }
+.kmb-split span { display: block; height: 10px; border-radius: 99px; background: #8fd3ff; overflow: hidden; }
+.kmb-split i { display: block; height: 100%; background: #ff8fb8; }
+.kmb-split small { display: block; margin-top: 4px; color: var(--plum-soft); font-variant-numeric: tabular-nums; }
+.kmb-stats .hand { font-size: 21px; color: var(--rose-deep); margin: 0; }
+.kmb-form { display: grid; gap: 10px; }
+.kmb-form .btn { justify-self: start; }
+.kmb-log { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+.kmb-log li { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 10px 40px 10px 12px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.kmb-log li.her { border-left: 4px solid #ff8fb8; }
+.kmb-log li.me { border-left: 4px solid #8fd3ff; }
+.kmb-log li .wn-x { top: 6px; right: 6px; }
+.kmb-amt { font: 700 16px/1.4 var(--font-display); color: var(--mint-deep); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kmb-log b { font: 700 14px/1.3 var(--font-display); }
+.kmb-log small { margin-left: 6px; color: var(--plum-faint); font-size: 12px; }
+.kmb-log .hand { margin: 2px 0 0; font-size: 19px; line-height: 1.25; }
+@media (max-width: 520px) { .kmb-top { grid-template-columns: 1fr; justify-items: center; text-align: center; } .kmb-jar { width: 190px; } }

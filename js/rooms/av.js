@@ -8,8 +8,45 @@
   const C = D.config;
   const T = K.time;
 
-  let root;
-  const H = () => D.hazine || { intro: [], clues: [], prize: [] };
+  let root, promiseRows = [];
+  const H = () => D.hazine || { intro: [], clues: [], prize: [], promises: [], promiseSteps: [] };
+  // Altın Bilet'teki her sözün son durumu (kale sahibi panelden günceller)
+  const pState = (id) => {
+    const r = promiseRows.filter((x) => x.data.id === id).pop();
+    return r ? r.data.state : 'hazirlaniyor';
+  };
+  const stepName = (st) => ((H().promiseSteps || []).find((x) => x[0] === st) || [st, st])[1];
+  function ticket() {
+    const ps = H().promises || [];
+    if (!ps.length) return '';
+    return `<div class="hv-ticket"><div class="hv-tk-head"><span>${keySvg}</span><div><p class="card-eyebrow">Altın Bilet</p><h3>Sandıktan çıkan üç gerçek söz</h3></div></div>
+      <ol class="hv-promises">${ps
+        .map((p) => {
+          const st = pState(p.id);
+          const steps = H().promiseSteps || [];
+          const at = Math.max(0, steps.findIndex((x) => x[0] === st));
+          return `<li class="st-${K.esc(st)}"><span class="hv-pic">${A.icon(p.icon || 'gift')}</span><div><b>${K.esc(p.title)}</b><p>${K.esc(K.fill(p.text))}</p>
+            <div class="hv-track">${steps.map((x, i) => `<i class="${i <= at ? 'on' : ''}"></i><small class="${i === at ? 'now' : ''}">${K.esc(x[1])}</small>`).join('')}</div></div></li>`;
+        })
+        .join('')}</ol></div>`;
+  }
+  K.on('cloud', async (on) => {
+    if (!on) return;
+    promiseRows = (await K.cloud.list('promise')).filter((r) => r.who === 'me');
+    K.cloud.on('promise', (r) => {
+      if (r.who !== 'me') return;
+      promiseRows.push(r);
+      if (!K.isOwner()) {
+        const p = (H().promises || []).find((x) => x.id === r.data.id);
+        if (p) K.fx.toast(`<b>Altın Bilet:</b> "${K.esc(p.title)}" artık ${K.esc(stepName(r.data.state).toLocaleLowerCase('tr'))}.`, { icon: keySvg, duration: 7000 });
+      }
+      if (K.activeRoom === 'av') render();
+    });
+    K.cloud.on('huntopen', (r) => {
+      if (K.isOwner() && r.who === 'her') K.fx.toast('<b>Sandığı açtı!</b> Altın Bilet\'teki üç söz artık senin görevin. Kale Paneli\'nden durumlarını güncelle.', { icon: keySvg, duration: 9000 });
+    });
+  });
+  K.hunt = { steps: () => H().promiseSteps || [], promises: () => H().promises || [], state: pState, opened: () => Boolean(st().opened) };
   const st = () => K.store.get('hunt', { started: false, step: 0, found: [] });
   const save = (s) => K.store.set('hunt', s);
   const done = () => st().step >= H().clues.length;
@@ -60,7 +97,7 @@
           <path d="M20 100 H180" stroke="#5A3A18" stroke-width="4"/>
           <g class="hv-shine" fill="#FFF4C7">${[40, 70, 100, 130, 160].map((x, i) => `<circle cx="${x}" cy="${40 - (i % 2) * 14}" r="3"/>`).join('')}</g>
         </svg></div>
-        ${s.opened ? `<article class="hv-prize">${K.paras(H().prize)}<p class="hv-sign">— ${K.esc(C.myPet)}</p></article>` : `<div class="actions" style="justify-content:center"><button class="btn red big" id="hvOpen">${keySvg} Sandığı aç</button></div>`}`;
+        ${s.opened ? `<article class="hv-prize">${K.paras(H().prize)}<p class="hv-sign">— ${K.esc(C.myPet)}</p></article>${ticket()}` : `<div class="actions" style="justify-content:center"><button class="btn red big" id="hvOpen">${keySvg} Sandığı aç</button></div>`}`;
       return;
     }
     const c = clues[s.step];
@@ -100,6 +137,8 @@
           s.opened = T.todayKey();
           save(s);
           K.stickers.award('hazine');
+          if (K.cloud && K.cloud.enabled) K.cloud.add('huntopen', { at: Date.now() });
+          if (!K.isOwner()) K.notify(`${C.herName} hazine sandığını açtı`, 'Altın Bilet\'teki üç söz artık gerçek: basılı kitap, pembe kutu, iki kulenin bileti. Durumlarını Kale Paneli\'nden güncelle.', ['key'], { priority: 5 });
           K.fx.confetti({ count: 200, shapes: ['star', 'heart'], colors: ['#FFD34E', '#FFF4C7', '#FF8FB8', '#E3174D'] });
           K.audio.sfx.success();
           render();

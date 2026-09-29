@@ -23,6 +23,8 @@
   const tissues = (ep, who) => (cloudOn() ? rows.wtissue.filter((r) => r.data.ep === ep && r.who === who).length : who === me() ? local().tissues[ep] || 0 : 0);
   const openEp = (ep) => ep === 1 || isDone(ep - 1) || K.isOwner();
   const doneCount = () => KU().episodes.filter((e) => isDone(e.n)).length;
+  // Dizinin sonunu bilmeyen kale sahibi için: son bölüm birlikte bitene kadar sonu anlatan yerler kapalı
+  K.spoilerOk = () => !K.isOwner() || !D.kulup || isDone(KU().episodes.length);
 
   /* ---------- Liste ---------- */
   function strip() {

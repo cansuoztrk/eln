@@ -231,6 +231,8 @@
       return false;
     }
     const live = await subscribed;
+    // Yeni açılan canlı kanal ilk birkaç saniye olay kaçırabiliyor; kısa bir ısınma
+    if (live) await new Promise((r) => setTimeout(r, 3000));
     let row;
     try {
       const { data, error } = await client.from('kale').insert({ space, kind: 'ping', author: 'me', data: await K.vault.seal({ ping: Date.now() }) }).select().single();
@@ -251,7 +253,7 @@
       say('okuma', false, hint(e));
       return false;
     }
-    for (let i = 0; i < 30 && !heard; i++) await new Promise((r) => setTimeout(r, 200));
+    for (let i = 0; i < 50 && !heard; i++) await new Promise((r) => setTimeout(r, 200));
     say('canli', live && heard, live && heard ? 'Canlı güncellemeler çalışıyor.' : 'Canlı olay gelmedi: kurulum kodunun son kısmı (supabase_realtime) çalışmamış olabilir. Site yine çalışır ama anlık düşmez.');
     try {
       const { error } = await client.from('kale').delete().eq('id', row.id);

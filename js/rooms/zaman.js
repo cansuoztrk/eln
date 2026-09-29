@@ -82,6 +82,11 @@
       setTimeout(() => (pz.hidden = true), 700);
     }
     rv.hidden = false;
+    if (ch.spoiler && K.spoilerOk && !K.spoilerOk()) {
+      rv.innerHTML = `<p class="card-eyebrow">Spoiler kalkanı</p><p>Bu kapının metni, dizinin sonunu anlatıyor. İzleme Kulübü'nde son bölümü birlikte bitirene kadar senden saklı.</p>`;
+      renderList();
+      return;
+    }
     rv.innerHTML = `<p class="card-eyebrow">O an, İstanbul'da</p>${(ch.reveal || []).map((p, k) => `<p style="--d:${k * (again ? 0.1 : 0.9)}s">${K.esc(K.fill(p))}</p>`).join('')}
       <div class="actions">${i + 1 < Z().chapters.length ? `<button class="btn soft small" data-next>${state(i + 1).open ? 'Sıradaki kapı' : 'Sıradaki kapı ' + state(i + 1).why.toLocaleLowerCase('tr')}</button>` : `<a class="btn red small" href="#dans">${A.icon('dance')} Dans pistine git</a>`}</div>`;
     renderList();
