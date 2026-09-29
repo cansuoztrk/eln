@@ -1,0 +1,288 @@
+/* Kale Paneli eklentileri (sadece kale sahibi):
+   - Bulut sihirbazı: Supabase adresini ve anahtarını dener, bu telefonda açar, onun telefonu için şifreli bağlantı linki üretir
+   - Ses stüdyosu: sesli notları metnini okuyarak burada kaydet ya da dosya seç; şifrelenip onun kalesine düşer
+   - Gerçek zambaklar: bahçesinde her 12 zambakta bir çiçekçiden gerçek buket; sipariş ve teslim işaretleri */
+(function () {
+  'use strict';
+  const K = window.K;
+  const A = K.art;
+  const D = window.ELN;
+  const C = D.config;
+  const T = K.time;
+
+  let root = null, built = false;
+  const CHECKS = [
+    ['baglanti', 'Projeye bağlantı ve tablo'],
+    ['yazma', 'Şifreli yazma'],
+    ['okuma', 'Okuma ve şifre çözme'],
+    ['canli', 'Canlı güncellemeler'],
+    ['silme', 'Silme'],
+  ];
+  const MAX_B64 = 2700000; // mühürlendikten sonra satır sınırının (4 MB) altında kalsın
+
+  /* ---------------- Bulut sihirbazı ---------------- */
+  function wizard(prefix) {
+    return `<form class="pn-form" id="${prefix}Form" autocomplete="off">
+        <input class="input" id="${prefix}Url" name="${prefix}Url" inputmode="url" spellcheck="false" placeholder="Project URL (https://xxxx.supabase.co)">
+        <input class="input" id="${prefix}Key" name="${prefix}Key" spellcheck="false" placeholder="anon public ya da Publishable key">
+        <button class="btn red small" type="submit">${A.ui('check')} Dene ve bağla</button>
+      </form>
+      <ul class="pn-checks" id="${prefix}Checks"></ul>
+      <div class="pn-cfg-done" id="${prefix}Done" hidden>
+        <div class="actions"><button class="btn small" type="button" data-cfg="here">${A.icon('key')} Bu telefonda aç</button><button class="btn soft small" type="button" data-cfg="link">${A.ui('send')} Onun telefonu için bağlantı</button></div>
+        <div class="pn-link" data-out hidden></div>
+      </div>`;
+  }
+  function bindWizard(box, prefix) {
+    let cfg = null;
+    K.$(`#${prefix}Form`, box).addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = K.$(`#${prefix}Url`, box).value.trim().replace(/\/+$/, '');
+      const key = K.$(`#${prefix}Key`, box).value.trim();
+      if (!/^https:\/\/.+/.test(url) || key.length < 20) return K.fx.toast('Adres https:// ile başlamalı, anahtar da uzun bir metin olmalı.');
+      const list = K.$(`#${prefix}Checks`, box);
+      list.innerHTML = CHECKS.map(([k, t]) => `<li data-k="${k}" class="wait"><i></i><b>${t}</b><span>Bekleniyor...</span></li>`).join('');
+      K.$(`#${prefix}Done`, box).hidden = true;
+      const ok = await K.cloud.test({ url, key }, (k, pass, msg) => {
+        const li = K.$(`[data-k="${k}"]`, list);
+        if (!li) return;
+        li.className = pass ? 'ok' : 'bad';
+        K.$('span', li).textContent = msg;
+      });
+      K.$$('li.wait', list).forEach((li) => {
+        li.className = 'skip';
+        K.$('span', li).textContent = 'Denenmedi';
+      });
+      if (ok) {
+        cfg = { url, key };
+        K.$(`#${prefix}Done`, box).hidden = false;
+        K.audio.sfx.success();
+      } else K.audio.sfx.fail();
+    });
+    box.addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-cfg]');
+      if (!b || !cfg) return;
+      if (b.dataset.cfg === 'here') {
+        await K.cloud.saveLocal(cfg);
+        K.fx.toast('Bu telefon bağlandı. Kale yeniden açılıyor...', { icon: A.icon('key') });
+        setTimeout(() => location.reload(), 1200);
+      }
+      if (b.dataset.cfg === 'link') {
+        const link = await K.cloud.link(cfg);
+        const out = K.$('[data-out]', box);
+        out.hidden = false;
+        out.innerHTML = `<p class="small">Bu bağlantıyı ona gönder. Şifreli: kalenin şifresini bilmeyen hiçbir şey okuyamaz. Kaleyi hangi uygulamada açıyorsa (ana ekrandaki simge ya da tarayıcı) bağlantıyı orada açmalı.</p>
+          <textarea class="textarea" readonly rows="3">${K.esc(link)}</textarea>
+          <div class="actions"><button class="btn small" type="button" data-copy>${A.ui('copy')} Kopyala</button></div>
+          <p class="muted small">En sağlamı: Project URL ve anahtarı bana gönder, kasaya ekleyeyim; iki telefon da kendiliğinden bağlanır, link gerekmez.</p>`;
+        K.$('[data-copy]', out).addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(link);
+            K.fx.toast('Kopyalandı.');
+          } catch (err) {
+            K.$('textarea', out).select();
+          }
+        });
+      }
+    });
+  }
+
+  /* ---------------- Ses stüdyosu ---------------- */
+  function voiceState(id) {
+    if ((C.voiceFiles || {})[id]) return ['kasa', 'Kasada'];
+    if (K.voice && K.voice.cloud[id]) return ['bulut', 'Bulutta'];
+    return ['yok', 'Henüz yok'];
+  }
+  function renderVoices() {
+    const ul = root && K.$('#pnVoices', root);
+    if (!ul) return;
+    ul.innerHTML = (D.voices || [])
+      .map((v) => {
+        const [st, label] = voiceState(v.id);
+        return `<li class="pn-v ${st}"><div><b>${K.esc(v.title)}</b><small>${K.esc(v.where || '')}${v.sure ? ` · ${K.esc(v.sure)}` : ''}</small></div><span class="pn-vst">${label}</span><button class="btn small ${st === 'yok' ? 'red' : 'soft'}" type="button" data-rec="${K.esc(v.id)}">${A.ui('mic')} ${st === 'yok' ? 'Kaydet' : 'Yeniden'}</button></li>`;
+      })
+      .join('');
+    const n = (D.voices || []).filter((v) => voiceState(v.id)[0] !== 'yok').length;
+    const c = K.$('#pnVoiceCount', root);
+    if (c) c.textContent = `${n} / ${(D.voices || []).length} ses hazır`;
+  }
+  function pickMime() {
+    const opts = ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus'];
+    return window.MediaRecorder ? opts.find((m) => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)) || '' : null;
+  }
+  const toB64 = (blob) =>
+    new Promise((res) => {
+      const r = new FileReader();
+      r.onload = () => res(String(r.result).split(',')[1] || '');
+      r.onerror = () => res('');
+      r.readAsDataURL(blob);
+    });
+  function studio(id) {
+    const v = (D.voices || []).find((x) => x.id === id);
+    if (!v) return;
+    let rec = null, chunks = [], blob = null, t0 = 0, tick = null, stream = null;
+    const m = K.ui.modal({
+      label: 'Ses stüdyosu',
+      cls: 'st-modal',
+      onClose: () => {
+        if (rec && rec.state === 'recording') rec.stop();
+        stopAll();
+      },
+      html: `<div class="st">
+        <p class="card-eyebrow">${K.esc(v.title)}${v.ton ? ` · ${K.esc(v.ton)}` : ''}${v.sure ? ` · ${K.esc(v.sure)}` : ''}</p>
+        <div class="st-tp">${(v.text || []).map((l) => `<p>${K.esc(K.fill(l))}</p>`).join('')}</div>
+        <div class="st-ctrl"><button class="btn red" type="button" data-st="rec">${A.ui('mic')} Kaydı başlat</button><button class="btn" type="button" data-st="stop" hidden>${A.ui('check')} Bitir</button><span class="st-time tnum" data-time>0:00</span></div>
+        <audio data-play controls hidden></audio>
+        <div class="actions"><label class="btn soft small">${A.ui('plus')} Ya da dosya seç<input type="file" accept="audio/*" data-file hidden></label><button class="btn red small" type="button" data-st="up" disabled>${A.ui('send')} Kaleye yükle</button></div>
+        <p class="muted small" data-msg>Sessiz bir yer bul, telefonu ağzına bir karış uzakta tut. Metni aynen okumak zorunda değilsin; içinden geldiği gibi.</p>
+      </div>`,
+    });
+    const box = m.el;
+    const msg = (t) => (K.$('[data-msg]', box).textContent = t);
+    const setBlob = (b) => {
+      blob = b;
+      const a = K.$('[data-play]', box);
+      a.src = URL.createObjectURL(b);
+      a.hidden = false;
+      K.$('[data-st="up"]', box).disabled = false;
+      msg(`${Math.round(b.size / 1024)} KB. Dinle; beğendiysen yükle.`);
+    };
+    const stopAll = () => {
+      clearInterval(tick);
+      if (stream) stream.getTracks().forEach((t) => t.stop());
+      stream = null;
+    };
+    box.addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-st]');
+      if (!b) return;
+      if (b.dataset.st === 'rec') {
+        const mime = pickMime();
+        if (mime === null) return msg('Bu tarayıcı kayıt yapamıyor. Telefonun ses kaydedicisiyle kaydedip "dosya seç"le yükle.');
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+        } catch (err) {
+          return msg('Mikrofon izni verilmedi. Tarayıcı ayarlarından izin verip tekrar dene.');
+        }
+        chunks = [];
+        rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 64000 } : { audioBitsPerSecond: 64000 });
+        rec.ondataavailable = (ev) => ev.data && ev.data.size && chunks.push(ev.data);
+        rec.onstop = () => {
+          stopAll();
+          setBlob(new Blob(chunks, { type: rec.mimeType || mime || 'audio/webm' }));
+        };
+        rec.start(500);
+        t0 = Date.now();
+        tick = setInterval(() => {
+          const s = Math.floor((Date.now() - t0) / 1000);
+          K.$('[data-time]', box).textContent = `${Math.floor(s / 60)}:${K.pad(s % 60)}`;
+          if (s >= 240) rec.state === 'recording' && rec.stop();
+        }, 250);
+        b.hidden = true;
+        K.$('[data-st="stop"]', box).hidden = false;
+        box.classList.add('recording');
+        msg('Kaydediliyor... Metin yukarıda. En fazla 4 dakika.');
+      }
+      if (b.dataset.st === 'stop' && rec && rec.state === 'recording') {
+        rec.stop();
+        b.hidden = true;
+        K.$('[data-st="rec"]', box).hidden = false;
+        K.$('[data-st="rec"]', box).innerHTML = `${A.ui('mic')} Yeniden kaydet`;
+        box.classList.remove('recording');
+      }
+      if (b.dataset.st === 'up' && blob) {
+        b.disabled = true;
+        msg('Şifrelenip yükleniyor...');
+        const b64 = await toB64(blob);
+        if (!b64) return msg('Dosya okunamadı.');
+        if (b64.length > MAX_B64) {
+          b.disabled = false;
+          return msg('Kayıt çok büyük. Biraz daha kısa kaydet ya da daha küçük bir dosya seç (yaklaşık 2 MB).');
+        }
+        const r = await K.cloud.add('voice', { id: v.id, mime: blob.type || 'audio/mp4', b64 });
+        if (!r) {
+          b.disabled = false;
+          return msg('Yüklenemedi. İnterneti kontrol edip tekrar dene.');
+        }
+        K.audio.sfx.chime();
+        K.fx.toast(`"${K.esc(v.title)}" onun kalesinde. İlk dinlediğinde sana haber gelecek.`, { icon: A.icon('mic'), duration: 5000 });
+        renderVoices();
+        m.close();
+      }
+    });
+    K.$('[data-file]', box).addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) setBlob(f);
+    });
+  }
+
+  /* ---------------- Gerçek zambaklar ---------------- */
+  async function renderReal() {
+    const box = root && K.$('#pnRealBody', root);
+    if (!box || !K.cloud.enabled) return;
+    const f = C.florist || {};
+    const [blooms, real] = await Promise.all([K.cloud.list('bloom'), K.cloud.list('realbouquet')]);
+    const n = blooms.filter((r) => r.who === 'her').reduce((a, r) => Math.max(a, r.data.n || 0), 0);
+    const every = f.every || 12;
+    const done = real.filter((r) => r.data.status === 'teslim').length;
+    const due = Math.floor(n / every) - done;
+    const last = real[real.length - 1];
+    box.innerHTML = `<p>Bahçesinde şu an <b>${K.num(n)}</b> zambak açtı. Her ${every} zambakta bir gerçek buket: ${due > 0 ? `<b class="pn-due">şu an ${due} buket borcun var!</b>` : `sıradaki ${K.num((Math.floor(n / every) + 1) * every)}. zambakta.`}</p>
+      ${f.name ? `<p class="muted small">${K.esc(f.name)} · ${K.esc(f.hours || '')} · <a href="tel:${K.esc((f.phone || '').replace(/\s/g, ''))}">${K.esc(f.phone || '')}</a> · <a href="${K.esc(f.url)}" target="_blank" rel="noopener">Instagram</a></p>` : ''}
+      <div class="actions"><button class="btn soft small" type="button" data-real="yolda">Sipariş verdim</button><button class="btn red small" type="button" data-real="teslim">Teslim edildi</button></div>
+      ${last ? `<p class="muted small">Son durum: ${last.data.status === 'teslim' ? 'teslim edildi' : 'yolda (o görmüyor, sürpriz)'} · ${T.fmt(new Date(last.at))}</p>` : ''}`;
+  }
+
+  /* ---------------- Panele yerleştir ---------------- */
+  K.on('room', async ({ id, el }) => {
+    if (id !== 'panel' || !K.isOwner()) return;
+    root = el;
+    if (!built) {
+      built = true;
+      const off = K.$('#pnOff', el);
+      off.innerHTML = `<p class="card-eyebrow">Ortak kaleyi bağla</p>
+        <p>Bulut henüz bağlı değil. Supabase projeni açıp kurulum kodunu çalıştırdıysan, adresini ve anahtarını buraya yapıştır. Kale her şeyi tek tek dener, sonra bağlar.</p>
+        ${wizard('pnCfg')}`;
+      bindWizard(off, 'pnCfg');
+      const main = K.$('#pnMain', el);
+      main.insertAdjacentHTML(
+        'beforeend',
+        `<section class="card pn-sec" id="pnVoice"><p class="card-eyebrow">Ses stüdyosu</p>
+          <p class="muted small">Sesli notların metinleri burada. Birine dokun, metni okuyarak kaydet (ya da telefonundaki bir ses dosyasını seç). Şifrelenip onun kalesine düşer; o dinleyince sana haber gelir. <b id="pnVoiceCount"></b></p>
+          <ul class="pn-voices" id="pnVoices"></ul></section>
+        <section class="card pn-sec" id="pnReal"><p class="card-eyebrow">Gerçek zambaklar</p><div id="pnRealBody"></div></section>
+        <section class="card pn-sec" id="pnCloud"><p class="card-eyebrow">Bulut bağlantısı</p>
+          <p class="muted small">${C.cloud && C.cloud.url ? 'Ayarlar kasada kayıtlı; iki telefon da kendiliğinden bağlanıyor.' : 'Bu telefon bağlı. Onun telefonu henüz bağlı değilse aynı bilgilerle bir bağlantı linki üret.'}</p>
+          <details><summary>Yeniden dene / bağlantı linki üret</summary>${wizard('pnCfg2')}</details></section>`
+      );
+      bindWizard(K.$('#pnCloud', main), 'pnCfg2');
+      main.addEventListener('click', async (e) => {
+        const r = e.target.closest('[data-rec]');
+        if (r) studio(r.dataset.rec);
+        const rb = e.target.closest('[data-real]');
+        if (rb) {
+          const status = rb.dataset.real;
+          let note = '';
+          if (status === 'teslim') note = (window.prompt('Buketin kartına ne yazdın? (Bahçesinde altın bir zambak olarak duracak)', 'Bu zambaklar gerçek.') || '').trim();
+          await K.cloud.add('realbouquet', { status, note });
+          K.fx.toast(status === 'teslim' ? 'Bahçesine altın bir zambak dikildi.' : 'Not edildi. O görmüyor; sürpriz bozulmadı.', { icon: A.icon('lily') });
+          renderReal();
+        }
+      });
+    }
+    if (await K.cloud.ready) {
+      renderVoices();
+      renderReal();
+    }
+  });
+  K.on('cloud-voice', renderVoices);
+  K.on('cloud', (on) => {
+    if (!on || !K.isOwner()) return;
+    const again = () => K.activeRoom === 'panel' && renderReal();
+    K.cloud.on('bloom', (r) => {
+      again();
+      const f = C.florist;
+      if (r.who === 'her' && f && r.data.n % (f.every || 12) === 0) K.fx.toast(`<b>Bahçesinde ${r.data.n}. zambak açtı!</b> Gerçek buketin zamanı: ${K.esc(f.name)}`, { icon: A.icon('lily'), duration: 8000 });
+    });
+    K.cloud.on('realbouquet', again);
+  });
+})();

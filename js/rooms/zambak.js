@@ -16,7 +16,7 @@
     ['#E3174D', '#FF8FB8', '#8C1033'],
     ['#FFD0E1', '#FFFFFF', '#F0578F'],
   ];
-  let root, bouquets = [];
+  let root, bouquets = [], reals = [];
   const Z = () => D.zambak || { notes: [] };
   const st = () => K.store.get('lily', { water: [], blooms: [] });
   const save = (s) => K.store.set('lily', s);
@@ -89,8 +89,23 @@
       K.fx.rain({ count: 50, shapes: ['heart'], colors: ['#FF8FB8', '#FFD0E1', '#FFFFFF'] });
       K.audio.sfx.chime();
       K.stickers.award('zambak');
-      K.notify(`${C.herName}'un zambağı açtı`, `Kaledeki ${s.blooms.length}. zambak açtı. Yedi gün boyunca sulayıp büyüttü.`, ['tulip']);
-      setTimeout(() => showNote(bloomed, s.blooms.length), fromHome ? 200 : 900);
+      const n = s.blooms.length;
+      const f = C.florist;
+      const every = (f && f.every) || 12;
+      if (K.cloud && K.cloud.enabled) K.cloud.add('bloom', { n });
+      // Her 12 zambakta bir: gerçek buket zamanı (ona sadece bir ipucu, sana çiçekçinin bilgileri)
+      if (f && n % every === 0) {
+        K.notify(`${C.herName}'un bahçesinde ${n}. zambak açtı`, `Söz verdiğin gerçek buketin zamanı: ${f.name} · ${f.hours} · ${f.phone}`, ['bouquet'], { click: f.url, priority: 5 });
+        setTimeout(
+          () =>
+            K.ui.modal({
+              label: 'On iki zambak',
+              html: `<div class="lily-note"><svg viewBox="-40 -40 80 80" class="lily-big">${flower(COLORS[3], -12, 16, 1)}${flower(COLORS[0], 12, 12, 1.1)}${flower(COLORS[1], 0, 22, 1.2)}</svg><p class="card-eyebrow">${K.num(n)} zambak</p><p class="hand">Bahçen doldu. Bu bahçe sana bir şey hazırlıyor... Önümüzdeki günlerde kapına bir göz at.</p></div>`,
+            }),
+          fromHome ? 400 : 1200
+        );
+      } else K.notify(`${C.herName}'un zambağı açtı`, `Kaledeki ${n}. zambak açtı. Yedi gün boyunca sulayıp büyüttü.`, ['tulip']);
+      setTimeout(() => showNote(bloomed, n), fromHome ? 200 : 900);
     } else {
       const left = 7 - stage(s);
       K.fx.toast(`Suladın. ${left === 1 ? 'Yarın açıyor!' : `Açmasına ${left} sulama kaldı.`}`, { icon: A.icon('lily') });
@@ -135,8 +150,21 @@
     }
     K.emit('lily');
   }
+  // Gerçek buket teslim edilince bahçeye altın bir zambak
+  function real(r, fresh) {
+    if (r.data.status !== 'teslim' || reals.some((x) => x.id === r.id)) return;
+    reals.push({ id: r.id, at: r.at, note: r.data.note || '' });
+    if (fresh && !K.isOwner()) {
+      K.fx.rain({ count: 90, shapes: ['heart', 'star'], colors: ['#FFD34E', '#FF8FB8', '#FFFFFF'] });
+      K.audio.sfx.success();
+      K.fx.toast(`<b>Bu zambaklar gerçek.</b> Bahçene altın bir zambak dikildi.`, { icon: A.icon('lily'), duration: 7000 });
+    }
+    K.emit('lily');
+  }
   K.on('cloud', async (on) => {
     if (!on) return;
+    (await K.cloud.list('realbouquet')).forEach((r) => real(r));
+    K.cloud.on('realbouquet', (r) => real(r, true));
     (await K.cloud.list('bouquet')).forEach((r) => arrived(r));
     K.cloud.on('bouquet', (r) => arrived(r, true));
     K.cloud.on('deleted', ({ id }) => {
@@ -159,6 +187,9 @@
     K.$('#lyBed', root).innerHTML = s.blooms.length
       ? s.blooms.map((b, i) => `<button class="ly-fl" data-b="${i}" style="--i:${i}" aria-label="${K.num(i + 1)}. zambak"><svg viewBox="-30 -40 60 110"><path d="M0 70 C0 40 -2 20 0 0" stroke="#3FA37A" stroke-width="3" fill="none"/><path d="M0 50 C-12 44 -16 36 -14 30 C-6 34 -2 42 0 50 Z" fill="#7ED6A5" stroke="#2F6B4E" stroke-width="1.4"/>${flower(COLORS[b.c], 0, 4, 1)}</svg><small>${T.fmtShort(b.day)}</small></button>`).join('')
       : `<p class="muted">Bahçe henüz boş. İlk zambak yedinci sulamada açacak.</p>`;
+    K.$('#lyReal', root).innerHTML = reals.length
+      ? `<h3 class="ly-h">Gerçek zambaklar</h3><div class="ly-real">${reals.map((r) => `<div class="ly-gold"><svg viewBox="-30 -40 60 70">${flower(['#FFE08A', '#FFF4C7', '#C98A12'], 0, 4, 1)}</svg><div><p class="card-eyebrow">${T.fmt(new Date(r.at))}</p><p class="hand">${K.esc(r.note || 'Bu zambaklar gerçek.')}</p></div></div>`).join('')}</div>`
+      : '';
     const total = bouquets.reduce((a, b) => a + (b.count || 1), 0);
     K.$('#lyVase', root).innerHTML = bouquets.length
       ? `${vase(total)}<ul class="ly-bq">${bouquets.slice().reverse().map((b) => `<li><b>${K.num(b.count)} zambak</b> · ${T.fmt(new Date(b.at))}<p class="hand">${K.esc(b.note)}</p></li>`).join('')}</ul>`
@@ -188,6 +219,7 @@
         </section>
         <h3 class="ly-h">Bahçen</h3>
         <div class="ly-bed" id="lyBed"></div>
+        <div id="lyReal"></div>
         <h3 class="ly-h">Vazo</h3>
         <div class="ly-vase" id="lyVase"></div>`;
       K.$('#lyWater', el).addEventListener('click', () => {

@@ -174,9 +174,108 @@
     if (before !== cloud.otherHere()) K.emit('presence', cloud.otherHere());
   });
 
+  /* ---------------- Kurulum: test, bu cihazda aç, bağlantı linki ---------------- */
+  // Ayar üç yerden gelebilir: kasadaki C.cloud, bu cihaza kaydedilmiş (mühürlü) ayar ya da #bulut:<mühür> linki
+  async function localCfg() {
+    const s = K.store.get('cloudCfg');
+    return s ? (await K.vault.unseal(s)) || {} : {};
+  }
+  cloud.saveLocal = async (cfg) => K.store.set('cloudCfg', await K.vault.seal({ url: cfg.url.trim(), key: cfg.key.trim(), space: cfg.space || 'kale' }));
+  cloud.link = async (cfg) => `${location.origin}${location.pathname}#bulut:${encodeURIComponent(await K.vault.seal({ url: cfg.url.trim(), key: cfg.key.trim(), space: cfg.space || 'kale' }))}`;
+  // Supabase projesini adım adım dener: bağlantı, yazma, okuma, canlı olay, silme
+  cloud.test = async (cfg, step) => {
+    let cl = null;
+    try {
+      return await runTest(cfg, step, (c) => (cl = c));
+    } finally {
+      // Deneme bitince (başarılı ya da değil) canlı bağlantıyı kapat
+      try {
+        cl && cl.removeAllChannels();
+      } catch (e) {}
+    }
+  };
+  async function runTest(cfg, step, keep) {
+    const say = (k, ok, msg) => step && step(k, ok, msg);
+    const space = 'test-' + Math.random().toString(36).slice(2, 8);
+    let client, ch;
+    try {
+      await loadLib();
+      client = window.supabase.createClient(cfg.url.trim(), cfg.key.trim(), { auth: { persistSession: false } });
+      keep(client);
+    } catch (e) {
+      say('baglanti', false, 'Kütüphane yüklenemedi ya da adres geçersiz.');
+      return false;
+    }
+    let heard = false;
+    const subscribed = new Promise((res) => {
+      ch = client
+        .channel('test-' + space)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'kale', filter: `space=eq.${space}` }, () => (heard = true))
+        .subscribe((st) => st === 'SUBSCRIBED' && res(true));
+      setTimeout(() => res(false), 7000);
+    });
+    const hint = (err) => {
+      const m = `${(err && err.code) || ''} ${(err && err.message) || err || ''}`;
+      if (/42P01|does not exist|relation/i.test(m)) return 'Tablo bulunamadı: SQL Editor\'da kurulum kodunu çalıştırdın mı?';
+      if (/401|JWT|apikey|API key|Invalid/i.test(m)) return 'Anahtar kabul edilmedi: anon public (ya da Publishable) anahtarı kopyaladığından emin ol.';
+      if (/Failed to fetch|NetworkError|ENOTFOUND|load failed/i.test(m)) return 'Adrese ulaşılamadı: Project URL doğru mu (https://....supabase.co)?';
+      if (/row-level security|policy/i.test(m)) return 'İzin kuralları eksik: kurulum kodunun tamamını çalıştır.';
+      return m.trim().slice(0, 160) || 'Bilinmeyen hata';
+    };
+    try {
+      const { error } = await client.from('kale').select('id').limit(1);
+      if (error) throw error;
+      say('baglanti', true, 'Projeye bağlanıldı, tablo yerinde.');
+    } catch (e) {
+      say('baglanti', false, hint(e));
+      return false;
+    }
+    const live = await subscribed;
+    let row;
+    try {
+      const { data, error } = await client.from('kale').insert({ space, kind: 'ping', author: 'me', data: await K.vault.seal({ ping: Date.now() }) }).select().single();
+      if (error) throw error;
+      row = data;
+      say('yazma', true, 'Şifreli bir deneme kaydı yazıldı.');
+    } catch (e) {
+      say('yazma', false, hint(e));
+      return false;
+    }
+    try {
+      const { data, error } = await client.from('kale').select('*').eq('id', row.id).single();
+      if (error) throw error;
+      const back = await K.vault.unseal(data.data);
+      if (!back || !back.ping) throw new Error('çözülemedi');
+      say('okuma', true, 'Kayıt geri okundu ve kasa anahtarıyla çözüldü.');
+    } catch (e) {
+      say('okuma', false, hint(e));
+      return false;
+    }
+    for (let i = 0; i < 30 && !heard; i++) await new Promise((r) => setTimeout(r, 200));
+    say('canli', live && heard, live && heard ? 'Canlı güncellemeler çalışıyor.' : 'Canlı olay gelmedi: kurulum kodunun son kısmı (supabase_realtime) çalışmamış olabilir. Site yine çalışır ama anlık düşmez.');
+    try {
+      const { error } = await client.from('kale').delete().eq('id', row.id);
+      if (error) throw error;
+      say('silme', true, 'Deneme kaydı silindi.');
+    } catch (e) {
+      say('silme', false, hint(e));
+    }
+    return true;
+  }
+
   async function start() {
     const q = new URLSearchParams(location.search).get('bulut');
-    const cfg = C.cloud || {};
+    // Bağlantı linkiyle gelindiyse: ayarı bu cihaza kaydet, adresi temizle
+    if (location.hash.startsWith('#bulut:')) {
+      const got = await K.vault.unseal(decodeURIComponent(location.hash.slice(7)));
+      history.replaceState(null, '', location.pathname + location.search);
+      if (got && got.url && got.key) {
+        await cloud.saveLocal(got);
+        setTimeout(() => K.fx.toast('<b>Ortak kale bağlandı.</b> Artık yazdıkların anında öbür telefona düşecek.', { icon: K.art.icon('hugs'), duration: 6000 }), 1500);
+      }
+    }
+    let cfg = C.cloud || {};
+    if (!(cfg.url && cfg.key)) cfg = await localCfg();
     try {
       if (q === 'deneme' && window.BroadcastChannel) adapter = mockAdapter();
       else if (cfg.url && cfg.key) adapter = await supabaseAdapter(cfg);

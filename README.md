@@ -72,14 +72,17 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 **Zaman Kanadı** (sevdiği bir hikâyeye selam)
 - **Kilerdeki Kapı**: Kilerin arkasındaki basamaktan ilişkimizin istediği gününe inilir: o günün olayı, o gecenin gökyüzü ve ayı, günün notu ve sorusu, o gün kaleye gelip gelmediği. Geleceğe kapı açılmaz; kilometre taşı günlerinin notları mühürlüdür, günü gelince açılır. Klavyede gizli bir kod yazmak da kilere düşürür (kasada).
 - **Zaman Yolcusu**: Yedi bölümlük görev, her gün bir kapı. Her bölümde küçük bir bulmaca (zaman kadranı, karışmış sohbet, yıldız birleştirme, balon melodisi, duvardaki A+E notu, dağılmış harfler, kaydırmalı resim) ve karşılığında o anın İstanbul tarafındaki hâli. Geçmiş arada bir "direnir".
+- **İzleme Kulübü**: Sevdiği diziyi bu sefer birlikte izlemek için sekiz bölüm: senin tahminlerin (o sonunu bildiği için okuyup güler), onun mühürlü notları (sen bölümü bitirene kadar kapalı), iki ekranda aynı anda geri sayım, mendil sayacı, bölüm sonu notları, iki tarafın tepkisi ve finalde bir mektupla "ağlama haritası".
 - **Güvercin Postası**: Gerçek güvercin hızıyla (≈22 saat) uçan mektuplar; haritada Karadeniz kıyısı ve Kafkaslar üzerinden izlenir. Alıcı mektubu ancak güvercin varınca okur. Bulut yoksa onun mektupları bildirim servisinin gecikmeli gönderimiyle tam varış saatinde sana düşer.
 
 - **Zambak Bahçesi** (Kalp): Onun çiçeği. Her gün sulanan saksı büyür; her yedi sulamada bir zambak açar, her zambağın yaprağında bir not var. Ana salonda "Zambağın" kartı. Kale Paneli'nden (bulut) ona zambak buketi gönderilir; vazoda durur.
+- **Gece Lambası** (Kalp): Kısılabilen Kitty lambası, tarayıcıda üretilen uyku sesleri (yağmur, dalga, rüzgâr, ninni), zamanlayıcı ve "uyuyorum" düğmesi (sana haber gider). Ertesi sabah kaleye ilk gelişte uyku raporu ve günaydın notu.
+- **Gerçek Zambaklar**: Bahçesinde her 12 zambakta bir sana çiçekçinin bilgileriyle hatırlatma gelir; panelden "teslim edildi" deyince bahçesine altın bir zambak dikilir.
 - **Bizim Şarkımız**: Plak çevrilince **B yüzü**: onun şarkısı.
 
 **Oyun Kanadı**: **Kalp Labirenti** (onun şarkısına: her gün yeni, kalp şeklinde ve çıkmaz sokağı olmayan bir labirent; her yol ortaya çıkar), **Dans Pisti** (bu site için yazılmış bir swing parçasıyla ritim oyunu; ikiniz aynı anda pistteyseniz birlikte dans edip uyumunuzu ölçersiniz), Gartic Odası, **Ortak Tahta** (bulut: aynı tahtaya canlı çizim; biri çizer öbürü tahmin eder, skor saklanır), Angela'nın Odası, Bakü'ye Uç (mini oyun), **Film Gecesi** (davet, ortak geri sayım, puan kartı), Dilek Gökyüzü, Müzik Kutusu.
 
-**Hazine Kanadı**: **İki Takvim** (senin ders programın, onun kendi girdiği dersleri, iki saat diliminde haftalık tablo ve ikinizin de boş olduğu saatler; ana salonda "Ardoş şu an derste / teneffüste / boşta" çipi), **Kitty Gazetesi** (her sabah yeni sayı: manşet, iki şehrin havası, Boğa & Akrep falı, bulmaca), **Soru Kutusu** (her gün bir soru; cevap sana gelir), **Bizim Özetimiz** (Wrapped tarzı hikâye), Boğaz'dan Hazar'a, Öğretmen Eln'in Sınıfı (sözlük, Azerbaycanca defter, ödev, aşk sınavı), Hayal Listesi, Aşk Kuponları, Özel Günler, Çıkartma Albümü ve **iyi saklanmış gizli bir kulübe** (içindeki dost her gün mamayla büyür: 5 seviye, seri, aksesuarlar).
+**Hazine Kanadı**: **Hazine Avı** (odalara saklanmış dokuz altın anahtar, ipuçlarıyla; dokuzu bulununca sandık açılır ve sana haber gelir), **İki Takvim** (senin ders programın, onun kendi girdiği dersleri, iki saat diliminde haftalık tablo ve ikinizin de boş olduğu saatler; ana salonda "Ardoş şu an derste / teneffüste / boşta" çipi), **Kitty Gazetesi** (her sabah yeni sayı: manşet, iki şehrin havası, Boğa & Akrep falı, bulmaca), **Soru Kutusu** (her gün bir soru; cevap sana gelir), **Bizim Özetimiz** (Wrapped tarzı hikâye), Boğaz'dan Hazar'a, Öğretmen Eln'in Sınıfı (sözlük, Azerbaycanca defter, ödev, aşk sınavı), Hayal Listesi, Aşk Kuponları, Özel Günler, Çıkartma Albümü ve **iyi saklanmış gizli bir kulübe** (içindeki dost her gün mamayla büyür: 5 seviye, seri, aksesuarlar).
 
 **Bu Günlere Özel** (sadece o tarihlerde görünür):
 - **Ters Kale**: Senin doğum gününden önceki hafta açılır; Eln sana kart tasarlar ve gönderir.
@@ -121,7 +124,7 @@ Bizim Defter, Birlikte, Ortak Tahta, canlı posta ve iki taraflı Soru Kutusu i�
 1. supabase.com'da ücretsiz hesap aç → **New project** (bölge: Frankfurt ya da yakın bir yer).
 2. Proje açılınca **SQL Editor → New query**: `tools/supabase.sql` dosyasının içeriğini yapıştır → **Run**.
 3. **Project Settings → API** sayfasından **Project URL** ve **anon public** anahtarını al.
-4. `private/content.mjs` → `config` içine ekle ve paketle:
+4. Ya Kale Paneli'ndeki **Ortak kaleyi bağla** bölümüne yapıştır (dener ve bağlar), ya da `private/content.mjs` → `config` içine ekle ve paketle (iki telefon da kendiliğinden bağlanır; en sağlamı bu):
    ```js
    cloud: { url: 'https://xxxx.supabase.co', key: 'anon-anahtar', space: 'kale' },
    ```
@@ -141,6 +144,9 @@ Kapıya Eln'in cevabı yerine **sahip şifresini** (`private/secrets.json` → `
 - **İlk buluşma tarihi**: Belli olunca yaz; geri sayım ve kutlama kendiliğinden başlar.
 - **Zambak gönder**: 1–21 zambaklık buket ve kartı; onun vazosuna düşer.
 - **Ders durumun**: devam ediyor / tatildeyim / sınav haftası.
+- **Ses stüdyosu**: Sesli notların metni ekranda; okuyarak kaydet ya da bir ses dosyası seç. Şifrelenip onun kalesine düşer.
+- **Gerçek zambaklar**: Bahçesindeki zambak sayısı, çiçekçi bilgileri, "sipariş verdim / teslim edildi".
+- **Bulut bağlantısı**: Supabase adresini ve anahtarını dener, bu telefonda açar ya da onun telefonu için şifreli bir bağlantı linki üretir.
 - Onun son hareketleri: cevaplar, defter sayfaları, telsiz mesajları.
 
 Sahip şifresi Eln'le paylaşılmamalı. Bulutu denemek için adresin sonuna `?bulut=deneme` eklersen aynı tarayıcıdaki iki sekme arasında çalışan sahte bir bulut açılır.

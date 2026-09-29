@@ -624,6 +624,7 @@
     }
     room.enter && room.enter(el);
     K.vault.fill(el);
+    K.emit('room', { id: room.id, el });
     const visited = K.store.get('visited', {});
     if (!visited[room.id]) {
       visited[room.id] = T.todayKey();
@@ -945,6 +946,12 @@
       D.cloudPhotos = D.cloudPhotos.filter((p) => p.cloudId !== id);
     });
     if (!K.activeRoom) renderDoors();
+    dailyBits();
+  });
+  // Panelden yeni bir ses yüklenince Sesim odası ve ses düğmeleri görünür olsun
+  K.on('cloud-voice', () => {
+    if (K.activeRoom) return;
+    renderDoors();
     dailyBits();
   });
   K.on('presence', (here) => {

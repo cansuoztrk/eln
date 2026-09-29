@@ -9,7 +9,9 @@
 
   const heard = () => K.store.get('voicesHeard', {});
   const def = (id) => D.voices.find((v) => v.id === id);
-  const exists = (id) => Boolean((C.voiceFiles || {})[id]) && Boolean(def(id));
+  // Buluttan gelen sesler (Kale Paneli'ndeki ses stüdyosundan): id → {mime, b64}
+  const cloudV = {};
+  const exists = (id) => Boolean((C.voiceFiles || {})[id] || cloudV[id]) && Boolean(def(id));
   // Kilit: 'YYYY-MM-DD' o günden sonra; 'MM-DD' her yıl sadece o gün (bir kez dinlenince açık kalır)
   function unlocked(v) {
     if (!v.lock || heard()[v.id]) return true;
@@ -101,7 +103,12 @@
     }
     let url;
     try {
-      url = await K.vault.audio(id);
+      if (cloudV[id] && !(C.voiceFiles || {})[id]) {
+        const bin = atob(cloudV[id].b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        url = URL.createObjectURL(new Blob([bytes], { type: cloudV[id].mime || 'audio/mp4' }));
+      } else url = await K.vault.audio(id);
     } catch (e) {
       K.$('.vp-lines', el).insertAdjacentHTML('afterbegin', '<p class="muted">Ses şu an açılamadı. İnternetini kontrol edip tekrar dene.</p>');
       el.classList.remove('loading');
@@ -166,5 +173,25 @@
   });
   document.addEventListener('keydown', (e) => e.key === 'Escape' && el && !el.hidden && close());
 
-  K.voice = { def, has, exists, unlocked, list, any, heard, btn, play, stop: close };
+  // Bulut: kale sahibinin yüklediği en son kayıt geçerli
+  const take = (r) => {
+    if (r.who !== 'me' || !r.data || !r.data.id || !r.data.b64) return;
+    const prev = cloudV[r.data.id];
+    if (!prev || prev.at <= r.at) cloudV[r.data.id] = { mime: r.data.mime, b64: r.data.b64, at: r.at, row: r.id };
+  };
+  K.on('cloud', async (on) => {
+    if (!on) return;
+    (await K.cloud.list('voice')).forEach(take);
+    K.emit('cloud-voice');
+    K.cloud.on('voice', (r) => {
+      take(r);
+      K.emit('cloud-voice', r.data.id);
+    });
+    K.cloud.on('deleted', ({ id }) => {
+      Object.keys(cloudV).forEach((k) => cloudV[k].row === id && delete cloudV[k]);
+      K.emit('cloud-voice');
+    });
+  });
+
+  K.voice = { def, has, exists, unlocked, list, any, heard, btn, play, stop: close, cloud: cloudV };
 })();
