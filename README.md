@@ -80,7 +80,7 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **Bilet Kumbarası** (Kalp, bulut): İlk buluşmanın bileti için ortak birikim; TL ya da AZN atılır, her atışın notu olur, çeyreklerde kutlama. Birikim arttıkça küçük bir uçak İstanbul'dan Bakü'ye doğru ilerler; "bu hızla şu gün dolar" tahmini ve hedef tarihe yetişmek için günlük gereken miktar gösterilir. Hedef ve kur Kale Paneli'nden.
 - **Biniş Kartı** (Kalp, bulut): Bilet alınınca panelden uçuş girilir; onun kalesine zarf içinde bir biniş kartı düşer (yolcu, kalkış/varış, koltuk, "seyahat sebebi"). Kalkışa geri sayım; uçuş günü uçak haritada gerçek saate göre ilerler ("Anadolu'nun üstünde", "Gürcistan'ın üstünde"...), ana salondaki çip "Ardoş uçakta" der, inince kutlama. O "Kapıda bekleyeceğim" diye cevap verir. İlk Sarılma geri sayımı da bu tarihe kurulur.
 - **Bakü'de İlk Gün** (Kalp): Uçak indiğinde yaşanacak ilk günün ortak planı. Stilize Bakü haritasında yerler; ikiniz de kalp atar, sabah/öğle/akşam/gece dilimlerine koyar, kendi bildiği yerleri ekler. Rehber o.
-- **Ne Zaman?** (Kalp, bulut): Bakü tarihi henüz belli değilken ortak takvim. Önümüzdeki dokuz ay için ikiniz de günlere "uygun / belki / olmaz" dersiniz (tek dokunuş ya da "Aralık" ile iki dokunuşta bir aralık). İkinizin de uygun olduğu günler parlar, kale en iyi aralıkları bulur (bilet için en az iki hafta sonrası), kumbaranın dolacağı gün uçakla işaretlenir. Biri aralık önerir, öbürü kabul edince "hedef" olur; kumbara o güne göre hesap yapar. Günlerin altında iki okulun takvimi ince çizgilerle durur (kesikli sınav, düz tatil; tahmini olanlar öyle yazıyor).
+- **Ne Zaman?** (Kalp, bulut): Bakü tarihi henüz belli değilken ortak takvim. Önümüzdeki dokuz ay için ikiniz de günlere "uygun / belki / olmaz" dersiniz (tek dokunuş ya da "Aralık" ile iki dokunuşta bir aralık). İkinizin de uygun olduğu günler parlar, kale en iyi aralıkları bulur (bilet için en az iki hafta sonrası), kumbaranın dolacağı gün uçakla işaretlenir. Biri aralık önerir, öbürü kabul edince "hedef" olur (kale sahibinin kasadaki önerisi: Novruz, 19–24 Mart 2027); kumbara o güne göre hesap yapar. Günlerin altında iki okulun takvimi ince çizgilerle durur (kesikli sınav, düz tatil; tahmini olanlar öyle yazıyor).
 - **Günün Sesi** (Kalp, bulut): Her gün birbirinize en fazla 20 saniyelik ses; her günün küçük bir sorusu var. Onun bugünkü sesi sen kendi sesini bırakınca açılır. Son 30 gün bir şeritte, ikinizin de ses bıraktığı günler seri olur. Sesler şifreli.
 - **21:21** (Kalp, bulut): Her akşam Bakü saatiyle 21:21'de (İstanbul 20:21) iki dakikalık pencere. İkiniz de o dakikada kalbe basarsanız gökyüzüne bir yıldız eklenir; her yedi yıldız adı olan bir takımyıldız olur. Pencere açıkken kalenin her yerinde alttan bir kalp çıkar.
 - **Gece Lambası** (Kalp): Kısılabilen Kitty lambası, tarayıcıda üretilen uyku sesleri (yağmur, dalga, rüzgâr, ninni), **Sesimle uyu** (uyuyamadığında, masal ve iyi geceler kayıtları arka arkaya, uyku sesinin üstünde), zamanlayıcı ve "uyuyorum" düğmesi (sana haber gider). Ertesi sabah kaleye ilk gelişte uyku raporu ve günaydın notu.
@@ -97,6 +97,7 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **Ters Kale**: Senin doğum gününden önceki hafta açılır; Eln sana kart tasarlar ve gönderir.
 - **Kış Takvimi**: 6–31 Aralık, her gün bir kapı (mektup, soru, kupon, fotoğraf).
 - **Doğum Günü Sarayı**: 23 Nisan haftası; o gün 23 hediye kutusu açılır.
+- **Novruz Bahçesi** (16–31 Mart; kale sahibi her zaman önizler, önizlemede buluta yazılmaz): Bayramdan önceki dört salı birer kapı. **Su Çərşənbəsi** (dilek kayığı; iki dilek de suya bırakılınca okunur), **Od Çərşənbəsi** (bir derdi ateşe at, kaydedilmez; üç kez ateşin üstünden atla), **Yel Çərşənbəsi** (fırıldağa mikrofonla üfle ya da dokun; rüzgâr bir not getirir), **Torpaq / Axır Çərşənbə** (birbirinizin kapısına papaq atın, gelen papağı şəkərbura, paxlava... ile doldurun; qulaq falı). Her gün uzayan bir səməni; bayram sabahı kırmızı kurdelesi bağlanır. Buluşma hedefi Novruz'a denk gelirse geri sayım da orada.
 
 ### Kendiliğinden değişenler
 - **Açılış Töreni**: Eln kaleye ilk kez girdiğinde, açılış filminden önce kapıdaki pembe kurdeleyi makasla o keser. Kapılar açılır, kısa bir mektup gelir (açılış gününe özel ayrı metin) ve sana "kurdeleyi kesti" haberi düşer.
@@ -121,7 +122,7 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 
 ## Sesli notları eklemek
 
-Metinler `private/phase3.mjs` → `voices` içinde (19 metin; her birinin yeri, tonu ve süresi yazılı; "Kurdele kesilince" açılış töreninde, "Biniş kartı" zarf açılınca çalar). En kolayı: Kale Paneli → **Ses stüdyosu**'ndan telefonla kaydet ya da dosya seç (en fazla ~2 MB). Stüdyo dosyaları için: dosyaları `private/voices/` içine **id ile aynı adla** koy (`gunaydin.m4a`, `iyi-geceler.m4a`, `masal.m4a`...; m4a, mp3, ogg, webm, wav olur) ve `node tools/vault.mjs pack` çalıştır. Sesler de şifrelenir. Dosyası olmayan ses sitede hiç görünmez.
+19 ses kaydedildi ve kasada (ses seviyeleri eşitlendi: gündüz −17, gece −19 LUFS; orijinaller `private/voices-orijinal/`). Metinler `private/phase3.mjs` → `voices` içinde (19 metin; her birinin yeri, tonu ve süresi yazılı; "Kurdele kesilince" açılış töreninde, "Biniş kartı" zarf açılınca çalar). En kolayı: Kale Paneli → **Ses stüdyosu**'ndan telefonla kaydet ya da dosya seç (en fazla ~2 MB). Stüdyo dosyaları için: dosyaları `private/voices/` içine **id ile aynı adla** koy (`gunaydin.m4a`, `iyi-geceler.m4a`, `masal.m4a`...; m4a, mp3, ogg, webm, wav olur) ve `node tools/vault.mjs pack` çalıştır. Sesler de şifrelenir. Dosyası olmayan ses sitede hiç görünmez.
 
 ## Kale Telsizi'ni kullanmak
 
@@ -182,7 +183,7 @@ Adresin sonuna `?tarih=2027-01-01` (ya da `?tarih=2027-01-01T00:30`) ekleyerek s
 
 ## Yayınlama (Netlify)
 
-Adres: **https://elnin-kralligi.netlify.app** (hediye kartındaki QR bu adrese gider).
+Adres: **https://elnin-kralligi.netlify.app** (hediye kartındaki QR bu adrese gider). Dala her gönderimde Netlify siteyi kendiliğinden günceller.
 
 1. [netlify.com](https://www.netlify.com)'da ücretsiz hesap aç (GitHub ile girmek en kolayı; site adresinde GitHub adın görünmez).
 2. **Add new site → Import an existing project → GitHub** → bu depoyu seç.

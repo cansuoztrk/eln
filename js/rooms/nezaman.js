@@ -26,7 +26,8 @@
   };
   const days = (who) => (who === mine() && local ? local : latest(who));
   const target = () => {
-    const a = tgts.filter((r) => r.who === 'me').pop();
+    // Kale sahibinin kendi kaydı yoksa kasadaki önerisi geçerli
+    const a = tgts.filter((r) => r.who === 'me').pop() || (NZ().suggest ? { data: NZ().suggest } : null);
     const b = tgts.filter((r) => r.who === 'her').pop();
     const agreed = a && b && a.data.from && a.data.from === b.data.from && a.data.to === b.data.to;
     return { agreed: agreed ? { from: a.data.from, to: a.data.to } : null, me: a && a.data.from ? a.data : null, her: b && b.data.from ? b.data : null };
@@ -139,7 +140,7 @@
     K.$('#nzTarget', root).innerHTML = tg.agreed
       ? `<div class="nz-agreed"><p class="card-eyebrow">Hedef</p><p class="nz-big">${K.esc(T.fmtShort(tg.agreed.from))} – ${K.esc(T.fmt(tg.agreed.to))}</p><p class="muted small">İkiniz de seçtiniz. ${T.daysUntil(tg.agreed.from) > 0 ? `${T.daysUntil(tg.agreed.from)} gün var.` : ''} Bileti alınca Kale Paneli'nden Biniş Kartı'nı gir.</p><button type="button" class="btn soft small" data-tclear>${A.ui('close')} Hedefi kaldır</button></div>`
       : ot && (!mt || mt.from !== ot.from || mt.to !== ot.to)
-      ? `<div class="nz-prop"><p><b>${K.esc(nameOf(other()))}</b> şu aralığı önerdi: <b>${K.esc(T.fmtShort(ot.from))} – ${K.esc(T.fmt(ot.to))}</b></p><button type="button" class="btn red small" data-take="${ot.from}|${ot.to}">${A.ui('check')} Kabul</button></div>`
+      ? `<div class="nz-prop"><p><b>${K.esc(nameOf(other()))}</b> şu aralığı önerdi: <b>${K.esc(T.fmtShort(ot.from))} – ${K.esc(T.fmt(ot.to))}</b>${ot.note ? `<span class="hand nz-pnote">${K.esc(K.fill(ot.note))}</span>` : ''}</p><button type="button" class="btn red small" data-take="${ot.from}|${ot.to}">${A.ui('check')} Kabul</button></div>`
       : mt
       ? `<p class="muted small">Önerin: <b>${K.esc(T.fmtShort(mt.from))} – ${K.esc(T.fmt(mt.to))}</b>. ${K.esc(nameOf(other()))} kabul edince hedef olur.</p>`
       : '';
