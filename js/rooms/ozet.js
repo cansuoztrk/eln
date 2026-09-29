@@ -52,6 +52,7 @@
     if (!K.cloud || !K.cloud.enabled) return null;
     const kinds = ['dvoice', 'tale', 'page', 'postcard', 'song', 'kacisbest', 'kphoto', 'pigeon', 'answer', 'nvwish'];
     const got = await Promise.all(kinds.map((k) => K.cloud.list(k, 2000)));
+    await Promise.all([K.kabin, K.sofra].map((x) => x && x.load && x.load()));
     const m = Object.fromEntries(kinds.map((k, i) => [k, got[i]]));
     const by = (list, w) => list.filter((r) => r.who === w).length;
     const photos = m.kphoto;
@@ -79,6 +80,9 @@
       pigeons: m.pigeon.length,
       answers: m.answer.length,
       met: meet && T.todayKey() >= meet.from ? meet : null,
+      strips: K.kabin ? K.kabin.count() : 0,
+      nerd: K.nerd ? K.nerd.score() : null,
+      tables: K.sofra ? K.sofra.count() : 0,
     };
   }
   const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -95,6 +99,12 @@
     if (c.cards) out.push({ bg: 'f', kicker: 'Kartpostal', big: K.num(c.cards), unit: 'kart', text: 'İki şehirden, her gün bir pencere.' });
     if (c.pages) out.push({ bg: 'b', kicker: 'Bizim Defter', big: K.num(c.pages), unit: 'sayfa', text: 'Pembe ve mavi mürekkep.' });
     if (c.songs) out.push({ bg: 'c', kicker: 'Şarkı Defteri', big: K.num(c.songs), unit: 'şarkı', text: 'Birini hatırlatan her şarkı buraya yazıldı.' });
+    if (c.strips) out.push({ bg: 'e', kicker: 'Fotoğraf Kabini', big: K.num(c.strips), unit: 'şerit', text: `${K.num(c.strips * 8)} kare; her birinin yarısı İstanbul, yarısı Bakü. Son karede hep aynı kalp.` });
+    if (c.nerd && c.nerd.g.me + c.nerd.g.her) {
+      const { t, g } = c.nerd;
+      out.push({ bg: 'f', kicker: 'Nərd', big: `${t.me} – ${t.her}`, unit: `${C.myPet} – ${C.herPet}`, text: `${K.num(g.me + g.her)} oyun. ${t.her > t.me ? `Şampiyon ${C.herPet}. Rövanş devam ediyor.` : t.me > t.her ? `Bu yıl ${C.myPet} önde. Seneye bakarız.` : 'Berabere. Tabii ki.'}` });
+    }
+    if (c.tables) out.push({ bg: 'a', kicker: 'Aynı Sofra', big: K.num(c.tables), unit: 'sofra', text: `${K.num(C.distanceKm)} km uzunluğunda bir masada, aynı akşam, aynı yemek.` });
     if (c.best) out.push({ bg: 'd', kicker: 'Kilitli Kule', big: mmss(c.best), unit: 'en hızlı kaçışımız', text: `${K.num(c.escapes)} kez birlikte kaçtık. Biri renkleri gördü, öbürü kilidi çevirdi.` });
     return out;
   }

@@ -337,6 +337,8 @@
     dance: `<path d="M12 44 C12 36 20 34 26 38 L30 42 C32 46 30 50 26 50 H16 C13 50 12 48 12 44 Z" fill="#E3174D" ${s}/><path d="M26 50 L28 58" ${s} stroke-width="3"/><path d="M34 34 C36 26 44 24 50 28 L54 32 C56 36 54 40 50 40 H40 C36 40 34 38 34 34 Z" fill="#4FA3E3" ${s}/><path d="M50 40 L52 48" ${s} stroke-width="3"/><path d="M40 12 V22 M40 12 L48 10 V20" fill="none" ${s} stroke-width="2.4"/><circle cx="38" cy="22" r="2.6" fill="${LINE}"/><circle cx="46" cy="20" r="2.6" fill="${LINE}"/><path d="M14 18 Q20 12 24 20" fill="none" ${s} stroke-width="2.2"/>`,
     week: `<rect x="6" y="12" width="52" height="44" rx="6" fill="#fff" ${s}/><path d="M6 22 H58" ${s}/><path d="M18 8 V16 M46 8 V16" ${s}/><rect x="12" y="28" width="10" height="16" rx="2" fill="#8FD3FF"/><rect x="27" y="28" width="10" height="10" rx="2" fill="#FF8FB8"/><rect x="42" y="34" width="10" height="16" rx="2" fill="#8FD3FF"/><rect x="27" y="42" width="10" height="8" rx="2" fill="#FFD34E"/>`,
     owl: `<path d="M38 8 A24 24 0 1 0 56 44 A19 19 0 1 1 38 8 Z" fill="#C9B6FF" ${s}/><text x="44" y="26" font-family="Fredoka, sans-serif" font-weight="700" font-size="11" fill="${LINE}">z</text><text x="50" y="16" font-family="Fredoka, sans-serif" font-weight="700" font-size="8" fill="${LINE}">z</text>`,
+    dice: `<rect x="6" y="20" width="30" height="30" rx="6" transform="rotate(-10 21 35)" fill="#fff" ${s}/><g fill="${LINE}" transform="rotate(-10 21 35)"><circle cx="14" cy="27" r="2.6"/><circle cx="21" cy="35" r="2.6"/><circle cx="28" cy="43" r="2.6"/></g><rect x="30" y="14" width="28" height="28" rx="6" transform="rotate(12 44 28)" fill="#E3174D" ${s}/><g fill="#fff" transform="rotate(12 44 28)"><circle cx="37" cy="21" r="2.4"/><circle cx="51" cy="21" r="2.4"/><circle cx="44" cy="28" r="2.4"/><circle cx="37" cy="35" r="2.4"/><circle cx="51" cy="35" r="2.4"/></g>`,
+    pot: `<path d="M24 14 C22 10 26 8 24 4 M32 14 C30 10 34 8 32 4 M40 14 C38 10 42 8 40 4" fill="none" ${s} stroke-width="2.2"/><path d="M10 26 H54 V44 C54 52 48 56 40 56 H24 C16 56 10 52 10 44 Z" fill="#FF8FB8" ${s}/><rect x="8" y="20" width="48" height="8" rx="4" fill="#fff" ${s}/><path d="M10 34 H4 M54 34 H60" ${s}/>${heartPath(32, 42, 0.9, '#fff')}`,
   };
   function icon(name, cls = '') {
     return `<svg class="ic ${cls}" viewBox="0 0 64 64" aria-hidden="true">${ICONS[name] || ICONS.heart}</svg>`;
@@ -369,6 +371,7 @@
     next: '<path d="M9 5 L16 12 L9 19"/>',
     sparkle: '<path d="M12 3 L13.8 10.2 L21 12 L13.8 13.8 L12 21 L10.2 13.8 L3 12 L10.2 10.2 Z"/>',
     image: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M4 18 L10 13 L14 16 L17 13 L21 17"/>',
+    camera: '<path d="M3 8 H7.5 L9.5 5 H14.5 L16.5 8 H21 V19 H3 Z"/><circle cx="12" cy="13" r="3.6"/>',
     copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8 V4 H4 V16 H8"/>',
   };
   function ui(name, cls = '') {
