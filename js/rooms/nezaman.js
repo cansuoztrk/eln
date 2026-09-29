@@ -224,7 +224,14 @@
       if (K.activeRoom === 'nezaman') render();
     });
   });
-  K.nezaman = { target: () => target().agreed };
+  K.nezaman = {
+    target: () => target().agreed,
+    // Anlaşılmış bir aralık yoksa masadaki öneri (kale sahibinin ya da onun)
+    proposal: () => {
+      const t = target();
+      return t.agreed ? Object.assign({ agreed: true }, t.agreed) : t.me || t.her ? Object.assign({ agreed: false }, t.me || t.her) : null;
+    },
+  };
 
   K.room({
     id: 'nezaman',

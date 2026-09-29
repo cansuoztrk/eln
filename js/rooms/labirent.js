@@ -128,16 +128,21 @@
     if (!days.includes(T.todayKey())) K.store.set('mazeDays', days.concat(T.todayKey()));
     K.stickers.award('labirent');
     const s = C.song2 || {};
-    setTimeout(
-      () =>
-        K.ui.modal({
-          label: 'Kalbin ortası',
-          html: `<div class="lb-win"><p class="script lb-win-t">${K.esc((D.labirent && D.labirent.title) || '')}</p>${K.paras((D.labirent && D.labirent.win) || [])}
-            ${s.title ? `<p class="muted small">${K.esc(s.artist)} · ${K.esc(s.title)}</p><div class="actions" style="justify-content:center"><a class="btn red small" href="${K.esc(s.youtubeUrl)}" target="_blank" rel="noopener">YouTube</a><a class="btn soft small" href="${K.esc(s.spotifyUrl)}" target="_blank" rel="noopener">Spotify</a></div>` : ''}
+    setTimeout(() => {
+      // Şarkı pencerenin içinde çalar (YouTube'a gitmez); pencere kapanınca durur
+      const md = K.ui.modal({
+        label: 'Kalbin ortası',
+        html: `<div class="lb-win"><p class="script lb-win-t">${K.esc((D.labirent && D.labirent.title) || '')}</p>${K.paras((D.labirent && D.labirent.win) || [])}
+            ${s.title ? `<p class="muted small">${K.esc(s.artist)} · ${K.esc(s.title)}</p><div class="actions" style="justify-content:center"><button type="button" class="btn red small" data-lb-song>${A.ui('play')} Şarkısını burada çal</button></div><div class="lb-song"></div>` : ''}
             <p class="muted small">Yarın labirent yeniden çizilecek. ${K.num(K.store.get('mazeDays', []).length)} kez ortaya vardın.</p></div>`,
-        }),
-      900
-    );
+      });
+      md.body.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-lb-song]');
+        if (!b) return;
+        b.remove();
+        K.pikap.mount(K.$('.lb-song', md.body), s);
+      });
+    }, 900);
   }
   function reset() {
     maze = build(T.dayNumber(T.now()) * 7919 + 55);

@@ -261,7 +261,8 @@
     const done = K.store.get('hazirlik', {});
     const list = D.hazirlik || [];
     const n = list.filter(([id]) => done[id]).length;
-    const vs = D.voices || [];
+    // Filme özel isteğe bağlı sesler teslim için sayılmaz
+    const vs = (D.voices || []).filter((v) => !v.optional);
     const vn = vs.filter((v) => voiceState(v.id)[0] !== 'yok').length;
     const msg = (D.teslim && D.teslim.message ? D.teslim.message : []).map((l) => K.fill(l).replace('{link}', location.origin + location.pathname.replace(/index\.html$/, ''))).join('\n');
     box.innerHTML = `

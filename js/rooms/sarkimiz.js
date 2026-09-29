@@ -6,7 +6,7 @@
   const D = window.ELN;
   const C = D.config;
 
-  let root, playing = false, side = 'A';
+  let root, playing = false, side = 'A', pk = null;
   // Plağın A yüzü bizim şarkımız, B yüzü onun şarkısı
   const cur = () => (side === 'B' && C.song2 ? C.song2 : C.song || {});
   const CAS = ['#FF8FB8', '#FFD34E', '#8FD3FF', '#C9B6FF', '#7ED6A5', '#FFB3CE', '#FFC9A8'];
@@ -90,23 +90,22 @@
     const btn = K.$('#ttPlay', root);
     btn.innerHTML = on ? `${A.ui('pause')} Durdur` : `${A.ui('play')} ${side === 'B' ? 'Onun şarkısını çal' : 'Şarkımızı çal'}`;
     const tv = K.$('#ttVideo', root);
-    if (on && !s.youtube) {
-      // B yüzü: şarkı YouTube/Spotify'da açılır, pikap dönmeye devam eder
-      if (K.audio.music.on) K.audio.music.stop(false);
-      window.open(s.youtubeUrl || s.spotifyUrl, '_blank', 'noopener');
-      K.stickers.award('bside');
-      return;
+    if (pk) {
+      pk.stop();
+      pk = null;
     }
     if (on) {
-      if (K.audio.music.on) K.audio.music.stop(false);
+      // Şarkı bu sayfada, pikabın altındaki ekranda çalar (YouTube'a gitmez)
       tv.hidden = false;
-      tv.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(s.youtube)}?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="${K.esc(s.artist)} - ${K.esc(s.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
-      K.stickers.award('anilar');
+      pk = K.pikap.mount(tv, s, { onEnd: () => playing && setPlaying(false) });
+      K.stickers.award(side === 'B' ? 'bside' : 'anilar');
+      setTimeout(() => tv.scrollIntoView({ block: 'nearest', behavior: K.reduced ? 'auto' : 'smooth' }), 200);
     } else {
       tv.innerHTML = '';
       tv.hidden = true;
     }
   }
+  const links = () => (side === 'B' ? '<a href="#labirent">Bu şarkının labirenti</a> · ' : '') + '<a href="#sarkidefteri">Şarkı Defteri</a> · <a href="#sinema">Bizim Filmimiz</a>';
 
   K.room({
     id: 'sarkimiz',
@@ -132,7 +131,7 @@
               <button class="btn red" id="ttPlay">${A.ui('play')} Şarkımızı çal</button>
               ${C.song2 ? `<button class="btn soft" id="ttFlip">${A.ui('refresh')} Plağı çevir</button>` : ''}
             </div>
-            <p class="muted small" id="ttLinks">Açılmazsa: <a href="${K.esc(s.youtubeUrl || '#')}" target="_blank" rel="noopener">YouTube'da aç</a> · <a href="${K.esc(s.spotifyUrl || '#')}" target="_blank" rel="noopener">Spotify'da ara</a></p>
+            <p class="muted small" id="ttLinks">${links()}</p>
           </div>
         </div>
         <div class="tt-video" id="ttVideo" hidden></div>
@@ -171,7 +170,7 @@
           K.$('#ttTitle', el).textContent = s2.title || '';
           K.$('#ttArtist', el).textContent = s2.artist || '';
           K.$('#ttPlay', el).innerHTML = `${A.ui('play')} ${side === 'B' ? 'Onun şarkısını çal' : 'Şarkımızı çal'}`;
-          K.$('#ttLinks', el).innerHTML = `${side === 'B' ? '' : 'Açılmazsa: '}<a href="${K.esc(s2.youtubeUrl || '#')}" target="_blank" rel="noopener">YouTube'da aç</a> · <a href="${K.esc(s2.spotifyUrl || '#')}" target="_blank" rel="noopener">Spotify'da ${side === 'B' ? 'aç' : 'ara'}</a>${side === 'B' ? ' · <a href="#labirent">Bu şarkının labirenti</a>' : ''}`;
+          K.$('#ttLinks', el).innerHTML = links();
           K.$('#ttLiner', el).innerHTML = K.paras(side === 'B' ? s2.note || [] : D.songLetter);
         });
       K.$('#casShelf', el).addEventListener('click', (e) => {
@@ -181,6 +180,10 @@
     },
     leave() {
       if (playing) setPlaying(false);
+      if (pk) {
+        pk.stop();
+        pk = null;
+      }
     },
   });
 })();

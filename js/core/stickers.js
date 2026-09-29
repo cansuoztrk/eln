@@ -63,6 +63,7 @@
     { id: 'kalkan', name: 'Şans Tılsımı', hint: 'Sınav Kalkanı\'ndan bir şans tılsımı gönder', icon: 'cap', color: '#E3F0FF', bonus: true },
     { id: 'tur', name: 'Kale Rehberi', hint: 'Kitty\'nin kale turunu sonuna kadar gez', icon: 'crown', color: '#FFF3C4', bonus: true },
     { id: 'okul', name: 'Nərd Okulu', hint: 'Nərd Okulu\'nun bütün derslerini bitir', icon: 'cap', color: '#FFE3E3', bonus: true },
+    { id: 'sinema', name: 'İlk Gösterim', hint: 'Bizim Filmimiz\'i jenerik sonrasına kadar izle', icon: 'clapper', color: '#E9D9FF', bonus: true },
     { id: 'kabin', name: 'Dört Kare', hint: 'Fotoğraf Kabini\'nde dört kare çek', icon: 'camera', color: '#FFE0EC' },
     { id: 'nerd', name: 'Şeş Beş', hint: 'Nərdde bir oyun kazan', icon: 'dice', color: '#FFE3E3' },
     { id: 'sofra', name: 'Aynı Sofra', hint: 'Aynı Sofra\'da tabağını göster', icon: 'pot', color: '#FFEBD9', bonus: true },
