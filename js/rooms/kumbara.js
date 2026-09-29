@@ -41,12 +41,32 @@
     </svg>`;
   }
 
+  // Uçuş çizgisi: birikim arttıkça uçak İstanbul'dan Bakü'ye ilerler
+  function flight(p) {
+    const q = Math.min(1, p);
+    const a = [24, 70], b = [296, 56], ctl = [160, -6];
+    const at = (t) => [(1 - t) * (1 - t) * a[0] + 2 * (1 - t) * t * ctl[0] + t * t * b[0], (1 - t) * (1 - t) * a[1] + 2 * (1 - t) * t * ctl[1] + t * t * b[1]];
+    const [x, y] = at(q);
+    const [x2, y2] = at(Math.min(1, q + 0.01));
+    const ang = (Math.atan2(y2 - y, x2 - x) * 180) / Math.PI;
+    const done = Array.from({ length: 41 }, (_, i) => at((i / 40) * q)).map((pt, i) => `${i ? 'L' : 'M'}${pt[0].toFixed(1)} ${pt[1].toFixed(1)}`).join(' ');
+    return `<svg class="kmb-fly" viewBox="0 0 320 96" role="img" aria-label="İstanbul'dan Bakü'ye, yolun yüzde ${Math.round(q * 100)}'ü">
+      <path d="M${a[0]} ${a[1]} Q${ctl[0]} ${ctl[1]} ${b[0]} ${b[1]}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 6" opacity=".35"/>
+      <path d="${done}" fill="none" stroke="#E3174D" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="${a[0]}" cy="${a[1]}" r="6" fill="#4FA3E3" stroke="#fff" stroke-width="2"/><text x="${a[0]}" y="${a[1] + 20}" text-anchor="middle" class="kmb-city">İstanbul</text>
+      <circle cx="${b[0]}" cy="${b[1]}" r="6" fill="#E3174D" stroke="#fff" stroke-width="2"/><text x="${b[0]}" y="${b[1] + 20}" text-anchor="middle" class="kmb-city">Bakü</text>
+      <g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${ang.toFixed(1)})"><path d="M-12 0 L10 0 M-2 0 L-8 -9 M-2 0 L-8 9 M-12 0 L-15 -4 M-12 0 L-15 4" stroke="#4A2138" stroke-width="3.5" stroke-linecap="round"/><path d="M10 0 L14 0" stroke="#E3174D" stroke-width="4" stroke-linecap="round"/></g>
+    </svg>`;
+  }
+
   function render() {
     if (!root) return;
     const c = cfg();
     const sum = total();
     const p = c.target ? sum / c.target : 0;
-    K.$('#kbJar', root).innerHTML = jar(p);
+    const fl = K.bilet && K.bilet.get();
+    K.$('#kbJar', root).innerHTML = jar(p) + (fl ? `<a class="kmb-stamp" href="#bilet">Bilet alındı<small>${K.esc(T.fmt(fl.date))}</small></a>` : '');
+    K.$('#kbFly', root).innerHTML = `${flight(p)}${c.label ? `<p class="kmb-label">${K.esc(c.label)}</p>` : ''}`;
     K.$('#kbSum', root).innerHTML = `<b>${fmt(sum)}</b> / ${fmt(c.target)}`;
     K.$('#kbLeft', root).textContent = sum >= c.target ? 'Kumbara doldu!' : `Bilete ${fmt(c.target - sum)} kaldı`;
     const by = { her: 0, me: 0 };
@@ -107,7 +127,7 @@
     id: 'kumbara',
     wing: 'kalp',
     title: 'Bilet Kumbarası',
-    sub: 'İlk buluşmanın bileti için, ikimizden',
+    sub: () => `${(cfg().label || 'İlk buluşmanın bileti')}, ikimizden`,
     icon: 'jar',
     color: '#E6F4FF',
     hidden: () => !D.kumbara || !K.cloud || !K.cloud.enabled,
@@ -119,6 +139,7 @@
       root = el;
       el.innerHTML = `
         <div class="room-intro">${K.paras(KB().intro)}</div>
+        <div class="kmb-flywrap" id="kbFly"></div>
         <section class="kmb-top">
           <div id="kbJar"></div>
           <div class="kmb-stats">

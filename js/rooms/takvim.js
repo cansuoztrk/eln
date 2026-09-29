@@ -81,7 +81,7 @@
     return { state: 'free', icon: 'heart', text: `${C.herPet} şu an derste değil`, sub: '' };
   }
   // Ana salon için: kale sahibine onu, ona Ardoş'u anlatır
-  K.where = () => (K.isOwner() ? elnos() : arda());
+  K.where = () => (K.isOwner() ? elnos() : (K.bilet && K.bilet.where()) || arda());
   K.whereArda = arda;
 
   /* ---------- Ortak boş saatler (Bakü saatiyle, 09:00–24:00) ---------- */
@@ -171,8 +171,10 @@
     chip.hidden = !s || (K.isOwner() && s.state !== 'class');
     if (!s) return;
     chip.className = `where-chip st-${s.state}`;
-    K.$('span', chip).innerHTML = `<b>${K.esc(s.text)}</b>${s.cls && s.state === 'class' ? ` · ${K.esc(s.cls.name)}` : ''}`;
+    chip.setAttribute('href', '#' + (s.room || 'takvim'));
+    chip.innerHTML = `${A.icon(s.chipIcon || 'week')}<span><b>${K.esc(s.text)}</b>${s.cls && s.state === 'class' ? ` · ${K.esc(s.cls.name)}` : s.chipSub ? ` · ${K.esc(s.chipSub)}` : ''}</span>`;
   }
+  K.homeChip = homeChip;
   K.on('built', () => {
     homeChip();
     clearInterval(tick);

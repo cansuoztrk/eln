@@ -77,10 +77,14 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 
 - **Zambak Bahçesi** (Kalp): Onun çiçeği. Her gün sulanan saksı büyür; her yedi sulamada bir zambak açar, her zambağın yaprağında bir not var. Ana salonda "Zambağın" kartı. Kale Paneli'nden (bulut) ona zambak buketi gönderilir; vazoda durur.
 - **Kartpostal** (Kalp, bulut): Her gün iki şehirden birer fotoğraflı kartpostal; ön yüz fotoğraf, arka yüz not, pul ve o günün damgası. Günlük bir ilham cümlesi var. Onun bugünkü kartı, sen kendi kartını gönderene kadar zarfta kalır.
-- **Bilet Kumbarası** (Kalp, bulut): İlk buluşmanın bileti için ortak birikim; TL ya da AZN atılır, her atışın notu olur, çeyreklerde kutlama. Hedef ve kur Kale Paneli'nden.
+- **Bilet Kumbarası** (Kalp, bulut): İlk buluşmanın bileti için ortak birikim; TL ya da AZN atılır, her atışın notu olur, çeyreklerde kutlama. Birikim arttıkça küçük bir uçak İstanbul'dan Bakü'ye doğru ilerler. Hedef ve kur Kale Paneli'nden.
+- **Biniş Kartı** (Kalp, bulut): Bilet alınınca panelden uçuş girilir; onun kalesine zarf içinde bir biniş kartı düşer (yolcu, kalkış/varış, koltuk, "seyahat sebebi"). Kalkışa geri sayım; uçuş günü uçak haritada gerçek saate göre ilerler ("Anadolu'nun üstünde", "Gürcistan'ın üstünde"...), ana salondaki çip "Ardoş uçakta" der, inince kutlama. O "Kapıda bekleyeceğim" diye cevap verir. İlk Sarılma geri sayımı da bu tarihe kurulur.
+- **Bakü'de İlk Gün** (Kalp): Uçak indiğinde yaşanacak ilk günün ortak planı. Stilize Bakü haritasında yerler; ikiniz de kalp atar, sabah/öğle/akşam/gece dilimlerine koyar, kendi bildiği yerleri ekler. Rehber o.
+- **21:21** (Kalp, bulut): Her akşam Bakü saatiyle 21:21'de (İstanbul 20:21) iki dakikalık pencere. İkiniz de o dakikada kalbe basarsanız gökyüzüne bir yıldız eklenir; her yedi yıldız adı olan bir takımyıldız olur. Pencere açıkken kalenin her yerinde alttan bir kalp çıkar.
 - **Gece Lambası** (Kalp): Kısılabilen Kitty lambası, tarayıcıda üretilen uyku sesleri (yağmur, dalga, rüzgâr, ninni), zamanlayıcı ve "uyuyorum" düğmesi (sana haber gider). Ertesi sabah kaleye ilk gelişte uyku raporu ve günaydın notu.
 - **Gerçek Zambaklar**: Bahçesinde her 12 zambakta bir sana çiçekçinin bilgileriyle hatırlatma gelir; panelden "teslim edildi" deyince bahçesine altın bir zambak dikilir.
 - **Bizim Şarkımız**: Plak çevrilince **B yüzü**: onun şarkısı.
+- **Şarkı Defteri** (Anılar, bulut): Birini hatırlatan şarkılar, adı ve "neden"iyle. Ortak çalma listesi; her gün biri "bugünün şarkısı" olur, YouTube ve Spotify aramasıyla açılır.
 
 **Oyun Kanadı**: **Kalp Labirenti** (onun şarkısına: her gün yeni, kalp şeklinde ve çıkmaz sokağı olmayan bir labirent; her yol ortaya çıkar), **Dans Pisti** (bu site için yazılmış bir swing parçasıyla ritim oyunu; ikiniz aynı anda pistteyseniz birlikte dans edip uyumunuzu ölçersiniz), Gartic Odası, **Ortak Tahta** (bulut: aynı tahtaya canlı çizim; biri çizer öbürü tahmin eder, skor saklanır), Angela'nın Odası, Bakü'ye Uç (mini oyun), **Film Gecesi** (davet, ortak geri sayım, puan kartı), Dilek Gökyüzü, Müzik Kutusu.
 
@@ -92,6 +96,7 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **Doğum Günü Sarayı**: 23 Nisan haftası; o gün 23 hediye kutusu açılır.
 
 ### Kendiliğinden değişenler
+- **Açılış Töreni**: Eln kaleye ilk kez girdiğinde, açılış filminden önce kapıdaki pembe kurdeleyi makasla o keser. Kapılar açılır, kısa bir mektup gelir (açılış gününe özel ayrı metin) ve sana "kurdeleyi kesti" haberi düşer.
 - İlk girişte bir kez oynayan **açılış filmi** (yıldızlı gece, iki şehir arasında uzayan bir iplik).
 - **Mevsimler**: Kahraman bölümde kışın kar, baharda yaprak, yazın ateş böceği, sonbaharda yaprak, doğum gününde balon.
 - **Posta kutusu**: Sonradan eklediğin mektuplar "Posta var!" diye gelir; Eln bir mektubu ilk kez açtığında sana bildirim düşer.
@@ -150,6 +155,8 @@ Kapıya Eln'in cevabı yerine **sahip şifresini** (`private/secrets.json` → `
 - **Gerçek zambaklar**: Bahçesindeki zambak sayısı, çiçekçi bilgileri, "sipariş verdim / teslim edildi".
 - **Altın Bilet**: Basılı kitap, pembe kutu, iki kulenin bileti: hazırlanıyor / yolda / teslim edildi.
 - **Bilet Kumbarası**: Hedef ve AZN kuru.
+- **Büyük açılış** (panelin en üstünde): kalenin ona verileceği gün, geri sayım, **Töreni önizle** ve açılışa hazırlık listesi.
+- **Biniş Kartı**: Bileti alınca uçuş günü, kalkış (İstanbul) ve varış (Bakü) saati, uçuş no, koltuk, dönüş günü ve karta bir not. **Zarfı önizle** ile onun göreceği anı önceden görürsün; "Kartı geri al" ile kaldırılır.
 - **Gerçek zambaklar** bölümünde çiçekçi için hazır Azerbaycanca sipariş mesajı.
 - **Bulut bağlantısı**: Supabase adresini ve anahtarını dener, bu telefonda açar ya da onun telefonu için şifreli bir bağlantı linki üretir.
 - Onun son hareketleri: cevaplar, defter sayfaları, telsiz mesajları.

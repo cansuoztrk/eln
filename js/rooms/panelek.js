@@ -251,6 +251,106 @@
         .join('')}</ul>`;
   }
 
+  /* ---------------- Büyük açılış: tarih, geri sayım, hazırlık listesi ---------------- */
+  function renderOpening() {
+    const box = root && K.$('#pnOpenBody', root);
+    if (!box) return;
+    const date = C.openingDate || '';
+    const left = date ? T.daysUntil(date) : null;
+    const done = K.store.get('hazirlik', {});
+    const list = D.hazirlik || [];
+    const n = list.filter(([id]) => done[id]).length;
+    box.innerHTML = `
+      <div class="pn-od"><b class="tnum">${left == null ? '—' : left > 0 ? K.num(left) : left === 0 ? 'Bugün' : 'Açıldı'}</b><span>${left > 0 ? 'gün kaldı' : ''}</span></div>
+      <p>${date ? `Kale ona <b>${T.fmt(date, true)}</b> verilecek.` : 'Açılış tarihi yok.'} ${date === '2026-12-06' ? 'Tanışmanızın birinci yılı; aynı sabah Kış Takvimi\'nin ilk kapısı ve "Tanışmamızın ilk yılı" sesli notu da açılıyor.' : ''}</p>
+      <form class="row" id="pnOdForm"><input class="input" type="date" id="pnOdDate" name="pnOdDate" value="${K.esc(date)}" aria-label="Açılış tarihi"><button class="btn small" type="submit">${A.ui('check')} Tarihi kaydet</button><button class="btn soft small" type="button" id="pnOdPreview">${A.icon('bow')} Töreni önizle</button></form>
+      <p class="card-eyebrow" style="margin-top:6px">Hazırlık listesi · ${n}/${list.length}</p>
+      <ul class="pn-prep">${list.map(([id, t, d]) => `<li class="${done[id] ? 'ok' : ''}"><label><input type="checkbox" data-prep="${K.esc(id)}" ${done[id] ? 'checked' : ''}><span><b>${K.esc(t)}</b><small>${K.esc(K.fill(d))}</small></span></label></li>`).join('')}</ul>`;
+    K.$('#pnOdForm', box).addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const v = K.$('#pnOdDate', box).value;
+      C.openingDate = v;
+      K.store.set('openingDate', v);
+      if (K.cloud.enabled) await K.cloud.add('config', { openingDate: v });
+      K.fx.toast(v ? `Açılış: ${T.fmt(v)}` : 'Açılış tarihi kaldırıldı.', { icon: A.icon('bow') });
+      renderOpening();
+    });
+    K.$('#pnOdPreview', box).addEventListener('click', () => K.acilis && K.acilis.play(null, true));
+    box.addEventListener('change', (e) => {
+      const c = e.target.closest('[data-prep]');
+      if (!c) return;
+      const d = K.store.get('hazirlik', {});
+      d[c.dataset.prep] = c.checked;
+      K.store.set('hazirlik', d);
+      renderOpening();
+    });
+  }
+  // Açılış tarihi buluttan ya da bu cihazdan
+  K.on('built', () => {
+    const local = K.store.get('openingDate');
+    if (local !== null && local !== undefined) C.openingDate = local;
+  });
+  K.on('cloud', async (on) => {
+    if (!on) return;
+    const rows = (await K.cloud.list('config')).filter((r) => 'openingDate' in r.data);
+    if (rows.length) C.openingDate = rows[rows.length - 1].data.openingDate;
+    K.cloud.on('config', (r) => 'openingDate' in r.data && (C.openingDate = r.data.openingDate));
+    K.cloud.on('opened', (r) => K.isOwner() && r.who === 'her' && K.fx.toast(`<b>${K.esc(C.herPet)} kurdeleyi kesti!</b> Kale onun artık.`, { icon: A.icon('bow'), duration: 10000 }));
+  });
+
+  /* ---------------- Biniş Kartı: bilet alınınca uçuşu gir ---------------- */
+  function renderFlight() {
+    const box = root && K.$('#pnFlightBody', root);
+    if (!box || !K.bilet) return;
+    const f = K.bilet.get() || {};
+    const v = (k) => K.esc(f[k] || '');
+    box.innerHTML = `<p class="muted small">${f.date ? `Şu an: <b>${T.fmt(f.date, true)}</b>, ${v('dep')} kalkış. Kart onun kalesinde; ilk açışta zarftan çıkar. Değiştirmek için aşağıyı düzenleyip yeniden gönder.` : 'Kumbara dolup bileti aldığında uçuşu buraya gir. Onun kalesine zarf içinde bir biniş kartı düşer; uçuş günü uçak haritada gerçek saate göre ilerler. İlk Sarılma geri sayımı da bu tarihe ayarlanır.'}</p>
+      <form class="pn-fl" id="pnFlForm" autocomplete="off">
+        <label><span>Uçuş günü</span><input class="input" type="date" name="date" value="${v('date')}" required></label>
+        <label><span>Kalkış (İstanbul)</span><input class="input" type="time" name="dep" value="${v('dep')}" required></label>
+        <label><span>Varış (Bakü)</span><input class="input" type="time" name="arr" value="${v('arr')}" required></label>
+        <label><span>Havalimanı</span><select class="input" name="from"><option value="IST" ${f.from !== 'SAW' ? 'selected' : ''}>İstanbul (IST)</option><option value="SAW" ${f.from === 'SAW' ? 'selected' : ''}>Sabiha Gökçen (SAW)</option></select></label>
+        <label><span>Uçuş no</span><input class="input" name="no" maxlength="12" placeholder="TK 332" value="${v('no')}"></label>
+        <label><span>Koltuk</span><input class="input" name="seat" maxlength="6" placeholder="7A" value="${v('seat')}"></label>
+        <label><span>Dönüş günü</span><input class="input" type="date" name="back" value="${v('back')}"></label>
+        <label class="wide"><span>Karta bir not</span><input class="input" name="note" maxlength="140" placeholder="Cam kenarı aldım; Hazar'ı ilk ben göreceğim." value="${v('note')}"></label>
+        <div class="actions wide"><button class="btn red small" type="submit">${A.icon('plane')} Kartı gönder</button><button class="btn soft small" type="button" data-fl="preview">Zarfı önizle</button>${f.date ? '<button class="btn soft small" type="button" data-fl="cancel">Kartı geri al</button>' : ''}</div>
+      </form>`;
+    const form = K.$('#pnFlForm', box);
+    const data = () => Object.fromEntries(Array.from(new FormData(form).entries()).map(([k, x]) => [k, String(x).trim()]));
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const d = data();
+      if (!d.date || !d.dep || !d.arr) return K.fx.toast('Gün, kalkış ve varış saati gerekli.');
+      if (d.back && d.back < d.date) return K.fx.toast('Dönüş günü uçuştan önce olamaz.');
+      const r = await K.cloud.add('flight', d);
+      if (!r) return K.fx.toast('Gönderilemedi. İnterneti kontrol et.');
+      await K.cloud.add('config', { firstMeetDate: d.date });
+      C.firstMeetDate = d.date;
+      K.fx.confetti({ count: 120, shapes: ['heart', 'star'] });
+      K.fx.toast(`<b>Biniş kartı gönderildi.</b> ${T.fmt(d.date)}. İlk Sarılma geri sayımı da bu güne kuruldu.`, { icon: A.icon('plane'), duration: 8000 });
+      setTimeout(renderFlight, 300);
+    });
+    box.addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-fl]');
+      if (!b) return;
+      if (b.dataset.fl === 'preview') {
+        const d = data();
+        return K.bilet.reveal(Object.assign({ id: 'onizleme', date: d.date || T.todayKey(), dep: d.dep || '09:40', arr: d.arr || '13:25' }, d.date ? d : {}), true);
+      }
+      if (b.dataset.armed !== '1') {
+        b.dataset.armed = '1';
+        b.textContent = 'Emin misin? Bir daha dokun';
+        return;
+      }
+      await K.cloud.add('flight', { date: '' });
+      await K.cloud.add('config', { firstMeetDate: '' });
+      C.firstMeetDate = '';
+      K.fx.toast('Kart geri alındı. Onun kalesinden kalktı.');
+      setTimeout(renderFlight, 300);
+    });
+  }
+
   /* ---------------- Panele yerleştir ---------------- */
   K.on('room', async ({ id, el }) => {
     if (id !== 'panel' || !K.isOwner()) return;
@@ -263,6 +363,8 @@
         ${wizard('pnCfg')}`;
       bindWizard(off, 'pnCfg');
       const main = K.$('#pnMain', el);
+      main.insertAdjacentHTML('afterbegin', `<section class="card pn-sec pn-open" id="pnOpenDay"><p class="card-eyebrow">Büyük açılış</p><div id="pnOpenBody"></div></section>`);
+      renderOpening();
       main.insertAdjacentHTML(
         'beforeend',
         `<section class="card pn-sec" id="pnVoice"><p class="card-eyebrow">Ses stüdyosu</p>
@@ -273,6 +375,7 @@
         <section class="card pn-sec" id="pnKumbara"><p class="card-eyebrow">Bilet Kumbarası</p>
           <p class="muted small">Hedef (bir gidiş-dönüş bilet ve biraz fazlası) ve AZN kuru. Kumbara TL üzerinden sayar.</p>
           <form class="row" id="pnKbForm" autocomplete="off"><input class="input" id="pnKbTarget" name="pnKbTarget" type="number" min="100" step="50" placeholder="Hedef TL" aria-label="Hedef"><input class="input" id="pnKbRate" name="pnKbRate" type="number" min="1" step="0.1" placeholder="1 AZN = ? TL" aria-label="AZN kuru"><button class="btn small" type="submit">${A.ui('check')} Kaydet</button></form></section>
+        <section class="card pn-sec pn-flight" id="pnFlight"><p class="card-eyebrow">Biniş Kartı</p><div id="pnFlightBody"></div></section>
         <section class="card pn-sec" id="pnCloud"><p class="card-eyebrow">Bulut bağlantısı</p>
           <p class="muted small">${C.cloud && C.cloud.url ? 'Ayarlar kasada kayıtlı; iki telefon da kendiliğinden bağlanıyor.' : 'Bu telefon bağlı. Onun telefonu henüz bağlı değilse aynı bilgilerle bir bağlantı linki üret.'}</p>
           <details><summary>Yeniden dene / bağlantı linki üret</summary>${wizard('pnCfg2')}</details></section>`
@@ -325,6 +428,7 @@
       renderVoices();
       renderReal();
       renderPromise();
+      renderFlight();
     }
   });
   K.on('cloud-voice', renderVoices);
