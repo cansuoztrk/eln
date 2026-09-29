@@ -159,6 +159,7 @@
         <div class="foot-theme" id="footTheme"></div>
         <p class="foot-small">Bu kaleye <b id="visitCount">1</b>. gelişin · <a href="#album">Çıkartmalar <b id="footStickers">0</b>/${K.stickers.total}</a></p>
         <button class="paw-secret no-burst" id="pawSecret" aria-label="Minicik bir pati izi">${A.icon('paw')}</button>
+        <button class="foot-lock no-burst" type="button" id="footLock">Bu cihazda kapıyı kilitle</button>
       </footer>`;
   }
 
@@ -695,6 +696,18 @@
       if (!K.activeRoom) renderDoors();
     });
     K.$('#pawSecret').addEventListener('click', findKopus);
+    // Bu cihazda kapıyı kilitle: kayıtlı anahtar silinir, kapı yeniden cevap sorar (başka biri bu telefonla girdiyse)
+    K.$('#footLock').addEventListener('click', (e) => {
+      const b = e.currentTarget;
+      if (b.dataset.armed !== '1') {
+        b.dataset.armed = '1';
+        b.textContent = 'Emin misin? Kapı yeniden cevap soracak. Bir daha dokun';
+        return;
+      }
+      K.store.del('vault');
+      location.hash = '';
+      location.reload();
+    });
   }
 
   /* ---------------- Özel günler ---------------- */

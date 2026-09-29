@@ -266,6 +266,7 @@
     const msg = (D.teslim && D.teslim.message ? D.teslim.message : []).map((l) => K.fill(l).replace('{link}', location.origin + location.pathname.replace(/index\.html$/, ''))).join('\n');
     box.innerHTML = `
       <div class="pn-od ${opened ? 'ok' : ''}"><b>${opened ? A.icon('bow') : A.icon('gift')}</b><span>${opened ? `<b>${K.esc(C.herPet)} kurdeleyi kesti.</b> ${K.esc(T.fmt(new Date(opened.at), true))}` : 'Kale teslime hazır. Kurdele henüz kesilmedi.'}</span></div>
+      ${opened ? `<p class="small muted pn-reset">Kaleyi ona daha vermediysen bu kayıt senin denemen olabilir (onun şifresiyle girip kurdeleyi kestiysen). <button type="button" class="btn ghost small" id="pnOpenReset">${A.ui('undo')} Denemeyi sıfırla</button></p>` : ''}
       <ul class="pn-checks" id="pnChecks">
         <li data-ck="cloud"><i></i><span><b>Bulut</b><small>Kontrol ediliyor...</small></span></li>
         <li data-ck="ntfy" class="${C.ntfyTopic ? '' : 'bad'}"><i></i><span><b>Sana gelen bildirimler</b><small>${C.ntfyTopic ? `Telefonuna ntfy uygulamasını kur, <b>${K.esc(C.ntfyTopic)}</b> konusuna abone ol; sonra Dene'ye bas.` : 'Bildirim konusu ayarlanmamış.'}</small></span>${C.ntfyTopic ? `<button type="button" class="btn soft small" id="pnNtfy">${A.ui('send')} Dene</button>` : ''}</li>
@@ -276,6 +277,20 @@
       <div class="actions"><button class="btn red small" type="button" id="pnMsgCopy">${A.ui('copy')} Mesajı kopyala</button><button class="btn soft small" type="button" id="pnOdPreview">${A.icon('bow')} Töreni önizle</button><button class="btn soft small" type="button" id="pnTourPreview">${A.icon('crown')} Kale turunu önizle</button></div>` : ''}
       <p class="card-eyebrow" style="margin-top:12px">Hazırlık listesi · ${n}/${list.length}</p>
       <ul class="pn-prep">${list.map(([id, t, d]) => `<li class="${done[id] ? 'ok' : ''}"><label><input type="checkbox" data-prep="${K.esc(id)}" ${done[id] ? 'checked' : ''}><span><b>${K.esc(t)}</b><small>${K.esc(K.fill(d))}</small></span></label></li>`).join('')}</ul>`;
+    const rs = K.$('#pnOpenReset', box);
+    rs &&
+      rs.addEventListener('click', async () => {
+        if (rs.dataset.armed !== '1') {
+          rs.dataset.armed = '1';
+          rs.textContent = 'Emin misin? Bir daha dokun';
+          return;
+        }
+        const rows = (await K.cloud.list('opened', 50)).filter((r) => r.who === 'her');
+        for (const r of rows) await K.cloud.remove(r.id);
+        opened = null;
+        K.fx.toast('Kurdele kaydı silindi. Tören onun telefonunda yine baştan oynar.', { icon: A.icon('bow') });
+        renderOpening();
+      });
     const pv = K.$('#pnOdPreview', box);
     pv && pv.addEventListener('click', () => K.acilis && K.acilis.play(null, true));
     const tp = K.$('#pnTourPreview', box);

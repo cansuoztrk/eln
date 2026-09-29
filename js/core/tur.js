@@ -47,7 +47,8 @@
       Object.assign(hole.style, { top: top + 'px', left: left + 'px', width: Math.min(r.width + pad * 2, W - left - 6) + 'px', height: h + 'px', opacity: 1 });
       let by = top + h + 14;
       if (by + bh > H - 12) by = Math.max(12, top - bh - 14);
-      if (by + bh > H - 12) by = Math.max(12, H - bh - 16);
+      // Ekrandan uzun bölümlerde (kanatlar gibi) balon ekranın altında durur
+      if (by + bh > H - 12 || r.height > H * 0.55) by = Math.max(12, H - bh - 16);
       bub.style.top = by + 'px';
       bub.style.left = K.clamp(r.left + r.width / 2 - bw / 2, 16, W - bw - 16) + 'px';
     } else {
