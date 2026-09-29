@@ -1,0 +1,16 @@
+# Netlify: derleme yok, depo kökü olduğu gibi yayınlanır. Özel içerik zaten şifreli (assets/vault).
+[build]
+  publish = "."
+  command = ""
+
+# Service worker her zaman taze gelsin (yeni sürümler hemen yüklensin)
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "same-origin"

@@ -193,5 +193,15 @@
     });
   });
 
-  K.voice = { def, has, exists, unlocked, list, any, heard, btn, play, stop: close, cloud: cloudV };
+  // Sesin çalınabilir adresi (kasadan ya da buluttan); oynatıcı açmadan çalmak için
+  async function url(id) {
+    if (cloudV[id] && !(C.voiceFiles || {})[id]) {
+      const bin = atob(cloudV[id].b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return URL.createObjectURL(new Blob([bytes], { type: cloudV[id].mime || 'audio/mp4' }));
+    }
+    return K.vault.audio(id);
+  }
+  K.voice = { def, has, exists, unlocked, list, any, heard, btn, play, url, stop: close, cloud: cloudV };
 })();

@@ -130,6 +130,60 @@
     timer = setTimeout(() => stopSound(20), min * 60e3);
   }
 
+  /* ---------- Sesimle uyu: uykusuz → masal → iyi geceler, arka arkaya ---------- */
+  const PL = ['uykusuz', 'masal', 'iyi-geceler'];
+  let pl = null;
+  const plIds = () => PL.filter((id) => K.voice && K.voice.has(id));
+  function plRender() {
+    const box = root && K.$('#glPl', root);
+    if (!box) return;
+    box.hidden = !plIds().length;
+    const now = pl && K.voice.def(pl.ids[pl.i]);
+    K.$('#glPlBtn', box).innerHTML = pl ? `${A.ui('pause')} Durdur` : `${A.ui('play')} Başlat`;
+    K.$('#glPlNow', box).innerHTML = now ? `<b>${pl.i + 1}/${pl.ids.length}</b> ${K.esc(now.title)}` : plIds().map((id) => K.esc(K.voice.def(id).title)).join(' · ');
+  }
+  function playlist() {
+    const ids = plIds();
+    if (!ids.length) return;
+    if (K.audio.music.on) K.audio.music.stop(false);
+    pl = { i: 0, ids };
+    plNext();
+  }
+  async function plNext() {
+    if (!pl) return;
+    if (pl.i >= pl.ids.length) {
+      stopPl();
+      return K.fx.toast('İyi uykular.', { icon: A.icon('moon') });
+    }
+    plRender();
+    let url = null;
+    try {
+      url = await K.voice.url(pl.ids[pl.i]);
+    } catch (e) {}
+    if (!pl) return;
+    if (!url) {
+      pl.i++;
+      return plNext();
+    }
+    const a = new Audio(url);
+    a.volume = 0.85;
+    pl.audio = a;
+    a.addEventListener('ended', () => {
+      if (!pl) return;
+      pl.i++;
+      pl.t = setTimeout(plNext, 2500);
+    });
+    a.play().catch(() => stopPl());
+  }
+  function stopPl() {
+    if (pl) {
+      clearTimeout(pl.t);
+      if (pl.audio) pl.audio.pause();
+    }
+    pl = null;
+    plRender();
+  }
+
   /* ---------- Uyuyorum ---------- */
   function sleep() {
     K.store.set('sleep', { at: Date.now(), shown: false });
@@ -213,6 +267,11 @@
           <p class="card-eyebrow" style="margin-top:12px">Zamanlayıcı</p>
           <div class="kc-presets">${[15, 30, 60, 0].map((m) => `<button type="button" class="chip" data-min="${m}" aria-pressed="${m === 30}">${m ? `${m} dk` : 'Sabaha kadar'}</button>`).join('')}</div>
         </section>
+        <section class="card gl-pl" id="glPl" hidden>
+          <p class="card-eyebrow">Sesimle uyu</p>
+          <p class="muted small">Uyuyamadığında: ${K.esc(C.myPet)}'un sesi arka arkaya, kısık sesle. Uyku sesi açıksa onunla birlikte çalar.</p>
+          <div class="gl-pl-row"><button type="button" class="btn soft" id="glPlBtn">${A.ui('play')} Başlat</button><p class="gl-pl-now" id="glPlNow"></p></div>
+        </section>
         <div class="actions" style="justify-content:center"><button class="btn red big" id="glSleep">${A.icon('moon')} Uyuyorum</button></div>
         <div class="gl-msg" id="glMsg"></div>`;
       let min = 30;
@@ -233,6 +292,7 @@
           K.$$('[data-min]', el).forEach((b) => b.setAttribute('aria-pressed', String(b === m)));
         }
         if (e.target.closest('#glSleep')) sleep();
+        if (e.target.closest('#glPlBtn')) (pl ? stopPl() : playlist());
         if (e.target.closest('#glLamp')) el.classList.toggle('lamp-off');
       });
       K.$('#glDim', el).addEventListener('input', (e) => el.style.setProperty('--glow', e.target.value / 100));
@@ -240,6 +300,7 @@
     enter() {
       root.classList.remove('asleep');
       status();
+      plRender();
     },
     leave() {
       // Oda kapansa da ses zamanlayıcıya kadar çalmaya devam eder; sadece ekran normale döner

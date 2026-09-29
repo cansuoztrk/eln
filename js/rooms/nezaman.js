@@ -79,6 +79,8 @@
 
   /* ---------- Çizim ---------- */
   const marks = () => Object.fromEntries((NZ().marks || []).map(([k, t]) => [k, t]));
+  // Okul takvimi şeritleri: [başlangıç, bitiş, not, kimin]
+  const rangesOn = (k) => (NZ().ranges || []).filter(([a, b]) => k >= a && k <= b);
   function month(y, m, ctx) {
     const first = new Date(Date.UTC(y, m - 1, 1));
     const lead = (first.getUTCDay() + 6) % 7; // pazartesi başlar
@@ -90,8 +92,11 @@
       const h = days('her')[k] || '', me = days('me')[k] || '';
       const past = k < ctx.today;
       const both = h === 'ok' && me === 'ok';
-      const cls = ['nz-c', past ? 'past' : '', both ? 'both' : '', h === 'no' || me === 'no' ? 'no' : '', ctx.tgt && k >= ctx.tgt.from && k <= ctx.tgt.to ? 'tgt' : '', ctx.win.has(k) ? 'win' : '', k === ctx.today ? 'today' : '', anchor === k ? 'anchor' : '', ctx.marks[k] ? 'mark' : ''].filter(Boolean).join(' ');
-      cells.push(`<button type="button" class="${cls}" data-day="${k}" ${past ? 'disabled' : ''} aria-label="${d} ${K.MONTHS[m - 1]}: ${K.esc(C.herPet)} ${lbl(h)}, ${K.esc(C.myPet)} ${lbl(me)}${ctx.marks[k] ? ', ' + K.esc(ctx.marks[k]) : ''}">
+      const rs = rangesOn(k);
+      const rw = (w) => rs.find((r) => r[3] === w || r[3] === 'both');
+      const rc = (w) => (rw(w) ? `r-${w} r-${w}-${rw(w)[4] || 'free'}` : '');
+      const cls = ['nz-c', rc('her'), rc('me'), rs.some((r) => r[3] === 'both') ? 'r-both' : '', past ? 'past' : '', both ? 'both' : '', h === 'no' || me === 'no' ? 'no' : '', ctx.tgt && k >= ctx.tgt.from && k <= ctx.tgt.to ? 'tgt' : '', ctx.win.has(k) ? 'win' : '', k === ctx.today ? 'today' : '', anchor === k ? 'anchor' : '', ctx.marks[k] ? 'mark' : ''].filter(Boolean).join(' ');
+      cells.push(`<button type="button" class="${cls}" data-day="${k}" ${past ? 'disabled' : ''} aria-label="${d} ${K.MONTHS[m - 1]}: ${K.esc(C.herPet)} ${lbl(h)}, ${K.esc(C.myPet)} ${lbl(me)}${ctx.marks[k] ? ', ' + K.esc(ctx.marks[k]) : ''}${rs.map((r) => ', ' + K.esc(r[2])).join('')}">
         <b>${d}</b><span class="nz-dots"><i class="her ${h}"></i><i class="me ${me}"></i></span>${k === ctx.eta ? `<span class="nz-plane" title="Kumbara bu hızla bugün doluyor">${A.icon('plane')}</span>` : ''}${ctx.marks[k] ? '<span class="nz-star" aria-hidden="true">★</span>' : ''}</button>`);
     }
     return `<section class="nz-month"><h3>${K.MONTHS[m - 1]} ${y}</h3><div class="nz-wd">${['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map((x) => `<span>${x}</span>`).join('')}</div><div class="nz-grid">${cells.join('')}</div></section>`;
@@ -245,7 +250,8 @@
             <button type="button" class="chip nz-range" id="nzRange">${A.ui('plus')} Aralık</button>
           </div>
           <p class="muted small" id="nzHint"></p>
-          <div class="nz-legend"><span><i class="her ok"></i>${K.esc(C.herPet)}</span><span><i class="me ok"></i>${K.esc(C.myPet)}</span><span><i class="lg-both"></i>İkiniz de uygun</span><span><i class="lg-tgt"></i>Hedef</span><span>${A.icon('plane')} Kumbara dolar</span></div>
+          <div class="nz-legend"><span><i class="her ok"></i>${K.esc(C.herPet)}</span><span><i class="me ok"></i>${K.esc(C.myPet)}</span><span><i class="lg-both"></i>İkiniz de uygun</span><span><i class="lg-tgt"></i>Hedef</span><span>${A.icon('plane')} Kumbara dolar</span>${(NZ().ranges || []).length ? `<span><i class="lg-rme"></i>${K.esc(C.myPet)} tatil</span><span><i class="lg-rme busy"></i>sınav</span><span><i class="lg-rher"></i>${K.esc(C.herPet)} tatil</span><span><i class="lg-rher busy"></i>sınav</span>` : ''}</div>
+          ${NZ().rangeNote ? `<p class="muted small nz-rnote">${K.esc(K.fill(NZ().rangeNote))}</p>` : ''}
         </div>
         <div class="nz-stat" id="nzStat"></div>
         <div class="nz-cal" id="nzCal"></div>
@@ -264,8 +270,8 @@
         const d = e.target.closest('[data-day]');
         if (d) {
           const k = d.dataset.day;
-          const mk = marks()[k];
-          if (mk) K.fx.toast(`<b>${K.esc(T.fmtShort(k))}:</b> ${K.esc(mk)}`, { icon: A.icon('star'), duration: 2500 });
+          const info = [marks()[k]].concat(rangesOn(k).map((r) => r[2])).filter(Boolean);
+          if (info.length) K.fx.toast(`<b>${K.esc(T.fmtShort(k))}:</b> ${info.map(K.esc).join(' · ')}`, { icon: A.icon('star'), duration: 3500 });
           if (range) {
             if (!anchor) {
               anchor = k;

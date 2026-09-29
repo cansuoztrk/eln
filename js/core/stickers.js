@@ -56,6 +56,7 @@
     { id: 'devam', name: 'Masalcı', hint: 'Masalın Devamı\'na ilk cümleni yaz', icon: 'book', color: '#FFE3EE' },
     { id: 'nezaman', name: 'Tarih Belli', hint: 'Ne Zaman? takviminde ikinizin de kabul ettiği bir hedef seçin', icon: 'week', color: '#FFF0C9', bonus: true },
     { id: 'duvar', name: 'Kilit Ekranı', hint: 'Kendi kilit ekranını kaydet', icon: 'frame', color: '#E8E0FF', bonus: true },
+    { id: 'gunses', name: 'Günün Sesi', hint: 'Günün Sesi\'ne ilk sesini bırak', icon: 'mic', color: '#FFE0EC' },
     { id: 'ses', name: 'İlk Ses', hint: 'Kalede bir sesli not bul ve dinle', icon: 'mic', color: '#FFE0E0', bonus: true },
     { id: 'aykardesi', name: 'Aynı Ay', hint: 'Bir dolunay gecesi aya bak', icon: 'moon', color: '#FFF3C4', bonus: true },
     { id: 'film', name: 'Film Gecesi', hint: 'Bir film gecesi başlat', icon: 'film', color: '#E0DBFF', bonus: true },

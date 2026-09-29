@@ -80,9 +80,10 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **Bilet Kumbarası** (Kalp, bulut): İlk buluşmanın bileti için ortak birikim; TL ya da AZN atılır, her atışın notu olur, çeyreklerde kutlama. Birikim arttıkça küçük bir uçak İstanbul'dan Bakü'ye doğru ilerler; "bu hızla şu gün dolar" tahmini ve hedef tarihe yetişmek için günlük gereken miktar gösterilir. Hedef ve kur Kale Paneli'nden.
 - **Biniş Kartı** (Kalp, bulut): Bilet alınınca panelden uçuş girilir; onun kalesine zarf içinde bir biniş kartı düşer (yolcu, kalkış/varış, koltuk, "seyahat sebebi"). Kalkışa geri sayım; uçuş günü uçak haritada gerçek saate göre ilerler ("Anadolu'nun üstünde", "Gürcistan'ın üstünde"...), ana salondaki çip "Ardoş uçakta" der, inince kutlama. O "Kapıda bekleyeceğim" diye cevap verir. İlk Sarılma geri sayımı da bu tarihe kurulur.
 - **Bakü'de İlk Gün** (Kalp): Uçak indiğinde yaşanacak ilk günün ortak planı. Stilize Bakü haritasında yerler; ikiniz de kalp atar, sabah/öğle/akşam/gece dilimlerine koyar, kendi bildiği yerleri ekler. Rehber o.
-- **Ne Zaman?** (Kalp, bulut): Bakü tarihi henüz belli değilken ortak takvim. Önümüzdeki dokuz ay için ikiniz de günlere "uygun / belki / olmaz" dersiniz (tek dokunuş ya da "Aralık" ile iki dokunuşta bir aralık). İkinizin de uygun olduğu günler parlar, kale en iyi aralıkları bulur (bilet için en az iki hafta sonrası), kumbaranın dolacağı gün uçakla işaretlenir. Biri aralık önerir, öbürü kabul edince "hedef" olur; kumbara o güne göre hesap yapar.
+- **Ne Zaman?** (Kalp, bulut): Bakü tarihi henüz belli değilken ortak takvim. Önümüzdeki dokuz ay için ikiniz de günlere "uygun / belki / olmaz" dersiniz (tek dokunuş ya da "Aralık" ile iki dokunuşta bir aralık). İkinizin de uygun olduğu günler parlar, kale en iyi aralıkları bulur (bilet için en az iki hafta sonrası), kumbaranın dolacağı gün uçakla işaretlenir. Biri aralık önerir, öbürü kabul edince "hedef" olur; kumbara o güne göre hesap yapar. Günlerin altında iki okulun takvimi ince çizgilerle durur (kesikli sınav, düz tatil; tahmini olanlar öyle yazıyor).
+- **Günün Sesi** (Kalp, bulut): Her gün birbirinize en fazla 20 saniyelik ses; her günün küçük bir sorusu var. Onun bugünkü sesi sen kendi sesini bırakınca açılır. Son 30 gün bir şeritte, ikinizin de ses bıraktığı günler seri olur. Sesler şifreli.
 - **21:21** (Kalp, bulut): Her akşam Bakü saatiyle 21:21'de (İstanbul 20:21) iki dakikalık pencere. İkiniz de o dakikada kalbe basarsanız gökyüzüne bir yıldız eklenir; her yedi yıldız adı olan bir takımyıldız olur. Pencere açıkken kalenin her yerinde alttan bir kalp çıkar.
-- **Gece Lambası** (Kalp): Kısılabilen Kitty lambası, tarayıcıda üretilen uyku sesleri (yağmur, dalga, rüzgâr, ninni), zamanlayıcı ve "uyuyorum" düğmesi (sana haber gider). Ertesi sabah kaleye ilk gelişte uyku raporu ve günaydın notu.
+- **Gece Lambası** (Kalp): Kısılabilen Kitty lambası, tarayıcıda üretilen uyku sesleri (yağmur, dalga, rüzgâr, ninni), **Sesimle uyu** (uyuyamadığında, masal ve iyi geceler kayıtları arka arkaya, uyku sesinin üstünde), zamanlayıcı ve "uyuyorum" düğmesi (sana haber gider). Ertesi sabah kaleye ilk gelişte uyku raporu ve günaydın notu.
 - **Gerçek Zambaklar**: Bahçesinde her 12 zambakta bir sana çiçekçinin bilgileriyle hatırlatma gelir; panelden "teslim edildi" deyince bahçesine altın bir zambak dikilir.
 - **Bizim Şarkımız**: Plak çevrilince **B yüzü**: onun şarkısı.
 - **Masalın Devamı** (Anılar, bulut): İki Kule Masalı "Devamı var..." diye biter; devamını ikiniz sırayla, bir iki cümleyle yazarsınız (kalem sırayla geçer, biri 3 gün yazmazsa öbürüne döner). Her altı sayfa bir bölüm; bölümün resmi içindeki kelimelere göre masalın sahnelerinden seçilir. Kale Kitabı'na da bölüm olarak girer.
@@ -179,13 +180,19 @@ Adresin sonuna `?tarih=2027-01-01` (ya da `?tarih=2027-01-01T00:30`) ekleyerek s
 
 ---
 
-## Yayınlama (GitHub Pages)
+## Yayınlama (Netlify)
 
-1. **Settings → Pages → Build and deployment → Source:** *Deploy from a branch*.
-2. Siteyi içeren dalı ve `/ (root)` klasörünü seçip **Save**.
-3. Birkaç dakika sonra: **https://cansuoztrk.github.io/eln/**
+Adres: **https://elnin-kralligi.netlify.app** (hediye kartındaki QR bu adrese gider).
 
-Şifre çözme `https://` gerektirir; GitHub Pages bunu sağlar. Mikrofon (Angela, mum üfleme) de `https://` ister.
+1. [netlify.com](https://www.netlify.com)'da ücretsiz hesap aç (GitHub ile girmek en kolayı; site adresinde GitHub adın görünmez).
+2. **Add new site → Import an existing project → GitHub** → bu depoyu seç.
+3. **Branch to deploy:** siteyi içeren dal. **Build command:** boş. **Publish directory:** `.` (`netlify.toml` zaten ayarlıyor) → **Deploy**.
+4. **Site configuration → Change site name:** `elnin-kralligi` → adres `https://elnin-kralligi.netlify.app` olur.
+5. Bundan sonra dala her gönderimde site kendiliğinden güncellenir.
+
+Başka bir ad seçersen hediye kartındaki QR'ı ve `index.html`'deki `og:image` adresini ona göre değiştir. GitHub Pages da çalışır (Settings → Pages → dal ve `/ (root)`), ama adres `kullanıcıadı.github.io` olur.
+
+Şifre çözme `https://` gerektirir; Netlify bunu sağlar. Mikrofon (Angela, mum üfleme, sesli notlar) de `https://` ister.
 
 ## Teknik notlar
 - Derleme yok. Tek dış kütüphane `js/vendor/supabase.js` (supabase-js, MIT), sadece bulut ayarı varsa yüklenir. Yazı tipleri Google Fonts'tan (Fredoka, Great Vibes, Caveat, Nunito).
