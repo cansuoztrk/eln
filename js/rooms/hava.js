@@ -199,9 +199,11 @@
     if (!on) return;
     const got = await Promise.all(KINDS.map((k) => K.cloud.list(k, 30)));
     got.flat().forEach((r) => rows.some((x) => x.id === r.id) || rows.push(r));
+    heroWx();
     KINDS.forEach((k) =>
       K.cloud.on(k, (r) => {
         if (rows.some((x) => x.id === r.id)) return;
+        if (k === 'hava') setTimeout(heroWx, 0);
         rows.push(r);
         if (r.who !== mine()) {
           if (k === 'hvcare' && r.data.to === mine()) {
@@ -238,6 +240,27 @@
     if (t && !wxOf(mine())) return [{ icon: 'cloud', title: `${nameOf(other())} bugün içinin havasını paylaştı: ${EMO[t[0]]}`, text: 'Seninki nasıl? Pencereni aç.', room: 'hava', cta: 'Havamı seç' }];
     return [];
   });
+  // Ana salondaki iki kulenin üstünde bugünün iç havası (İstanbul solda, Bakü sağda)
+  function heroWx() {
+    const towers = K.$$('.hero-scene .scene-tower');
+    if (towers.length < 2) return;
+    [['me', towers[0]], ['her', towers[towers.length - 1]]].forEach(([w, el]) => {
+      const r = wxOf(w);
+      let b = K.$('.hero-wx', el);
+      if (!r) return b && b.remove();
+      const t = typeOf(r.data.type);
+      if (!t) return;
+      if (!b) {
+        b = K.el('<a class="hero-wx" href="#hava"></a>');
+        el.appendChild(b);
+      }
+      b.className = `hero-wx wx-${t[0]}`;
+      b.title = `${nameOf(w)}: içi ${t[1].toLocaleLowerCase('tr')}${r.data.note ? ' · ' + r.data.note : ''}`;
+      b.setAttribute('aria-label', b.title);
+      b.innerHTML = `<span>${EMO[t[0]]}</span>${['yagmur', 'firtina', 'kar'].includes(t[0]) ? `<i class="hw-fall">${'<b></b>'.repeat(7)}</i>` : ''}`;
+    });
+  }
+  K.on('built', () => setTimeout(heroWx, 300));
   K.hava = { today: (w) => wxOf(w), load: loadAll, emo: EMO, careEmo: CARE_EMO, care: careDef, type: typeOf };
 
   K.room({

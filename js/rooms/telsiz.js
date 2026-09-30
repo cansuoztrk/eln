@@ -129,7 +129,7 @@
     if (!K.store.get('presence', true)) return;
     if (!K.store.get('presenceInfo')) {
       K.store.set('presenceInfo', true);
-      setTimeout(() => K.fx.toast(`<b>Telsiz açık:</b> Kaleye geldiğinde ${K.esc(C.myPet)}'a haber gider. Kapatmak için Telsiz odası.`, { icon: A.icon('radio'), duration: 6000 }), 7000);
+      setTimeout(() => K.fx.toast(`<b>Telsiz açık:</b> Kaleye geldiğinde ${K.esc(C.myPet)}'a haber gider. Kapatmak için Telsiz odası.`, { icon: A.icon('radio'), duration: 6000, log: false }), 7000);
     }
     const last = K.store.get('presenceAt', 0);
     if (Date.now() - last < 3 * 3600e3) return;

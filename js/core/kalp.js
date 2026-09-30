@@ -107,6 +107,7 @@
       st.textContent = du ? du.data.emoji : '';
       st.hidden = !du;
     }
+    K.emit('kalpbar');
     // Dock'taki kalpte alev sayısı
     const f = K.$('#dockFlame');
     if (f) {
@@ -176,7 +177,9 @@
       ['kelime', 'cards', 'Kelime'],
       ['hava', 'cloud', 'Hava'],
       ['durum', 'chat', 'Durumum'],
-    ].filter(([id]) => id === 'hikaye' || id === 'durum' || K.rooms.some((r) => r.id === id && !(typeof r.hidden === 'function' ? r.hidden() : r.hidden)));
+      ['zamanli', 'hourglass', 'Zamanlı'],
+      ['kare', 'camera', 'Günün Karesi'],
+    ].filter(([id]) => id === 'hikaye' || id === 'durum' || id === 'zamanli' || K.rooms.some((r) => r.id === id && !(typeof r.hidden === 'function' ? r.hidden() : r.hidden)));
     menu = K.el(`<div class="kmenu" role="dialog" aria-modal="true" aria-label="Kalp menüsü">
       <div class="kmenu-back" data-km-x></div>
       <div class="kmenu-panel">
@@ -207,7 +210,12 @@
   }
   async function act(id, btn) {
     const o = other();
-    if (['radyo', 'pinpon', 'kelime', 'hava'].includes(id)) {
+    if (id === 'zamanli') {
+      closeMenu();
+      if (!on()) return K.fx.toast('Bulut kapalı; bunun için Kale Paneli\'nden bulutu açın.');
+      return K.surpriz && K.surpriz.compose();
+    }
+    if (['radyo', 'pinpon', 'kelime', 'hava', 'kare'].includes(id)) {
       closeMenu();
       location.hash = id;
       return;

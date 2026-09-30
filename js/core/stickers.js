@@ -80,6 +80,8 @@
     { id: 'radyo', name: 'Aynı Saniye', hint: 'Kale Radyosu\'nda bir şarkı aç', icon: 'vinyl', color: '#E9E0FF', bonus: true },
     { id: 'pinpon', name: 'İki Kıyı', hint: 'Onunla bir pinpon maçı bitir', icon: 'heart', color: '#DDF0FF', bonus: true },
     { id: 'kelime', name: 'Kelime Avcısı', hint: 'Günün Kelimesi\'ni bul', icon: 'cards', color: '#E3F6EC', bonus: true },
+    { id: 'surpriz', name: 'Zaman Postacısı', hint: 'Ona zamanlı bir sürpriz not bırak', icon: 'hourglass', color: '#FFF1C9', bonus: true },
+    { id: 'kare', name: 'İki Şehir Bir Kare', hint: 'Günün Karesi\'ne fotoğrafını koy', icon: 'camera', color: '#FFE9D6', bonus: true },
     { id: 'ses', name: 'İlk Ses', hint: 'Kalede bir sesli not bul ve dinle', icon: 'mic', color: '#FFE0E0', bonus: true },
     { id: 'aykardesi', name: 'Aynı Ay', hint: 'Bir dolunay gecesi aya bak', icon: 'moon', color: '#FFF3C4', bonus: true },
     { id: 'film', name: 'Film Gecesi', hint: 'Bir film gecesi başlat', icon: 'film', color: '#E0DBFF', bonus: true },

@@ -2,7 +2,7 @@
    tam ekran, dokunarak ilerleyen bir hikâye olarak oynar. İkiniz de fotoğraf ya da yazıyla kendi hikâyenizi paylaşırsınız;
    onun hikâyesine tepki (❤️ 🥹 😂 😍 🤗) ya da yanıt bırakırsınız, o da "gördü" bilgisini görür.
    Öne çıkanlar: kartpostallar, Bakü Günlüğü, kabin şeritleri, sahneler, ilkler ve hikâye arşivi.
-   Kayıtlar: hikaye {thumb, full, text, bg} + hkimg {img} · hkgor {ref} · hktepki {ref, r} · hkyanit {ref, text} */
+   Kayıtlar: hikaye {thumb, full, text, bg, audio, dur} + hkimg {img} + hkses {b64, mime} · hkgor {ref} · hktepki {ref, r} · hkyanit {ref, text} */
 (function () {
   'use strict';
   const K = window.K;
@@ -76,7 +76,27 @@
   }
 
   /* ---------- Oynatıcı ---------- */
-  let V = null;
+  let V = null, voiceEl = null;
+  function stopVoice() {
+    if (voiceEl) {
+      try {
+        voiceEl.pause();
+      } catch (e) {}
+      voiceEl = null;
+    }
+  }
+  async function playVoice(x) {
+    const h = await K.cloud.get(x.row.data.audio);
+    if (!V || V.items[V.i] !== x || !h || !h.data || !h.data.b64) return;
+    const bin = atob(h.data.b64);
+    const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    voiceEl = new Audio(URL.createObjectURL(new Blob([u8], { type: h.data.mime || 'audio/mp4' })));
+    voiceEl.play().catch(() => {});
+    V.pos = 0;
+    const card = K.$('.hk-card.voice', V.el);
+    if (card) card.classList.add('playing');
+  }
   function open(items, opt = {}) {
     if (!items.length) return;
     close(true);
@@ -104,6 +124,7 @@
     const v = V;
     V = null;
     cancelAnimationFrame(v.raf);
+    stopVoice();
     v.el.classList.remove('in');
     setTimeout(() => v.el.remove(), 320);
     document.body.classList.remove('has-story');
@@ -141,7 +162,9 @@
     K.$$('.hk-segs b', V.el).forEach((b, j) => (b.style.width = j < i ? '100%' : '0%'));
     V.pos = 0;
     V.last = performance.now();
-    V.dur = x.img ? 7000 : x.text && x.text.length > 90 ? 8000 : 5500;
+    stopVoice();
+    const hasVoice = x.kind === 'hikaye' && x.row && x.row.data.audio;
+    V.dur = hasVoice ? Math.max(5500, (x.row.data.dur || 5) * 1000 + 900) : x.img ? 7000 : x.text && x.text.length > 90 ? 8000 : 5500;
     K.$('.hk-who', V.el).innerHTML = x.who ? K.avatar(x.who) : `<span class="k-av hl">${x.emoji || '♥'}</span>`;
     K.$('.hk-name', V.el).textContent = x.who ? nameOf(x.who) : V.title || '';
     K.$('.hk-time', V.el).textContent = `${x.at ? K.ago(x.at) : ''}${x.kind !== 'hikaye' && x.title ? ' · ' + x.title.split(':')[0] : ''}`;
@@ -158,6 +181,9 @@
         const h = await K.cloud.get(x.row.data.full);
         if (V && V.items[V.i] === x && h && h.data && h.data.img) K.$('.hk-photo img', st).src = h.data.img;
       }
+    } else if (hasVoice) {
+      st.innerHTML = `<div class="hk-card voice"><span class="hk-wave" aria-hidden="true">${'<i></i>'.repeat(18)}</span><p class="hk-vt">${K.esc(x.text || 'Sesli hikâye')}</p><small>${Math.round(x.row.data.dur || 0)} saniye · sesi açık dinle</small></div>`;
+      playVoice(x);
     } else if (x.kind === 'hikaye') {
       st.innerHTML = `<div class="hk-card text"><p>${K.esc(x.text || '')}</p></div>`;
     } else {
@@ -201,6 +227,7 @@
       holdT = setTimeout(() => {
         held = true;
         if (V) V.paused = true;
+        if (voiceEl) voiceEl.pause();
         el.classList.add('paused');
       }, 220);
     });
@@ -213,6 +240,7 @@
         held = false;
         justHeld = Date.now();
         if (V) V.paused = false;
+        if (voiceEl) voiceEl.play().catch(() => {});
         el.classList.remove('paused');
         return;
       }
@@ -242,12 +270,20 @@
       const x = V.items[V.i];
       const text = String(e.target.t.value || '').trim();
       if (!text) return;
-      e.target.t.value = '';
-      e.target.t.blur();
+      const inp = e.target.t;
+      inp.value = '';
+      inp.blur();
       const r = await K.cloud.add('hkyanit', { ref: x.id, text });
       if (r) rows.yanit.push(r);
       K.audio.sfx.pop();
-      K.fx.toast(`Yanıtın ${K.esc(K.ek(nameOf(other()), 'e'))} gitti.`, { icon: A.icon('chat'), duration: 2500 });
+      // Onay hikâyenin içinde kalsın (ekranı kaplayan bildirim yok)
+      const ph = inp.placeholder;
+      inp.placeholder = `Gönderildi ✓ ${K.ek(nameOf(other()), 'e')} gitti`;
+      inp.classList.add('sent');
+      setTimeout(() => {
+        inp.placeholder = ph;
+        inp.classList.remove('sent');
+      }, 2600);
       if (!K.isOwner()) K.notify(`${C.herName} hikâyene yanıt verdi`, `${x.title ? x.title + ' → ' : ''}${text}`, ['speech_balloon']);
     });
     el.addEventListener('keydown', (e) => {
@@ -288,13 +324,14 @@
   }
   function compose() {
     const pr = K.pick(HK().prompts || ['Şu an ne görüyorsun?']);
-    let file = null, bg = 0;
+    let file = null, bg = 0, voice = null, recr = null;
     const m = K.ui.modal({
       label: 'Hikâye paylaş',
       cls: 'hk-compose',
       html: `<p class="card-eyebrow">Hikâyen · 24 saat halkada, sonra arşivde</p><h2>${K.esc(pr)}</h2>
         <div class="hk-prev" style="background:${BGS[0]}"><img alt="" hidden><p class="hk-prev-t"></p></div>
-        <div class="row hk-src"><label class="btn soft small">${A.ui('camera')} Fotoğraf<input type="file" accept="image/*" hidden></label><span class="hk-bgs">${BGS.map((b, i) => `<button type="button" style="background:${b}" data-bg="${i}" aria-label="Arka plan ${i + 1}"></button>`).join('')}</span></div>
+        <div class="row hk-src"><span class="hk-srcb"><label class="btn soft small">${A.ui('camera')} Fotoğraf<input type="file" accept="image/*" hidden></label><button type="button" class="btn soft small hk-mic" data-hk-mic>${A.ui('mic')} Ses</button></span><span class="hk-bgs">${BGS.map((b, i) => `<button type="button" style="background:${b}" data-bg="${i}" aria-label="Arka plan ${i + 1}"></button>`).join('')}</span></div>
+        <div class="hk-rec" hidden><span class="hk-rec-dot"></span><b class="hk-rec-t">0 sn</b><span class="hk-rec-w" aria-hidden="true">${'<i></i>'.repeat(14)}</span><audio controls hidden></audio></div>
         <textarea class="textarea" rows="2" maxlength="220" placeholder="Bir cümle ekle (isteğe bağlı)"></textarea>
         <button type="button" class="btn red" data-hk-post>${A.ui('send')} ${K.esc(nameOf(other()))} görsün</button>`,
     });
@@ -307,7 +344,47 @@
       im.hidden = false;
       pv.classList.add('has-img');
     });
+    // Sesli hikâye: en fazla 30 saniye
+    const recBox = K.$('.hk-rec', m.body), micB = K.$('[data-hk-mic]', m.body);
+    async function toggleRec() {
+      if (recr && recr.r.state === 'recording') return recr.r.stop();
+      const mime = window.MediaRecorder ? ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find((x) => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(x)) || '' : null;
+      if (mime === null || !navigator.mediaDevices) return K.fx.toast('Bu cihaz ses kaydını desteklemiyor.');
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      } catch (err) {
+        return K.fx.toast('Mikrofon izni verilmedi. Tarayıcı ayarlarından izin verip tekrar dene.');
+      }
+      const chunks = [];
+      const r = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 48000 } : { audioBitsPerSecond: 48000 });
+      recr = { r, start: Date.now() };
+      r.ondataavailable = (ev) => ev.data.size && chunks.push(ev.data);
+      r.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        clearInterval(recr.tick);
+        const blob = new Blob(chunks, { type: r.mimeType || mime || 'audio/webm' });
+        voice = { blob, dur: Math.round(((Date.now() - recr.start) / 1000) * 10) / 10 };
+        recBox.classList.remove('on');
+        const au = K.$('audio', recBox);
+        au.src = URL.createObjectURL(blob);
+        au.hidden = false;
+        micB.innerHTML = `${A.ui('mic')} Yeniden kaydet`;
+        pv.classList.add('has-voice');
+      };
+      r.start();
+      recBox.hidden = false;
+      recBox.classList.add('on');
+      K.$('audio', recBox).hidden = true;
+      micB.innerHTML = `${A.ui('pause')} Bitir`;
+      recr.tick = setInterval(() => {
+        const sec = (Date.now() - recr.start) / 1000;
+        K.$('.hk-rec-t', recBox).textContent = `${Math.floor(sec)} / 30 sn`;
+        if (sec >= 30 && r.state === 'recording') r.stop();
+      }, 200);
+    }
     m.body.addEventListener('click', async (e) => {
+      if (e.target.closest('[data-hk-mic]')) return toggleRec();
       const b = e.target.closest('[data-bg]');
       if (b) {
         bg = +b.dataset.bg;
@@ -317,10 +394,27 @@
       const post = e.target.closest('[data-hk-post]');
       if (!post) return;
       const text = ta.value.trim();
-      if (!file && !text) return ta.focus();
+      if (recr && recr.r.state === 'recording') return K.fx.toast('Önce kaydı bitir.');
+      if (!file && !text && !voice) return ta.focus();
       post.disabled = true;
       post.classList.add('loading');
       let data = { text, bg };
+      if (voice) {
+        const b64 = await new Promise((res) => {
+          const fr = new FileReader();
+          fr.onload = () => res(String(fr.result).split(',')[1] || '');
+          fr.onerror = () => res('');
+          fr.readAsDataURL(voice.blob);
+        });
+        const au = b64 && b64.length < 1.6e6 && (await K.cloud.add('hkses', { b64, mime: voice.blob.type || 'audio/webm' }));
+        if (!au) {
+          post.disabled = false;
+          post.classList.remove('loading');
+          return K.fx.toast('Ses gönderilemedi. Daha kısa bir kayıt dene.');
+        }
+        data.audio = au.id;
+        data.dur = voice.dur;
+      }
       if (file) {
         const [full, thumb] = await Promise.all([shrink(file, 1280, 0.82), shrink(file, 420, 0.72)]);
         const big = full && (await K.cloud.add('hkimg', { img: full }));
@@ -329,7 +423,7 @@
           post.classList.remove('loading');
           return K.fx.toast('Fotoğraf gönderilemedi. İnternet bağlantını kontrol et.');
         }
-        data = { text, thumb, full: big.id };
+        data = Object.assign(data, { thumb, full: big.id });
       }
       const r = await K.cloud.add('hikaye', data);
       if (!r) {
@@ -339,9 +433,9 @@
       }
       m.close();
       K.audio.sfx.success();
-      K.fx.toast(`<b>Hikâyen paylaşıldı.</b> ${K.esc(nameOf(other()))} halkayı görünce açacak.`, { icon: A.icon('camera') });
+      K.fx.toast(`<b>Hikâyen paylaşıldı.</b> ${K.esc(nameOf(other()))} halkayı görünce açacak.`, { icon: A.icon(voice ? 'mic' : 'camera') });
       K.stickers.award('hikaye');
-      if (!K.isOwner()) K.notify(`${C.herName} bir hikâye paylaştı`, text || 'Bir fotoğraf', ['camera_with_flash']);
+      if (!K.isOwner()) K.notify(`${C.herName} bir hikâye paylaştı`, text || (voice ? 'Sesli bir hikâye' : 'Bir fotoğraf'), ['camera_with_flash']);
       bar();
     });
   }

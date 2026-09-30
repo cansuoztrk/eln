@@ -59,6 +59,12 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **Kale Radyosu** (Oyun, bulut): Aynı şarkıyı aynı saniyede dinlemek. Biri Şarkı Defteri'nden bir şarkı açar; öbürü girince şarkı onda da ortak saate göre kaldığı yerden çalar. Bitince sıradaki başlar; tepkiler (❤️ 🥹 🎶 💃 😍) iki ekranda uçar. Radyo açıkken ana salonda "Birlikte dinle" kartı.
 - **İki Kıyı Pinpon** (Oyun): Masanın yarısı bir telefonda, yarısı öbüründe. Top (bir kalp) ekranının tepesinden çıkınca canlı olarak onun ekranının tepesine düşer; aynı anda sadece topun olduğu telefon hesapladığı için gecikme oyunu bozmaz. Her vuruşta hızlanır; yedi sayı alan kazanır, maç sonuçları sayılır. O kalede değilse Kitty ile antrenman.
 - **Günün Kelimesi** (Oyun): Her gün beş harfli bir kelime, hepsi hikâyemizden (liste kasada, şifreli). Türkçe klavye, altı hak. İkiniz de aynı kelimeyi çözer; sen bitirmeden onun tahtası sadece renk olarak görünür, bitirince harfleriyle açılır. Seri ve "kim daha az denemede buldu" sayacı.
+- **Bildirimler ve zil**: Bildirimler küçük; aynı anda en fazla iki tane, dokununca ya da yana kaydırınca kapanır, içlerindeki bağlantılar çalışır. Hikâye ya da kalp menüsü açıkken ekranın üstünde görünür (önceki sürümde bu durumda bildirim bütün ekranı kaplıyordu). Önemli olanlar (onun gönderdikleri, davetler, paketler) üst çubuktaki **zile** de yazılır; okunmamış sayısı zilin üstünde.
+- **Sesli hikâye**: Hikâye paylaşırken "Ses" ile 30 saniyeye kadar kayıt; onun ekranında dalga dalga oynar.
+- **Zamanlı Sürpriz** (Kalp menüsü → Zamanlı): Bir not yaz, ne zaman açılacağını seç (onun saatiyle yarın sabah 08:00, bu gece 23:00, bir saat sonra ya da istediğin an). O saate kadar mühürlü; ana salonda sadece "sana mühürlü bir not bıraktı · açılış yarın 08:00" yazar. Zamanı gelince zarf açılır; açtığında gönderene haber gider. Bekleyenler iptal edilebilir.
+- **Günün Karesi** (Anılar, bulut): Her gün bir konu ("Gökyüzü", "Penceren", "Ayakkabıların"...), iki fotoğraf: biri İstanbul'dan, biri Bakü'den. Onunki, sen kendininkini koyana kadar bulanık; ikisi gelince yan yana tek kare. Albüm ve seri.
+- **Kulelerde iç hava**: Ana salonda İstanbul ve Bakü kulelerinin üstünde o günün "Kalbin Hava Durumu" (yağmurluysa yağmur yağar, karlıysa kar).
+- **Radyoya şarkı ekle**: Kale Radyosu'ndan doğrudan şarkı adı ve YouTube bağlantısıyla (Şarkı Defteri'ne de yazılır).
 
 ## Kalenin kanatları
 

@@ -146,7 +146,24 @@
         <section class="card ry-now" id="ryNow"></section>
         <div class="ry-tv pk" id="ryTv" hidden></div>
         <div class="ry-reacts" id="ryReacts" hidden>${REACTS.map((r) => `<button type="button" data-ry-r="${r}">${r}</button>`).join('')}<div class="ry-fly" id="ryFly" aria-hidden="true"></div></div>
-        <section class="card"><p class="card-eyebrow">Liste · Şarkı Defteri</p><ul class="ry-list" id="ryList"></ul></section>`;
+        <section class="card"><p class="card-eyebrow">Liste · Şarkı Defteri</p><ul class="ry-list" id="ryList"></ul>
+          <form class="ry-add" id="ryAdd" autocomplete="off"><p class="card-eyebrow">Listeye şarkı ekle</p>
+            <input class="input" name="t" maxlength="80" placeholder="Şarkının adı"><input class="input" name="a" maxlength="60" placeholder="Sanatçı">
+            <input class="input" name="y" maxlength="200" placeholder="YouTube bağlantısı (Paylaş → Bağlantıyı kopyala)">
+            <button class="btn red small" type="submit">${A.ui('plus')} Ekle</button></form></section>`;
+      el.addEventListener('submit', async (e) => {
+        if (!e.target.closest('#ryAdd')) return;
+        e.preventDefault();
+        const f = e.target;
+        const title = f.t.value.trim(), artist = f.a.value.trim(), yt = K.pikap.idOf(f.y.value);
+        if (!title || !yt) return K.fx.toast(!title ? 'Şarkının adını yaz.' : 'Bu bir YouTube bağlantısına benzemiyor.');
+        const r = await K.cloud.add('song', { title, artist: artist || '', note: '', yt });
+        if (!r) return K.fx.toast('Eklenemedi. İnterneti kontrol et.');
+        f.reset();
+        K.audio.sfx.chime();
+        K.fx.toast(`<b>${K.esc(title)}</b> listeye ve Şarkı Defteri'ne eklendi.`, { icon: A.icon('vinyl') });
+        setTimeout(render, 300);
+      });
       el.addEventListener('click', (e) => {
         const p = e.target.closest('[data-ry-play]');
         if (p) return start(p.dataset.ryPlay);

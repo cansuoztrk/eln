@@ -18,7 +18,7 @@
 
   // Her tür: kayıt → {icon, room, title, text, img, emoji, weight} ya da null (gösterilmez)
   const N = {
-    hikaye: (r) => ({ icon: 'camera', room: '', title: 'Hikâye', text: r.data.text || '', img: r.data.thumb, story: true, weight: 3 }),
+    hikaye: (r) => ({ icon: r.data.audio ? 'mic' : 'camera', room: '', emoji: r.data.audio ? '🎙️' : '', title: r.data.audio ? 'Sesli hikâye' : 'Hikâye', text: r.data.text || '', img: r.data.thumb, bg: r.data.bg, story: true, weight: 3 }),
     dvoice: (r) => ({ icon: 'mic', room: 'gunses', emoji: '🎙️', title: 'Günün Sesi\'ni bıraktı', text: `${Math.round(r.data.dur || 0)} saniyelik bir ses. Seninkini bırakınca açılır.`, weight: 3 }),
     hava: (r) => {
       const t = K.hava && K.hava.type(r.data.type);
@@ -74,6 +74,11 @@
     round: (r) => ({ icon: 'pencil', room: 'gartic', emoji: '✏️', title: 'Gartic turu', text: r.data.win ? `"${r.data.word}" bilindi.` : 'Bilinemedi.', weight: 1 }),
     filmline: () => ({ icon: 'clapper', room: 'sinema', emoji: '🎞️', title: 'Filmdeki bir soruya cevap', text: 'Sen de cevaplayınca açılır.', weight: 1 }),
     hangi: () => null,
+    kare: (r) => {
+      const open = r.who === (K.isOwner() ? 'me' : 'her') || (K.kare && K.kare.mineDone(r.data.day));
+      return { icon: 'camera', room: 'kare', emoji: '🖼️', title: `Günün Karesi: ${r.data.p}`, text: open ? '' : 'Seninkini koyunca açılır.', img: open ? r.data.thumb : null, weight: 3 };
+    },
+    zamanli: () => null,
     durum: (r) => (r.data.k ? { icon: 'chat', room: '', emoji: r.data.emoji, title: `Durumu: ${r.data.text}`, text: '', weight: 1 } : null),
     selam: (r) => ({ icon: r.data.k === 'gece' ? 'moon' : 'sun', room: '', emoji: r.data.k === 'gece' ? '🌙' : '☀️', title: r.data.k === 'gece' ? 'İyi geceler' : 'Günaydın', text: r.data.text || '', weight: 2 }),
     kucak: () => ({ icon: 'hugs', room: '', emoji: '🤗', title: 'Sana sarıldı', text: 'Kalp menüsünden, sımsıkı.', weight: 2 }),
@@ -84,7 +89,7 @@
     kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
   const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem']);
 

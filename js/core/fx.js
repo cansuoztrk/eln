@@ -196,19 +196,62 @@
 
   /* ---------- Bildirim balonu ---------- */
   let toastBox;
+  // Bildirimler: en fazla iki tane aynı anda; dokununca ya da yana kaydırınca kapanır;
+  // önemli olanlar (uzun süreli ya da o.log) zil kutusuna da yazılır
+  let lastToast = { html: '', at: 0 };
   function toast(html, o = {}) {
     if (!toastBox) {
       toastBox = K.el('<div class="toasts" role="status" aria-live="polite"></div>');
       document.body.appendChild(toastBox);
     }
+    // Aynı bildirim üst üste gelmesin
+    if (lastToast.html === html && Date.now() - lastToast.at < 2500) return;
+    lastToast = { html, at: Date.now() };
     const t = K.el(`<div class="toast ${o.cls || ''}">${o.icon ? `<span class="toast-ic">${o.icon}</span>` : ''}<span class="toast-tx">${html}</span></div>`);
+    const kill = () => {
+      if (t.dataset.gone) return;
+      t.dataset.gone = '1';
+      t.classList.remove('in');
+      t.classList.add('out');
+      setTimeout(() => t.remove(), 350);
+    };
+    // Üçüncüsü gelince en eskisi hemen gider
+    const live = [...toastBox.children].filter((x) => !x.dataset.gone);
+    if (live.length >= 2) live.slice(0, live.length - 1).forEach((x) => x._kill && x._kill());
+    t._kill = kill;
     toastBox.appendChild(t);
     requestAnimationFrame(() => t.classList.add('in'));
-    setTimeout(() => {
-      t.classList.remove('in');
-      setTimeout(() => t.remove(), 400);
-    }, o.duration || 3400);
+    let timer = setTimeout(kill, o.duration || 3400);
+    // Dokun: kapat (bağlantıya dokunulduysa bağlantı çalışır, sonra kapanır)
+    let sx = null;
+    t.addEventListener('pointerdown', (e) => {
+      sx = e.clientX;
+      clearTimeout(timer);
+    });
+    t.addEventListener('pointermove', (e) => {
+      if (sx == null) return;
+      const dx = e.clientX - sx;
+      t.style.transform = `translateX(${dx}px)`;
+      t.style.opacity = String(Math.max(0.2, 1 - Math.abs(dx) / 220));
+    });
+    const up = (e) => {
+      if (sx == null) return;
+      const dx = e.clientX - sx;
+      sx = null;
+      t.style.transform = '';
+      t.style.opacity = '';
+      if (Math.abs(dx) > 60 || !e.target.closest('a, button')) return kill();
+      timer = setTimeout(kill, 600);
+    };
+    t.addEventListener('pointerup', up);
+    t.addEventListener('pointercancel', () => {
+      sx = null;
+      t.style.transform = '';
+      timer = setTimeout(kill, 1500);
+    });
+    if (o.log !== false && (o.log || (o.duration || 0) >= 5000)) K.emit('bildirim', { html, icon: o.icon || '', at: Date.now() });
   }
+
 
   /* ---------- Pencere (modal) ---------- */
   function modal(o = {}) {
