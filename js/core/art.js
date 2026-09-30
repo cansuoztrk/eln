@@ -378,6 +378,11 @@
     image: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M4 18 L10 13 L14 16 L17 13 L21 17"/>',
     camera: '<path d="M3 8 H7.5 L9.5 5 H14.5 L16.5 8 H21 V19 H3 Z"/><circle cx="12" cy="13" r="3.6"/>',
     copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8 V4 H4 V16 H8"/>',
+    search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 L20 20"/>',
+    home: '<path d="M4 11 L12 4 L20 11"/><path d="M6 10 V20 H18 V10"/><path d="M10 20 V15 H14 V20"/>',
+    castle: '<path d="M4 20 V9 H7 V11 H9 V9 H11 V20 M13 20 V9 H15 V11 H17 V9 H20 V20 Z M4 20 H20"/><path d="M11 14 H13"/><path d="M7.5 9 V5 L9 6 L7.5 7"/>',
+    cal: '<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10 H20 M8 3 V7 M16 3 V7"/><path d="M8 14 H9 M11.5 14 H12.5 M15 14 H16 M8 17 H9 M11.5 17 H12.5"/>',
+    wave: '<path d="M7 11 C5 9 5 6 7.5 5.5 C9 5.2 10 6.5 10 7.5 V4.5 C10 3 12.5 3 12.5 4.5 V10 M12.5 5.5 C12.5 4 15 4 15 5.5 V10 M15 7 C15 5.5 17.5 5.5 17.5 7 V13 C17.5 18 14.5 20 11.5 20 C9 20 7.5 18.5 6 16 L4 12.5 C3.3 11.3 5 10 6 11 L7.5 13"/>',
   };
   function ui(name, cls = '') {
     return `<svg class="ui ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${U[name]}</svg>`;

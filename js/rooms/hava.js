@@ -238,7 +238,7 @@
     if (t && !wxOf(mine())) return [{ icon: 'cloud', title: `${nameOf(other())} bugün içinin havasını paylaştı: ${EMO[t[0]]}`, text: 'Seninki nasıl? Pencereni aç.', room: 'hava', cta: 'Havamı seç' }];
     return [];
   });
-  K.hava = { today: (w) => wxOf(w), load: loadAll, emo: EMO };
+  K.hava = { today: (w) => wxOf(w), load: loadAll, emo: EMO, careEmo: CARE_EMO, care: careDef, type: typeOf };
 
   K.room({
     id: 'hava',

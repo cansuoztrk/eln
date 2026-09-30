@@ -73,6 +73,15 @@
         if (error) throw error;
         return (await Promise.all(data.reverse().map(decodeRow))).filter(Boolean);
       },
+      // Birden çok türden en yeni kayıtlar tek istekte (hikâyeler ve Gün Gün Biz için); eskiden yeniye sıralı
+      async many(kinds, opt = {}) {
+        let q = client.from('kale').select('*').eq('space', space).in('kind', kinds);
+        if (opt.since) q = q.gte('created_at', new Date(opt.since).toISOString());
+        if (opt.before) q = q.lt('created_at', new Date(opt.before).toISOString());
+        const { data, error } = await q.order('created_at', { ascending: false }).limit(opt.limit || 500);
+        if (error) throw error;
+        return (await Promise.all(data.reverse().map(decodeRow))).filter(Boolean);
+      },
       async get(id) {
         const { data, error } = await client.from('kale').select('*').eq('space', space).eq('id', id).maybeSingle();
         if (error) throw error;
@@ -134,6 +143,11 @@
         const all = rows().filter((r) => r.kind === kind && (!opt.before || new Date(r.created_at).getTime() < opt.before));
         return (await Promise.all(all.slice(-limit).map(decodeRow))).filter(Boolean);
       },
+      async many(kinds, opt = {}) {
+        const t = (r) => new Date(r.created_at).getTime();
+        const all = rows().filter((r) => kinds.includes(r.kind) && (!opt.since || t(r) >= opt.since) && (!opt.before || t(r) < opt.before));
+        return (await Promise.all(all.slice(-(opt.limit || 500)).map(decodeRow))).filter(Boolean);
+      },
       async get(id) {
         const r = rows().find((x) => x.id === id);
         return r ? decodeRow(r) : null;
@@ -162,6 +176,8 @@
     people: [],
     // Bir türdeki kayıtlar (eskiden yeniye)
     list: async (kind, limit, opt) => (adapter ? adapter.list(kind, limit, opt).catch(() => []) : []),
+    // Birden çok türün kayıtları tek istekte: many(['hava', 'dakika'], { since, before, limit })
+    many: async (kinds, opt) => (adapter && adapter.many ? adapter.many(kinds, opt).catch(() => []) : []),
     // Tek bir kayıt (büyük fotoğraflar gibi, sadece gerektiğinde)
     get: async (id) => (adapter && adapter.get ? adapter.get(id).catch(() => null) : null),
     async add(kind, obj) {

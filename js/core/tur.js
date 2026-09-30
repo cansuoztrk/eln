@@ -17,7 +17,9 @@
     bugun: '.today-grid',
     album: '.top-actions a[href="#album"]',
     muzik: '#musicBtn',
-    kanat: '#wings',
+    kanat: '#castleMap',
+    hikaye: '#stories',
+    dock: '#dock',
     son: '#special',
   };
   const shown = (el) => {

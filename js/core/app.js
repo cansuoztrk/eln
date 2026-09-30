@@ -91,6 +91,7 @@
           <div class="scene-sea" aria-hidden="true"></div>
         </div>
       </section>
+      <section class="wrap stories" id="stories" hidden></section>
       <section class="together">
         <div class="wrap">
           <div class="together-card">
@@ -151,6 +152,8 @@
       <section class="wrap sec castle">
         <h2 class="sec-title">Kalenin <span class="script">kanatları</span></h2>
         <p class="sec-sub" id="castleSub">Bazı kapılar sadece özel günlerde, bazıları sadece gece açılıyor, biri de iyi saklanmış. Acele etme; bu kale her gün biraz değişiyor.</p>
+        <div class="kmap-wrap" id="castleMap"></div>
+        <div class="shelf-quick" id="shelfQuick"></div>
         <div id="wings"></div>
       </section>
       <footer class="foot">
@@ -182,22 +185,112 @@
       <span class="door-sub">${K.esc(K.fill(K.val(r.sub)))}</span>${tag}
     </a>`;
   }
+  // Kanatların kısa adları (haritadaki kuleler için)
+  const SHORT = { sahip: 'Sahip', mevsim: 'Özel Günler', zaman: 'Zaman', anilar: 'Anılar', kalp: 'Kalp', oyun: 'Oyun', hazine: 'Hazine' };
+  const wingRooms = (w) => K.rooms.filter((r) => (r.wing || 'hazine') === w.id && visible(r));
+  function shelfDoors(rooms, visited) {
+    // Hareket olan (rozetli) kapılar öne
+    const hot = rooms.filter((r) => !r.secret && visited[r.id] && r.badge && r.badge());
+    return hot.concat(rooms.filter((r) => !hot.includes(r)));
+  }
   function renderDoors() {
     const visited = K.store.get('visited', {});
-    K.$('#wings').innerHTML = WINGS.map((w) => {
-      const rooms = K.rooms.filter((r) => (r.wing || 'hazine') === w.id && visible(r));
-      if (!rooms.length) return '';
-      return `<section class="wing" style="--wing:${w.color}">
+    const open = K.store.get('shelfOpen', {});
+    const wings = WINGS.filter((w) => wingRooms(w).length);
+    K.$('#wings').innerHTML = wings
+      .map((w) => {
+        const rooms = wingRooms(w);
+        const fresh = rooms.filter((r) => !visited[r.id]).length;
+        const isOpen = open[w.id] || rooms.length <= 2;
+        return `<section class="wing shelf ${isOpen ? 'open' : ''}" id="wing-${w.id}" style="--wing:${w.color}">
         <div class="wing-head">
           <h3 class="wing-ribbon"><span class="wing-ic">${A.icon(w.icon)}</span><span>${K.esc(w.title)}</span></h3>
           <p class="wing-sub">${K.esc(w.sub)}</p>
         </div>
-        <nav class="doors" aria-label="${K.esc(w.title)}">${rooms.map((r) => doorHTML(r, visited)).join('')}</nav>
+        <div class="shelf-top"><span class="shelf-n">${rooms.length} oda${fresh ? ` · <b>${fresh} yeni</b>` : ''}</span>${rooms.length > 2 ? `<button type="button" class="shelf-all" data-shelf="${w.id}" aria-expanded="${isOpen}">${isOpen ? 'Sıraya diz' : 'Hepsini göster'}</button>` : ''}</div>
+        <nav class="doors ${isOpen ? '' : 'row'}" aria-label="${K.esc(w.title)}">${shelfDoors(rooms, visited).map((r) => doorHTML(r, visited)).join('')}</nav>
       </section>`;
-    }).join('');
-    const n = K.rooms.filter(visible).length;
-    K.$('#castleSub').textContent = `${WINGS.filter((w) => K.rooms.some((r) => (r.wing || 'hazine') === w.id && visible(r))).length} kanat, ${n} oda. Bazı kapılar sadece özel günlerde, bazıları sadece gece açılıyor, biri de iyi saklanmış. Acele etme; bu kale her gün biraz değişiyor.`;
+      })
+      .join('');
+    // Hızlı raflar: son girdiklerin ve henüz girmediklerin
+    const last = K.store.get('lastVisit', {});
+    const all = K.rooms.filter((r) => visible(r) && !r.secret);
+    const recent = all.filter((r) => last[r.id]).sort((a, b) => last[b.id] - last[a.id]).slice(0, 10);
+    const unseen = all.filter((r) => !visited[r.id] && r.id !== 'panel');
+    const q = [];
+    if (recent.length >= 3) q.push(['Son girdiklerin', recent, 'recent']);
+    if (unseen.length && unseen.length < all.length) q.push([`Henüz girmediklerin · ${unseen.length}`, unseen.slice(0, 14), 'unseen']);
+    K.$('#shelfQuick').innerHTML = q.map(([t, rooms, cls]) => `<section class="qshelf ${cls}"><p class="qshelf-t">${K.esc(t)}</p><nav class="doors row mini">${rooms.map((r) => doorHTML(r, visited)).join('')}</nav></section>`).join('');
+    const n = all.length;
+    K.$('#castleSub').textContent = `${wings.length} kanat, ${n} oda. Haritada bir kuleye dokun ya da aşağıdaki raflarda gez. Bazı kapılar sadece özel günlerde, bazıları sadece gece açılıyor, biri de iyi saklanmış.`;
+    castleMap(wings, visited);
     initTilt();
+  }
+  /* ---------------- Kale haritası: her kanat bir kule; gökyüzü Bakü saatine göre ---------------- */
+  function castleMap(wings, visited) {
+    const box = K.$('#castleMap');
+    if (!box) return;
+    const h = T.baku().h;
+    const phase = h >= 20 || h < 6 ? 'night' : h < 8 ? 'dawn' : h >= 17 ? 'dusk' : 'day';
+    const W = 1200, base = 392, n = wings.length;
+    const gap = (W - 120) / Math.max(1, n);
+    const mid = (n - 1) / 2;
+    const L = '#4A2138';
+    const towers = wings.map((w, i) => {
+      const rooms = wingRooms(w);
+      const fresh = rooms.filter((r) => !visited[r.id]).length;
+      const hot = rooms.filter((r) => visited[r.id] && r.badge && r.badge()).length;
+      const x = 60 + gap * (i + 0.5);
+      const tw = Math.min(118, gap * 0.78);
+      const th = 150 + (mid - Math.abs(i - mid)) * 26 + (w.id === 'kalp' ? 30 : 0);
+      const top = base - th;
+      const cols = 2, nw = Math.min(8, rooms.length);
+      const wins = Array.from({ length: nw }, (_, k) => {
+        const cx = x + (k % cols ? tw * 0.2 : -tw * 0.2);
+        const cy = top + 78 + Math.floor(k / cols) * 30;
+        if (cy > base - 52) return '';
+        const lit = k < fresh ? 'new' : phase === 'night' || phase === 'dusk' ? 'lit' : '';
+        return `<path class="km-win ${lit}" d="M${cx - 7} ${cy + 10} V${cy} A7 7 0 0 1 ${cx + 7} ${cy} V${cy + 10} Z"/>`;
+      }).join('');
+      const merl = Array.from({ length: 5 }, (_, k) => `<rect x="${x - tw / 2 + k * (tw / 4.5) - 1}" y="${top - 12}" width="${tw / 7}" height="14" rx="2" fill="#FFF7FA" stroke="${L}" stroke-width="3"/>`).join('');
+      const badge = fresh + hot;
+      return `<g class="km-t" data-wing="${w.id}" tabindex="0" role="button" aria-label="${K.esc(w.title)}: ${rooms.length} oda${fresh ? `, ${fresh} yeni` : ''}" style="--wing:${w.color}">
+        <path class="km-flag" d="M${x} ${top - 118} L${x + 30} ${top - 110} L${x} ${top - 100} Z" fill="${w.color}" stroke="${L}" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M${x} ${top - 84} V${top - 120}" stroke="${L}" stroke-width="3" stroke-linecap="round"/>
+        <path d="M${x - tw / 2 - 10} ${top - 10} L${x} ${top - 86} L${x + tw / 2 + 10} ${top - 10} Z" fill="${w.color}" stroke="${L}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M${x - tw / 4} ${top - 34} L${x} ${top - 72}" stroke="rgba(255,255,255,.45)" stroke-width="5" stroke-linecap="round"/>
+        ${merl}
+        <rect class="km-body" x="${x - tw / 2}" y="${top}" width="${tw}" height="${th}" fill="#FFF7FA" stroke="${L}" stroke-width="3"/>
+        <rect x="${x - tw / 2}" y="${top}" width="${tw}" height="${th}" fill="${w.color}" opacity=".16"/>
+        <circle cx="${x}" cy="${top + 36}" r="24" fill="#fff" stroke="${L}" stroke-width="3"/>
+        <svg x="${x - 17}" y="${top + 19}" width="34" height="34" viewBox="0 0 64 64">${A.ICONS[w.icon] || ''}</svg>
+        ${wins}
+        <path d="M${x - 15} ${base} V${base - 26} A15 15 0 0 1 ${x + 15} ${base - 26} V${base} Z" fill="${L}"/>
+        ${badge ? `<g class="km-badge"><circle cx="${x + tw / 2 - 4}" cy="${top - 4}" r="15" fill="#E3174D" stroke="#fff" stroke-width="3"/><text x="${x + tw / 2 - 4}" y="${top + 1}" text-anchor="middle">${badge}</text></g>` : ''}
+        <g class="km-lbl"><rect x="${x - 58}" y="${base + 14}" width="116" height="30" rx="15" fill="#fff" stroke="${w.color}" stroke-width="3"/><text x="${x}" y="${base + 34}" text-anchor="middle">${K.esc(SHORT[w.id] || w.title)}</text></g>
+      </g>`;
+    });
+    const stars = phase === 'night' ? Array.from({ length: 40 }, (_, i) => `<circle class="km-star" cx="${(i * 131) % W}" cy="${(i * 47) % 200 + 10}" r="${1 + (i % 3) * 0.6}" style="--d:${(i % 7) * 0.4}s"/>`).join('') : '';
+    const moon = A.moonPhase ? A.moonPhase(T.now()) : null;
+    const orb = phase === 'night' ? `<circle cx="1060" cy="80" r="34" fill="#FFF2B8"/><circle cx="${1060 + 26 * (1 - (moon ? moon.illum : 0.5))}" cy="72" r="32" fill="#2A2266" opacity="${moon && moon.illum > 0.95 ? 0 : 0.9}"/>` : `<circle class="km-sun" cx="1060" cy="${phase === 'day' ? 76 : 150}" r="40" fill="${phase === 'day' ? '#FFD34E' : '#FFB36B'}"/>`;
+    box.innerHTML = `<div class="kmap-scroll"><svg class="kmap ${phase}" viewBox="0 0 ${W} 460" role="group" aria-label="Kalenin haritası">
+      <defs><linearGradient id="kmSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s1"/><stop offset="1" class="s2"/></linearGradient></defs>
+      <rect width="${W}" height="460" fill="url(#kmSky)"/>${stars}${orb}
+      <g class="km-clouds"><path d="M120 110 q20 -30 50 -10 q30 -26 56 4 q30 0 26 22 h-150 q-10 -14 18 -16 Z" /><path d="M620 70 q18 -26 44 -8 q26 -22 48 4 q26 0 22 18 h-128 q-8 -12 14 -14 Z" /><path d="M860 150 q16 -22 38 -6 q22 -20 42 4 q22 0 18 16 h-110 q-8 -12 12 -14 Z" /></g>
+      <path d="M0 330 C180 280 330 300 480 318 C660 340 820 280 1000 300 C1100 312 1160 320 1200 314 V460 H0 Z" class="km-hill1"/>
+      <rect x="40" y="${base - 46}" width="${W - 80}" height="46" fill="#FFF1F6" stroke="${L}" stroke-width="3"/>
+      ${Array.from({ length: 36 }, (_, k) => `<rect x="${44 + k * 31.6}" y="${base - 58}" width="18" height="14" rx="2" fill="#FFF1F6" stroke="${L}" stroke-width="2.5"/>`).join('')}
+      <path d="M0 ${base + 4} C300 ${base - 6} 900 ${base + 14} 1200 ${base} V460 H0 Z" class="km-ground"/>
+      ${towers.join('')}
+    </svg></div>`;
+    const sc = K.$('.kmap-scroll', box);
+    const wide = sc.scrollWidth > sc.clientWidth + 4;
+    box.classList.toggle('scrollable', wide);
+    if (wide) {
+      sc.scrollLeft = (sc.scrollWidth - sc.clientWidth) / 2;
+      box.insertAdjacentHTML('beforeend', '<p class="kmap-hint">‹ Kaydır · bir kuleye dokun ›</p>');
+      setTimeout(() => sc.addEventListener('scroll', () => box.classList.add('moved'), { once: true, passive: true }), 400);
+    }
   }
   // Masaüstünde kapılar imlece doğru hafifçe eğilir
   function initTilt() {
@@ -661,7 +754,36 @@
       history.pushState(null, '', location.pathname + location.search);
       closeRoom();
     });
-    K.$('#wings').addEventListener('click', (e) => {
+    const castle = K.$('.castle');
+    const toWing = (id) => {
+      const el = K.$('#wing-' + id);
+      if (!el) return;
+      K.audio.sfx.whoosh();
+      el.scrollIntoView({ behavior: K.reduced ? 'auto' : 'smooth', block: 'start' });
+      el.classList.remove('flash');
+      void el.offsetWidth;
+      el.classList.add('flash');
+    };
+    castle.addEventListener('keydown', (e) => {
+      const t = e.target.closest('.km-t');
+      if (t && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        toWing(t.dataset.wing);
+      }
+    });
+    castle.addEventListener('click', (e) => {
+      const t = e.target.closest('.km-t');
+      if (t) return toWing(t.dataset.wing);
+      const sh = e.target.closest('[data-shelf]');
+      if (sh) {
+        const open = K.store.get('shelfOpen', {});
+        open[sh.dataset.shelf] = !open[sh.dataset.shelf];
+        K.store.set('shelfOpen', open);
+        K.audio.sfx.tap();
+        renderDoors();
+        if (!open[sh.dataset.shelf]) K.$('#wing-' + sh.dataset.shelf).scrollIntoView({ block: 'start' });
+        return;
+      }
       const d = e.target.closest('.door');
       if (!d) return;
       e.preventDefault();

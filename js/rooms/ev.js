@@ -294,7 +294,7 @@
     );
   });
   K.on('presence', () => K.activeRoom === 'ev' && !drag && render());
-  K.ev = { count: () => state().length, load: loadAll };
+  K.ev = { count: () => state().length, load: loadAll, def: itemDef, roomName: (id) => (ROOMS.find((r) => r[0] === id) || [])[1] || '' };
 
   K.room({
     id: 'ev',

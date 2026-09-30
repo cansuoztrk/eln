@@ -43,6 +43,17 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 
 ---
 
+## Kale 2.0: ana salon ve her yerden erişilenler
+
+- **Kale Haritası**: "Kalenin kanatları"nın başında, her kanadın bir kule olduğu çizimli bir kale. Gökyüzü Bakü saatine göre değişir (sabah, gündüz, akşam, gece; gece yıldızlar ve ayın evresi). Kulelerin pencereleri odalardır: henüz girilmemiş odaların pencereleri altın gibi parlar, kulenin üstünde yeni ya da hareketli oda sayısı yazar. Kuleye dokununca o kanadın rafına gidilir. Telefonda harita yana kaydırılır.
+- **Raflar**: Her kanat artık tek sıra, yana kayan bir raf ("Hepsini göster" ile eski ızgaraya açılır; seçim hatırlanır). Üstte **Son girdiklerin** ve **Henüz girmediklerin** rafları. Ana salon telefonda yarı yarıya kısaldı.
+- **Hikâyeler** (bulut): Ana salonun üstünde halkalar. Onun halkası onun son iki gününü tam ekran, dokunarak ilerleyen bir hikâye olarak oynatır: hava durumu, kartpostal, Bakü Günlüğü fotoğrafı, günün sesi, şarkı, 21:21, sofra, sahne, evdeki eşya... (mühürlü şeylerin içeriği açılmaz, sadece "bir şey bıraktı" der). İkiniz de **fotoğraf ya da yazıyla hikâye paylaşırsınız** (24 saat halkada, sonra arşivde). Onun hikâyesine tepki (❤️ 🥹 😂 😍 🤗) ya da yanıt bırakılır; paylaşan "gördü" bilgisini, tepkileri ve yanıtları görür. Basılı tutunca durur, aşağı kaydırınca kapanır. **Öne çıkanlar**: kartpostallar, Bakü Günlüğü, kabin şeritleri, sahneler, ilkler ve hikâye arşivi.
+- **Alt menü**: Salon · Kanatlar · Kitty'ye Sor · Gün Gün · onun kulesi. Aşağı kaydırınca kısılır, yukarı kaydırınca geri gelir.
+- **Yanında** (bulut): Menüdeki onun kulesinde yeşil nokta varsa kalede; hangi odadaysa orada yazar. Dokununca: şehrinin saati, içinin havası, (Ardoş için) ders programı, **Yanına git** (aynı odaya ışınlanır), **Dürt** (onun ekranında kenarlardan kalpler yükselir, telefonu titrer, "Ben de ♥" ile geri dürtülür) ve Eln için **Kaleye çağır** (Ardoş'un telefonuna bildirim). Aynı odadaysanız oda pembe bir ışıkla çevrilir; odalarda onun kulesi köşede küçük bir baloncuk olarak durur.
+- **Kitty'ye Sor**: Kalenin her köşesinde arama. Odalar, sebepler, sohbetlerimiz, mektupların adları, şarkılar, portreler, izler, kuponlar, günün soruları, ilkler, film bölümleri, masal ve sözlük; ayrıca kısayollar (müzik, kale turu, hikâye paylaş, dürt, kalenin rengi) ve "Şansıma bir kapı". Türkçe harf duyarsız; masaüstünde Ctrl+K ya da "/".
+- **Gün Gün Biz** (Anılar, bulut): Tanıştığınız günden bugüne her gün bir kare; kare ne kadar koyuysa o gün kalede o kadar çok an var. Önemli günlerde kalp. Bir kareye dokununca o günün bütün anları saat saat açılır (kimin yaptığı, fotoğrafı, odasına git); önceki/sonraki gün. Üstte toplam an, ikinizin de iz bıraktığı günler, en uzun seri, en dolu gün. **Bir ay önce bugün** (ya da bir yıl): o günden bir an ana salonda kart olarak geri gelir.
+- **Kale turu** iki yeni adımla (hikâyeler, alt menü); kale haritası "kanatlar" adımında.
+
 ## Kalenin kanatları
 
 **Anılar Kanadı**
