@@ -125,9 +125,21 @@
     return `<button type="button" class="gg-back" data-gg="${k}">${pr && pr.img ? `<img src="${pr.img}" alt="">` : `<span class="gg-back-e">${mk ? '♥' : (pr && pr.emoji) || '♥'}</span>`}<span><small>${K.esc(label)} · ${K.esc(T.fmt(k))}</small><b>${K.esc(mk ? mk[0].title : pr ? pr.title : '')}</b>${l.length ? `<em>${l.length} an</em>` : ''}</span></button>`;
   }
 
+  // Aynı kişinin aynı türden art arda anları tek satır: "Seni düşündü ×12"
+  function collapse(l) {
+    const out = [];
+    l.forEach((x) => {
+      const p = out.find((y) => y.who === x.who && y.kind === x.kind && (x.kind === 'dusun' || x.kind === 'ozlem' || x.kind === 'dakika' || x.kind === 'r36'));
+      if (p) {
+        p.n = (p.n || 1) + 1;
+        p.title = p.title.replace(/ ×\d+$/, '') + ` ×${p.n}`;
+      } else out.push(Object.assign({}, x));
+    });
+    return out;
+  }
   /* ---------- Günün anları ---------- */
   function day(k) {
-    const l = byDay[k] || [];
+    const l = collapse(byDay[k] || []);
     const mk = milestones()[k];
     const d = utc(k);
     const wd = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'][d.getUTCDay()];

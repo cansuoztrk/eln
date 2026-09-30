@@ -884,10 +884,11 @@
     box.hidden = false;
     box.innerHTML = list
       .map(
-        (s) => `<div class="special-card">${A.icon(s.icon)}<div><h3>${K.esc(s.title)}</h3><p>${K.esc(s.text)}</p>
-          <div class="special-actions"><a class="btn small" href="#${s.room}">${K.esc(s.cta || 'Hemen git')}</a>${s.action === 'moon' ? `<button class="btn soft small" data-moon>${A.ui('heart')} Şu an aya bakıyorum</button>` : ''}</div></div></div>`
+        (s, i) => `<div class="special-card">${A.icon(s.icon)}<div><h3>${K.esc(s.title)}</h3><p>${K.esc(s.text)}</p>
+          <div class="special-actions">${s.run ? `<button type="button" class="btn small" data-sp-run="${i}">${K.esc(s.cta || 'Hemen')}</button>` : `<a class="btn small" href="#${s.room}">${K.esc(s.cta || 'Hemen git')}</a>`}${s.action === 'moon' ? `<button class="btn soft small" data-moon>${A.ui('heart')} Şu an aya bakıyorum</button>` : ''}</div></div></div>`
       )
       .join('');
+    K.$$('[data-sp-run]', box).forEach((b) => b.addEventListener('click', () => list[+b.dataset.spRun].run()));
     const mb = K.$('[data-moon]', box);
     mb &&
       mb.addEventListener('click', async () => {

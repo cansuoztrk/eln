@@ -1,0 +1,163 @@
+/* Eln'in Krallığı — 19. aşama: Kalp Menüsü, Alevimiz, Kale Radyosu, İki Kıyı Pinpon, Günün Kelimesi */
+
+/* ---------- Alt menü: ortadaki kalp ---------- */
+.dock { align-items: center; }
+.dock .dock-kalp { position: relative; flex: 0 0 64px; align-self: stretch; margin-top: -22px; padding: 0; background: none; border-radius: 50%; box-shadow: none; }
+.dock .dock-kalp:hover { background: none; }
+.dk-heart { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FF7FAE, #E3174D 70%); box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--line), 0 12px 24px -8px rgba(227, 23, 77, 0.65); animation: dkPulse 2.8s ease-in-out infinite; }
+.dk-heart svg { width: 32px; height: 28px; fill: #fff; filter: drop-shadow(0 2px 2px rgba(120, 0, 40, 0.3)); }
+@keyframes dkPulse { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.08); } 24% { transform: scale(0.98); } 36% { transform: scale(1.05); } 50% { transform: scale(1); } }
+.dock-kalp.beat .dk-heart { animation: dkBeat 0.7s var(--ease-spring); }
+@keyframes dkBeat { 30% { transform: scale(1.3); } }
+.dock-kalp:active .dk-heart { transform: scale(0.92); }
+#dockFlame { position: absolute; top: -8px; right: -10px; padding: 2px 6px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 2px #FFB36B; font: 700 11px/1.3 var(--font-display); font-style: normal; color: #C4531C; white-space: nowrap; }
+body.kmenu-open .dock { z-index: 166; }
+@media (prefers-reduced-motion: reduce) { .dk-heart { animation: none; } }
+
+/* ---------- Kalp menüsü ---------- */
+.kmenu { position: fixed; inset: 0; z-index: 165; display: grid; justify-items: center; align-items: end; padding: 0 12px calc(var(--dock-h) + 38px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
+.kmenu-back { position: absolute; inset: 0; background: rgba(74, 33, 56, 0.35); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.25s; pointer-events: auto; }
+.kmenu.in .kmenu-back { opacity: 1; }
+.kmenu-panel { position: relative; width: min(430px, 100%); padding: 16px 14px 12px; border-radius: 30px; background: var(--paper); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--line), 0 30px 60px -20px rgba(74, 33, 56, 0.55); transform: translateY(30px) scale(0.92); transform-origin: 50% 100%; opacity: 0; transition: transform 0.4s var(--ease-spring), opacity 0.2s; pointer-events: auto; }
+.kmenu.in .kmenu-panel { transform: none; opacity: 1; }
+.kmenu-to { display: flex; align-items: center; gap: 10px; margin: 0 4px 14px; }
+.kmenu-to .k-av { width: 40px; height: 40px; }
+.kmenu-to span { display: grid; line-height: 1.2; }
+.kmenu-to small { font: 700 11px/1.2 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--plum-soft); }
+.kmenu-to b { font: 600 16px/1.2 var(--font-display); color: var(--plum); }
+.kmenu-arc { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; align-items: end; margin-bottom: 12px; }
+.kmenu-b { display: grid; justify-items: center; gap: 4px; padding: 0; border: 0; background: none; color: var(--plum); cursor: pointer; opacity: 0; transform: translateY(20px) scale(0.6); transition: transform 0.45s var(--ease-spring), opacity 0.25s; transition-delay: calc(var(--i) * 40ms); }
+.kmenu.in .kmenu-b { opacity: 1; transform: translateY(var(--lift, 0)) scale(1); }
+.kmenu-b:nth-child(1), .kmenu-b:nth-child(5) { --lift: 16px; }
+.kmenu-b:nth-child(2), .kmenu-b:nth-child(4) { --lift: 4px; }
+.kmenu-b span { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(160deg, #fff, var(--petal)); box-shadow: 0 0 0 2px var(--line), 0 8px 16px -8px rgba(176, 45, 96, 0.5); font-size: 28px; transition: transform 0.2s var(--ease-spring); }
+.kmenu-b:hover span { transform: scale(1.08); }
+.kmenu-b:active span { transform: scale(0.9); }
+.kmenu-b small { font: 600 11.5px/1.15 var(--font-display); text-align: center; }
+.kmenu-b.sent span { animation: kmSent 0.6s var(--ease-spring); background: linear-gradient(160deg, #FFD0E1, #FF8FB8); }
+@keyframes kmSent { 40% { transform: scale(1.25) rotate(-8deg); } }
+.kmenu-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; padding: 10px 4px 4px; border-top: 2px dashed var(--line); }
+.kmenu-row button { display: grid; justify-items: center; gap: 3px; padding: 8px 2px; border: 0; border-radius: 16px; background: none; color: var(--plum); cursor: pointer; }
+.kmenu-row button:hover { background: var(--blush); }
+.kmenu-row .ic { width: 34px; height: 34px; }
+.kmenu-row small { font: 600 11.5px/1.1 var(--font-display); }
+.kmenu-hint { margin: 8px 4px 0; font-size: 11.5px; line-height: 1.35; color: var(--plum-faint); text-align: center; }
+
+/* ---------- Alev ve bugünün sayaçları ---------- */
+.kalp-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px auto 12px; justify-content: center; position: relative; z-index: 4; }
+.kb-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 0; background: #fff; box-shadow: 0 0 0 2px var(--line); color: var(--plum); font: 500 13px/1.2 var(--font-body); max-width: 100%; }
+.kb-chip b { font-family: var(--font-display); }
+.kb-chip.alev { cursor: pointer; font-weight: 600; }
+.kb-chip.alev.lit { background: linear-gradient(90deg, #FFE3C2, #FFD0E1); box-shadow: 0 0 0 2px #FFB36B; }
+.kb-chip.alev.lit .kb-fl { animation: flick 1.6s ease-in-out infinite alternate; display: inline-block; }
+.kb-chip.alev.cold { filter: grayscale(0.7); }
+@keyframes flick { to { transform: scale(1.18) rotate(-6deg); } }
+.alev-big { display: flex; align-items: baseline; justify-content: center; gap: 6px; margin: 0 0 6px; }
+.alev-big span { font-size: 54px; filter: grayscale(0.6); }
+.alev-big.lit span { filter: none; animation: flick 1.4s ease-in-out infinite alternate; }
+.alev-big b { font: 700 64px/1 var(--font-display); color: #C4531C; font-variant-numeric: tabular-nums; }
+.alev-big small { font: 600 18px var(--font-display); color: var(--plum-soft); }
+.alev-sheet h2 { margin: 0; text-align: center; font: 600 24px/1.2 var(--font-display); color: var(--plum); }
+.alev-sheet .muted { text-align: center; }
+.alev-today { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 8px; }
+.alev-today li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 14px; background: var(--blush); }
+.alev-today li.ok { background: #E3F6EC; }
+.alev-today .k-av { width: 34px; height: 34px; }
+.alev-next { text-align: center; font-size: 14px; color: var(--plum-soft); }
+.alev-sheet .btn { width: 100%; justify-content: center; }
+.yan-pulse.soft { animation: none; box-shadow: none; }
+
+/* ---------- Kale Radyosu ---------- */
+.ry-now { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.ry-disc { position: relative; width: 116px; height: 116px; flex: none; border-radius: 50%; background: repeating-radial-gradient(circle, #2B2024 0 2px, #3A2B31 2px 4px); box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.5); }
+.ry-disc span { position: absolute; inset: 36%; border-radius: 50%; background: radial-gradient(circle, #2B2024 0 12%, #FF8FB8 13% 100%); box-shadow: 0 0 0 3px #fff; }
+.ry-disc.spin { animation: rySpin 3.2s linear infinite; }
+@keyframes rySpin { to { transform: rotate(360deg); } }
+.ry-meta { flex: 1 1 200px; min-width: 0; }
+.ry-meta h3 { margin: 2px 0; font: 600 24px/1.2 var(--font-display); color: var(--plum); }
+.ry-artist { margin: 0 0 6px; color: var(--plum-soft); }
+.ry-with { margin: 0 0 10px; font-size: 13.5px; color: var(--plum-soft); }
+.ry-with .dot { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; background: #3FA37A; }
+.ry-tv { margin: 14px 0; }
+.ry-reacts { position: relative; display: flex; justify-content: center; gap: 10px; margin: 0 0 14px; }
+.ry-reacts button { width: 50px; height: 50px; border-radius: 50%; border: 0; background: #fff; box-shadow: 0 0 0 2px var(--line); font-size: 24px; cursor: pointer; transition: transform 0.2s var(--ease-spring); }
+.ry-reacts button:active { transform: scale(1.3); }
+.ry-fly { position: absolute; left: 0; right: 0; bottom: 100%; height: 240px; pointer-events: none; overflow: hidden; }
+.ry-fly i { position: absolute; bottom: 0; left: var(--x); font-style: normal; font-size: 34px; animation: ryFly 2.6s var(--ease-out) forwards; }
+@keyframes ryFly { from { transform: translateY(0) scale(0.6); opacity: 0; } 15% { opacity: 1; } to { transform: translateY(-230px) scale(1.2); opacity: 0; } }
+.ry-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ry-list li { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 14px; }
+.ry-list li.on { background: var(--petal); }
+.ry-list li button { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 0; background: var(--bow); color: #fff; cursor: pointer; }
+.ry-list li.on button { background: var(--plum); }
+.ry-list li div { display: grid; min-width: 0; flex: 1; }
+.ry-list li b { font: 600 15px/1.25 var(--font-display); }
+.ry-list li span { font-size: 13px; color: var(--plum-soft); }
+.ry-list li small { font-size: 12px; color: var(--plum-faint); }
+.ry-list li.empty { display: block; color: var(--plum-soft); }
+
+/* ---------- İki Kıyı Pinpon ---------- */
+.pp-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.pp-score { font: 600 18px/1.2 var(--font-display); color: var(--plum); font-variant-numeric: tabular-nums; }
+.pp-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pp-tally { width: 100%; color: var(--plum-soft); }
+.pp-stage { display: grid; justify-items: center; }
+.pp-stage canvas { display: block; width: min(420px, 100%); aspect-ratio: 360 / 560; max-width: 100%; border-radius: 22px; box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--line), var(--shadow); touch-action: none; background: #FFE3EE; }
+@media (max-height: 760px) { .pp-stage canvas { width: min(360px, 100%); } }
+
+/* ---------- Günün Kelimesi ---------- */
+.kl-wrap { display: grid; gap: 16px; align-items: start; }
+@media (min-width: 820px) { .kl-wrap { grid-template-columns: minmax(0, 1fr) 260px; } }
+.kl-main { display: grid; gap: 14px; justify-items: center; }
+.kl-board { display: grid; gap: 6px; }
+.kl-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.kl-t { display: grid; place-items: center; width: min(58px, 16vw); aspect-ratio: 1; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 2px var(--line); font: 700 26px/1 var(--font-display); color: var(--plum); text-transform: none; }
+.kl-t.typed { box-shadow: inset 0 0 0 2.5px var(--plum-soft); animation: klPop 0.12s ease; }
+.kl-t.g { background: #3FA37A; color: #fff; box-shadow: none; }
+.kl-t.y { background: #E8B838; color: #fff; box-shadow: none; }
+.kl-t.x { background: #BBA9B3; color: #fff; box-shadow: none; }
+.kl-row.flip .kl-t { animation: klFlip 0.5s ease both; animation-delay: calc(var(--i) * 110ms); }
+.kl-row.shake { animation: klShake 0.4s; }
+@keyframes klPop { 50% { transform: scale(1.1); } }
+@keyframes klFlip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+@keyframes klShake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.kl-board.small .kl-t { width: 30px; border-radius: 7px; font-size: 14px; }
+.kl-board.small { gap: 4px; }
+.kl-board.small .kl-row { gap: 4px; }
+.kl-res { margin: 0; text-align: center; font: 600 17px/1.4 var(--font-display); color: var(--plum); }
+.kl-res.won { color: #2E8B6A; }
+.kl-res .hand { font-size: 21px; color: var(--plum-soft); }
+.kl-kb { display: grid; gap: 6px; width: min(560px, 100%); }
+.kl-kb > div { display: flex; gap: 4px; justify-content: center; }
+.kl-kb button { flex: 1 1 0; min-width: 0; height: 50px; padding: 0; border: 0; border-radius: 10px; background: #fff; box-shadow: 0 0 0 1.5px var(--line), 0 3px 0 var(--line); color: var(--plum); font: 600 17px var(--font-display); cursor: pointer; }
+.kl-kb button.wide { flex: 1.5 1 0; font-size: 20px; }
+.kl-kb button:active { transform: translateY(2px); box-shadow: 0 0 0 1.5px var(--line); }
+.kl-kb button.g { background: #3FA37A; color: #fff; box-shadow: 0 3px 0 #2E7A5A; }
+.kl-kb button.y { background: #E8B838; color: #fff; box-shadow: 0 3px 0 #B98E20; }
+.kl-kb button.x { background: #D8CBD2; color: #fff; box-shadow: 0 3px 0 #BBA9B3; }
+.kl-side { display: grid; gap: 12px; }
+.kl-side .card { display: grid; justify-items: center; gap: 8px; }
+.kl-stats { display: grid; gap: 6px; }
+.kl-stats span { padding: 8px 12px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 2px var(--line); font-size: 13.5px; color: var(--plum-soft); }
+.kl-stats b { color: var(--plum); font-family: var(--font-display); }
+
+/* Cilalar */
+body.kmenu-open .toasts { bottom: auto; top: calc(70px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 480px) {
+  .room-kelime .room-intro p + p { display: none; }
+  .kl-t { width: min(50px, 12.6vw); font-size: 23px; }
+  .kl-kb button { height: 46px; font-size: 16px; }
+  .kl-main { gap: 10px; }
+}
+/* Durumum */
+.dock-yan { position: relative; }
+.dk-st { position: absolute; top: -2px; right: calc(50% - 26px); font-size: 15px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2)); }
+.kb-chip.durum { background: linear-gradient(90deg, #EEF7FF, #fff); box-shadow: 0 0 0 2px #BFE6FF; }
+.kb-chip small { color: var(--plum-faint); font-size: 11.5px; }
+.durum-sheet h2 { margin: 2px 0 4px; font: 600 24px/1.2 var(--font-display); color: var(--plum); }
+.durum-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin: 12px 0; }
+.durum-grid button { display: grid; justify-items: center; gap: 4px; padding: 10px 4px; border-radius: 16px; border: 2px solid var(--line); background: #fff; color: var(--plum); cursor: pointer; }
+.durum-grid button span { font-size: 26px; line-height: 1.1; }
+.durum-grid button small { font: 600 12px/1.2 var(--font-display); text-align: center; }
+.durum-grid button.on { border-color: var(--bow); background: var(--petal); }
+.kl-main > div { width: 100%; display: grid; justify-items: center; gap: 10px; }

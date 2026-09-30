@@ -56,7 +56,7 @@
     async function start() {
       const fid = 'pk' + ++seq;
       const auto = o.autoplay === false ? 0 : 1;
-      box.innerHTML = `<div class="pk-screen"><iframe id="${fid}" src="https://www.youtube-nocookie.com/embed/${ids[i]}?enablejsapi=1&autoplay=${auto}&playsinline=1&rel=0&modestbranding=1&origin=${encodeURIComponent(location.origin)}" title="${K.esc([song.artist, song.title].filter(Boolean).join(' · '))}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>${o.hint === false ? '' : '<p class="pk-hint">Başlamazsa videoya bir kez dokun.</p>'}`;
+      box.innerHTML = `<div class="pk-screen"><iframe id="${fid}" src="https://www.youtube-nocookie.com/embed/${ids[i]}?enablejsapi=1&autoplay=${auto}&playsinline=1&rel=0&modestbranding=1${o.sync ? `&start=${Math.max(0, Math.floor(o.sync() || 0))}` : ''}&origin=${encodeURIComponent(location.origin)}" title="${K.esc([song.artist, song.title].filter(Boolean).join(' · '))}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>${o.hint === false ? '' : '<p class="pk-hint">Başlamazsa videoya bir kez dokun.</p>'}`;
       if (K.audio.music.on) K.audio.music.stop(false);
       const YT = await api();
       if (dead || !YT || !document.getElementById(fid)) return;
@@ -74,6 +74,13 @@
             onStateChange: (e) => {
               if (e.data === 1) {
                 if (K.audio.music.on) K.audio.music.stop(false);
+                // Birlikte dinlerken: çalan yer ortak saatten 2 saniyeden fazla saparsa oraya atla
+                if (o.sync) {
+                  try {
+                    const want = o.sync();
+                    if (want != null && Math.abs(e.target.getCurrentTime() - want) > 2) e.target.seekTo(want, true);
+                  } catch (x) {}
+                }
                 const h = K.$('.pk-hint', box);
                 if (h) h.hidden = true;
                 o.onPlay && o.onPlay();

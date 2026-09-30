@@ -91,6 +91,9 @@
     });
   });
 
+  // Kale Radyosu için: çalınabilen bütün şarkılar
+  K.sarkidefteri = { songs: () => songs().filter((s) => s.playable) };
+
   K.room({
     id: 'sarkidefteri',
     wing: 'anilar',

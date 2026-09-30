@@ -46,7 +46,8 @@
     document.body.classList.toggle('same-room', Boolean(s));
     const bub = K.$('#yanBubble');
     if (bub) {
-      bub.hidden = !(on && K.activeRoom);
+      // Alt kenarı kullanan oyunlarda (kelime klavyesi, pinpon raketi) baloncuk gizlenir
+      bub.hidden = !(on && K.activeRoom) || ['kelime', 'pinpon', 'nerd'].includes(K.activeRoom);
       bub.classList.toggle('same', Boolean(s));
       K.$('.yb-t', bub).textContent = s ? YN().same || 'Buradasınız' : w && w.room ? w.text : 'Kalede';
     }
@@ -97,7 +98,7 @@
       cls: 'yan-sheet',
       html: `<div class="yan-top">${K.avatar(o, 'big yan-av ' + (w ? 'on' : ''))}<div><p class="card-eyebrow">${K.esc(city)} · ${K.esc(K.time.hm(tz))}</p><h2>${K.esc(nameOf(o))}</h2>
           <p class="yan-st">${w ? `<span class="dot on"></span>${r ? `Şu an <b>${K.esc(w.text)}</b> odasında` : w.text === 'Ana salonda' ? 'Şu an ana salonda' : 'Şu an kalede'}` : `<span class="dot"></span>Kalede değil${lastSeen ? ` · son görülme ${K.esc(K.ago(lastSeen))}` : ''}`}</p></div></div>
-        <ul class="yan-facts">${wxT ? `<li><span>${K.hava.emo[wxT[0]]}</span>İçi bugün ${K.esc(wxT[1].toLocaleLowerCase('tr'))}${wx.data.note ? `: "${K.esc(wx.data.note)}"` : ''}</li>` : ''}${plan ? `<li><span>📅</span>${K.esc(plan)}</li>` : ''}</ul>
+        <ul class="yan-facts">${K.durum && K.durum.of(o) ? `<li><span>${K.durum.of(o).data.emoji}</span>${K.esc(K.durum.of(o).data.text)} · ${K.esc(K.ago(K.durum.of(o).at))}</li>` : ''}${wxT ? `<li><span>${K.hava.emo[wxT[0]]}</span>İçi bugün ${K.esc(wxT[1].toLocaleLowerCase('tr'))}${wx.data.note ? `: "${K.esc(wx.data.note)}"` : ''}</li>` : ''}${plan ? `<li><span>📅</span>${K.esc(plan)}</li>` : ''}</ul>
         <div class="yan-acts">
           ${canGo ? `<a class="btn red" href="#${r.id}" data-close>${A.ui('next')} Yanına git: ${K.esc(K.val(r.title))}</a>` : ''}
           <button type="button" class="btn ${canGo ? 'soft' : 'red'}" data-yan-durt>${A.ui('heart')} Dürt</button>
@@ -122,28 +123,50 @@
   function dock() {
     if (K.$('#dock')) return;
     const d = K.el(`<nav class="dock" id="dock" aria-label="Kale menüsü">
-      <button type="button" data-dock="home" aria-label="Ana salon">${A.ui('home')}<span>Salon</span></button>
-      <button type="button" data-dock="map" aria-label="Kalenin kanatları">${A.ui('castle')}<span>Kanatlar</span></button>
-      <button type="button" data-dock="ara" class="dock-ara" aria-label="Kitty'ye Sor">${A.ui('search')}<span>Ara</span></button>
+      <button type="button" data-dock="home" aria-label="Ana salon; bir daha dokununca kalenin haritası">${A.ui('home')}<span>Salon</span></button>
+      <button type="button" data-dock="ara" aria-label="Kitty'ye Sor">${A.ui('search')}<span>Ara</span></button>
+      <button type="button" data-dock="kalp" class="dock-kalp" aria-label="Kalp menüsü (basılı tut: dürt)"><i class="dk-heart" aria-hidden="true"><svg viewBox="-13 -14 26 23"><path d="M0 7 C-11 -1 -11 -12 -4.5 -12 C-1.5 -12 0 -9.5 0 -8 C0 -9.5 1.5 -12 4.5 -12 C11 -12 11 -1 0 7 Z"/></svg></i><em id="dockFlame" hidden></em></button>
       <button type="button" data-dock="gungun" aria-label="Gün Gün Biz">${A.ui('cal')}<span>Gün Gün</span></button>
-      <button type="button" data-dock="yan" class="dock-yan" aria-label="${K.esc(nameOf(other()))}">${K.avatar(other(), 'yan-av')}<span id="dockYanL">${K.esc(nameOf(other()))}</span></button>
+      <button type="button" data-dock="yan" class="dock-yan" aria-label="${K.esc(nameOf(other()))}">${K.avatar(other(), 'yan-av')}<b class="dk-st" id="dockSt" hidden></b><span id="dockYanL">${K.esc(nameOf(other()))}</span></button>
     </nav>`);
     const bub = K.el(`<button type="button" class="yan-bubble" id="yanBubble" hidden aria-label="${K.esc(nameOf(other()))} kalede">${K.avatar(other(), 'yan-av on')}<span class="yb-t"></span></button>`);
     document.body.appendChild(d);
     document.body.appendChild(bub);
     document.body.classList.add('has-dock');
+    // Kalp: dokun → menü, basılı tut → dürt
+    const heart = K.$('.dock-kalp', d);
+    let holdT = 0, held = false;
+    heart.addEventListener('pointerdown', () => {
+      held = false;
+      holdT = setTimeout(() => {
+        held = true;
+        heart.classList.add('beat');
+        setTimeout(() => heart.classList.remove('beat'), 700);
+        const r = heart.getBoundingClientRect();
+        K.fx.burst(r.left + r.width / 2, r.top, { count: 14, power: 6 });
+        nudge();
+      }, 480);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => heart.addEventListener(ev, () => clearTimeout(holdT)));
+    heart.addEventListener('contextmenu', (e) => e.preventDefault());
     d.addEventListener('click', (e) => {
       const b = e.target.closest('[data-dock]');
       if (!b) return;
-      K.audio.sfx.tap();
       const a = b.dataset.dock;
-      if (a === 'home' || a === 'map') {
-        if (K.activeRoom) location.hash = '';
+      if (a === 'kalp') {
+        if (held) return (held = false);
+        return K.kalp && K.kalp.openMenu();
+      }
+      K.audio.sfx.tap();
+      if (a === 'home') {
+        const wasRoom = Boolean(K.activeRoom);
+        if (wasRoom) location.hash = '';
         setTimeout(() => {
-          const el = a === 'map' ? K.$('#castleMap') : null;
+          // Zaten en üstteyken bir daha dokunmak kalenin haritasına indirir
+          const el = !wasRoom && window.scrollY < 200 ? K.$('#castleMap') : null;
           if (el) el.scrollIntoView({ behavior: K.reduced ? 'auto' : 'smooth', block: 'start' });
           else window.scrollTo({ top: 0, behavior: K.reduced ? 'auto' : 'smooth' });
-        }, K.activeRoom ? 480 : 0);
+        }, wasRoom ? 480 : 0);
       }
       if (a === 'ara') K.ara && K.ara.open();
       if (a === 'gungun') location.hash = 'gungun';

@@ -74,11 +74,19 @@
     round: (r) => ({ icon: 'pencil', room: 'gartic', emoji: '✏️', title: 'Gartic turu', text: r.data.win ? `"${r.data.word}" bilindi.` : 'Bilinemedi.', weight: 1 }),
     filmline: () => ({ icon: 'clapper', room: 'sinema', emoji: '🎞️', title: 'Filmdeki bir soruya cevap', text: 'Sen de cevaplayınca açılır.', weight: 1 }),
     hangi: () => null,
+    durum: (r) => (r.data.k ? { icon: 'chat', room: '', emoji: r.data.emoji, title: `Durumu: ${r.data.text}`, text: '', weight: 1 } : null),
+    selam: (r) => ({ icon: r.data.k === 'gece' ? 'moon' : 'sun', room: '', emoji: r.data.k === 'gece' ? '🌙' : '☀️', title: r.data.k === 'gece' ? 'İyi geceler' : 'Günaydın', text: r.data.text || '', weight: 2 }),
+    kucak: () => ({ icon: 'hugs', room: '', emoji: '🤗', title: 'Sana sarıldı', text: 'Kalp menüsünden, sımsıkı.', weight: 2 }),
+    dusun: () => ({ icon: 'heart', room: '', emoji: '💭', title: 'Seni düşündü', text: '', weight: 0 }),
+    ozlem: () => ({ icon: 'heart', room: '', emoji: '🥺', title: 'Seni özledi', text: '', weight: 0 }),
+    radyo: (r) => (r.data.state === 'play' && r.data.song ? { icon: 'vinyl', room: 'radyo', emoji: '📻', title: `Radyoda: ${r.data.song.title}`, text: r.data.song.artist || '', weight: 2 } : null),
+    ppwin: (r) => ({ icon: 'heart', room: 'pinpon', emoji: '🏓', title: `Pinpon: ${nameOf(r.data.winner)} kazandı`, text: r.data.score ? `${r.data.score.me}–${r.data.score.her}` : '', weight: 2 }),
+    kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
-  const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36']);
+  const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem']);
 
   function norm(r) {
     const f = N[r.kind];
