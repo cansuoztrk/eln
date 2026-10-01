@@ -315,6 +315,8 @@
     const x = Object.assign({ click: K.roomUrl('') }, extra || {});
     return K.isOwner && K.isOwner() ? K.pingHer(title, message, tags, x) : K.notify(title, message, tags, x);
   };
+  // Rolden bağımsız: 'me' → User155'in kanalı, 'her' → Eln'in kanalı (hatırlatıcı gibi kendiliğinden gidenler için)
+  K.ntfyTo = (who, title, message, tags, extra) => ntfyPost(who === 'her' ? C.ntfyTopicHer : C.ntfyTopic, title, message, tags, extra);
   // Eln'in kendi telefonuna deneme bildirimi (kurulum kartı için)
   K.pingSelf = (title, message, tags) => ntfyPost(C.ntfyTopicHer, title, message, tags);
   // Bildirimde gönderenin adı ve dokununca açılacak oda

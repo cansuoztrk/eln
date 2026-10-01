@@ -94,6 +94,15 @@ Küsünce de buradayız. Saatlerce konuşamadığımız o anlar için:
 - **Kaydırarak geri**: Ana ekrana eklenmiş kalede (iPhone'da tarayıcının geri düğmesi yok) odadan çıkmak için ekranın sol kenarından sağa kaydır; oda parmağı izler.
 - Kalp menüsünde artık Barış, kedimiz ve Kavanoz da var.
 
+### 23. aşama
+
+- **Kapıdaki kutuyu Eln bulur**: Kale sahibinin ekranında kutu kapalı kalır ("Bu kutuyu o bulsun"); Eln sahiplenince sahibe bildirim gider.
+- **Kavanozda Ardoş'un kalpleri**: Kalp Kavanozu'nda baştan 21 notlu kalp (Ardoş'un ağzından, kasada) ve sonraki 40 gün her sabah Bakü saatiyle 08:00'de bir kalp daha. Eln kavanozu açınca yenisi gözünün önünde düşer; ana salonda "bugünkü kalbi düştü" kartı.
+- **Telesekreter** (Kalp, bulut): İkinizin kalıcı sesli mesaj kutusu. Kayda bas (en fazla 90 saniye), bir etiket seç (günaydın, iyi geceler, özledim, sesini duymak istedim, sana bir şarkı, özür), gönder. Retro bir makine: dinlenmemiş mesaj varsa kırmızı ışık yanıp söner, çalarken kaset makaraları döner, "Yenileri dinle" hepsini sırayla çalar. Gönderen "dinlendi ✓" görür. Mesajlar silinmez.
+- **Tahmin Et Beni** (Oyun, bulut): Her gün iki soru, biri senin biri onun hakkında. Kendi sorunu cevapla, onunkinde onun ne diyeceğini tahmin et; ikisi de yazılmadan hiçbir şey görünmez. Açılınca cevabın sahibi puanlar (✓ bildi, ≈ yakın, ✗ bilemedi); "seni ne kadar tanıyor" çubukları ve önceki günler.
+- **Kale Hatırlatıcı**: Ay dönümü (her ayın 21'i), birlikte geçen her yüzüncü gün, doğum günleri (öbürüne bir gün önce akşam da hatırlatma), sevgili olduğunuz gün ve tanışma yıldönümünde iki telefona kendiliğinden bildirim. ntfy ileri tarihli gönderimi en fazla üç gün önceden kurabildiği için kim kaleye girerse önümüzdeki üç günü kurar; aynı bildirim ikinci kez kurulmaz.
+- Bildirimler artık Günün Karesi, Günün Kelimesi ve Günün Sorusu için de iki yönlü (Ardoş'un cevabı bildirimde görünmez).
+
 ### Telefonuna bildirim (Eln'in iPhone'u)
 
 Ardoş bir şey gönderince Eln'in kilit ekranına düşer: dürt, sarıl, günaydın / iyi geceler, zamanlı sürpriz (açılış anında), hikâye, radyo, kare, pinpon daveti, mektup, Barış Köprüsü'ndeki her şey... Kurulum Eln'in ana salonunda bir kart olarak çıkar (ayrıca zil → "Telefonuna bildirim"): App Store'dan ücretsiz **ntfy** uygulaması → "+" ile kasadaki kanal adına abone ol → **Deneme gönder** → **Geldi**. "Geldi" denince Ardoş'a haber gider; Ardoş zilden kurulumu görür ve ona deneme gönderebilir. Kanal adı kasada (`config.ntfyTopicHer`). Bildirimler artık iki yönlü: Eln'in yaptıkları da eskisi gibi Ardoş'un telefonuna gider.

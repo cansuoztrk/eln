@@ -87,6 +87,8 @@
     { id: 'kedi', name: 'Kedi Ailesi', hint: 'Kalenin kapısındaki yavruyu sahiplen', icon: 'paw', color: '#FFEFD9', bonus: true },
     { id: 'kavanoz', name: 'İlk Kalp', hint: 'Kalp Kavanozu\'na bir kalp at', icon: 'jar', color: '#FFE3EE', bonus: true },
     { id: 'cicek', name: 'Tam Gün', hint: 'İkinizin de Günün Çiçeği açsın', icon: 'lily', color: '#E3F6EC', bonus: true },
+    { id: 'telesekreter', name: 'Sesim Sende', hint: 'Telesekretere bir sesli mesaj bırak', icon: 'radio', color: '#FFE0EA', bonus: true },
+    { id: 'tahmin', name: 'Seni Tanıyorum', hint: 'Tahmin Et Beni\'de bir soru cevapla', icon: 'question', color: '#E6F0FF', bonus: true },
     { id: 'telefon', name: 'Cebimde Kale', hint: 'Telefonuna kale bildirimlerini kur', icon: 'bow', color: '#E3F0FF', bonus: true },
     { id: 'kare', name: 'İki Şehir Bir Kare', hint: 'Günün Karesi\'ne fotoğrafını koy', icon: 'camera', color: '#FFE9D6', bonus: true },
     { id: 'ses', name: 'İlk Ses', hint: 'Kalede bir sesli not bul ve dinle', icon: 'mic', color: '#FFE0E0', bonus: true },

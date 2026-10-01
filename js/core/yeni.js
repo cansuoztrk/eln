@@ -10,6 +10,18 @@
 
   const key = () => 'yeni-' + (K.isOwner() ? 'me' : 'her');
   const latest = () => (D.yenilikler || []).slice(-1)[0] || null;
+  // Görülmemiş bütün sürümlerin yenilikleri birlikte (elle açınca son ikisi)
+  function pack(manual) {
+    const all = D.yenilikler || [];
+    const seen = K.store.get(key(), 0) || 0;
+    const vs = manual ? all.slice(-2) : all.filter((v) => v.v > seen);
+    const pick = vs.length ? vs : all.slice(-1);
+    const items = [];
+    pick.slice().reverse().forEach((v) => (v.items || []).forEach((it) => items.some((x) => x[0] === it[0]) || items.push(it)));
+    return { v: all.length ? all[all.length - 1].v : 0, title: (pick[pick.length - 1] || {}).title, items };
+  }
+  const NOROOM = ['kaydir', 'hatirlat'];
+  const target = (id) => id.replace(/21$/, '');
   const roomOk = (id) => {
     const r = K.rooms.find((x) => x.id === id);
     return Boolean(r && !(typeof r.hidden === 'function' ? r.hidden() : r.hidden));
@@ -19,13 +31,15 @@
       if (id === 'telefon') return !K.isOwner() && Boolean(C.ntfyTopicHer) && Boolean(K.telefon);
       if (id === 'cicek') return Boolean(K.$('#cicek') && !K.$('#cicek').hidden);
       if (id === 'kaydir') return true;
+      if (id === 'hatirlat') return Boolean(K.hatirlat && C.ntfyTopicHer);
+      if (id === 'kavanoz21') return !K.isOwner() && roomOk('kavanoz');
       return roomOk(id);
     });
   }
   let view = null;
-  function open() {
-    const v = latest();
-    if (!v || view) return;
+  function open(manual) {
+    const v = pack(manual === true);
+    if (!v.items.length || view) return;
     const list = items(v);
     if (!list.length) return;
     K.store.set(key(), v.v);
@@ -44,7 +58,7 @@
       K.$$('.yn-segs i', view).forEach((s, k) => s.classList.toggle('done', k <= i));
       K.$('.yn-stage', view).innerHTML = `<div class="yn-card" data-id="${K.esc(id)}"><div class="yn-ic">${A.icon(ic)}</div><h2>${K.esc(title)}</h2><p>${K.esc(K.fill(text))}</p></div>`;
       const last = i === list.length - 1;
-      const go = id === 'kaydir' ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' ? 'Kur' : id === 'cicek' ? 'Çiçeğe bak' : 'Dene'}</button>`;
+      const go = NOROOM.includes(id) ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' ? 'Kur' : id === 'cicek' ? 'Çiçeğe bak' : 'Dene'}</button>`;
       K.$('.yn-foot', view).innerHTML = `${go}<button type="button" class="btn ${go ? 'ghost' : 'red'}" data-yn-next>${last ? 'Kaleye dön' : 'Sıradaki'}</button>`;
       K.audio.sfx.tap();
     };
@@ -76,7 +90,7 @@
             K.go('');
             return setTimeout(() => K.$('#cicek') && K.$('#cicek').scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
           }
-          K.go(id);
+          K.go(target(id));
         }, 320);
       }
     });

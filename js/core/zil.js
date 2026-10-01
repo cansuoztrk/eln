@@ -39,7 +39,7 @@
     m.body.addEventListener('click', (e) => {
       if (e.target.closest('[data-zil-yeni]')) {
         m.close();
-        return setTimeout(() => K.yeni.open(), 330);
+        return setTimeout(() => K.yeni.open(true), 330);
       }
       if (e.target.closest('[data-zil-phone]')) {
         m.close();

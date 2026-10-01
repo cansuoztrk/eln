@@ -144,7 +144,7 @@
     K.$$('.kd-after', root).forEach((x) => (x.hidden = !ad));
     if (!ad) {
       stg.innerHTML = `<div class="kd-scene door"><div class="kd-gate" aria-hidden="true">${A.kizKulesi()}${A.qizQalasi()}</div>${box()}</div>
-        <p class="kd-say">${K.esc(KD().found || '')}</p><button type="button" class="btn red" data-kd="sahip">${A.icon('paw')} ${K.esc(KD().adopt || 'Sahiplen')}</button>`;
+        <p class="kd-say">${K.esc(KD().found || '')}</p>${K.isOwner() ? `<p class="kd-secret">🤫 Bu kutuyu ${K.esc(C.herPet)} bulsun. Bulduğunda sana haber gelecek.</p>` : `<button type="button" class="btn red" data-kd="sahip">${A.icon('paw')} ${K.esc(KD().adopt || 'Sahiplen')}</button>`}`;
       return;
     }
     const m = mood();
@@ -215,6 +215,7 @@
   async function adopt() {
     if (!on()) return K.fx.toast('Bulut kapalı; Pamuk için bulut gerekiyor.');
     if (adoption()) return render();
+    if (K.isOwner()) return K.fx.toast(`Bu kutuyu ${K.esc(C.herPet)} bulsun.`, { duration: 3000 });
     const r = await K.cloud.add('kedisahip', {});
     if (!r) return K.fx.toast('Olmadı. İnternet bağlantını kontrol et.');
     push(r);
@@ -413,6 +414,7 @@
   K.specialHooks = (K.specialHooks || []).concat(() => {
     if (!loaded || !on() || !D.kedi) return [];
     const ad = adoption();
+    if (!ad && K.isOwner()) return [];
     if (!ad) return [{ icon: 'paw', title: '🐾 Kalenin kapısında bir kutu var', text: 'İçinden iki minik kulak görünüyor. Biri seni bekliyor.', room: 'kedi', cta: 'Kapıya bak' }];
     const p = pending();
     if (p && p.who !== mine()) return [{ icon: 'paw', title: `🎀 ${nameOf(p.who)} kedimize "${p.data.name}" adını önerdi`, text: 'Beğenirsen onayla, beğenmezsen başka bir ad öner.', room: 'kedi', cta: 'Bak' }];

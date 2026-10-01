@@ -18,7 +18,27 @@
   const PAL = { her: ['#FF6FA3', '#FF8FB8', '#F0578F', '#FFB3CB', '#E3174D'], me: ['#9C86F0', '#B9A6FF', '#7FB8F0', '#8F73E6', '#C9B6FF'] };
   const MAXB = 130;
 
-  let rows = [], loaded = false, root = null;
+  let rows = [], loaded = false, root = null, hold = new Set();
+  // Ardoş'un kavanoza önceden bıraktığı kalpler: ilk 21'i baştan içeride, sonra her gün (Bakü 08:00) bir tane
+  const SD = () => (KV().seed || null);
+  function seeds() {
+    const s = SD();
+    if (!s || !s.start) return [];
+    const t0 = T.at(s.start).getTime();
+    const out = (s.first || []).map((n, i) => ({ id: 'seed-f' + i, kind: 'kalpk', who: 'me', at: t0 - (s.first.length - i) * 6e4, data: { note: K.fill(n), c: i % 5, seed: true } }));
+    (s.daily || []).forEach((n, d) => {
+      const at = t0 + d * 864e5 + 8 * 36e5;
+      if (at <= Date.now()) out.push({ id: 'seed-d' + d, kind: 'kalpk', who: 'me', at, data: { note: K.fill(n), c: (d + 2) % 5, seed: true, daily: d } });
+    });
+    return out;
+  }
+  const dailyN = () => seeds().filter((r) => r.data.daily != null).length;
+  const seenKey = () => 'kvSeed-' + mine();
+  function mergeSeeds() {
+    const have = new Set(rows.map((r) => r.id));
+    seeds().forEach((r) => have.has(r.id) || rows.push(r));
+    rows.sort((a, b) => a.at - b.at);
+  }
   const notes = (w) => rows.filter((r) => r.who === w && r.data.note);
   const level = (n) => [50, 100, 250, 500, 1000].filter((m) => n >= m).length;
 
@@ -297,7 +317,7 @@
     const list = rows.slice(-MAXB);
     const have = new Set(bodies.map((b) => b.row.id));
     bodies = bodies.filter((b) => list.some((r) => r.id === b.row.id));
-    list.forEach((r) => have.has(r.id) || bodies.push(body(r, false)));
+    list.forEach((r) => have.has(r.id) || hold.has(r.id) || bodies.push(body(r, false)));
     wake();
   }
   function drop(r) {
@@ -417,7 +437,17 @@
   K.on('cloud', async (ok) => {
     if (!ok) return;
     rows = await K.cloud.list('kalpk', 2000);
+    mergeSeeds();
     loaded = true;
+    // Gün dönünce yeni kalp
+    setInterval(() => {
+      const n = rows.length;
+      mergeSeeds();
+      if (rows.length !== n) {
+        if (K.activeRoom === 'kavanoz') freshDrops();
+        else K.renderSpecials && !K.activeRoom && K.renderSpecials();
+      }
+    }, 5 * 6e4);
     K.cloud.on('kalpk', (r) => {
       if (rows.some((x) => x.id === r.id)) return;
       rows.push(r);
@@ -428,6 +458,48 @@
       } else if (r.who !== mine() && r.data.note) K.fx.toast(`💗 <b>${K.esc(nameOf(r.who))} kavanoza notlu bir kalp attı.</b> <a href="#kavanoz">Kavanoza bak</a>`, { duration: 7000 });
     });
   });
+
+  // Eln için: görmediği Ardoş kalpleri (ilk girişte 21'in hepsi baştan içeride, sonra günlükler tek tek düşer)
+  function pendingSeeds() {
+    if (K.isOwner() || !SD()) return [];
+    const seen = K.store.get(seenKey(), -1);
+    if (seen < 0) return [];
+    return seeds().filter((r) => r.data.daily != null && r.data.daily >= seen);
+  }
+  function freshDrops() {
+    if (K.isOwner() || !SD()) return;
+    const seen = K.store.get(seenKey(), -1);
+    const list = seen < 0 ? [] : seeds().filter((r) => r.data.daily != null && r.data.daily >= seen);
+    if (seen < 0) {
+      setTimeout(() => K.fx.toast(`💌 <b>${K.esc(K.fill(SD().firstToast || ''))}</b>`, { duration: 7000 }), 600);
+      K.store.set(seenKey(), dailyN());
+      return;
+    }
+    K.store.set(seenKey(), dailyN());
+    list.forEach((r, i) =>
+      setTimeout(() => {
+        hold.delete(r.id);
+        drop(r);
+        K.audio.sfx.pop();
+        if (i === list.length - 1) K.fx.toast(`💌 <b>${K.esc(K.fill(SD().dailyToast || ''))}</b> <button type="button" class="linkish" data-kv-last>Oku</button>`, { duration: 7000 });
+        count();
+      }, i * 500)
+    );
+  }
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-kv-last]')) return;
+    const r = seeds().filter((x) => x.data.daily != null).pop();
+    r && show(r);
+  });
+  K.specialHooks = (K.specialHooks || []).concat(() => {
+    if (!loaded || K.isOwner() || !SD() || !D.kavanoz) return [];
+    const seen = K.store.get(seenKey(), -1);
+    if (seen < 0) return [{ icon: 'jar', title: `💌 ${C.myPet} kavanoza senden önce 21 kalp attı`, text: 'İçlerinde birer not var. Kavanozu aç, bir kalbe dokun.', room: 'kavanoz', cta: 'Kavanoza bak' }];
+    if (dailyN() > seen) return [{ icon: 'jar', title: K.fill(SD().dailyToast || ''), text: 'İçinde sana küçük bir not var.', room: 'kavanoz', cta: 'Oku' }];
+    return [];
+  });
+
+  K.kavanoz = { seeds, count: () => rows.length };
 
   K.room({
     id: 'kavanoz',
@@ -483,9 +555,13 @@
     enter() {
       requestAnimationFrame(() => {
         resize();
+        const fresh = pendingSeeds();
+        fresh.forEach((r) => hold.add(r.id));
         fill();
         count();
         draw();
+        const first = !K.isOwner() && SD() && K.store.get(seenKey(), -1) < 0;
+        if (fresh.length || first) setTimeout(freshDrops, 900);
       });
     },
     leave() {

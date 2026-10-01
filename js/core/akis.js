@@ -96,14 +96,16 @@
     kedisahip: () => ({ icon: 'paw', room: 'kedi', emoji: '🐾', title: 'Kalenin kapısındaki yavru kediyi sahiplendi', text: 'Artık ikimizin bir kedisi var.', weight: 4 }),
     kedionay: () => ({ icon: 'paw', room: 'kedi', emoji: '🎀', title: `Kedimizin adı: ${K.kedi ? K.kedi.name() : ''}`, text: 'Biri önerdi, öbürü onayladı.', weight: 3 }),
     kalpk: (r) => ({ icon: 'jar', room: 'kavanoz', emoji: '💗', title: 'Kavanoza kalp attı', text: r.data.note ? 'İçinde küçük bir not var.' : '', weight: 1, uid: 'k' + r.who + dayOf(r.at) }),
+    tsmesaj: (r) => ({ icon: 'radio', room: 'telesekreter', emoji: '📼', title: 'Telesekretere sesli mesaj bıraktı', text: `${Math.round(r.data.dur || 0)} saniye. Dinlemek için telesekretere.`, weight: 3 }),
+    tahmin: (r) => ({ icon: 'question', room: 'tahmin', emoji: '🤔', title: r.data.t === 'cevap' ? 'Tahmin Et Beni: kendi sorusunu cevapladı' : 'Tahmin Et Beni: senin hakkında tahmin etti', text: 'İkiniz de yazınca açılır.', weight: 1, uid: 't' + r.who + r.data.day }),
     ozur: () => ({ icon: 'lily', room: 'baris', emoji: '🌷', title: 'Özür diledi', text: '', weight: 1 }),
     bayrak: () => ({ icon: 'flag', room: 'baris', emoji: '🕊️', title: 'Beyaz bayrak kaldırdı', text: '', weight: 1 }),
     kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk', 'tsmesaj'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
-  const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem', 'ozur', 'bayrak']);
+  const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem', 'ozur', 'bayrak', 'tahmin']);
 
   function norm(r) {
     const f = N[r.kind];
@@ -120,7 +122,7 @@
   function dedupe(items) {
     const seen = new Set();
     return items.filter((x) => {
-      if (x.kind !== 'ev' && x.kind !== 'baristi' && x.kind !== 'kalpk') return true;
+      if (!['ev', 'baristi', 'kalpk', 'tahmin'].includes(x.kind)) return true;
       if (seen.has(x.uid)) return false;
       seen.add(x.uid);
       return true;

@@ -112,6 +112,7 @@
 .kd-tag b { font: 600 26px/1.1 var(--font-display); color: var(--plum); }
 .kd-tag small { font-size: 12px; color: var(--plum-faint); }
 .kd-tag span { padding: 3px 10px; border-radius: 99px; background: #FFF4D6; color: #8A5A00; font: 700 12px var(--font-display); }
+.kd-secret { margin: 0 16px; padding: 10px 14px; border-radius: 14px; background: #F3EEFF; color: #5A4A8A; font: 600 14px/1.4 var(--font-display); }
 .kd-say { margin: 0; padding-inline: 16px; font: 400 23px/1.25 var(--font-hand); color: var(--plum); text-wrap: balance; }
 .kd-live { margin: 6px 0 0; min-height: 18px; text-align: center; font: 600 13px var(--font-display); color: var(--rose-deep); opacity: 0; transition: opacity 0.3s; }
 .kd-live.on { opacity: 1; }
