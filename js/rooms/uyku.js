@@ -34,7 +34,7 @@
     const h = heard();
     const t = tonight();
     K.$('#uyHead', root).innerHTML = `<div class="uy-sky" aria-hidden="true">${Array.from({ length: 22 }, (_, i) => `<i style="left:${(i * 41) % 100}%;top:${(i * 29) % 80}%;--d:${(i % 6) * 0.7}s"></i>`).join('')}<span class="uy-moon"></span></div>
-      <div class="uy-head-tx"><p class="card-eyebrow">Bu gecenin masalı</p>${t ? `<h2>${t.uyku.emoji} ${K.esc(t.title)}</h2><p>${K.esc(t.uyku.ozet)}</p><button type="button" class="btn red" data-uy-open="${t.id}">${A.ui(has(t.id) ? 'play' : 'book')} ${has(t.id) ? 'Dinle' : 'Oku'}</button>` : ''}
+      <div class="uy-head-tx"><p class="card-eyebrow">Bu gecenin masalı</p>${t ? `<h2>${t.uyku.emoji} ${K.esc(t.title)}</h2><p>${K.esc(t.uyku.ozet)}</p><button type="button" class="btn red" data-uy-open="${t.id}">${has(t.id) ? `${A.ui('play')} Dinle` : '📖 Oku'}</button>` : ''}
       <p class="uy-count">${own ? `<b>${n}</b> / ${list.length} masal kaydedildi` : `<b>${n}</b> masal ${K.esc(K.ek(C.myPet, 'in'))} sesinden · ${Object.keys(h).length} dinlendi`}</p></div>`;
     K.$('#uyShelf', root).innerHTML = list
       .map((v, i) => {
