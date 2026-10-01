@@ -246,7 +246,7 @@ body.gece-modu .hm-wrap { --hm-sea1: #1E2A55; --hm-sea2: #2B2160; --hm-wave: #2F
 .am-legend .am-len { margin-right: 4px; color: var(--plum-faint); letter-spacing: -2px; }
 .am-legend li.sunk { text-decoration: line-through; color: var(--plum-faint); }
 .am-turn { margin: 0; padding: 10px 14px; border-radius: 14px; text-align: center; font: 600 16px var(--font-display); }
-.am-turn.mine { background: #FFF1C9; color: #7A4B00; animation: kPulse 2s ease-in-out infinite; }
+.am-turn.myturn { background: #FFF1C9; color: #7A4B00; animation: kPulse 2s ease-in-out infinite; }
 .am-turn.wait { background: var(--petal); color: var(--plum-soft); }
 .am-mine-h { margin-top: 6px; }
 .am-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

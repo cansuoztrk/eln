@@ -139,7 +139,7 @@
       return;
     }
     const my = s.turn === me;
-    box.innerHTML = `<p class="am-turn ${my ? 'mine' : 'wait'}">${my ? '🎯 Sıra sende: onun denizine bir top at' : `⏳ Sıra ${K.esc(K.ek(nameOf(ot), 'de'))}`}</p>
+    box.innerHTML = `<p class="am-turn ${my ? 'myturn' : 'wait'}">${my ? '🎯 Sıra sende: onun denizine bir top at' : `⏳ Sıra ${K.esc(K.ek(nameOf(ot), 'de'))}`}</p>
       <p class="card-eyebrow">${K.esc(AM().fleets[ot].sea)} · ${K.esc(K.ek(nameOf(ot), 'in'))} filosu</p>${grid(ot, s, { target: my })}${legend(ot, s)}
       <p class="card-eyebrow am-mine-h">${K.esc(AM().fleets[me].sea)} · senin filon</p>${grid(me, s, { small: true })}
       <p class="muted small center">İsabet: ${s.shots[me].filter((x) => x.hit >= 0).length} · Atış: ${s.shots[me].length}</p>`;
