@@ -172,9 +172,10 @@
     ];
     const birlikte = [
       ['baris', 'bridge', 'Barış'],
+      ['kedi', 'paw', K.kedi && K.kedi.adopted() ? K.kedi.name() : 'Kedimiz'],
+      ['kavanoz', 'jar', 'Kavanoz'],
       ['hikaye', 'camera', 'Hikâye'],
       ['radyo', 'music', 'Radyo'],
-      ['pinpon', 'heart', 'Pinpon'],
       ['kelime', 'cards', 'Kelime'],
       ['hava', 'cloud', 'Hava'],
       ['durum', 'chat', 'Durumum'],
@@ -217,7 +218,7 @@
       if (!on()) return K.fx.toast('Bulut kapalı; bunun için Kale Paneli\'nden bulutu açın.');
       return K.surpriz && K.surpriz.compose();
     }
-    if (['radyo', 'pinpon', 'kelime', 'hava', 'kare', 'baris'].includes(id)) {
+    if (['radyo', 'pinpon', 'kelime', 'hava', 'kare', 'baris', 'kedi', 'kavanoz'].includes(id)) {
       closeMenu();
       location.hash = id;
       return;
@@ -354,5 +355,5 @@
     if (s.n >= 2 && s.todayMe && !s.todayOther && h >= 18) return [{ icon: 'heart', title: `🔥 ${s.n} günlük alev sönmesin`, text: K.fill((AL().riskOther || '').replace('{other}', nameOf(other()))), run: () => K.yan && K.yan.nudge(), cta: 'Onu dürt' }];
     return [];
   });
-  K.kalp = { openMenu, closeMenu, streak, act, alevSheet, chips };
+  K.kalp = { openMenu, closeMenu, streak, act, alevSheet, chips, todayOf: (w) => ['selam', 'kucak', 'dusun', 'ozlem'].some((k) => today[k].some((r) => r.who === w)) };
 })();

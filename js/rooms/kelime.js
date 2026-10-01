@@ -220,5 +220,5 @@
       render();
     },
   });
-  K.kelime = { word: () => word().join(''), score };
+  K.kelime = { word: () => word().join(''), score, doneBy: (w) => (w === mine() && store().done) || rows.some((r) => r.who === w && r.data.day === day()) };
 })();

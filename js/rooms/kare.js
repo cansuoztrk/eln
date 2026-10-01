@@ -148,7 +148,7 @@
     if (t && !mineDone(k)) return [{ icon: 'camera', title: `Günün Karesi: ${nameOf(other())} "${promptOf(k)}" fotoğrafını koydu`, text: 'Seninkini koyunca onunki açılır; ikisi yan yana tek kare olur.', room: 'kare', cta: 'Seninkini koy' }];
     return [];
   });
-  K.kare = { mineDone, promptOf };
+  K.kare = { mineDone, promptOf, doneBy: (w, k = T.todayKey()) => Boolean(of(k, w)) };
 
   K.room({
     id: 'kare',

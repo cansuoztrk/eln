@@ -93,12 +93,15 @@
     },
     barissoz: (r) => ({ icon: 'kintsugi', room: 'baris', emoji: '💛', title: 'Bir barış sözü', text: cut(r.data.text), weight: 3 }),
     kural: (r) => ({ icon: 'note', room: 'baris', emoji: '📜', title: 'Barış Antlaşması\'na bir madde', text: cut(r.data.text), weight: 2 }),
+    kedisahip: () => ({ icon: 'paw', room: 'kedi', emoji: '🐾', title: 'Kalenin kapısındaki yavru kediyi sahiplendi', text: 'Artık ikimizin bir kedisi var.', weight: 4 }),
+    kedionay: () => ({ icon: 'paw', room: 'kedi', emoji: '🎀', title: `Kedimizin adı: ${K.kedi ? K.kedi.name() : ''}`, text: 'Biri önerdi, öbürü onayladı.', weight: 3 }),
+    kalpk: (r) => ({ icon: 'jar', room: 'kavanoz', emoji: '💗', title: 'Kavanoza kalp attı', text: r.data.note ? 'İçinde küçük bir not var.' : '', weight: 1, uid: 'k' + r.who + dayOf(r.at) }),
     ozur: () => ({ icon: 'lily', room: 'baris', emoji: '🌷', title: 'Özür diledi', text: '', weight: 1 }),
     bayrak: () => ({ icon: 'flag', room: 'baris', emoji: '🕊️', title: 'Beyaz bayrak kaldırdı', text: '', weight: 1 }),
     kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
   const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem', 'ozur', 'bayrak']);
 
@@ -117,7 +120,7 @@
   function dedupe(items) {
     const seen = new Set();
     return items.filter((x) => {
-      if (x.kind !== 'ev' && x.kind !== 'baristi') return true;
+      if (x.kind !== 'ev' && x.kind !== 'baristi' && x.kind !== 'kalpk') return true;
       if (seen.has(x.uid)) return false;
       seen.add(x.uid);
       return true;

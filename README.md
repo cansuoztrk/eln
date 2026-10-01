@@ -84,6 +84,16 @@ Küsünce de buradayız. Saatlerce konuşamadığımız o anlar için:
 - Eln için kasada, sadece kızgınken açılmak üzere yazılmış bir mektup var.
 - Kırgınlık, mektup, özür, mola, bayrak ve tören hikâyelere ve Gün Gün Biz'e (içerik açılmadan) "Barıştık 🕊️" olarak geçer.
 
+### Ana Salon 3.0 ve yeni odalar (22. aşama)
+
+- **Günün Çiçeği** (ana salon, bulut): İki çiçek, biri senin biri onun. Her günlük ritüel bir yaprak açar: günün sorusu, günün kelimesi, günün karesi, içinin havası, bir selam ya da sarılma. Kendi çiçeğinin kapalı yaprağına (ya da alttaki çipe) dokununca o ritüele gider. İki çiçek de açınca "Bugün tam gün" kutlaması. Yeni bir kayıt tutmaz; var olanlardan okur.
+- **Kart desteleri**: Telefonda ana salonun özel kartları ve "Bugün senin için" kartları alt alta uzamak yerine yana kayan birer deste (yandaki kart kenardan görünür, altta noktalar). Ana salon yaklaşık 1000 piksel kısaldı. Masaüstünde ızgara aynı.
+- **Ortak kedimiz** (Kalp, bulut): Kalenin kapısında, iki kulenin ortasında bulunan bir yavru kedi. Biri sahiplenir; adı birlikte konur (biri önerir, öbürü onaylar). Beslenir (İstanbul'dan hamsi, Bakü'den kütüm, süt, tavuk, ödül maması), parmakla okşanır (mırlar, kalpler uçar), yumakla oynanır. Tokluk, neşe ve **iki ayrı sevgi çubuğu**: ikinizin de sevgisini ister, biri uzun süre gelmezse "kapısının önünde onu bekliyor". Bakü saatiyle gece uyur (o saatlerde acıkmaz). Küsünce Barış Köprüsü'nde beyaz bayrakla oturur. Yaşla büyür (yavru, minik, genç, kraliçe); ikinizin de baktığı günler biriktikçe numara öğrenir (pati, dönme, kuyruğuyla kalp, takla, fiyonk, kulelere tırmanma, taç). Biri onu severken öbürünün ekranında canlı kalpler uçar. Ana salonda Bakü kulesinin dibinde oturur; üstünde hâli (🍽️ 💤 🥺 💗).
+- **Kalp Kavanozu** (Kalp, bulut): Her "seni seviyorum" kavanoza düşen bir kalp; istersen içine küçük bir not. Kalpler gerçekten düşer, çarpışır ve yığılır (küçük bir fizik motoru). "Salla" (ya da telefonu sallamak) kalpleri zıplatır. Bir kalbe dokununca kimin, ne zaman attığı ve notu; "Kavanozdan çek" onun notlarından birini rastgele çeker. Onun kalpleri sen odadayken canlı düşer. 50, 100, 250, 500 ve 1000 kalpte kavanoz süslenir (kurdele, fiyonk, parıltı, altın kapak).
+- **Kalede yeni ne var?**: Güncellemeden sonra kaleye ilk gelişte bir kez, hikâye gibi kayan sayfalar; her yenilik bir sayfa, "Dene" ile doğrudan oraya. Zilden her zaman yeniden açılır. İlk kez gelen biri görmez (ona kale turu var).
+- **Kaydırarak geri**: Ana ekrana eklenmiş kalede (iPhone'da tarayıcının geri düğmesi yok) odadan çıkmak için ekranın sol kenarından sağa kaydır; oda parmağı izler.
+- Kalp menüsünde artık Barış, kedimiz ve Kavanoz da var.
+
 ### Telefonuna bildirim (Eln'in iPhone'u)
 
 Ardoş bir şey gönderince Eln'in kilit ekranına düşer: dürt, sarıl, günaydın / iyi geceler, zamanlı sürpriz (açılış anında), hikâye, radyo, kare, pinpon daveti, mektup, Barış Köprüsü'ndeki her şey... Kurulum Eln'in ana salonunda bir kart olarak çıkar (ayrıca zil → "Telefonuna bildirim"): App Store'dan ücretsiz **ntfy** uygulaması → "+" ile kasadaki kanal adına abone ol → **Deneme gönder** → **Geldi**. "Geldi" denince Ardoş'a haber gider; Ardoş zilden kurulumu görür ve ona deneme gönderebilir. Kanal adı kasada (`config.ntfyTopicHer`). Bildirimler artık iki yönlü: Eln'in yaptıkları da eskisi gibi Ardoş'un telefonuna gider.
