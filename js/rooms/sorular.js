@@ -32,7 +32,9 @@
         const r = cloudRows.filter((x) => x.who === 'me' && x.data.i === i).pop();
         return r ? { a: r.data.a, date: K.time.key(T.baku(new Date(r.at))) } : undefined;
       }
-      return all()[i];
+      // Başka cihazdan cevapladıysa buluttaki kaydı da say
+      const r = all()[i] ? null : cloudRows.filter((x) => x.who === 'her' && x.data.i === i).pop();
+      return all()[i] || (r ? { a: r.data.a, date: K.time.key(T.baku(new Date(r.at))) } : undefined);
     },
     other: (i) => {
       const r = cloudRows.filter((x) => x.who !== mine() && x.data.i === i).pop();
