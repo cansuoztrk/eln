@@ -499,7 +499,7 @@
     return [];
   });
 
-  K.kavanoz = { seeds, count: () => rows.length };
+  K.kavanoz = { seeds, count: () => rows.length, notesOf: (w) => rows.filter((r) => r.who === w && r.data.note).map((r) => r.data.note) };
 
   K.room({
     id: 'kavanoz',

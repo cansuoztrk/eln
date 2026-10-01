@@ -143,6 +143,8 @@
     return [];
   });
 
+  K.tahmin = { knows };
+
   K.room({
     id: 'tahmin',
     wing: 'oyun',

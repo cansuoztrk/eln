@@ -67,7 +67,12 @@
   async function show(n) {
     i = n;
     // Görünmeyen yerler atlanır; son adım (kapanış) yeri yoksa ortada gösterilir
-    while (i < steps.length - 1 && steps[i].sel && !shown(K.$(steps[i].sel))) i++;
+    const vis = (sel) => {
+      const e = K.$(sel);
+      if (e && K.salon) K.salon.reveal(e);
+      return shown(e);
+    };
+    while (i < steps.length - 1 && steps[i].sel && !vis(steps[i].sel)) i++;
     if (i >= steps.length) return finish();
     const st = steps[i];
     const el = st.sel && shown(K.$(st.sel)) ? K.$(st.sel) : null;

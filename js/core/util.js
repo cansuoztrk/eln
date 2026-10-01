@@ -165,6 +165,10 @@
     istTime: () => T.hm(C.tzIstanbul),
     km: () => K.num(C.distanceKm),
     hugs: () => K.num(K.hugDebt()),
+    // Okuyana göre: öbürünün ve kendi evcil adı
+    other: () => K.otherName(),
+    otherPet: () => K.otherName(),
+    mePet: () => (K.isOwner() ? C.myPet : C.herPet),
   };
   // Sarılma borcu: birlikte geçen her gün bir sarılma + uzaktan gönderilen her sarılma
   K.hugDebt = () => Math.max(0, T.daysSince(C.togetherDate)) + K.store.get('hugs', 0);

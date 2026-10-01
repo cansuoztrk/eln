@@ -6,7 +6,9 @@
    Barış Defteri (kaç kez küstük, hep barıştık), Barış Antlaşması (ikinizin de imzaladığı maddeler).
    Kayıtlar: aramiz {s, lvl, until, note} · bayrak {} · kmektup {feel, need, what, ask} · kmokundu {ref} · kmcevap {ref, text}
    ozur {text, flower, audio, dur} + ozurses {b64, mime} · ozurcevap {ref, k} · mola {min} · isik {on}
-   baristi {ep, dur, first} · barissoz {ep, text} · kural {text} · kuralimza {ref} */
+   baristi {ep, dur, first} · barissoz {ep, text} · kural {text} · kuralimza {ref}
+   Barıştan sonra: barisders {ep, text} (ne öğrendik) · yakinlik {ep, day, i} (üç günlük yakınlık görevleri).
+   Kabul edilen özürlerin çiçekleri Özür Çiçekleri Bahçesi'nde kalır; küsken antlaşmadan bir madde hatırlatılır. */
 (function () {
   'use strict';
   const K = window.K;
@@ -20,7 +22,8 @@
   const other = () => (K.isOwner() ? 'her' : 'me');
   const nameOf = (w) => (w === 'me' ? C.myPet : C.herPet);
   const on = () => Boolean(K.cloud && K.cloud.enabled);
-  const KINDS = ['aramiz', 'bayrak', 'kmektup', 'kmokundu', 'kmcevap', 'ozur', 'ozurcevap', 'mola', 'isik', 'baristi', 'barissoz', 'kural', 'kuralimza'];
+  const KINDS = ['aramiz', 'bayrak', 'kmektup', 'kmokundu', 'kmcevap', 'ozur', 'ozurcevap', 'mola', 'isik', 'baristi', 'barissoz', 'kural', 'kuralimza', 'barisders', 'yakinlik'];
+  const B2 = () => D.baris2 || { tasks: [], lessonIdeas: [] };
   // 48 saat hiçbir şey olmazsa bölüm sessizce kapanır (altın damar sayılmaz)
   const STALE = 48 * 36e5;
   const BREATH = () => B().breath || [['Nefes al', 4], ['Tut', 4], ['Ver', 6], ['Bekle', 2]];
@@ -57,7 +60,7 @@
     const eps = [];
     let cur = null;
     for (const r of sorted) {
-      if (r.kind === 'baristi' || r.kind === 'barissoz' || r.kind === 'kural' || r.kind === 'kuralimza') continue;
+      if (r.kind === 'baristi' || r.kind === 'barissoz' || r.kind === 'kural' || r.kind === 'kuralimza' || r.kind === 'barisders' || r.kind === 'yakinlik') continue;
       if (cur && r.at - cur.lastAt > STALE) {
         cur.stale = true;
         eps.push(cur);
@@ -672,6 +675,82 @@
     changed();
   }
 
+  /* ---------- Barıştan sonra: ne öğrendik, yakınlık görevleri, özür bahçesi, antlaşmadan hatırlatma ---------- */
+  const lessonsOf = (ep) => of('barisders').filter((r) => r.data.ep === ep).sort((a, b) => a.at - b.at);
+  const lastPeace = () => {
+    const { done, cur } = build();
+    return cur ? null : done[done.length - 1] || null;
+  };
+  // Barış günü 1. gün; üç gün boyunca her gün bir görev
+  function afterPeace() {
+    const ep = lastPeace();
+    if (!ep) return null;
+    const d = T.dayNumber(T.now()) - T.dayNumber(new Date(ep.doneAt));
+    return d >= 0 && d <= 2 ? { ep, day: d + 1 } : null;
+  }
+  const taskI = (ep, day) => (K.hash(ep.start.id) + day) % Math.max(1, (B2().tasks || []).length);
+  const taskDone = (ep, day, w) => of('yakinlik').some((r) => r.data.ep === ep.start.id && r.data.day === day && r.who === w);
+  const sealedRules = () => of('kural').filter((r) => { const s = signers(r); return s.includes('me') && s.includes('her'); });
+  function remindRule() {
+    const { cur } = build();
+    const list = sealedRules();
+    if (!cur || !list.length) return null;
+    return list[K.hash(cur.start.id + T.todayKey()) % list.length];
+  }
+  const accepted = () => of('ozur').filter((r) => { const a = answerOf(r.id); return a && a.data.k === 'kabul'; }).sort((a, b) => a.at - b.at);
+  async function doTask(ep, day) {
+    if (taskDone(ep, day, mine())) return;
+    const r = await add('yakinlik', { ep: ep.start.id, day, i: taskI(ep, day) });
+    if (!r) return K.fx.toast('Gönderilemedi.');
+    K.audio.sfx.chime();
+    const both = taskDone(ep, day, other());
+    K.fx.toast(both ? '💞 <b>İkiniz de yaptınız.</b> Kırılan yer biraz daha sağlamlaştı.' : '💞 İşaretlendi.', { duration: 3000 });
+    ping(`💞 ${K.meName()} bugünün yakınlık görevini yaptı`, (B2().tasks || [])[taskI(ep, day)] || '', ['two_hearts']);
+    changed();
+  }
+  async function addLesson(ep, text) {
+    const r = await add('barisders', { ep, text });
+    if (!r) return K.fx.toast('Gönderilemedi.');
+    K.audio.sfx.paper();
+    K.fx.toast('📖 Barış Defteri\'ne yazıldı.', { duration: 2500 });
+    ping(`📖 ${K.meName()} bu barıştan bir şey öğrendi`, text, ['book']);
+    changed();
+  }
+  function afterHtml() {
+    const ap = afterPeace();
+    const ep = lastPeace();
+    const recent = ep && Date.now() - ep.doneAt < 7 * 864e5;
+    if (!ap && !recent) return '';
+    let html = '';
+    if (ap) {
+      const tasks = B2().tasks || [];
+      html += `<p class="card-eyebrow">💞 ${K.esc(B2().tasksTitle || 'Yakınlık görevleri')}</p><p class="muted small">${K.esc(B2().tasksText || '')}</p><ol class="br-yak">${[1, 2, 3].map((d) => {
+        const t = tasks[taskI(ap.ep, d)] || '';
+        const fut = d > ap.day;
+        const me = taskDone(ap.ep, d, mine()), ot = taskDone(ap.ep, d, other());
+        return `<li class="${d === ap.day ? 'now' : ''} ${fut ? 'fut' : ''} ${me && ot ? 'both' : ''}"><b>${d}. gün</b><p>${fut ? (d - ap.day === 1 ? 'Yarın açılır.' : `${d - ap.day} gün sonra açılır.`) : K.esc(t)}</p>${fut ? '' : `<span class="br-yak-who"><span class="${me ? 'on' : ''}">${me ? '✓' : '○'} Sen</span><span class="${ot ? 'on' : ''}">${ot ? '✓' : '○'} ${K.esc(nameOf(other()))}</span></span>${d === ap.day && !me ? `<button type="button" class="btn red small" data-br-yak="${d}">Yaptım</button>` : ''}`}</li>`;
+      }).join('')}</ol>`;
+    }
+    if (ep && recent) {
+      const ls = lessonsOf(ep.start.id);
+      const mineL = ls.some((r) => r.who === mine());
+      html += `<div class="br-ders"><p class="card-eyebrow">📖 Ne öğrendik?</p>${ls.map((r) => `<p><b>${K.esc(nameOf(r.who))}:</b> <span class="hand">${K.esc(r.data.text)}</span></p>`).join('')}
+        ${mineL ? '' : `<p class="muted small">${K.esc(B2().lessonsIntro || '')}</p><div class="br-chips one">${(B2().lessonIdeas || []).map((x) => `<button type="button" class="chip" data-ders-idea>${K.esc(x)}</button>`).join('')}</div>
+        <form class="br-ders-add" autocomplete="off" data-ep="${ep.start.id}"><input class="input" name="t" maxlength="160" placeholder="Bu barıştan öğrendiğim..."><button class="btn soft small" type="submit">${A.ui('plus')} Deftere yaz</button></form>`}</div>`;
+    }
+    return html;
+  }
+  function gardenHtml() {
+    const list = accepted();
+    if (!list.length) return '';
+    const FL = B().flowers || [];
+    return `<p class="card-eyebrow">🌷 ${K.esc(B2().garden || 'Özür Çiçekleri Bahçesi')}</p><p class="muted small">${K.esc(B2().gardenText || '')}</p>
+      <div class="br-garden">${list.map((r, i) => {
+        const f = FL.find((x) => x[0] === r.data.flower) || ['', '🌷', ''];
+        return `<button type="button" class="br-gf" data-br-gf="${r.id}" style="--i:${i};--h:${58 + (K.hash(r.id) % 34)}px" aria-label="${K.esc(nameOf(r.who))} · ${K.esc(T.fmtShort(new Date(r.at)))}"><span class="br-gf-head">${f[1]}</span><span class="br-gf-stem"></span><small>${K.esc(T.fmtShort(new Date(r.at)))}</small></button>`;
+      }).join('')}</div>`;
+  }
+
   /* ---------- Oda ---------- */
   function render() {
     if (!root || K.activeRoom !== 'baris') return;
@@ -710,6 +789,16 @@
     ];
     if (cur) acts.push(['isik', 'candle', isikOf(me) ? 'Işığımı kapat' : 'Işığım açık', 'Konuşmasam da buradayım']);
     if (cur || myHour() >= 21 || myHour() < 4) acts.push(['gece', 'moon', 'Küs ama iyi geceler', 'Küs yatsak da iyi geceler diyelim']);
+    const rr = remindRule();
+    const rm = K.$('#brRemind', root);
+    rm.hidden = !rr;
+    rm.innerHTML = rr ? `<span aria-hidden="true">📜</span><div><small>${K.esc(B2().remind || 'Antlaşmamızdan')}</small><p class="hand">${K.esc(rr.data.text)}</p></div>` : '';
+    const af = afterHtml();
+    K.$('#brAfter', root).hidden = !af;
+    K.$('#brAfter', root).innerHTML = af;
+    const gd = gardenHtml();
+    K.$('#brGarden', root).hidden = !gd;
+    K.$('#brGarden', root).innerHTML = gd;
     K.$('#brActs', root).innerHTML = acts.map(([id, ic, t, s]) => `<button type="button" class="br-act" data-br="${id}">${A.icon(ic)}<b>${K.esc(t)}</b><small>${K.esc(s)}</small></button>`).join('');
     // Canlı: mola, mektuplar, özürler
     const live = [];
@@ -780,7 +869,8 @@
       ${n ? `<div class="br-stats"><div><b>${K.esc(dur(avg))}</b><small>ortalama küslük</small></div><div><b>${K.esc(dur(fastest.doneAt - fastest.start.at))}</b><small>en hızlı barışma</small></div><div><b>${firstBy.me} · ${firstBy.her}</b><small>bayrağı ilk kaldıran: ${K.esc(nameOf('me'))} · ${K.esc(nameOf('her'))}</small></div></div>` : ''}
       <ul class="br-pages">${list.map((e, i) => {
         const ps = promisesOf(e.start.id);
-        return `<li><span class="br-pg-n">${n - i}</span><div><b>${K.esc(T.fmtShort(new Date(e.start.at)))} · ${K.esc(dur(e.doneAt - e.start.at))}</b><small>Bayrağı ilk ${K.esc(nameOf(e.first))} kaldırdı</small>${ps.map((p) => `<p><b>${K.esc(nameOf(p.who))}:</b> <span class="hand">${K.esc(p.data.text)}</span></p>`).join('')}</div></li>`;
+        const ls = lessonsOf(e.start.id);
+        return `<li><span class="br-pg-n">${n - i}</span><div><b>${K.esc(T.fmtShort(new Date(e.start.at)))} · ${K.esc(dur(e.doneAt - e.start.at))}</b><small>Bayrağı ilk ${K.esc(nameOf(e.first))} kaldırdı</small>${ps.map((p) => `<p><b>${K.esc(nameOf(p.who))}:</b> <span class="hand">${K.esc(p.data.text)}</span></p>`).join('')}${ls.map((p) => `<p class="br-pg-ders">📖 <b>${K.esc(nameOf(p.who))} öğrendi:</b> <span class="hand">${K.esc(p.data.text)}</span></p>`).join('')}</div></li>`;
       }).join('')}</ul>
 `;
     tick();
@@ -850,6 +940,8 @@
     if (r.kind === 'isik' && d.on) K.fx.toast(`🕯️ <b>${K.esc(from)} ışığını açık bıraktı.</b> Konuşmasa da burada.`, { duration: 7000 });
     if (r.kind === 'kural') K.fx.toast(`📜 <b>${K.esc(from)} antlaşmaya bir madde ekledi:</b> ${K.esc(d.text)} <a href="#baris">İmzala</a>`, { duration: 9000 });
     if (r.kind === 'barissoz' && cerOpen && cerOpen.draw) cerOpen.draw();
+    if (r.kind === 'barisders') K.fx.toast(`📖 <b>${K.esc(from)} bu barıştan bir şey öğrendi:</b> ${K.esc(d.text)}`, { duration: 8000 });
+    if (r.kind === 'yakinlik') K.fx.toast(`💞 <b>${K.esc(from)} bugünün yakınlık görevini yaptı.</b> <a href="#baris">Gör</a>`, { duration: 6000 });
   }
 
   /* ---------- Bağlantılar ---------- */
@@ -889,6 +981,8 @@
     const me = mine(), o = other();
     const fresh = done.filter((e) => Date.now() - e.doneAt < 3 * 864e5 && !K.store.get(`barisSeen-${me}-${e.start.id}`));
     if (fresh.length) out.push({ icon: 'kintsugi', title: '🕊️ Barıştınız', text: 'Kırık kalbin çatlağı altınla doluyor. Töreni aç, bu barışa bir söz yaz.', run: () => ceremony(fresh[fresh.length - 1]), cta: 'Töreni aç' });
+    const ap2 = afterPeace();
+    if (ap2 && (B2().tasks || []).length && !taskDone(ap2.ep, ap2.day, me)) out.push({ icon: 'heart', title: `💞 Yakınlık görevi · ${ap2.day}/3`, text: B2().tasks[taskI(ap2.ep, ap2.day)], room: 'baris', cta: 'Göreve git' });
     const mo = molaNow();
     if (mo) out.push({ icon: 'hourglass', title: `⏳ Mola: ${dur(mo.end - Date.now())} kaldı`, text: `${nameOf(mo.r.who)} başlattı. İkinizin ekranında da aynı nefes.`, room: 'baris', cta: 'Birlikte nefes al' });
     const unread = lettersTo(me).filter((r) => !read(r.id));
@@ -921,7 +1015,7 @@
     K.audio.sfx.paper();
   }
 
-  K.baris = { active, done: () => build().done, ceremony, flag: raiseFlag, mood, stateOf };
+  K.baris = { active, done: () => build().done, ceremony, flag: raiseFlag, mood, stateOf, promisesOf: (w) => of('barissoz').filter((r) => r.who === w).map((r) => r.data.text) };
 
   K.room({
     id: 'baris',
@@ -945,12 +1039,15 @@
         <section class="card br-heart" id="brHeart"></section>
         <section class="card br-bridge-card" id="brBridge"></section>
         <section class="card br-state" id="brState"></section>
+        <section class="card br-remind" id="brRemind" hidden></section>
         <div class="br-acts" id="brActs"></div>
         <div class="br-live" id="brLive"></div>
+        <section class="card br-after" id="brAfter" hidden></section>
         <section class="card br-env br-kizgin" id="brKizgin" hidden></section>
         <section class="card br-tip" id="brTip"></section>
         <section class="card br-ant" id="brAnt"></section>
-        <section class="card br-def" id="brDef"></section>`;
+        <section class="card br-def" id="brDef"></section>
+        <section class="card br-garden-card" id="brGarden" hidden></section>`;
       el.addEventListener('click', (e) => {
         const st = e.target.closest('[data-st]');
         if (st) return stateSheet(st.dataset.st);
@@ -987,6 +1084,32 @@
         }
         const sg = e.target.closest('[data-br-sign]');
         if (sg) return signRule(sg.dataset.brSign);
+        const yk = e.target.closest('[data-br-yak]');
+        if (yk) {
+          const ap = afterPeace();
+          return ap && doTask(ap.ep, +yk.dataset.brYak);
+        }
+        const di = e.target.closest('[data-ders-idea]');
+        if (di) {
+          const f = K.$('.br-ders-add input', el);
+          f.value = di.textContent;
+          return f.focus();
+        }
+        const gf = e.target.closest('[data-br-gf]');
+        if (gf) {
+          const r = rows.find((x) => x.id === gf.dataset.brGf);
+          if (!r) return;
+          const f = (B().flowers || []).find((x) => x[0] === r.data.flower) || ['', '🌷', ''];
+          const a = answerOf(r.id);
+          return K.ui.modal({
+            label: 'Özür çiçeği',
+            cls: 'br-sheet br-read',
+            html: `<div class="br-flower big" aria-hidden="true">${f[1]}</div><p class="card-eyebrow">${K.esc(nameOf(r.who))} · ${K.esc(T.fmt(new Date(r.at)))}</p>${r.data.text ? `<p class="hand">${K.esc(r.data.text)}</p>` : ''}${a ? `<p class="muted small">🕊️ ${K.esc(K.ago(a.at))} kabul edildi.</p>` : ''}${r.data.audio ? `<button type="button" class="btn soft small" data-br-voice2="${r.id}">${A.ui('play')} Sesini dinle</button>` : ''}`,
+          }).body.addEventListener('click', (ev) => {
+            const v = ev.target.closest('[data-br-voice2]');
+            if (v) playApology(r, v);
+          });
+        }
         const un = e.target.closest('[data-br-unrule]');
         if (un) {
           K.cloud.remove(un.dataset.brUnrule);
@@ -1001,6 +1124,13 @@
         }
       });
       el.addEventListener('submit', (e) => {
+        const df = e.target.closest('.br-ders-add');
+        if (df) {
+          e.preventDefault();
+          const t = df.t.value.trim();
+          if (t) addLesson(df.dataset.ep, t);
+          return;
+        }
         if (!e.target.closest('.br-rule-add')) return;
         e.preventDefault();
         const t = e.target.t.value.trim();

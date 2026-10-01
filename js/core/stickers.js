@@ -101,6 +101,12 @@
     { id: 'kralice', name: 'Kraliçe', hint: 'Gizli kulübedeki dostunu en üst seviyeye çıkar', icon: 'crown', color: '#FFE9B8', bonus: true },
     { id: 'bside', name: 'B Yüzü', hint: 'Plağı çevir, onun şarkısını çal', icon: 'vinyl', color: '#FFE0EC', bonus: true },
     { id: 'pembe', name: 'Pembenin Tonları', hint: 'Kalenin rengini değiştir', icon: 'palette', color: '#FFD0E1', bonus: true },
+    { id: 'minnet', name: 'Minnettarım', hint: 'Minnet Defteri\'ne bir cümle yaz', icon: 'note', color: '#FFF4D9', bonus: true },
+    { id: 'endise', name: 'Güvenli Liman', hint: 'İçi sıkışan birine güven ver', icon: 'heart', color: '#E0EEFF', bonus: true },
+    { id: 'gunbatimi', name: 'Aynı Güneş', hint: 'Güneşi birlikte uğurlayın', icon: 'sun', color: '#FFE0C7', bonus: true },
+    { id: 'gorev', name: 'Görev Tamam', hint: 'Haftanın görevini ikiniz de bitirin', icon: 'star', color: '#FFF1C9', bonus: true },
+    { id: 'onyil', name: '2036', hint: 'On Yıl Sonra kutusuna bir not bırak', icon: 'hourglass', color: '#E6E0FF', bonus: true },
+    { id: 'hayalyap', name: 'Hayal Gerçek', hint: 'Hayallerimizden birine "Yaptık!" deyin', icon: 'list', color: '#E3F6EC', bonus: true },
     { id: 'muhur', name: 'Kırılan Mühür', hint: 'Bu çıkartma ilk buluşmada açılır', icon: 'hugs', color: '#FFD6E5', bonus: true },
   ];
   const REQUIRED = DEFS.filter((d) => !d.bonus);

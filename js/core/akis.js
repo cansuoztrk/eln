@@ -99,11 +99,18 @@
     tsmesaj: (r) => ({ icon: 'radio', room: 'telesekreter', emoji: '📼', title: 'Telesekretere sesli mesaj bıraktı', text: `${Math.round(r.data.dur || 0)} saniye. Dinlemek için telesekretere.`, weight: 3 }),
     tahmin: (r) => ({ icon: 'question', room: 'tahmin', emoji: '🤔', title: r.data.t === 'cevap' ? 'Tahmin Et Beni: kendi sorusunu cevapladı' : 'Tahmin Et Beni: senin hakkında tahmin etti', text: 'İkiniz de yazınca açılır.', weight: 1, uid: 't' + r.who + r.data.day }),
     ozur: () => ({ icon: 'lily', room: 'baris', emoji: '🌷', title: 'Özür diledi', text: '', weight: 1 }),
+    minnet: () => ({ icon: 'note', room: 'minnet', emoji: '🙏', title: 'Minnet Defteri\'ne bir cümle yazdı', text: 'Seninkini yazınca açılır.', weight: 2 }),
+    gorev: (r) => ({ icon: 'star', room: 'gorev', emoji: '🏅', title: 'Haftanın görevini yaptı', text: cut(r.data.note), weight: 2 }),
+    onyil: () => ({ icon: 'hourglass', room: 'onyil', emoji: '⏳', title: 'On yıl sonraki bize bir zarf bıraktı', text: 'Mühürlü.', weight: 2 }),
+    gunbatimi: () => ({ icon: 'sun', room: '', emoji: '🌅', title: 'Güneşi seninle uğurladı', text: 'Bakü\'den İstanbul\'a aynı gün batımı.', weight: 2 }),
+    hayal: (r) => ({ icon: 'list', room: 'hayaller', emoji: '💭', title: 'Hayal listemize yeni bir hayal', text: cut(r.data.text), weight: 2 }),
+    hayalyap: (r) => ({ icon: 'list', room: 'hayaller', emoji: '🎉', title: 'Bir hayalimiz gerçek oldu', text: cut(r.data.note), weight: 4 }),
+    barisders: (r) => ({ icon: 'kintsugi', room: 'baris', emoji: '📖', title: 'Bu barıştan bir şey öğrendi', text: cut(r.data.text), weight: 2 }),
     bayrak: () => ({ icon: 'flag', room: 'baris', emoji: '🕊️', title: 'Beyaz bayrak kaldırdı', text: '', weight: 1 }),
     kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk', 'tsmesaj'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk', 'tsmesaj', 'minnet', 'gorev', 'onyil', 'gunbatimi', 'hayal', 'hayalyap', 'barisders'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
   const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem', 'ozur', 'bayrak', 'tahmin']);
 
