@@ -46,6 +46,8 @@
       if (!K.isOwner()) K.store.set('answers', a);
       if (K.cloud.enabled) K.cloud.add('answer', { i, a: text.slice(0, 400) });
       if (Object.keys(a).length >= 7) K.stickers.award('soru');
+      // Ardoş'un cevabı bildirimde görünmez: Eln kendi cevabını yazınca kalede açılır
+      if (K.isOwner()) K.pingHer(`Günün sorusu: ${C.myPet} cevapladı`, `${K.fill(D.questions[i])}\n\nSen de cevaplayınca onunki açılır.`, ['speech_balloon'], { click: K.roomUrl('sorular') });
       const ok = await K.notify(`Günün sorusu: ${C.herName} cevapladı`, `${K.fill(D.questions[i])}\n\n"${text}"`, ['speech_balloon']);
       K.fx.toast(ok ? `Cevabın ${K.ek(C.myName, 'in')} telefonuna ulaştı.` : 'Cevabın deftere yazıldı.', { icon: A.icon('question') });
       K.emit('answered', i);

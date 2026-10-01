@@ -151,7 +151,7 @@
       if (K.cloud && K.cloud.enabled && !mineRow()) {
         const r = await K.cloud.add('kelime', { day: day(), guesses: s.g, won });
         if (r) rows.push(r);
-        if (!K.isOwner()) K.notify(`Günün Kelimesi: ${C.herName} ${won ? `${s.g.length}. denemede buldu` : 'bulamadı'}`, '', ['abc']);
+        K.ping(`Günün Kelimesi: ${K.meName()} ${won ? `${s.g.length}. denemede buldu` : 'bulamadı'}`, 'Harfler, sen de çözünce açılır.', ['abc']);
       }
       render();
     }

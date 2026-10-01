@@ -100,7 +100,7 @@
       K.fx.confetti({ count: 90, shapes: ['heart'] });
       K.fx.toast(`<b>Kare tamamlandı!</b> ${K.esc(K.ek(nameOf(other()), 'in'))} fotoğrafı açıldı.`, { icon: A.icon('camera') });
     } else K.fx.toast(`<b>Koydun.</b> ${K.esc(nameOf(other()))} koyunca kare tamamlanır.`, { icon: A.icon('camera') });
-    if (!K.isOwner()) K.notify(`Günün Karesi: ${C.herName} "${promptOf(k)}" fotoğrafını koydu`, of(k, other()) ? 'Kare tamamlandı!' : 'Seninki bekleniyor.', ['camera']);
+    K.ping(`Günün Karesi: ${K.meName()} "${promptOf(k)}" fotoğrafını koydu`, of(k, other()) ? 'Kare tamamlandı!' : 'Seninki bekleniyor.', ['camera']);
     render();
   }
   async function full(id) {
