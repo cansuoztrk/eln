@@ -81,6 +81,16 @@
       const sc = K.$('.cc-score');
       if (sc) out.push({ room: '', run: () => set('bugun', { scroll: true }), ic: 'lily', n: sc.firstChild ? sc.firstChild.textContent : '0', u: '/10', t: 'Günün Çiçeği', s: 'Bugünün ritüelleri' });
     }
+    if (K.uyku && K.uyku.total()) out.push({ room: 'uyku', ic: 'moon', n: `${K.uyku.count()}/${K.uyku.total()}`, u: '', t: 'Uyku Masalları', s: K.uykubiz ? `${K.uykubiz.nights()} gece birlikte uyuduk` : 'Sesimle masallar' });
+    if (K.harita) out.push({ room: 'harita', ic: 'map', n: K.harita.dreams(), u: 'hayal', t: 'Bizim Haritamız', s: K.harita.went() ? `${K.harita.went()} yere gittik` : 'Kuzey ışıkları, Paris, Roma...' });
+    if (K.yarisma && K.cloud && K.cloud.enabled) {
+      const w = K.yarisma.wins();
+      out.push({ room: 'yarisma', ic: 'question', n: `${w.her}–${w.me}`, u: '', t: 'Bilgi Yarışması', s: K.yarisma.games() ? `${K.yarisma.games()} yarışma` : 'Kitty sunuyor' });
+    }
+    if (K.amiral && K.cloud && K.cloud.enabled) {
+      const w = K.amiral.wins(), s = K.amiral.state();
+      out.push({ room: 'amiral', ic: 'flag', n: `${w.her}–${w.me}`, u: '', t: 'Amiral Battı', s: s && !s.winner && s.ready ? (s.turn === (K.isOwner() ? 'me' : 'her') ? '🎯 Sıra sende' : 'Sıra onda') : 'Boğaz\'a karşı Hazar' });
+    }
     if (K.onyil && K.cloud && K.cloud.enabled) out.push({ room: 'onyil', ic: 'hourglass', n: K.num(K.onyil.days()), u: 'gün', t: 'On Yıl Sonra', s: `Kapsülde ${K.onyil.count()} zarf` });
     if (K.kisayol) out.push({ room: '', run: () => K.kisayol.open(), ic: 'hug', n: '🗣️', u: '', t: 'Siri ile Sarıl', s: `"Hey Siri, ${K.ek(K.otherName(), 'e')} sarıl"` });
     out.push({ room: 'album', ic: 'sticker', n: Object.keys(K.stickers.got()).length, u: 'çıkartma', t: 'Çıkartma albümü', s: `Zorunlulardan ${K.stickers.done()}/${K.stickers.total}` });

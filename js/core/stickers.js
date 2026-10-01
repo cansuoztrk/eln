@@ -107,6 +107,11 @@
     { id: 'gorev', name: 'Görev Tamam', hint: 'Haftanın görevini ikiniz de bitirin', icon: 'star', color: '#FFF1C9', bonus: true },
     { id: 'onyil', name: '2036', hint: 'On Yıl Sonra kutusuna bir not bırak', icon: 'hourglass', color: '#E6E0FF', bonus: true },
     { id: 'hayalyap', name: 'Hayal Gerçek', hint: 'Hayallerimizden birine "Yaptık!" deyin', icon: 'list', color: '#E3F6EC', bonus: true },
+    { id: 'uyku', name: 'Masal Dinleyicisi', hint: 'Uyku Masalları\'ndan birini sonuna kadar dinle', icon: 'moon', color: '#DCD6F7', bonus: true },
+    { id: 'uykubiz', name: 'Aynı Gece', hint: 'İkiniz de aynı gece "uyuyorum" deyin', icon: 'moon', color: '#E0DBFF', bonus: true },
+    { id: 'harita', name: 'Kâşif', hint: 'Haritamıza bir iğne tak', icon: 'map', color: '#DDF0FF', bonus: true },
+    { id: 'yarisma', name: 'Yarışma Kraliçesi', hint: 'Bilgi Yarışması\'nı kazan', icon: 'crown', color: '#FFE9B8', bonus: true },
+    { id: 'amiral', name: 'Amiral', hint: 'Amiral Battı\'yı kazan', icon: 'flag', color: '#D6ECFF', bonus: true },
     { id: 'muhur', name: 'Kırılan Mühür', hint: 'Bu çıkartma ilk buluşmada açılır', icon: 'hugs', color: '#FFD6E5', bonus: true },
   ];
   const REQUIRED = DEFS.filter((d) => !d.bonus);

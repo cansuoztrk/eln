@@ -15,7 +15,7 @@
   };
 
   function render() {
-    const vs = K.voice.list();
+    const vs = K.voice.list().filter((v) => !v.uyku);
     const heard = K.voice.heard();
     K.$('#svCount', root).textContent = `${vs.filter((v) => heard[v.id]).length} / ${vs.length} ses dinlendi`;
     K.$('#svList', root).innerHTML = vs
@@ -39,7 +39,7 @@
     color: '#FFE0E0',
     hidden: () => !K.voice || !K.voice.any(),
     badge: () => {
-      const n = K.voice.list().filter((v) => K.voice.unlocked(v) && !K.voice.heard()[v.id]).length;
+      const n = K.voice.list().filter((v) => !v.uyku && K.voice.unlocked(v) && !K.voice.heard()[v.id]).length;
       return n ? `${n} yeni` : '';
     },
     init(el) {

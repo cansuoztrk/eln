@@ -33,10 +33,6 @@ body.tab-biz .biz, body.tab-kale .sec.castle { animation: rise 0.45s var(--ease-
 /* ---------- Gece Modu ---------- */
 .gece-btn .ic { width: 26px; height: 26px; }
 .gece-btn.on { background: #2F2152; border-color: #5B4791; box-shadow: 0 0 0 3px rgba(255, 211, 78, 0.25), var(--shadow-s); }
-@media (max-width: 400px) {
-  .top-actions { gap: 6px; }
-  .top-actions .icon-btn { width: 40px; height: 40px; }
-}
 body.gece-modu { --line: #5A3F70; --glass: rgba(44, 30, 66, 0.84); background-color: #1C1230; background-image: radial-gradient(circle, rgba(255, 214, 236, 0.11) 1.6px, transparent 2.2px), radial-gradient(circle, rgba(255, 230, 160, 0.08) 1.2px, transparent 1.8px); background-size: 34px 34px, 52px 52px; background-position: 0 0, 17px 21px; }
 body.gece-modu::after { content: ''; position: fixed; inset: 0; z-index: 400; pointer-events: none; background: rgba(205, 125, 80, 0.2); mix-blend-mode: multiply; }
 body.gece-modu .topbar { background: rgba(28, 18, 48, 0.88); border-bottom-color: rgba(255, 255, 255, 0.08); }

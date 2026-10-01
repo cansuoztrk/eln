@@ -21,7 +21,8 @@
     return { v: all.length ? all[all.length - 1].v : 0, title: (pick[pick.length - 1] || {}).title, items };
   }
   const NOROOM = ['kaydir', 'hatirlat', 'gece', 'gunbatimi'];
-  const target = (id) => id.replace(/21$/, '');
+  const ALIAS = { uykubiz: 'gece' };
+  const target = (id) => ALIAS[id] || id.replace(/21$/, '');
   const roomOk = (id) => {
     const r = K.rooms.find((x) => x.id === id);
     return Boolean(r && !(typeof r.hidden === 'function' ? r.hidden() : r.hidden));
@@ -36,6 +37,7 @@
       if (id === 'salon') return Boolean(K.salon);
       if (id === 'endise') return Boolean(K.endise && K.cloud && K.cloud.enabled);
       if (id === 'gece') return Boolean(K.$('#geceBtn'));
+      if (id === 'uykubiz') return roomOk('gece') && Boolean(K.cloud && K.cloud.enabled);
       if (id === 'gunbatimi') return Boolean(K.gunbatimi && K.cloud && K.cloud.enabled);
       if (id === 'kisayol') return Boolean(K.kisayol && (K.isOwner() ? C.ntfyTopicHer : C.ntfyTopic));
       return roomOk(id);

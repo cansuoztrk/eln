@@ -99,7 +99,7 @@
     ul.innerHTML = (D.voices || [])
       .map((v) => {
         const [st, label] = voiceState(v.id);
-        return `<li class="pn-v ${st}"><div><b>${K.esc(v.title)}</b><small>${K.esc(v.where || '')}${v.sure ? ` · ${K.esc(v.sure)}` : ''}</small></div><span class="pn-vst">${label}</span><button class="btn small ${st === 'yok' ? 'red' : 'soft'}" type="button" data-rec="${K.esc(v.id)}">${A.ui('mic')} ${st === 'yok' ? 'Kaydet' : 'Yeniden'}</button></li>`;
+        return `${v.uyku && v.uyku.n === 1 ? '<li class="pn-vhead">🌙 Uyku Masalları</li>' : ''}<li class="pn-v ${st}"><div><b>${K.esc(v.title)}</b><small>${K.esc(v.where || '')}${v.sure ? ` · ${K.esc(v.sure)}` : ''}</small></div><span class="pn-vst">${label}</span><button class="btn small ${st === 'yok' ? 'red' : 'soft'}" type="button" data-rec="${K.esc(v.id)}">${A.ui('mic')} ${st === 'yok' ? 'Kaydet' : 'Yeniden'}</button></li>`;
       })
       .join('');
     const n = (D.voices || []).filter((v) => voiceState(v.id)[0] !== 'yok').length;
@@ -216,6 +216,9 @@
       if (f) setBlob(f);
     });
   }
+
+  // Başka odalardan (Uyku Masalları) doğrudan stüdyo
+  K.studio = (id) => K.isOwner() && K.cloud && K.cloud.enabled && studio(id);
 
   /* ---------------- Gerçek zambaklar ---------------- */
   async function renderReal() {

@@ -189,7 +189,7 @@
     K.store.set('sleep', { at: Date.now(), shown: false });
     const lines = G().night;
     const line = lines.length ? K.fill(lines[Math.floor(Math.random() * lines.length)]) : '';
-    if (K.cloud && K.cloud.enabled) K.cloud.add('sleep', { at: Date.now() });
+    if (K.cloud && K.cloud.enabled) K.cloud.add('sleep', { at: Date.now() }).then((r) => r && (pushRow(r), bizRender(), bothCheck()));
     K.ping(`${K.meName()} uyudu`, 'Işığını kapattı. Sen de iyi uykular.', ['crescent_moon'], { priority: 3 });
     root.classList.add('asleep');
     K.$('#glMsg', root).innerHTML = `<p class="hand">${K.esc(line)}</p><p class="muted small">Ekran kısıldı. Ses açıksa zamanlayıcı bitince yavaşça susacak.</p>`;
@@ -220,15 +220,147 @@
   });
   K.on('cloud', async (on) => {
     if (!on) return;
-    const pick = (rows) => rows.filter((r) => r.who !== (K.isOwner() ? 'me' : 'her')).pop();
-    otherSleep = pick(await K.cloud.list('sleep', 60)) || null;
+    const pick = (rows) => rows.filter((r) => r.who !== mine()).pop();
+    rows = await K.cloud.many(['sleep', 'uyandim'], { since: Date.now() - 40 * 864e5, limit: 400 });
+    otherSleep = pick(rows.filter((r) => r.kind === 'sleep')) || null;
+    bizLoaded = true;
     K.cloud.on('sleep', (r) => {
-      if (r.who === (K.isOwner() ? 'me' : 'her')) return;
+      if (!pushRow(r) || r.who === mine()) return;
       otherSleep = r;
-      K.fx.toast(`${K.esc(K.otherName())} uyudu. İyi geceler de.`, { icon: A.icon('moon') });
-      if (K.activeRoom === 'gece') status();
+      K.fx.toast(asleep(mine()) ? `${K.esc(K.otherName())} da uyudu. İki kule birlikte karardı.` : `${K.esc(K.otherName())} uyudu. İyi geceler de.`, { icon: A.icon('moon') });
+      bothCheck();
+      if (K.activeRoom === 'gece') status(), bizRender();
+      K.renderSpecials && !K.activeRoom && K.renderSpecials();
     });
+    K.cloud.on('uyandim', (r) => {
+      if (!pushRow(r) || r.who === mine()) return;
+      if (!asleep(mine())) K.fx.toast(`☀️ <b>${K.esc(K.otherName())} uyandı.</b>${r.data.text ? ` "${K.esc(r.data.text)}"` : ''}`, { duration: 7000 });
+      if (K.activeRoom === 'gece') bizRender();
+      K.renderSpecials && !K.activeRoom && K.renderSpecials();
+    });
+    K.renderSpecials && !K.activeRoom && K.renderSpecials();
   });
+
+  /* ---------- Birlikte Uyuyalım: iki kule birlikte kararır, sabah ilk uyananın günaydını mühürlü bekler ---------- */
+  const BZ = () => D.uykubiz || { both: [], morningIdeas: [] };
+  const mine = () => (K.isOwner() ? 'me' : 'her');
+  const other = () => (K.isOwner() ? 'her' : 'me');
+  let rows = [], bizLoaded = false;
+  const pushRow = (r) => (r && !rows.some((x) => x.id === r.id) ? (rows.push(r), true) : false);
+  const lastSleep = (w) => rows.filter((r) => r.kind === 'sleep' && r.who === w && Date.now() - r.at < 16 * 36e5).sort((a, b) => b.at - a.at)[0] || null;
+  const wakeAfter = (w, at) => rows.filter((r) => r.kind === 'uyandim' && r.who === w && r.at > at).sort((a, b) => a.at - b.at)[0] || null;
+  const asleep = (w) => {
+    const s = lastSleep(w);
+    return Boolean(s && !wakeAfter(w, s.at));
+  };
+  // Gece anahtarı: öğleden 12 saat geri (gece 01:00'de yatmak önceki akşama sayılır)
+  const nightOf = (at) => T.key(T.baku(new Date(at - 12 * 36e5)));
+  function nights() {
+    const by = {};
+    rows.filter((r) => r.kind === 'sleep').forEach((r) => ((by[nightOf(r.at)] = by[nightOf(r.at)] || {})[r.who] = r.at));
+    return Object.keys(by).filter((k) => by[k].me && by[k].her).sort();
+  }
+  const hm = (at) => {
+    const p = T.parts(K.isOwner() ? C.tzIstanbul : C.tzBaku, new Date(at));
+    return `${K.pad(p.h)}:${K.pad(p.mi)}`;
+  };
+  const bothAsleep = () => asleep('me') && asleep('her') && Math.abs(lastSleep('me').at - lastSleep('her').at) < 8 * 36e5;
+  function bothCheck() {
+    if (!bothAsleep()) return;
+    const k = nightOf(Math.max(lastSleep('me').at, lastSleep('her').at));
+    if (K.store.get('uykuBizSeen') === k) return;
+    K.store.set('uykuBizSeen', k);
+    K.stickers.award('uykubiz');
+  }
+  // Uyandığımda öbürünün bıraktığı günaydın (benim son uykumdan sonra yazılan, metinli)
+  function noteFor() {
+    const mySleep = rows.filter((r) => r.kind === 'sleep' && r.who === mine()).sort((a, b) => b.at - a.at)[0];
+    if (!mySleep || Date.now() - mySleep.at > 20 * 36e5) return null;
+    const n = rows.filter((r) => r.kind === 'uyandim' && r.who === other() && r.at > mySleep.at && r.data.first).sort((a, b) => a.at - b.at)[0];
+    return n ? { note: n, mine: wakeAfter(mine(), mySleep.at) } : null;
+  }
+  const morningForMe = () => {
+    const s = lastSleep(mine());
+    return Boolean(s && Date.now() - s.at > 3 * 36e5 && !wakeAfter(mine(), s.at));
+  };
+  function scene() {
+    const me = asleep(mine()), ot = asleep(other());
+    const tw = (w, on) => `<div class="gb2-tower ${w} ${on ? 'off' : ''}"><span class="gb2-win"></span><span class="gb2-win"></span><span class="gb2-zz">${on ? 'z z z' : ''}</span><small>${K.esc(w === 'me' ? C.myCity : C.herCity)}</small></div>`;
+    return `<div class="gb2-scene ${me && ot ? 'both' : ''}" aria-hidden="true"><span class="gb2-moon"></span>${tw('me', asleep('me'))}<span class="gb2-bridge"><i class="gb2-cat">🐈</i></span>${tw('her', asleep('her'))}</div>`;
+  }
+  function bizRender() {
+    const box = root && K.$('#glBiz', root);
+    if (!box) return;
+    if (!bizLoaded || !K.cloud || !K.cloud.enabled) return (box.hidden = true);
+    box.hidden = false;
+    const n = nights().length;
+    const me = asleep(mine()), ot = asleep(other());
+    const line = bothAsleep() ? K.pick(BZ().both || ['']) : ot ? `${K.otherName()} ${hm(lastSleep(other()).at)}'de uyudu. ${BZ().waiting || ''}` : me ? `Sen uyudun; ${K.otherName()} hâlâ uyanık.` : 'İkiniz de uyanıksınız.';
+    const nt = noteFor();
+    box.innerHTML = `<p class="card-eyebrow">🌙 ${K.esc(BZ().title || 'Birlikte Uyuyalım')}</p>${scene()}<p class="gb2-line">${K.esc(line)}</p>
+      <p class="muted small">Birlikte uyuduğumuz geceler: <b>${n}</b></p>
+      ${nt && nt.mine ? `<div class="en-reply"><small>${K.esc(K.otherName())} · ${K.esc(hm(nt.note.at))}</small><p class="hand">${K.esc(nt.note.data.text)}</p></div>` : ''}
+      ${morningForMe() ? `<button type="button" class="btn red" data-gl-wake>☀️ Uyandım${nt ? ' · günaydınını aç' : ''}</button>` : ''}`;
+  }
+  async function wake() {
+    const s = lastSleep(mine());
+    const first = asleep(other());
+    if (!first) {
+      const r = await K.cloud.add('uyandim', {});
+      pushRow(r);
+      const nt = noteFor();
+      K.audio.sfx.chime();
+      if (nt) {
+        const d = Math.max(1, Math.round((r.at - nt.note.at) / 6e4));
+        K.ui.modal({
+          label: 'Günaydın',
+          cls: 'gl-wake',
+          html: `<div class="gl-morning">${A.kitty({ eyes: 'happy', crown: true })}<p class="card-eyebrow">${K.esc(K.otherName())} senden ${d < 60 ? `${d} dakika` : `${Math.round(d / 60)} saat`} önce uyandı</p><p class="hand gl-wake-note">${K.esc(nt.note.data.text)}</p></div>`,
+        });
+      } else K.fx.toast('☀️ Günaydın! İkiniz de uyandınız.', { duration: 3000 });
+      K.ping(`☀️ ${K.meName()} uyandı`, 'Günaydın!', ['sunrise'], { priority: 2 });
+      bizRender();
+      K.renderSpecials && !K.activeRoom && K.renderSpecials();
+      return;
+    }
+    // Önce ben uyandım: ona mühürlü bir günaydın
+    const m = K.ui.modal({
+      label: 'Günaydın bırak',
+      cls: 'br-sheet',
+      html: `<p class="card-eyebrow">☀️ Önce sen uyandın</p><h2>${K.esc(K.otherName())} hâlâ uyuyor</h2><p class="muted">${K.esc(BZ().morningIntro || '')}</p>
+        <div class="br-chips">${(BZ().morningIdeas || []).map((x) => `<button type="button" class="chip" data-gm>${K.esc(x)}</button>`).join('')}</div>
+        <input class="input" maxlength="140" placeholder="Günaydın..."><button type="button" class="btn red" data-gm-go>☀️ Bırak</button>`,
+    });
+    m.body.addEventListener('click', async (e) => {
+      const c = e.target.closest('[data-gm]');
+      if (c) return (K.$('input', m.body).value = c.textContent);
+      const g = e.target.closest('[data-gm-go]');
+      if (!g) return;
+      g.disabled = true;
+      const text = K.$('input', m.body).value.trim() || (BZ().morningIdeas || ['Günaydın'])[0];
+      const r = await K.cloud.add('uyandim', { text, first: true, slept: s ? s.at : 0 });
+      if (!r) return (g.disabled = false), K.fx.toast('Gönderilemedi.');
+      pushRow(r);
+      m.close();
+      K.audio.sfx.chime();
+      K.fx.toast('☀️ Bırakıldı. O uyanıp "Uyandım" deyince açılacak.', { duration: 3500 });
+      // Uyuyanı uyandırmasın: düşük öncelik, sessiz
+      K.ping(`☀️ ${K.meName()} sana bir günaydın bıraktı`, 'Uyanınca kalede "Uyandım" de, açılsın.', ['sunrise'], { priority: 2 });
+      bizRender();
+    });
+  }
+  document.addEventListener('click', (e) => e.target.closest('[data-gl-wake]') && wake());
+  K.specialHooks = (K.specialHooks || []).concat(() => {
+    if (!bizLoaded || !D.gece) return [];
+    if (morningForMe()) {
+      const nt = rows.find((r) => r.kind === 'uyandim' && r.who === other() && r.data.first && r.at > lastSleep(mine()).at);
+      return [{ icon: 'sun', title: nt ? `💌 Sen uyurken ${K.otherName()} bir günaydın bıraktı` : '☀️ Günaydın! Uyandığını ona söyle', text: nt ? 'Mühürlü. "Uyandım" deyince açılır.' : asleep(other()) ? `${K.otherName()} hâlâ uyuyor; ona mühürlü bir günaydın bırakabilirsin.` : 'Tek dokunuş: "Uyandım".', run: wake, cta: 'Uyandım' }];
+    }
+    const h = T.parts(K.isOwner() ? C.tzIstanbul : C.tzBaku).h;
+    if (asleep(other()) && !asleep(mine()) && (h >= 21 || h < 4)) return [{ icon: 'moon', title: `🌙 ${K.otherName()} ${hm(lastSleep(other()).at)}'de uyudu`, text: 'Sen de "uyuyorum" deyince iki kule birlikte kararır.', room: 'gece', cta: 'Gece Lambası' }];
+    return [];
+  });
+  K.uykubiz = { nights: () => nights().length, asleep, bothAsleep };
   function status() {
     const el = root && K.$('#glOther', root);
     if (!el) return;
@@ -272,6 +404,8 @@
           <p class="muted small">Uyuyamadığında: ${K.esc(C.myPet)}'un sesi arka arkaya, kısık sesle. Uyku sesi açıksa onunla birlikte çalar.</p>
           <div class="gl-pl-row"><button type="button" class="btn soft" id="glPlBtn">${A.ui('play')} Başlat</button><p class="gl-pl-now" id="glPlNow"></p></div>
         </section>
+        <section class="card gl-biz" id="glBiz" hidden></section>
+        <a class="card gl-uyku" href="#uyku"><span aria-hidden="true">📚</span><div><b>Uyku Masalları</b><small>${K.esc(C.myPet)}'un sesinden on iki masal</small></div></a>
         <div class="actions" style="justify-content:center"><button class="btn red big" id="glSleep">${A.icon('moon')} Uyuyorum</button></div>
         <div class="gl-msg" id="glMsg"></div>`;
       let min = 30;
@@ -301,6 +435,7 @@
       root.classList.remove('asleep');
       status();
       plRender();
+      bizRender();
     },
     leave() {
       // Oda kapansa da ses zamanlayıcıya kadar çalmaya devam eder; sadece ekran normale döner
