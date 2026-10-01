@@ -29,12 +29,17 @@
       label: 'Bildirimler',
       cls: 'zil-sheet',
       html: `<p class="card-eyebrow">Kalede olanlar</p><h2>Bildirimler</h2>
+        ${K.telefon && (K.isOwner() || window.ELN.config.ntfyTopicHer) ? `<button type="button" class="zil-phone ${K.telefon.done() ? 'ok' : ''}" data-zil-phone><span aria-hidden="true">📱</span><span>${K.isOwner() ? 'Onun telefonuna bildirim' : 'Telefonuna bildirim'}<small>${K.isOwner() ? 'Kurulumu gör, deneme gönder' : K.telefon.done() ? 'Açık ✓' : 'Kilit ekranına düşsün: kur'}</small></span>${A.ui('next')}</button>` : ''}
         ${items.length ? `<ul class="zil-list">${items.map((x) => `<li class="${x.at > seen ? 'new' : ''}"><span class="zi">${x.icon || A.icon('bow')}</span><div>${x.html}<small>${K.esc(K.ago ? K.ago(x.at) : '')}</small></div></li>`).join('')}</ul>
           <div class="zil-foot"><button type="button" class="btn ghost small" data-zil-clear>Temizle</button></div>` : '<p class="zil-empty">Şimdilik sessiz. Bir şey olunca burada birikir.</p>'}`,
     });
     K.store.set(key() + '-seen', Date.now());
     badge();
     m.body.addEventListener('click', (e) => {
+      if (e.target.closest('[data-zil-phone]')) {
+        m.close();
+        return setTimeout(() => K.telefon.sheet(), 330);
+      }
       if (e.target.closest('[data-zil-clear]')) {
         K.store.set(key(), []);
         m.close();

@@ -112,7 +112,7 @@
       K.fx.confetti({ count: 90, shapes: ['star', 'heart'] });
       K.fx.toast(`<b>Yeni bölüm açıldı:</b> Bölüm ${ROMAN[Math.floor((n - 1) / PER)] || ''}`, { icon: A.icon('story') });
     }
-    if (!K.isOwner()) K.notify(`${C.herName} masala bir cümle ekledi`, text, ['book', 'heart']);
+    K.ping(`${K.meName()} masala bir cümle ekledi`, text, ['book', 'heart']);
     render();
     const el = K.$$('.dv-p', root).pop();
     el && el.scrollIntoView({ behavior: K.reduced ? 'auto' : 'smooth', block: 'center' });

@@ -932,7 +932,7 @@
     form.reset();
     K.audio.sfx.chime();
     K.fx.toast('Sahne filme eklendi. "Biz" bölümünde oynayacak.', { icon: A.icon('film') });
-    if (!K.isOwner()) K.notify(`${C.herName} filmimize bir sahne ekledi`, text, ['clapper']);
+    K.ping(`${K.meName()} filmimize bir sahne ekledi`, text, ['clapper']);
     lobby();
   }
 

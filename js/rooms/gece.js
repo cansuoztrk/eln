@@ -190,7 +190,7 @@
     const lines = G().night;
     const line = lines.length ? K.fill(lines[Math.floor(Math.random() * lines.length)]) : '';
     if (K.cloud && K.cloud.enabled) K.cloud.add('sleep', { at: Date.now() });
-    if (!K.isOwner()) K.notify(`${C.herName} uyudu`, 'Işığını kapattı. Sen de iyi uykular.', ['crescent_moon'], { priority: 3 });
+    K.ping(`${K.meName()} uyudu`, 'Işığını kapattı. Sen de iyi uykular.', ['crescent_moon'], { priority: 3 });
     root.classList.add('asleep');
     K.$('#glMsg', root).innerHTML = `<p class="hand">${K.esc(line)}</p><p class="muted small">Ekran kısıldı. Ses açıksa zamanlayıcı bitince yavaşça susacak.</p>`;
     if (K.voice && K.voice.has('iyi-geceler')) K.$('#glMsg', root).insertAdjacentHTML('beforeend', K.voice.btn('iyi-geceler', 'Sesimle iyi geceler'));

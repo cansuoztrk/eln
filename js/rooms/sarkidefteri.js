@@ -130,7 +130,7 @@
         if (!r) return K.fx.toast('Eklenemedi. İnterneti kontrol et.');
         ['sdTitle', 'sdArtist', 'sdNote', 'sdYt'].forEach((id) => (K.$('#' + id, el).value = ''));
         K.audio.sfx.chime();
-        if (!K.isOwner()) K.notify(`${C.herName} şarkı defterine yazdı`, `${artist} · ${title}${r.data.note ? `: ${r.data.note}` : ''}`, ['musical_note']);
+        K.ping(`${K.meName()} şarkı defterine yazdı`, `${artist} · ${title}${r.data.note ? `: ${r.data.note}` : ''}`, ['musical_note']);
         render();
       });
       el.addEventListener('submit', async (e) => {

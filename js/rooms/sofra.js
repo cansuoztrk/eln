@@ -330,7 +330,7 @@
     saveProg();
     K.audio.sfx.chime();
     const d = dishOf(dish);
-    if (!K.isOwner()) K.notify(`${C.herName} sofrayı kurdu: ${d.me.name} & ${d.her.name}`, 'Aynı Sofra\'ya gel; malzemelerini topla.', ['stew']);
+    K.ping(`${K.meName()} sofrayı kurdu: ${d.me.name} & ${d.her.name}`, 'Aynı Sofra\'ya gel; malzemelerini topla.', ['stew']);
     render();
   }
   async function addPlate(file) {
@@ -344,7 +344,7 @@
     if (!r) return K.fx.toast('Fotoğraf gönderilemedi.');
     K.stickers.award('sofra');
     K.fx.confetti({ count: 70, shapes: ['heart'] });
-    if (!K.isOwner()) K.notify(`${C.herName} tabağını gösterdi`, 'Aynı Sofra\'da kalp ver.', ['stew']);
+    K.ping(`${K.meName()} tabağını gösterdi`, 'Aynı Sofra\'da kalp ver.', ['stew']);
     render();
   }
   async function rate(n) {
@@ -356,7 +356,7 @@
     const r = await K.cloud.add('sfrate', { sid, stars: n, note });
     if (!r) return;
     K.audio.sfx.success();
-    if (!K.isOwner()) K.notify(`${C.herName} senin tabağına ${n} kalp verdi`, note || 'Aynı Sofra', ['heart']);
+    K.ping(`${K.meName()} senin tabağına ${n} kalp verdi`, note || 'Aynı Sofra', ['heart']);
     render();
   }
 

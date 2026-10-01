@@ -180,7 +180,7 @@
         id = 'c' + r.id;
       }
     }
-    const pushed = await K.notify(`Telsiz · ${C.herName}`, text, tags, { click: liveUrl() });
+    const pushed = await K.ping(`Telsiz · ${K.meName()}`, text, tags, { click: K.isOwner() ? K.roomUrl('telsiz') : liveUrl() });
     ok = ok || pushed;
     const list = inbox();
     list.unshift({ id, t: Date.now(), dir: 'out', text, ok });

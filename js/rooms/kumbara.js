@@ -196,7 +196,7 @@
         K.$('#kbNote', el).value = '';
         K.audio.sfx.sparkle();
         if (before === total()) render();
-        if (!K.isOwner()) K.notify(`${C.herName} kumbaraya para attı`, `${amount} ${K.$('#kbCur', el).value}${r.data.note ? `: ${r.data.note}` : ''}`, ['moneybag']);
+        K.ping(`${K.meName()} kumbaraya para attı`, `${amount} ${K.$('#kbCur', el).value}${r.data.note ? `: ${r.data.note}` : ''}`, ['moneybag']);
         render();
       });
       el.addEventListener('click', async (e) => {

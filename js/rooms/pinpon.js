@@ -325,7 +325,7 @@
         if (e.target.closest('[data-pp-invite]')) {
           invite = { gid: 'p' + Date.now().toString(36) };
           K.cloud.send('pp', { t: 'invite', gid: invite.gid });
-          if (!K.isOwner()) K.notify(`${C.herName} seni pinpona çağırıyor`, 'İki Kıyı Pinpon', ['ping_pong']);
+          K.ping(`${K.meName()} seni pinpona çağırıyor`, 'İki Kıyı Pinpon', ['ping_pong']);
           return status();
         }
         if (e.target.closest('[data-pp-cancel]')) {

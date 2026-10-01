@@ -112,7 +112,7 @@
     const r = await K.cloud.add('exam', { name, date, time });
     if (!r) return K.fx.toast('Eklenemedi. İnterneti kontrol et.');
     K.audio.sfx.pop();
-    if (!K.isOwner()) K.notify(`${C.herName} sınav tarihi ekledi`, `${name}: ${T.fmt(date)}${time ? ' ' + time : ''}`, ['books']);
+    K.ping(`${K.meName()} sınav tarihi ekledi`, `${name}: ${T.fmt(date)}${time ? ' ' + time : ''}`, ['books']);
     render();
   }
   async function sendCharm(examId, charm) {
@@ -125,7 +125,7 @@
     K.fx.confetti({ count: 60, shapes: ['star', 'heart'] });
     K.stickers.award('kalkan');
     K.fx.toast(`${charmName(charm)} yola çıktı.`, { icon: A.icon('star') });
-    if (!K.isOwner()) K.notify(`${C.herName} sana ${charmName(charm).toLocaleLowerCase('tr-TR')} gönderdi`, `${e.data.name} sınavın için${note ? `: ${note}` : ''}`, ['four_leaf_clover']);
+    K.ping(`${K.meName()} sana ${charmName(charm).toLocaleLowerCase('tr-TR')} gönderdi`, `${e.data.name} sınavın için${note ? `: ${note}` : ''}`, ['four_leaf_clover']);
     render();
   }
   async function setMood(examId, mood) {
@@ -133,7 +133,7 @@
     const r = await K.cloud.add('examres', { exam: examId, mood });
     if (!r) return;
     if (mood === 'iyi') K.fx.confetti({ count: 120, shapes: ['star'] });
-    if (!K.isOwner()) K.notify(`${C.herName}: ${e ? e.data.name : 'sınav'} ${MOODS.find((m) => m[0] === mood)[1].toLocaleLowerCase('tr-TR')}`, 'Sınav Kalkanı', ['books']);
+    K.ping(`${K.meName()}: ${e ? e.data.name : 'sınav'} ${MOODS.find((m) => m[0] === mood)[1].toLocaleLowerCase('tr-TR')}`, 'Sınav Kalkanı', ['books']);
     render();
   }
 

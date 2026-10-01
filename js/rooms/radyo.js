@@ -78,7 +78,7 @@
     if (!rows.some((q) => q.id === r.id)) rows.push(r);
     K.audio.sfx.tap();
     K.stickers.award('radyo');
-    if (!K.isOwner()) K.notify(`${C.herName} Kale Radyosu'nda bir şarkı açtı`, `${x.data.title} · ${x.data.artist || ''}`, ['radio']);
+    if (!advancing) K.ping(`${K.meName()} Kale Radyosu'nda bir şarkı açtı`, `${x.data.title} · ${x.data.artist || ''}`, ['radio'], { click: K.roomUrl('radyo') });
     sync();
   }
   function nextOf(sid) {
@@ -129,7 +129,7 @@
     const s = live();
     return s && s.who === other() ? [{ icon: 'vinyl', title: `${nameOf(s.who)} şu an radyoda: ${s.data.song.title}`, text: `${s.data.song.artist || ''}. Girersen sende de aynı saniyeden çalar.`, room: 'radyo', cta: 'Birlikte dinle' }] : [];
   });
-  K.radyo = { live };
+  K.radyo = { live, start };
 
   K.room({
     id: 'radyo',

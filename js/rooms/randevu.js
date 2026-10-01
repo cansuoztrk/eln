@@ -256,7 +256,7 @@
       if (r && !rows.some((x) => x.id === r.id)) rows.push(r);
       K.audio.sfx.success();
       K.fx.burst(window.innerWidth / 2, window.innerHeight / 2.5, { count: 18 });
-      if (!K.isOwner()) K.notify(`${C.herName} randevu çarkını çevirdi`, `Bu akşam: ${items[k][1]}`, ['candle']);
+      K.ping(`${K.meName()} randevu çarkını çevirdi`, `Bu akşam: ${items[k][1]}`, ['candle']);
       if (tab === 'cark') render();
     });
   }

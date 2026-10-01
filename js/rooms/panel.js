@@ -119,6 +119,7 @@
       K.audio.sfx.chime();
       K.fx.confetti({ count: 60 });
       K.fx.toast(open ? `Mektup ${T.fmt(open)}'da açılmak üzere postalandı.` : 'Mektup postalandı. Kaledeyse şu an ekranına düştü.', { icon: A.icon('letter') });
+      K.pingHer(`💌 ${K.ek(C.myPet, 'den')} mektup var`, open ? `"${title}" · ${T.fmt(open)} günü açılacak` : `"${title}" · Mektuplar odasında seni bekliyor`, ['love_letter'], { click: K.roomUrl('mektuplar') });
       renderLists();
     });
     K.$('#pnNoteForm', el).addEventListener('submit', async (e) => {

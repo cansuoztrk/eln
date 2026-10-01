@@ -284,7 +284,7 @@
         inp.placeholder = ph;
         inp.classList.remove('sent');
       }, 2600);
-      if (!K.isOwner()) K.notify(`${C.herName} hikâyene yanıt verdi`, `${x.title ? x.title + ' → ' : ''}${text}`, ['speech_balloon']);
+      K.ping(`${K.meName()} hikâyene yanıt verdi`, `${x.title ? x.title + ' → ' : ''}${text}`, ['speech_balloon']);
     });
     el.addEventListener('keydown', (e) => {
       if (e.target.closest('input')) return;
@@ -302,7 +302,7 @@
     K.vibrate(20);
     const r = await K.cloud.add('hktepki', { ref: x.id, r: emo });
     if (r) rows.tepki.push(r);
-    if (!K.isOwner()) K.notify(`${C.herName} ${emo}`, `${x.title || 'Hikâyene'} tepki bıraktı`, ['heart']);
+    K.ping(`${K.meName()} ${emo}`, `${x.title || 'Hikâyene'} tepki bıraktı`, ['heart']);
   }
 
   /* ---------- Paylaş ---------- */
@@ -435,7 +435,7 @@
       K.audio.sfx.success();
       K.fx.toast(`<b>Hikâyen paylaşıldı.</b> ${K.esc(nameOf(other()))} halkayı görünce açacak.`, { icon: A.icon(voice ? 'mic' : 'camera') });
       K.stickers.award('hikaye');
-      if (!K.isOwner()) K.notify(`${C.herName} bir hikâye paylaştı`, text || (voice ? 'Sesli bir hikâye' : 'Bir fotoğraf'), ['camera_with_flash']);
+      K.ping(`${K.meName()} bir hikâye paylaştı`, text || (voice ? 'Sesli bir hikâye' : 'Bir fotoğraf'), ['camera_with_flash']);
       bar();
     });
   }

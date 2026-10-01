@@ -1,0 +1,280 @@
+/* Eln'in Krallığı — 21. aşama: Barış Köprüsü (küs/barış, köprü, Altın Kalp, kalpten mektup, özür, mola, Barış Töreni,
+   Barış Antlaşması, Barış Defteri), ana salonda bulut ve gökkuşağı, telefona bildirim kurulumu */
+
+/* ---------- Altın Kalp (kintsugi) ---------- */
+.br-heart { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; align-items: center; background: linear-gradient(135deg, #FFF8EA, #FFEFF5); }
+.br-kalp-wrap { position: relative; width: 150px; }
+.br-kalp-wrap::after { content: ''; position: absolute; inset: 14% 10% 4%; z-index: -1; border-radius: 50%; background: radial-gradient(closest-side, rgba(237, 190, 69, 0.45), transparent); filter: blur(6px); }
+.br-kalp { display: block; width: 100%; height: auto; overflow: visible; }
+.br-kalp .br-seam { stroke-width: 4; }
+.br-kalp .br-glow { stroke-width: 11; opacity: 0.25; }
+.br-kalp .br-seam.new { stroke-dasharray: 400; stroke-dashoffset: 400; animation: brDraw 2.2s 0.4s ease forwards; }
+.br-kalp .br-crack { stroke: #4A2138; stroke-width: 3.6; stroke-dasharray: 220; stroke-dashoffset: 220; animation: brDraw 1.4s 0.2s ease forwards; }
+.br-kalp-wrap.kus .br-kalp { filter: saturate(0.55); animation: brTremble 5s ease-in-out infinite; }
+.br-kalp-wrap.kus::after { background: radial-gradient(closest-side, rgba(134, 86, 111, 0.25), transparent); }
+@keyframes brDraw { to { stroke-dashoffset: 0; } }
+@keyframes brTremble { 0%, 92%, 100% { transform: none; } 94% { transform: translateX(-2px) rotate(-1deg); } 96% { transform: translateX(2px) rotate(1deg); } 98% { transform: translateX(-1px); } }
+.br-kalp-text { min-width: 0; }
+.br-kalp-text h3 { margin: 2px 0 6px; font: 600 21px/1.25 var(--font-display); color: var(--plum); text-wrap: balance; }
+.br-kalp-text .muted { margin: 0; font-size: 14px; line-height: 1.5; }
+.br-now { margin: 10px 0 0; padding: 7px 12px; border-radius: 999px; background: #EEF0F7; color: #5A5170; font: 600 13px/1.3 var(--font-display); display: inline-block; }
+@media (max-width: 460px) {
+  .br-heart { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .br-kalp-wrap { width: 140px; }
+}
+
+/* ---------- Köprü: her bayrak bir yarıyı indirir ---------- */
+.br-bridge-card { display: grid; justify-items: center; gap: 10px; background: linear-gradient(180deg, #EAF6FF 0%, #FFF6FA 70%); overflow: hidden; }
+.br-bridge { width: 100%; max-width: 520px; height: auto; overflow: visible; }
+.br-deck { transform-box: fill-box; transition: transform 1.4s var(--ease-spring); }
+.br-deck.l { transform-origin: 0% 100%; transform: rotate(-52deg); }
+.br-deck.r { transform-origin: 100% 100%; transform: rotate(52deg); }
+.br-deck.down { transform: none; }
+.br-wflag { transform: scale(0); transition: transform 0.7s 0.2s var(--ease-spring); }
+.br-wflag.up { transform: scale(1); }
+.br-wflag.up path:last-child { animation: brWave 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 50%; }
+@keyframes brWave { 50% { transform: skewY(-6deg) scaleX(0.94); } }
+.br-bheart { transform-box: fill-box; transform-origin: center; transform: scale(0); opacity: 0; transition: transform 0.8s 1.1s var(--ease-spring), opacity 0.4s 1.1s; }
+.br-bridge.joined .br-bheart { transform: scale(1); opacity: 1; animation: brBeat 2.4s 2s ease-in-out infinite; }
+@keyframes brBeat { 0%, 60%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1.04); } 45% { transform: scale(1.12); } }
+.br-bridge-cap { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.br-bridge-cap span { padding: 6px 12px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 1.5px var(--line); font: 600 13px/1.2 var(--font-display); color: var(--plum-soft); }
+.br-bridge-cap span.ok { color: var(--mint-deep); box-shadow: 0 0 0 2px var(--mint); }
+.br-flag-btn .ic { width: 24px; height: 24px; }
+.br-wait { margin: 0; text-align: center; }
+
+/* ---------- Aramız nasıl ---------- */
+.br-sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 8px 0 14px; }
+.br-side { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px; border-radius: 18px; background: #fff; box-shadow: 0 0 0 2px var(--line); }
+.br-side .yan-av { width: 44px; height: 44px; }
+.br-side > div { display: grid; gap: 3px; min-width: 0; }
+.br-side small { font-size: 12px; color: var(--plum-soft); }
+.br-side b { font: 600 15px/1.25 var(--font-display); color: var(--plum); }
+.br-side .hand { margin: 2px 0 0; font-size: 19px; line-height: 1.2; color: var(--plum); overflow-wrap: anywhere; }
+.br-side.st-kirgin { background: linear-gradient(160deg, #EEF0F7, #fff); box-shadow: 0 0 0 2px #C9CDE0; }
+.br-side.st-alan { background: linear-gradient(160deg, #F2F4FA, #fff); box-shadow: 0 0 0 2px #D5D9E8; }
+.br-side.st-hazir { background: linear-gradient(160deg, #EAF8F1, #fff); box-shadow: 0 0 0 2px var(--mint); }
+.br-lvl { font-size: 13px; letter-spacing: -2px; }
+.br-isik { display: inline-block; margin-top: 2px; padding: 4px 9px; border-radius: 999px; background: #FFF4D6; color: #8A5A00; font: 600 12px/1.25 var(--font-display); animation: brCandle 2.6s ease-in-out infinite; }
+@keyframes brCandle { 50% { box-shadow: 0 0 14px 2px rgba(255, 196, 80, 0.55); } }
+.br-lab { display: grid; gap: 6px; margin: 12px 0 6px; font: 600 14px/1.3 var(--font-display); color: var(--plum); }
+.br-lab small { font: 400 12px var(--font-body); color: var(--plum-soft); }
+.br-states { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.br-states button { display: grid; grid-template-columns: 34px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 8px; align-items: center; padding: 10px; border-radius: 16px; border: 2px solid var(--line); background: #fff; color: var(--plum); text-align: left; cursor: pointer; transition: transform 0.2s var(--ease-spring), border-color 0.2s; }
+.br-states button span { grid-row: 1 / 3; font-size: 26px; line-height: 1; text-align: center; }
+.br-states button b { font: 600 14px/1.2 var(--font-display); }
+.br-states button small { font-size: 11.5px; line-height: 1.3; color: var(--plum-soft); }
+.br-states button.on { border-color: var(--bow); background: var(--petal); }
+.br-states button:active { transform: scale(0.97); }
+@media (max-width: 420px) { .br-sides { grid-template-columns: 1fr; } }
+
+/* ---------- Eylemler ---------- */
+.br-acts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 14px 0; }
+.br-act { display: grid; justify-items: start; gap: 4px; padding: 14px; border: 0; border-radius: 20px; background: #fff; box-shadow: 0 0 0 2px var(--line), var(--shadow-s); color: var(--plum); text-align: left; cursor: pointer; transition: transform 0.2s var(--ease-spring); }
+.br-act:hover { transform: translateY(-2px); }
+.br-act:active { transform: scale(0.97); }
+.br-act .ic { width: 40px; height: 40px; }
+.br-act b { font: 600 15px/1.2 var(--font-display); }
+.br-act small { font-size: 12px; line-height: 1.35; color: var(--plum-soft); }
+
+/* ---------- Mola: aynı anda nefes ---------- */
+.br-live { display: grid; gap: 12px; margin-bottom: 14px; }
+.br-live:empty { display: none; }
+.br-mola { display: grid; justify-items: center; text-align: center; gap: 10px; background: linear-gradient(180deg, #EEF6FF, #F6F0FF); }
+.br-breath { position: relative; display: grid; place-items: center; width: 190px; height: 190px; }
+.br-breath i { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #FFFFFF, #CFE6FF 45%, #B9A6FF); box-shadow: 0 0 40px -6px rgba(143, 115, 230, 0.6); animation: brBreath var(--cyc, 16s) var(--off, 0s) infinite ease-in-out; }
+.br-breath b { position: relative; font: 600 20px/1.1 var(--font-display); color: var(--plum); }
+.br-breath small { position: relative; margin-top: -40px; font: 600 15px var(--font-display); color: var(--plum-soft); }
+@keyframes brBreath { 0% { transform: scale(0.6); } 25% { transform: scale(1); } 50% { transform: scale(1); } 87.5% { transform: scale(0.6); } 100% { transform: scale(0.6); } }
+.br-mola-left { margin: 0; font-size: 14px; color: var(--plum-soft); }
+.br-mola-left .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--mint-deep); vertical-align: 1px; }
+
+/* ---------- Mektuplar ve özürler ---------- */
+.br-env { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: start; }
+.br-env-ic { font-size: 40px; line-height: 1; text-align: center; animation: brFloat 3.4s ease-in-out infinite; }
+.br-env h3 { margin: 2px 0 4px; font: 600 18px/1.25 var(--font-display); color: var(--plum); }
+.br-env .muted { margin: 0 0 10px; }
+.br-env .hand { margin: 4px 0 10px; font-size: 21px; line-height: 1.25; color: var(--plum); overflow-wrap: anywhere; }
+.br-env:not(.read):not(.mine) { background: linear-gradient(135deg, #FFF0F5, #FFF8E8); box-shadow: 0 0 0 2px var(--rose), var(--shadow-s); }
+.br-env.mine { background: var(--cream); }
+@keyframes brFloat { 50% { transform: translateY(-4px) rotate(-3deg); } }
+.br-apology { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: start; background: linear-gradient(135deg, #FFF3F7, #FFFDF4); }
+.br-apology:not(.mine) { box-shadow: 0 0 0 2px var(--rose), var(--shadow-s); }
+.br-flower { font-size: 52px; line-height: 1; text-align: center; transform-origin: 50% 90%; animation: brBloom 1.2s var(--ease-spring) both, brSway 4s 1.2s ease-in-out infinite; }
+@keyframes brBloom { from { transform: scale(0.2) rotate(-20deg); opacity: 0; } }
+@keyframes brSway { 50% { transform: rotate(6deg); } }
+.br-apology h3 { margin: 2px 0 4px; font: 600 17px/1.25 var(--font-display); color: var(--plum); }
+.br-apology .hand { margin: 4px 0 10px; font-size: 22px; line-height: 1.25; color: var(--plum); overflow-wrap: anywhere; }
+.br-voice.playing { background: var(--bow); color: #fff; }
+.br-ans { margin: 4px 0 8px; font: 600 14px var(--font-display); color: var(--mint-deep); }
+.br-kizgin { background: linear-gradient(135deg, #FFE8EF, #FFF4DC); box-shadow: 0 0 0 2px #FFC9D9; }
+
+/* ---------- Kağıt (mektup) ---------- */
+.br-sheet h2 { margin: 2px 0 6px; font: 600 24px/1.2 var(--font-display); color: var(--plum); text-wrap: balance; }
+.br-sheet .btn.red { justify-content: center; }
+.br-sheet > .btn.red, .br-sheet .modal-body > .btn.red { width: 100%; margin-top: 12px; }
+.br-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.br-chips .chip { font-size: 13px; }
+.br-chips.one .chip { white-space: normal; text-align: left; }
+.br-paper { position: relative; margin: 14px 0 4px; padding: 18px 18px 12px 26px; border-radius: 14px; background: repeating-linear-gradient(180deg, #FFFDF8 0 31px, #F6DCE6 31px 32px); box-shadow: 0 10px 26px -16px rgba(74, 33, 56, 0.55), inset 4px 0 0 #FFB3CB; }
+.br-paper .hand { margin: 0; font-size: 23px; line-height: 32px; color: var(--plum); overflow-wrap: anywhere; }
+.br-paper .card-eyebrow { margin-bottom: 4px; }
+.br-paper.open { animation: brUnfold 0.7s var(--ease-spring) both; }
+.br-paper.kizgin { background: repeating-linear-gradient(180deg, #FFF9F0 0 31px, #F3D9C8 31px 32px); }
+@keyframes brUnfold { from { transform: perspective(600px) rotateX(-70deg); opacity: 0; transform-origin: 50% 0; } }
+.br-sign { margin: 8px 0 0; text-align: right; font: 400 26px/1.2 var(--font-script); color: var(--rose-deep); }
+.br-heard { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #EAF8F1; box-shadow: 0 0 0 2px var(--mint); }
+.br-heard .hand { margin: 4px 0 0; font-size: 21px; color: var(--plum); }
+.br-hear { margin-top: 14px; display: grid; gap: 8px; }
+.br-hear .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.br-flowers { display: flex; flex-wrap: wrap; gap: 8px; }
+.br-flowers button { display: grid; justify-items: center; gap: 2px; width: 64px; padding: 8px 4px; border-radius: 14px; border: 2px solid var(--line); background: #fff; color: var(--plum); cursor: pointer; }
+.br-flowers button span { font-size: 28px; line-height: 1; }
+.br-flowers button small { font: 600 11px var(--font-display); }
+.br-flowers button.on { border-color: var(--bow); background: var(--petal); transform: scale(1.06); }
+.br-rec { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 12px 0 0; padding: 10px 12px; border-radius: 14px; background: var(--blush); box-shadow: 0 0 0 1.5px var(--line); }
+.br-rec audio { width: 100%; height: 36px; }
+.br-rec-dot { width: 12px; height: 12px; border-radius: 50%; background: #BBA9B3; }
+.br-rec.on .br-rec-dot { background: var(--bow); animation: recBlink 1s steps(2) infinite; }
+.br-sheet .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.br-sheet .row .btn { flex: 1 1 auto; justify-content: center; }
+.br-mins { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.br-mins button { display: grid; justify-items: center; padding: 14px 4px; border-radius: 18px; border: 2px solid var(--line); background: linear-gradient(180deg, #fff, #F3EEFF); color: var(--plum); cursor: pointer; }
+.br-mins b { font: 600 26px/1 var(--font-display); }
+.br-mins small { font-size: 12px; color: var(--plum-soft); }
+.br-lvls { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.br-lvls button { padding: 10px 2px; border-radius: 12px; border: 2px solid var(--line); background: #fff; font-size: 12px; letter-spacing: -3px; cursor: pointer; overflow: hidden; }
+.br-lvls button.on { border-color: #8E93B5; background: #EEF0F7; }
+.br-untils { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- İpucu ---------- */
+.br-tip { background: #FFFBF0; }
+.br-tip-t { margin: 4px 0 6px; font: 400 23px/1.3 var(--font-hand); color: var(--plum); }
+
+/* ---------- Barış Antlaşması ---------- */
+.br-ant { background: linear-gradient(180deg, #FBF3E4, #FFF9EF); box-shadow: 0 0 0 2px #EAD7B5; }
+.br-ant h3, .br-def h3 { margin: 2px 0 4px; font: 600 20px/1.25 var(--font-display); color: var(--plum); }
+.br-rules { margin: 12px 0; padding: 0 0 0 22px; display: grid; gap: 10px; }
+.br-rules li { padding: 10px 12px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1.5px #EAD7B5; }
+.br-rules li::marker { font: 600 15px var(--font-display); color: #9A7A3E; }
+.br-rules li.empty { list-style: none; margin-left: -22px; color: var(--plum-soft); background: none; box-shadow: none; }
+.br-rules li.sealed { box-shadow: 0 0 0 2px #EDBE45, 0 6px 16px -10px rgba(185, 131, 38, 0.6); }
+.br-rules p { margin: 0 0 6px; font: 400 22px/1.25 var(--font-hand); color: var(--plum); overflow-wrap: anywhere; }
+.br-sigs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.br-sigs .sig { font: 400 22px/1 var(--font-script); color: var(--rose-deep); border-bottom: 1.5px solid #E6CFA0; padding: 0 4px 2px; }
+.br-sigs .sig.wait { font: 400 12px var(--font-body); color: var(--plum-faint); border-bottom-style: dashed; }
+.br-seal { font-size: 22px; animation: brStamp 0.6s var(--ease-spring) both; }
+@keyframes brStamp { from { transform: scale(2.4) rotate(-30deg); opacity: 0; } }
+.br-rule-add { display: flex; gap: 8px; margin-bottom: 8px; }
+.br-rule-add .input { flex: 1; min-width: 0; }
+
+/* ---------- Barış Defteri ---------- */
+.br-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 10px 0; }
+.br-stats div { display: grid; gap: 2px; padding: 10px; border-radius: 14px; background: #FFF6E0; text-align: center; }
+.br-stats b { font: 600 16px/1.2 var(--font-display); color: #8A5A00; }
+.br-stats small { font-size: 11.5px; line-height: 1.3; color: var(--plum-soft); }
+.br-pages { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.br-pages li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1.5px var(--line); }
+.br-pg-n { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #FFF0B8, #E8B53A); color: #5A3A00; font: 600 15px var(--font-display); }
+.br-pages b { font: 600 14px/1.3 var(--font-display); color: var(--plum); }
+.br-pages small { display: block; font-size: 12px; color: var(--plum-soft); }
+.br-pages p { margin: 4px 0 0; font-size: 13px; }
+.br-pages .hand { font-size: 19px; }
+@media (max-width: 420px) { .br-stats { grid-template-columns: 1fr; } }
+
+/* ---------- Barış Töreni ---------- */
+.br-ceremony .modal-panel { text-align: center; background: radial-gradient(120% 80% at 50% 0%, #3B2459 0%, #241A4A 55%, #1A1336 100%); color: #FFF4E0; overflow: hidden; }
+.br-ceremony .modal-x { color: #fff; background: rgba(255, 255, 255, 0.14); box-shadow: inset 0 0 0 1.5px rgba(255, 225, 154, 0.4); }
+.br-cer-stage { position: relative; width: min(240px, 70vw); margin: 8px auto 0; }
+.br-cer-heart { position: relative; z-index: 1; display: block; width: 100%; height: auto; overflow: visible; }
+.br-half { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 1.4s var(--ease-spring); }
+.br-half.l { transform: translate(-20px, 10px) rotate(-10deg); }
+.br-half.r { transform: translate(20px, 10px) rotate(10deg); }
+.br-ceremony.join .br-half { transform: none; }
+.br-gold-crack, .br-gold-glow { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 240; stroke-dashoffset: 240; }
+.br-gold-crack { stroke-width: 6; }
+.br-gold-glow { stroke-width: 16; opacity: 0; }
+.br-ceremony.gold .br-gold-crack { transition: stroke-dashoffset 1.6s ease; stroke-dashoffset: 0; }
+.br-ceremony.gold .br-gold-glow { transition: stroke-dashoffset 1.6s ease, opacity 1s; stroke-dashoffset: 0; opacity: 0.4; animation: brGlow 2.4s 1.6s ease-in-out infinite; }
+@keyframes brGlow { 50% { opacity: 0.75; } }
+.br-cer-rays { position: absolute; inset: -40%; z-index: 0; opacity: 0; background: repeating-conic-gradient(from 0deg, rgba(255, 224, 140, 0.18) 0 8deg, transparent 8deg 22deg); -webkit-mask: radial-gradient(closest-side, #000 30%, transparent); mask: radial-gradient(closest-side, #000 30%, transparent); transition: opacity 1.2s 1.2s; }
+.br-ceremony.gold .br-cer-rays { opacity: 1; animation: brSpin 30s linear infinite; }
+@keyframes brSpin { to { transform: rotate(360deg); } }
+.br-cer-lines p { margin: 6px 0; font: 400 25px/1.25 var(--font-hand); color: #FFF4E0; opacity: 0; }
+.br-cer-lines p.big { font: 600 30px/1.2 var(--font-display); color: #FFE19A; }
+.br-cer-lines p.br-cer-n { font: 600 13px/1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; color: #E7C97A; }
+.br-ceremony.gold .br-cer-lines p { animation: brRise 0.9s calc(1s + var(--i) * 0.8s) ease forwards; }
+@keyframes brRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.br-cer-promise { margin-top: 14px; padding: 14px; border-radius: 18px; background: rgba(255, 255, 255, 0.08); box-shadow: inset 0 0 0 1.5px rgba(255, 225, 154, 0.35); text-align: left; opacity: 0; }
+.br-ceremony.gold .br-cer-promise { animation: brRise 0.9s 4.2s ease forwards; }
+.br-cer-promise .card-eyebrow { color: #E7C97A; }
+.br-cer-promise .chip { background: rgba(255, 255, 255, 0.12); color: #FFF4E0; border-color: rgba(255, 225, 154, 0.35); }
+.br-cer-promise .textarea { margin-top: 8px; background: rgba(255, 255, 255, 0.95); }
+.br-cer-promise .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.br-cer-promise .row .btn { flex: 1 1 auto; justify-content: center; }
+.br-cer-soz p { margin: 8px 0 0; color: #FFF4E0; }
+.br-cer-soz .hand { font-size: 21px; color: #FFE19A; }
+
+/* ---------- Beyaz güvercin ---------- */
+.br-dove { position: fixed; left: -90px; bottom: 22%; z-index: 9500; width: 70px; height: 70px; pointer-events: none; animation: brFly 4s cubic-bezier(0.45, 0.05, 0.4, 1) forwards; filter: drop-shadow(0 8px 10px rgba(74, 33, 56, 0.25)); }
+.br-dove.big { width: 96px; height: 96px; }
+.br-dove .ic { width: 100%; height: 100%; animation: brFlap 0.36s ease-in-out infinite alternate; }
+@keyframes brFly { 0% { transform: translate(0, 0) rotate(-6deg); } 50% { transform: translate(55vw, -22vh) rotate(4deg); } 100% { transform: translate(115vw, -48vh) rotate(-8deg); } }
+@keyframes brFlap { to { transform: scaleY(0.86) translateY(3px); } }
+
+/* ---------- Ana salon: bulut, yağmur, gökkuşağı, kulelerin arasındaki kalp ---------- */
+body.kale-bulut .garland { opacity: 0.35; filter: grayscale(0.9); transition: opacity 1s, filter 1s; }
+body.kale-bulut .hero .cloud { filter: grayscale(0.7) brightness(0.92); }
+body.kale-bulut .hero { background: linear-gradient(180deg, #E6E3EE 0%, #F1ECF3 45%, #FBF4F7 100%); }
+body.kale-bulut.night .hero { background: linear-gradient(180deg, #23203A 0%, #3B3356 55%, #7D6A86 100%); }
+.hero-kusrain { position: absolute; inset: 0; overflow: hidden; }
+.hero-kusrain i { position: absolute; top: -12%; width: 2px; height: 16px; border-radius: 2px; background: linear-gradient(transparent, rgba(120, 130, 170, 0.55)); animation: brRain 1.6s var(--d, 0s) linear infinite; }
+@keyframes brRain { to { transform: translateY(130vh); } }
+.hero-rainbow { position: absolute; left: 50%; bottom: 8%; width: min(760px, 120%); aspect-ratio: 2 / 1; max-width: none; transform: translateX(-50%); opacity: 0.5; animation: brFade 2.4s ease both; }
+.hero-rainbow i { position: absolute; inset: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0; border: 10px solid; border-bottom: 0; }
+.hero-rainbow i:nth-child(1) { border-color: #FF8FA3; }
+.hero-rainbow i:nth-child(2) { inset: 10px 10px 0; border-color: #FFC48A; }
+.hero-rainbow i:nth-child(3) { inset: 20px 20px 0; border-color: #FFE58A; }
+.hero-rainbow i:nth-child(4) { inset: 30px 30px 0; border-color: #A8E6B8; }
+.hero-rainbow i:nth-child(5) { inset: 40px 40px 0; border-color: #9FD3FF; }
+.hero-rainbow i:nth-child(6) { inset: 50px 50px 0; border-color: #C9B2FF; }
+@keyframes brFade { from { opacity: 0; } }
+.hero-baris { position: absolute; top: -9%; left: 50%; z-index: 4; display: grid; justify-items: center; gap: 2px; padding: 6px 10px 6px; border-radius: 18px; background: rgba(255, 255, 255, 0.88); box-shadow: 0 8px 18px -10px rgba(74, 33, 56, 0.5); transform: translateX(-50%); text-decoration: none; color: var(--plum); animation: hwFloat 3.6s ease-in-out infinite; white-space: nowrap; }
+.hero-baris span { display: block; width: 40px; }
+.hero-baris small { font: 600 11px/1.1 var(--font-display); }
+.hero-baris.gold { box-shadow: 0 0 0 2px #EDBE45, 0 8px 18px -10px rgba(185, 131, 38, 0.7); }
+body.kale-bulut .dock .dock-kalp::after { content: '☁️'; position: absolute; top: -4px; right: -2px; font-size: 16px; animation: brFloat 3s ease-in-out infinite; }
+
+/* ---------- Kalp menüsü ---------- */
+.kmenu-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.kmenu-row button.glow { background: #FFF4D6; box-shadow: 0 0 0 2px #EDBE45; animation: brCandle 2.4s ease-in-out infinite; }
+.kmenu-bulut { display: block; margin: 8px 4px 0; padding: 8px 12px; border-radius: 14px; background: #EEF0F7; color: #4A4466; font: 500 13px/1.3 var(--font-body); text-decoration: none; text-align: center; }
+
+/* ---------- Telefona bildirim ---------- */
+.tel-phone { display: grid; gap: 8px; margin: 0 auto 14px; padding: 16px 12px 18px; max-width: 320px; border-radius: 28px; background: linear-gradient(160deg, #6A4C93 0%, #C46A9A 60%, #F2A07B 100%); box-shadow: inset 0 0 0 4px #2B2024, 0 14px 30px -16px rgba(43, 32, 36, 0.7); }
+.tel-clock { margin: 2px 0 6px; text-align: center; font: 600 40px/1 var(--font-display); color: #fff; letter-spacing: 0.02em; }
+.tel-notif { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; align-items: start; padding: 10px; border-radius: 16px; background: rgba(255, 255, 255, 0.86); text-align: left; animation: brRise 0.8s 0.3s ease both; }
+.tel-notif.two { animation-delay: 1s; opacity: 0.9; }
+.tel-app { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08); }
+.tel-app .ic { width: 26px; height: 26px; }
+.tel-notif b { display: block; font: 600 13px/1.25 var(--font-body); color: #1F1A1D; }
+.tel-notif small { display: block; font-size: 12px; line-height: 1.3; color: #4E4549; }
+.tel-now { font-size: 11px; color: #6E6468; }
+.tel-sheet h2 { margin: 2px 0 6px; font: 600 23px/1.2 var(--font-display); color: var(--plum); text-wrap: balance; }
+.tel-steps { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 10px; }
+.tel-steps li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 10px; align-items: start; padding: 12px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.5px var(--line); }
+.tel-steps li > b { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--bow); color: #fff; font: 600 16px var(--font-display); }
+.tel-steps p { margin: 4px 0 8px; font-size: 14px; line-height: 1.45; }
+.tel-steps .row { display: flex; flex-wrap: wrap; gap: 8px; }
+.tel-topic { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 4px; }
+.tel-topic code { flex: 1 1 180px; min-width: 0; padding: 9px 12px; border-radius: 12px; background: var(--blush); box-shadow: inset 0 0 0 1.5px var(--line); font: 600 15px/1.2 ui-monospace, 'SF Mono', Menlo, monospace; color: var(--plum); overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.zil-phone { display: grid; grid-template-columns: 30px minmax(0, 1fr) 20px; gap: 10px; align-items: center; width: 100%; margin: 0 0 12px; padding: 10px 12px; border: 0; border-radius: 16px; background: linear-gradient(90deg, #EEF4FF, #FFF0F5); box-shadow: 0 0 0 1.5px #CFE0FF; color: var(--plum); text-align: left; cursor: pointer; font: 600 14px/1.25 var(--font-display); }
+.zil-phone > span:first-child { font-size: 24px; }
+.zil-phone small { display: block; font: 400 12px var(--font-body); color: var(--plum-soft); }
+.zil-phone.ok small { color: var(--mint-deep); }
+.zil-phone .ui { width: 18px; height: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .br-kalp-wrap.kus .br-kalp, .br-env-ic, .br-flower, .br-isik, .hero-kusrain i, .br-cer-rays, .br-bridge.joined .br-bheart { animation: none !important; }
+  .br-dove { display: none; }
+}

@@ -294,20 +294,34 @@
     if (text && (await K.copy(text))) return 'copied';
     return 'failed';
   };
-  // ntfy.sh ile User155'in telefonuna bildirim (config.ntfyTopic boşsa hiçbir şey göndermez)
-  K.canNotify = () => Boolean(C.ntfyTopic);
-  K.notify = async (title, message, tags, extra) => {
-    if (!C.ntfyTopic || K.previewDate) return false;
+  // ntfy.sh ile telefona bildirim. K.notify: Eln → User155'in telefonu (config.ntfyTopic boşsa hiçbir şey göndermez).
+  // K.ping: kim gönderirse göndersin öbürünün telefonuna (sahip → Eln'in kanalı config.ntfyTopicHer, Eln → K.notify)
+  const ntfyPost = async (topic, title, message, tags, extra) => {
+    if (!topic || K.previewDate) return false;
     try {
       const res = await fetch('https://ntfy.sh/', {
         method: 'POST',
-        body: JSON.stringify(Object.assign({ topic: C.ntfyTopic, title, message, tags: tags || ['heart'], priority: 4 }, extra || {})),
+        body: JSON.stringify(Object.assign({ topic, title, message, tags: tags || ['heart'], priority: 4 }, extra || {})),
       });
       return res.ok;
     } catch (e) {
       return false;
     }
   };
+  K.canNotify = () => Boolean(C.ntfyTopic);
+  K.notify = (title, message, tags, extra) => ntfyPost(C.ntfyTopic, title, message, tags, extra);
+  K.pingHer = (title, message, tags, extra) => (K.isOwner && K.isOwner() ? ntfyPost(C.ntfyTopicHer, title, message, tags, extra) : Promise.resolve(false));
+  K.ping = (title, message, tags, extra) => {
+    const x = Object.assign({ click: K.roomUrl('') }, extra || {});
+    return K.isOwner && K.isOwner() ? K.pingHer(title, message, tags, x) : K.notify(title, message, tags, x);
+  };
+  // Eln'in kendi telefonuna deneme bildirimi (kurulum kartı için)
+  K.pingSelf = (title, message, tags) => ntfyPost(C.ntfyTopicHer, title, message, tags);
+  // Bildirimde gönderenin adı ve dokununca açılacak oda
+  K.meName = () => (K.isOwner && K.isOwner() ? C.myPet : C.herName);
+  K.roomUrl = (id) => location.origin + location.pathname + (id ? '#' + id : '');
+  // ntfy'nin ileri tarihli gönderimi (en fazla 3 gün): zaman damgası → {delay}
+  K.later = (at) => (at - Date.now() > 9e4 && at - Date.now() < 71 * 36e5 ? { delay: String(Math.round(at / 1000)) } : null);
   K.vibrate = (p) => {
     try {
       navigator.vibrate && navigator.vibrate(p);

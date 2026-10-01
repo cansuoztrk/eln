@@ -150,7 +150,7 @@
       if (d) {
         K.cloud.send('kalp', { k: 'durum' });
         K.fx.toast(`${d[1]} Durumun: <b>${K.esc(d[2])}</b>`, { duration: 2500 });
-        if (!K.isOwner()) K.notify(`${C.herName}: ${d[1]} ${d[2]}`, d[0] === 'musait' ? 'Şu an müsait, arayabilirsin.' : 'Durumunu güncelledi.', ['speech_balloon'], d[0] === 'musait' ? { priority: 4 } : undefined);
+        K.ping(`${K.meName()}: ${d[1]} ${d[2]}`, d[0] === 'musait' ? 'Şu an müsait, arayabilirsin.' : 'Durumunu güncelledi.', ['speech_balloon'], d[0] === 'musait' ? { priority: 4 } : undefined);
       }
       chips();
     });
@@ -171,6 +171,7 @@
       ['ozlem', '🥺', KP().ozledim || 'Özledim'],
     ];
     const birlikte = [
+      ['baris', 'bridge', 'Barış'],
       ['hikaye', 'camera', 'Hikâye'],
       ['radyo', 'music', 'Radyo'],
       ['pinpon', 'heart', 'Pinpon'],
@@ -185,7 +186,8 @@
       <div class="kmenu-panel">
         <p class="kmenu-to">${K.avatar(o, 'yan-av ' + (K.cloud && K.cloud.otherHere() ? 'on' : ''))}<span><small>${K.esc(K.ek(nameOf(o), 'e'))}</small><b>${K.cloud && K.cloud.otherHere() ? 'Şu an kalede' : 'Kaleye girince görür'}</b></span></p>
         <div class="kmenu-arc">${ona.map(([id, emo, label], i) => `<button type="button" class="kmenu-b" data-km="${id}" style="--i:${i}"><span>${emo}</span><small>${K.esc(label)}</small></button>`).join('')}</div>
-        <div class="kmenu-row">${birlikte.map(([id, ic, label]) => `<button type="button" data-km="${id}">${A.icon(ic)}<small>${K.esc(label)}</small></button>`).join('')}</div>
+        ${K.baris && K.baris.active() ? `<a class="kmenu-bulut" href="#baris" data-km-x>☁️ Aranızda küçük bir bulut var · <b>Köprüye git</b></a>` : ''}
+        <div class="kmenu-row">${birlikte.map(([id, ic, label]) => `<button type="button" data-km="${id}" class="${id === 'baris' && K.baris && K.baris.active() ? 'glow' : ''}">${A.icon(ic)}<small>${K.esc(label)}</small></button>`).join('')}</div>
         <p class="kmenu-hint">${K.esc(KP().hint || '')}</p>
       </div></div>`);
     document.body.appendChild(menu);
@@ -215,7 +217,7 @@
       if (!on()) return K.fx.toast('Bulut kapalı; bunun için Kale Paneli\'nden bulutu açın.');
       return K.surpriz && K.surpriz.compose();
     }
-    if (['radyo', 'pinpon', 'kelime', 'hava', 'kare'].includes(id)) {
+    if (['radyo', 'pinpon', 'kelime', 'hava', 'kare', 'baris'].includes(id)) {
       closeMenu();
       location.hash = id;
       return;
@@ -242,7 +244,7 @@
       await K.cloud.add('kucak', {});
       K.cloud.send('kalp', { k: 'saril' });
       K.fx.toast(`<b>Sarıldın.</b> ${K.esc(nameOf(o))} ${K.cloud.otherHere() ? 'şu an hissediyor' : 'kaleye girince hissedecek'}.`, { icon: A.icon('hugs'), duration: 3000 });
-      if (!K.isOwner()) K.notify(`${C.herName} sana sarıldı`, '🤗', ['hugging_face']);
+      K.ping(`${K.meName()} sana sarıldı`, '🤗', ['hugging_face']);
     }
     if (id === 'sabah' || id === 'gece') {
       const pool = ((KP()[id] || {})[mine()] || []).filter(Boolean);
@@ -250,14 +252,14 @@
       await K.cloud.add('selam', { k: id, text });
       K.cloud.send('kalp', { k: id, text });
       K.fx.toast(`<b>${id === 'gece' ? '🌙' : '☀️'} Gönderildi:</b> ${K.esc(text)}`, { icon: A.icon(id === 'gece' ? 'moon' : 'sun'), duration: 3500 });
-      if (!K.isOwner()) K.notify(`${C.herName}: ${text}`, id === 'gece' ? 'İyi geceler' : 'Günaydın', [id === 'gece' ? 'crescent_moon' : 'sunny']);
+      K.ping(`${K.meName()}: ${text}`, id === 'gece' ? 'İyi geceler' : 'Günaydın', [id === 'gece' ? 'crescent_moon' : 'sunny']);
     }
     if (id === 'dusun' || id === 'ozlem') {
       await K.cloud.add(id, {});
       K.cloud.send('kalp', { k: id });
       const n = today[id].filter((x) => x.who === mine()).length;
       K.fx.toast(id === 'dusun' ? `💭 Bugün onu <b>${n}</b>. kez düşündün.` : `🥺 Bugün <b>${n}</b>. kez özledin.`, { duration: 2200 });
-      if (!K.isOwner() && (n === 1 || n % 5 === 0)) K.notify(`${C.herName} ${id === 'dusun' ? 'seni düşündü' : 'seni özledi'}`, `Bugün ${n}. kez`, [id === 'dusun' ? 'thought_balloon' : 'pleading_face']);
+      if (n === 1 || n % 5 === 0) K.ping(`${K.meName()} ${id === 'dusun' ? 'seni düşündü' : 'seni özledi'}`, `Bugün ${n}. kez`, [id === 'dusun' ? 'thought_balloon' : 'pleading_face']);
     }
     K.stickers.award('kalpmenu');
     chips();

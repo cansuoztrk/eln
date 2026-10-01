@@ -174,7 +174,7 @@
     K.audio.sfx.chime();
     K.stickers.award('gunses');
     if (clip(T.todayKey(), other())) K.fx.toast(`<b>${K.esc(K.ek(nameOf(other()), 'in'))} bugünkü sesi açıldı.</b>`, { icon: A.icon('mic') });
-    if (!K.isOwner()) K.notify(`${C.herName} günün sesini bıraktı`, prompt(T.todayKey()), ['microphone']);
+    K.ping(`${K.meName()} günün sesini bıraktı`, prompt(T.todayKey()), ['microphone']);
     sel = null;
     render();
   }

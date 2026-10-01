@@ -127,8 +127,8 @@
     if (!rows.some((x) => x.id === r.id)) rows.push(r);
     const t = typeOf(type);
     K.audio.sfx.tap();
-    if (!K.isOwner() && BAD.includes(type)) K.notify(`${C.herName}: içim bugün ${t[1].toLocaleLowerCase('tr')}`, note || t[2], ['cloud_with_rain']);
-    if (!K.isOwner() && !BAD.includes(type)) K.notify(`${C.herName}: içim bugün ${t[1].toLocaleLowerCase('tr')}`, note || t[2], ['sunny']);
+    if (BAD.includes(type)) K.ping(`${K.meName()}: içim bugün ${t[1].toLocaleLowerCase('tr')}`, note || t[2], ['cloud_with_rain']);
+    if (!BAD.includes(type)) K.ping(`${K.meName()}: içim bugün ${t[1].toLocaleLowerCase('tr')}`, note || t[2], ['sunny']);
     const them = wxOf(other());
     if (them && them.data.type === type) K.fx.toast(`<b>Aynı gökyüzü.</b> ${K.esc(HV().same || '')}`, { icon: A.icon('cloud'), duration: 6000 });
     render();
@@ -142,7 +142,7 @@
     K.audio.sfx.whoosh();
     K.fx.toast(`<b>${K.esc(c ? c[1] : 'Paket')} yola çıktı.</b> ${K.esc(nameOf(other()))} kaleye girince açacak.`, { icon: A.icon('cloud') });
     K.stickers.award('hava');
-    if (!K.isOwner()) K.notify(`${C.herName} sana bir ${c ? c[1].toLocaleLowerCase('tr') : 'paket'} gönderdi`, c ? c[2] : '', ['gift']);
+    K.ping(`${K.meName()} sana bir ${c ? c[1].toLocaleLowerCase('tr') : 'paket'} gönderdi`, c ? c[2] : '', ['gift']);
     render();
   }
   function openGift(id) {
@@ -178,7 +178,7 @@
     });
     K.cloud.add('hvopen', { care: id }).then((r) => {
       if (r && !rows.some((x) => x.id === r.id)) rows.push(r);
-      if (!K.isOwner()) K.notify(`${C.herName} paketini açtı`, `${def[1]}: açıldı.`, ['white_check_mark']);
+      K.ping(`${K.meName()} paketini açtı`, `${def[1]}: açıldı.`, ['white_check_mark']);
       render();
       K.renderSpecials && K.renderSpecials();
     });

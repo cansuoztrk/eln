@@ -66,6 +66,28 @@ Kapı cevapları ve mühürlü mektubun şifresi `private/secrets.json` içinde 
 - **Kulelerde iç hava**: Ana salonda İstanbul ve Bakü kulelerinin üstünde o günün "Kalbin Hava Durumu" (yağmurluysa yağmur yağar, karlıysa kar).
 - **Radyoya şarkı ekle**: Kale Radyosu'ndan doğrudan şarkı adı ve YouTube bağlantısıyla (Şarkı Defteri'ne de yazılır).
 
+### Barış Köprüsü (Kalp Kanadı, bulut)
+
+Küsünce de buradayız. Saatlerce konuşamadığımız o anlar için:
+
+- **Aramız nasıl?** Her biri kendi durumunu seçer: İyiyiz · Kırgınım (bir ile beş bulut arası) · Biraz alana ihtiyacım var (30 dk, 1 saat, 3 saat, yarın sabaha kadar) · Konuşmaya hazırım; istersen bir cümleyle. Öbürü hem ekranda hem telefonunda görür.
+- **Köprü**: İki kule arasında bir asma köprü. Küslükte iki yarısı kalkık durur; **beyaz bayrak** kaldıran kendi yarısını indirir. İki yarı birleşince ortada bir kalp atar.
+- **Kalpten Mektup**: Suçlamadan, "ben" diliyle: ne oldu, ne hissettin (kırgın, yalnız, anlaşılmamış...), neye ihtiyacın var (güven, sabır, biraz alan...), bir rican. Mektup kendiliğinden yazılır ve o **"Okumaya hazırım"** diyene kadar mühürlü kalır. Okuyan önce cevap vermez; **"Seni duydum"** der.
+- **Özür**: Hazır cümleler ya da kendi sözlerin, yanına bir çiçek (lale, gül, zambak, papatya, çikolata) ve istersen **60 saniyelik sesin**. Özür dilemek bayrağı kaldırmak sayılır; öbürü "Kabul ediyorum" ya da "Biraz zamana ihtiyacım var" der.
+- **Mola**: 10, 20, 30 ya da 60 dakika. İki ekranda aynı daire aynı anda büyüyüp küçülür (nefes al, tut, ver); ikiniz de odadaysanız "o da şu an seninle nefes alıyor" yazar. Bitince telefona "Mola bitti" düşer.
+- **Işığım açık**: Konuşmaya hazır değilken "buradayım" demenin sessiz yolu. **Küs ama iyi geceler**: gece küs yatmamak için tek dokunuş.
+- **Barış Töreni**: İkiniz de bayrağı kaldırınca (bayrak, özür, kabul ya da "İyiyiz") iki ekranda da kırık kalbin iki yarısı birleşir, çatlak altınla dolar (kintsugi). Herkes bu barışa bir söz yazar; istenirse radyoda bir barış şarkısı açılır.
+- **Altın Kalp**: Her barışma kalbe kalıcı bir altın damar ekler. "N kez küstük, N kez barıştık."
+- **Barış Defteri**: Her küslüğün tarihi, ne kadar sürdüğü, bayrağı kimin önce kaldırdığı ve verilen sözler; ortalama küslük, en hızlı barışma.
+- **Barış Antlaşması**: Sakinken yazılan, kızgınken hatırlanan maddeler ("Gece ikiden sonra tartışmayız"). İkiniz de imzalayınca mühürlenir.
+- **Ana salon**: Küslükte salon grileşir, ince bir yağmur yağar, bayraklı ip solar; Kitty'nin üstünde çatlak bir kalp onun durumunu gösterir, kalp menüsünde "Barış" parlar. Barıştığınız gün gökyüzünde gökkuşağı ve altın damarlı kalp.
+- Eln için kasada, sadece kızgınken açılmak üzere yazılmış bir mektup var.
+- Kırgınlık, mektup, özür, mola, bayrak ve tören hikâyelere ve Gün Gün Biz'e (içerik açılmadan) "Barıştık 🕊️" olarak geçer.
+
+### Telefonuna bildirim (Eln'in iPhone'u)
+
+Ardoş bir şey gönderince Eln'in kilit ekranına düşer: dürt, sarıl, günaydın / iyi geceler, zamanlı sürpriz (açılış anında), hikâye, radyo, kare, pinpon daveti, mektup, Barış Köprüsü'ndeki her şey... Kurulum Eln'in ana salonunda bir kart olarak çıkar (ayrıca zil → "Telefonuna bildirim"): App Store'dan ücretsiz **ntfy** uygulaması → "+" ile kasadaki kanal adına abone ol → **Deneme gönder** → **Geldi**. "Geldi" denince Ardoş'a haber gider; Ardoş zilden kurulumu görür ve ona deneme gönderebilir. Kanal adı kasada (`config.ntfyTopicHer`). Bildirimler artık iki yönlü: Eln'in yaptıkları da eskisi gibi Ardoş'un telefonuna gider.
+
 ## Kalenin kanatları
 
 **Anılar Kanadı**

@@ -86,12 +86,21 @@
     ozlem: () => ({ icon: 'heart', room: '', emoji: '🥺', title: 'Seni özledi', text: '', weight: 0 }),
     radyo: (r) => (r.data.state === 'play' && r.data.song ? { icon: 'vinyl', room: 'radyo', emoji: '📻', title: `Radyoda: ${r.data.song.title}`, text: r.data.song.artist || '', weight: 2 } : null),
     ppwin: (r) => ({ icon: 'heart', room: 'pinpon', emoji: '🏓', title: `Pinpon: ${nameOf(r.data.winner)} kazandı`, text: r.data.score ? `${r.data.score.me}–${r.data.score.her}` : '', weight: 2 }),
+    baristi: (r) => {
+      const m = Math.max(1, Math.round((r.data.dur || 0) / 6e4));
+      const d = m < 60 ? `${m} dakika` : m < 1440 ? `${Math.round(m / 60)} saat` : `${Math.round(m / 1440)} gün`;
+      return { icon: 'kintsugi', room: 'baris', emoji: '🕊️', title: 'Barıştık', text: `${d} sürdü. Kalbe bir altın damar daha.`, weight: 4, uid: 'b' + r.data.ep };
+    },
+    barissoz: (r) => ({ icon: 'kintsugi', room: 'baris', emoji: '💛', title: 'Bir barış sözü', text: cut(r.data.text), weight: 3 }),
+    kural: (r) => ({ icon: 'note', room: 'baris', emoji: '📜', title: 'Barış Antlaşması\'na bir madde', text: cut(r.data.text), weight: 2 }),
+    ozur: () => ({ icon: 'lily', room: 'baris', emoji: '🌷', title: 'Özür diledi', text: '', weight: 1 }),
+    bayrak: () => ({ icon: 'flag', room: 'baris', emoji: '🕊️', title: 'Beyaz bayrak kaldırdı', text: '', weight: 1 }),
     kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
-  const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem']);
+  const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem', 'ozur', 'bayrak']);
 
   function norm(r) {
     const f = N[r.kind];
@@ -108,7 +117,7 @@
   function dedupe(items) {
     const seen = new Set();
     return items.filter((x) => {
-      if (x.kind !== 'ev') return true;
+      if (x.kind !== 'ev' && x.kind !== 'baristi') return true;
       if (seen.has(x.uid)) return false;
       seen.add(x.uid);
       return true;

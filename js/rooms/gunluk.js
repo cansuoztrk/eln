@@ -131,7 +131,7 @@
     if (n) {
       K.audio.sfx.chime();
       K.stickers.award('gunluk');
-      if (!K.isOwner()) K.notify(`${C.herName} Bakü Günlüğü'ne ${n} fotoğraf ekledi`, cap || '', ['camera']);
+      K.ping(`${K.meName()} Bakü Günlüğü'ne ${n} fotoğraf ekledi`, cap || '', ['camera']);
     }
     render();
   }
@@ -241,7 +241,7 @@
           const r = await K.cloud.add('kletter', { text });
           if (!r) return K.fx.toast('Gönderilemedi.');
           K.fx.toast('Mektubun mühürlendi. Kavuşunca açılacak.', { icon: A.icon('letter') });
-          if (!K.isOwner()) K.notify(`${C.herName} kavuşunca açılacak mektubunu yazdı`, 'Mühürlü; sen de kavuşunca okuyacaksın.', ['love_letter']);
+          K.ping(`${K.meName()} kavuşunca açılacak mektubunu yazdı`, 'Mühürlü; sen de kavuşunca okuyacaksın.', ['love_letter']);
           return render();
         }
         if (b && b.dataset.gl === 'note') {

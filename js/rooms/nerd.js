@@ -479,7 +479,7 @@
     sel = null;
     if (next.winner) {
       await K.cloud.add('nerdwin', { gid, winner: w, pts: next.pts });
-      if (!K.isOwner()) K.notify(`${C.herName} nərdde kazandı${next.pts === 2 ? ' (mars!)' : ''}`, 'Rövanş için kaleye gel.', ['game_die']);
+      K.ping(`${K.meName()} nərdde kazandı${next.pts === 2 ? ' (mars!)' : ''}`, 'Rövanş için kaleye gel.', ['game_die']);
     } else if (!K.isOwner() && !K.cloud.otherHere()) K.notify(`${C.herName} nərdde oynadı: ${call(dice)}`, 'Sıra sende.', ['game_die']);
     if (next.winner) over(next);
     else render();
@@ -552,7 +552,7 @@
     const r = await K.cloud.add('nerd', { gid, n: 0, st: s, mv: [], dice: null, open: { me: a, her: b } });
     if (!r) return K.fx.toast('Oyun başlatılamadı.');
     K.fx.toast(`Açılış zarları: ${C.myPet} ${a}, ${C.herPet} ${b}. ${nameOf(s.turn)} başlıyor.`, { icon: A.icon('dice'), duration: 6000 });
-    if (!K.isOwner()) K.notify(`${C.herName} yeni bir nərd oyunu açtı`, `${nameOf(s.turn)} başlıyor.`, ['game_die']);
+    K.ping(`${K.meName()} yeni bir nərd oyunu açtı`, `${nameOf(s.turn)} başlıyor.`, ['game_die']);
   }
   async function resign() {
     if (mode === 'bot') {

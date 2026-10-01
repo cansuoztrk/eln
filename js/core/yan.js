@@ -66,6 +66,11 @@
     K.vibrate(30);
     K.audio.sfx.pop();
     K.stickers.award('durt');
+    // Kalede değilse telefonuna da gitsin (beş dakikada bir)
+    if (!here() && Date.now() - K.store.get('durtPing', 0) > 5 * 6e4) {
+      K.store.set('durtPing', Date.now());
+      K.ping(`💗 ${K.meName()} seni dürttü`, 'Kalbini hissettirmek istedi. Kaleye uğra.', ['heart']);
+    }
     if (!here()) K.fx.toast(K.esc(K.fill((YN().away || '{other} şu an kalede değil.').replace('{other}', nameOf(other())))), { icon: A.icon('heart'), duration: 4500 });
     else K.fx.toast(`<b>Dürttün.</b> ${K.esc(nameOf(other()))} şu an kalbini hissediyor.`, { icon: A.icon('heart'), duration: 2500 });
   }
@@ -102,7 +107,7 @@
         <div class="yan-acts">
           ${canGo ? `<a class="btn red" href="#${r.id}" data-close>${A.ui('next')} Yanına git: ${K.esc(K.val(r.title))}</a>` : ''}
           <button type="button" class="btn ${canGo ? 'soft' : 'red'}" data-yan-durt>${A.ui('heart')} Dürt</button>
-          ${!w && !K.isOwner() ? `<button type="button" class="btn soft" data-yan-call>${A.icon('bow')} ${K.esc(K.ek(nameOf(o), 'i'))} kaleye çağır</button>` : ''}
+          ${!w ? `<button type="button" class="btn soft" data-yan-call>${A.icon('bow')} ${K.esc(K.ek(nameOf(o), 'i'))} kaleye çağır</button>` : ''}
           <a class="btn ghost" href="#birlikte" data-close>${A.icon('hugs')} Birlikte odası</a>
         </div>`,
     });
@@ -112,7 +117,7 @@
         const last = K.store.get('yanCall', 0);
         if (Date.now() - last < 10 * 6e4) return K.fx.toast('Az önce çağırdın; bildirimi gitti. Biraz bekle.');
         K.store.set('yanCall', Date.now());
-        K.notify(K.fill(YN().call || '{herPet} seni kaleye çağırıyor'), K.fill(YN().callText || ''), ['bell', 'heart'], { priority: 5 });
+        K.ping(K.isOwner() ? `${C.myPet} seni kaleye çağırıyor` : K.fill(YN().call || '{herPet} seni kaleye çağırıyor'), K.fill(YN().callText || ''), ['bell', 'heart'], { priority: 5 });
         K.fx.toast(`<b>Çağırdın.</b> ${K.esc(K.ek(nameOf(o), 'in'))} telefonuna bildirim gitti.`, { icon: A.icon('bow') });
         m.close();
       }

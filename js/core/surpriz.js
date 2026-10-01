@@ -102,6 +102,10 @@
         const r = await K.cloud.add('zamanli', { to: o, at: when, text, emoji });
         if (!r) return K.fx.toast('Gönderilemedi. İnternet bağlantını kontrol et.');
         rows.push(r);
+        // Açılış anında onun telefonuna da düşsün (ntfy en fazla üç gün ileriye zamanlayabilir)
+        const lt = K.later(when);
+        if (lt || when - Date.now() <= 9e4) K.ping(`${emoji} ${K.ek(K.meName(), 'den')} zamanlı bir sürpriz`, 'Mühür açıldı; zarf seni bekliyor.', ['gift'], lt || {});
+        else K.ping(`${emoji} ${K.meName()} sana mühürlü bir not bıraktı`, `Açılış: ${whenText(o, when)}`, ['gift']);
         m.close();
         K.audio.sfx.chime();
         K.stickers.award('surpriz');
@@ -134,7 +138,7 @@
       bar();
       K.renderSpecials && K.renderSpecials();
     });
-    if (!K.isOwner()) K.notify(`${C.herName} zamanlı notunu açtı`, r.data.text.slice(0, 120), ['love_letter']);
+    K.ping(`${K.meName()} zamanlı notunu açtı`, r.data.text.slice(0, 120), ['love_letter']);
   }
 
   // Ana salondaki çip: bekleyen sürpriz (içeriği gizli) ya da açılmaya hazır olan

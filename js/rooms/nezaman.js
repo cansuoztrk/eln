@@ -192,10 +192,10 @@
       K.stickers.award('nezaman');
       K.fx.confetti({ count: 160, shapes: ['heart', 'star'] });
       K.fx.toast(`<b>Hedef belli:</b> ${T.fmtShort(from)} – ${T.fmt(to)}`, { icon: A.icon('plane'), duration: 8000 });
-      if (!K.isOwner()) K.notify(`${C.herName} hedef tarihi kabul etti`, `${T.fmtShort(from)} – ${T.fmt(to)}`, ['airplane', 'heart'], { priority: 5 });
+      K.ping(`${K.meName()} hedef tarihi kabul etti`, `${T.fmtShort(from)} – ${T.fmt(to)}`, ['airplane', 'heart'], { priority: 5 });
     } else {
       K.fx.toast(`Önerildi. ${K.esc(nameOf(other()))} kabul edince hedef olur.`, { icon: A.icon('plane') });
-      if (!K.isOwner()) K.notify(`${C.herName} bir buluşma aralığı önerdi`, `${T.fmtShort(from)} – ${T.fmt(to)}`, ['airplane']);
+      K.ping(`${K.meName()} bir buluşma aralığı önerdi`, `${T.fmtShort(from)} – ${T.fmt(to)}`, ['airplane']);
     }
     render();
   }

@@ -321,7 +321,7 @@
     }
     K.stickers.award('kabin');
     const st = strips().find((x) => x.sid === s.sid);
-    if (!K.isOwner()) K.notify(`${C.herName} kabinde dört kare çekti`, st && full(st) ? 'Şeridiniz tamamlandı. Fotoğraf Kabini\'nde.' : 'Sana yarım bir şerit bıraktı. Kendi yarını çekince açılacak.', ['camera']);
+    K.ping(`${K.meName()} kabinde dört kare çekti`, st && full(st) ? 'Şeridiniz tamamlandı. Fotoğraf Kabini\'nde.' : 'Sana yarım bir şerit bıraktı. Kendi yarını çekince açılacak.', ['camera']);
     sess = null;
     film();
     controls();
