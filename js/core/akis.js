@@ -104,6 +104,18 @@
     yarisma: (r) => ({ icon: 'question', room: 'yarisma', emoji: '🎤', title: `Bilgi Yarışması: ${r.data.me === r.data.her ? 'berabere' : `${nameOf(r.data.me > r.data.her ? 'me' : 'her')} kazandı`}`, text: `${K.num(r.data.her)} – ${K.num(r.data.me)}`, weight: 3 }),
     uyandim: (r) => (r.data.first ? { icon: 'sun', room: 'gece', emoji: '☀️', title: 'Önce o uyandı ve bir günaydın bıraktı', text: '', weight: 1 } : null),
     amiral: (r) => (r.data.t === 'yeni' ? { icon: 'flag', room: 'amiral', emoji: '⚓', title: 'Amiral Battı\'ya çağırdı', text: 'Filonu diz.', weight: 1 } : null),
+    opucuk: () => ({ icon: 'heart', room: '', emoji: '💋', title: 'Uzaktan bir öpücük gönderdi', text: 'Ekranında tam bıraktığı yerde.', weight: 2 }),
+    nabiz: (r) => ({ icon: 'heart', room: '', emoji: '💓', title: 'Kalp atışını gönderdi', text: `${r.data.bpm} atış/dk${r.data.line ? ` · ${r.data.line}` : ''}`, weight: 2 }),
+    sabahses: () => ({ icon: 'sun', room: 'alarm', emoji: '☀️', title: 'Bir günaydın sesi kaydetti', text: 'Bir sabah bununla uyanacak.', weight: 2 }),
+    soz: (r) => ({ icon: 'key', room: 'soz', emoji: '🤞', title: 'Bir söz verdi', text: cut(r.data.text), weight: 2 }),
+    soztut: () => ({ icon: 'key', room: 'soz', emoji: '✅', title: 'Sözünü tuttu', text: '', weight: 2 }),
+    iyilik: (r) => ({ icon: 'star', room: 'iyilik', emoji: '⭐', title: 'Bugün küçük bir iyilik yaptı', text: cut(r.data.note), weight: 2 }),
+    bulmacacoz: () => ({ icon: 'letter', room: 'bulmaca', emoji: '🔐', title: 'Şifreli mektup çözüldü', text: 'Anahtarın iki yarısı birleşti.', weight: 3 }),
+    emojisarki: (r) => ({ icon: 'music', room: 'emojisarki', emoji: '🎶', title: 'Bir şarkıyı emojilerle anlattı', text: r.data.emoji || '', weight: 2 }),
+    emojicevap: (r) => (r.data.ok ? { icon: 'music', room: 'emojisarki', emoji: '⭐', title: 'Emoji şarkıyı bildi', text: cut(r.data.guess), weight: 2 } : null),
+    prenses: () => ({ icon: 'story', room: 'prenses', emoji: '📖', title: 'Hikâyede seçimini yaptı', text: 'Prenses ve User155', weight: 1 }),
+    kedikart: (r) => ({ icon: 'paw', room: 'kedi', emoji: '📮', title: `${K.kedi ? K.kedi.name() : 'Kedimiz'} kartpostal yolladı`, text: r.data.yer || '', weight: 1 }),
+    aynigok: () => ({ icon: 'sky', room: '', emoji: '🌍', title: 'İki şehrin gökyüzü aynıydı', text: '', weight: 1 }),
     minnet: () => ({ icon: 'note', room: 'minnet', emoji: '🙏', title: 'Minnet Defteri\'ne bir cümle yazdı', text: 'Seninkini yazınca açılır.', weight: 2 }),
     gorev: (r) => ({ icon: 'star', room: 'gorev', emoji: '🏅', title: 'Haftanın görevini yaptı', text: cut(r.data.note), weight: 2 }),
     onyil: () => ({ icon: 'hourglass', room: 'onyil', emoji: '⏳', title: 'On yıl sonraki bize bir zarf bıraktı', text: 'Mühürlü.', weight: 2 }),
@@ -115,7 +127,7 @@
     kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk', 'tsmesaj', 'minnet', 'gorev', 'onyil', 'gunbatimi', 'hayal', 'hayalyap', 'barisders', 'pin', 'pingittik', 'yarisma', 'uyandim', 'amiral'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk', 'tsmesaj', 'minnet', 'gorev', 'onyil', 'gunbatimi', 'hayal', 'hayalyap', 'barisders', 'pin', 'pingittik', 'yarisma', 'uyandim', 'amiral', 'opucuk', 'nabiz', 'sabahses', 'soz', 'soztut', 'iyilik', 'bulmacacoz', 'emojisarki', 'emojicevap', 'prenses', 'kedikart', 'aynigok'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
   const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem', 'ozur', 'bayrak', 'tahmin']);
 

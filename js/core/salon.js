@@ -92,7 +92,15 @@
       out.push({ room: 'amiral', ic: 'flag', n: `${w.her}–${w.me}`, u: '', t: 'Amiral Battı', s: s && !s.winner && s.ready ? (s.turn === (K.isOwner() ? 'me' : 'her') ? '🎯 Sıra sende' : 'Sıra onda') : 'Boğaz\'a karşı Hazar' });
     }
     if (K.onyil && K.cloud && K.cloud.enabled) out.push({ room: 'onyil', ic: 'hourglass', n: K.num(K.onyil.days()), u: 'gün', t: 'On Yıl Sonra', s: `Kapsülde ${K.onyil.count()} zarf` });
+    const on = K.cloud && K.cloud.enabled;
+    if (K.iyilik && on) out.push({ room: 'iyilik', ic: 'star', n: K.iyilik.streak(K.isOwner() ? 'me' : 'her'), u: 'gün seri', t: 'Bugün Senin İçin', s: `Toplam ${K.iyilik.count()} yıldız` });
+    if (K.soz && on) out.push({ room: 'soz', ic: 'key', n: K.soz.kept(), u: 'söz tutuldu', t: 'Söz Defteri', s: K.soz.open() ? `${K.soz.open()} söz bekliyor` : 'Küçük sözler unutulmasın' });
+    if (K.alarm && on) {
+      const c = K.alarm.cfg(K.isOwner() ? 'me' : 'her');
+      out.push({ room: 'alarm', ic: 'sun', n: c.on ? c.time : '—', u: '', t: 'Sesimle Uyan', s: `${K.alarm.pool().length} günaydın sesi` });
+    }
     if (K.kisayol) out.push({ room: '', run: () => K.kisayol.open(), ic: 'hug', n: '🗣️', u: '', t: 'Siri ile Sarıl', s: `"Hey Siri, ${K.ek(K.otherName(), 'e')} sarıl"` });
+    if (K.widget) out.push({ room: '', run: () => K.widget.open(), ic: 'frame', n: '📱', u: '', t: "Kale Widget'ı", s: 'Ana ekranda ve kilit ekranında kale' });
     out.push({ room: 'album', ic: 'sticker', n: Object.keys(K.stickers.got()).length, u: 'çıkartma', t: 'Çıkartma albümü', s: `Zorunlulardan ${K.stickers.done()}/${K.stickers.total}` });
     return out;
   }

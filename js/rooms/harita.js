@@ -434,7 +434,7 @@
     );
     K.cloud.on('deleted', ({ id }) => rows.some((r) => r.id === id) && ((rows = rows.filter((r) => r.id !== id)), refresh()));
   });
-  K.harita = { count: () => pins().length, dreams: () => pins().filter((p) => p.kind === 'hayal' && !went(p.ref)).length, went: () => pins().filter((p) => went(p.ref)).length };
+  K.harita = { count: () => pins().length, dreams: () => pins().filter((p) => p.kind === 'hayal' && !went(p.ref)).length, went: () => pins().filter((p) => went(p.ref)).length, places: () => pins().filter((p) => p.kind === 'hayal').map((p) => ({ ref: p.ref, name: p.name, place: p.place || '', emoji: p.emoji || '📍' })) };
 
   K.room({
     id: 'harita',

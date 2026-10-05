@@ -35,11 +35,12 @@
           <li><b>3</b><div><p>${K.esc(st[2] || '')}</p><div class="row"><button type="button" class="btn soft small" data-tel-test>${A.ui('send')} Deneme gönder</button><button type="button" class="btn red small" data-tel-ok>${A.ui('check')} Geldi</button></div></div></li>
         </ol>
         <p class="muted small">Uygulama bildirim izni isterse "İzin Ver" de. Bildirime dokununca kale açılır. Kanal adı sadece sende ve onda; kimseyle paylaşma.</p>
-        ${K.kisayol ? '<button type="button" class="btn ghost small ky-link" data-tel-siri>🗣️ Bonus: Siri ile Sarıl kestirmesi</button>' : ''}`,
+        ${K.kisayol ? '<button type="button" class="btn ghost small ky-link" data-tel-siri>🗣️ Bonus: Siri ile Sarıl kestirmesi</button>' : ''}${K.widget ? '<button type="button" class="btn ghost small ky-link" data-tel-wg>📱 Bonus: Kale Widget\'ı</button>' : ''}`,
     });
     K.store.set('telLater', Date.now() + 3 * 864e5);
     m.body.addEventListener('click', async (e) => {
       if (e.target.closest('[data-tel-siri]')) return m.close(), setTimeout(() => K.kisayol.open(), 320);
+      if (e.target.closest('[data-tel-wg]')) return m.close(), setTimeout(() => K.widget.open(), 320);
       if (e.target.closest('[data-tel-copy]')) {
         const ok = await K.copy(topic);
         return K.fx.toast(ok ? 'Kopyalandı. Şimdi ntfy\'da "+" ile yapıştır.' : 'Kopyalanamadı; kanal adını elle yaz.', { duration: 3000 });
@@ -74,10 +75,11 @@
       cls: 'tel-sheet',
       html: `<p class="card-eyebrow">${K.esc(K.ek(C.herPet, 'in'))} telefonu</p><h2>${r ? 'Bildirimler açık ✓' : 'Henüz kurulmadı'}</h2>
         <p class="muted">${r ? `${K.esc(K.ago(r.at))} kurdu. Sen dürtünce, sarılınca, sürpriz, hikâye ya da Barış Köprüsü'nden bir şey gönderince ${K.esc(K.ek(C.herPet, 'in'))} kilit ekranına düşüyor.` : `Ana salonunda ona bir kurulum kartı çıkıyor (App Store'dan ntfy, bir kanal adı, bir deneme). Kurunca burada görürsün.`}</p>
-        <div class="row"><button type="button" class="btn soft small" data-tel-test>${A.ui('send')} Ona deneme gönder</button>${K.kisayol ? '<button type="button" class="btn ghost small" data-tel-siri>🗣️ Siri ile Sarıl</button>' : ''}</div>`,
+        <div class="row"><button type="button" class="btn soft small" data-tel-test>${A.ui('send')} Ona deneme gönder</button>${K.kisayol ? '<button type="button" class="btn ghost small" data-tel-siri>🗣️ Siri ile Sarıl</button>' : ''}${K.widget ? '<button type="button" class="btn ghost small" data-tel-wg>📱 Widget</button>' : ''}</div>`,
     });
     m.body.addEventListener('click', async (e) => {
       if (e.target.closest('[data-tel-siri]')) return m.close(), setTimeout(() => K.kisayol.open(), 320);
+      if (e.target.closest('[data-tel-wg]')) return m.close(), setTimeout(() => K.widget.open(), 320);
       if (!e.target.closest('[data-tel-test]')) return;
       const ok = await K.pingHer(`${C.myPet} sana el sallıyor 👋`, 'Kale bildirimleri çalışıyor.', ['wave']);
       K.fx.toast(ok ? 'Gönderildi. Kurduysa telefonuna düştü.' : 'Gönderilemedi.', { duration: 3000 });

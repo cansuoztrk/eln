@@ -129,6 +129,25 @@ Küsünce de buradayız. Saatlerce konuşamadığımız o anlar için:
 - **Haftalık Kalp Raporu** (Kalp, bulut): Her pazar akşamı (Bakü 20:00) haftanın havası, kalp endeksi, ikinizin karşılaştırması (kaleye uğranan gün, kalp menüsü, kavanoz, minnet, sesli mesaj, hikâye, kare), öne çıkanlar (birlikte uyunan geceler, gün batımları, barışlar, oyunlar), kavanozdan haftanın notu ve iki öneri. Önceki haftalar gezilebilir.
 - Hayal listesine kuzey ışıkları, Pont des Arts ve Trevi eklendi; yeni çıkartmalar (Masal Dinleyicisi, Aynı Gece, Kâşif, Yarışma Kraliçesi, Amiral); yeni kayıtlar hikâyelere ve Gün Gün Biz'e geçer; Biz panosunda yeni kutular.
 
+### 26. aşama
+
+- **Uzaktan Öpücük** (kalp menüsü): Ekranda bir, iki ya da üç yere dokunulur, ruj rengi seçilir (kırmızı, pembe, mor). Onun ekranında tam o noktalarda ruj izi belirir; Pamuk utanıp gözlerini kapatır. O kalede değilse ana salonda kart olarak bekler.
+- **Kalp Atışım** (kalp menüsü): Parmak arka kameraya konur, 15 saniyede nabız kırmızı ışığın değişiminden ölçülür (fener varsa yanar); kamera yoksa nabzı hissettikçe kalbe dokunulur. Onun ekranında kalp aynı ritimde atar, sesle ve (Android'de) titreşimle.
+- **Sesimle Uyan** (Kalp, bulut): Herkes kendi şehrinin saatiyle uyanma saatini ve günlerini seçer; o saatte telefonuna acil bildirim düşer, dokununca onun günaydın sesi çalar. Sesler odadan kaydedilir (30 sn, hazır cümlelerle); telesekreterdeki günaydın mesajları ve kasadaki "Günaydın" sesi de havuzda. Bildirimler en fazla iki gün önceden kurulur; iki cihaz aynı anda kurmaya kalkarsa yalnız ilki gönderir. "2 dk sonra dene" düğmesi.
+- **Söz Defteri** (Kalp, bulut): Küçük sözler tarihiyle yazılır; o sabah söz verene bildirim. Söz verilen "nazikçe hatırlat" der, söz veren "tuttum" der, öbürü teşekkür kalbi gönderir.
+- **Bugün Senin İçin** (Kalp, bulut): Her gün ikinize farklı birer küçük iyilik önerisi (kırk öneri, günde bir "başka öner"). Yapınca o günün takvim karesine yıldız düşer; öbürü "bugün senin için bunu yaptı" diye görür. Seri ve aylık yıldız takvimi.
+- **Kalp Haritası** (Kalp, bulut): Bir yılın kalbi tek sayfada; on iki satır, her kare bir gün. Kare çapraz bölünür: sol üst Eln'in, sağ alt Ardoş'un o günkü iç havası; hava yoksa o günkü hareket kadar pembeleşir. Güne dokununca özeti ve "Gün Gün'de aç", aya dokununca ayın özeti.
+- **Gerçek Hava ve Aynı Gökyüzü** (ana salon): Gökyüzünün sol yarısı İstanbul'un, sağ yarısı Bakü'nün o anki gerçek havası (yağmur damlaları, kar, sis, şimşek, güneş ışığı); kulelerin üstünde derece. İki şehrin havası aynıysa ana salonda "Aynı gökyüzü" kartı ve çıkartma.
+- **Kale Yedeği** (Hazine, bulut): Okunur arşiv (günlere bölünmüş HTML kitapçık), sadece yazılar (küçük JSON) ya da her şey (fotoğraf ve seslerle). Dosya cihaza iner ve şifresizdir. Her ayın ilk günlerinde hatırlatma.
+- **Kale Widget'ı**: iPhone ana ekranı ve kilit ekranı için Scriptable kodu, kalenin kendi ayarlarından üretilir: birlikte geçen gün, bir sonraki 21'e kalan gün, iki şehrin canlı saati. Biz panosundan ve telefon kurulumundan açılır.
+- **Şifreli Mektup** (Oyun, bulut): Her hafta şifreli bir cümle; harfler simgeye dönüşmüş, anahtarın yarısı Eln'de yarısı Ardoş'ta. Bir simgeye yazılan harf ikinizin tahtasında da görünür; hepsi doğru olunca mektup açılır.
+- **Emoji Şarkı** (Oyun, bulut): Şarkı Defteri'nden bir şarkı emojilerle anlatılır; öbürü dört seçenekten (şarkı azsa yazarak) bulur, iki hak. Bilinen şarkı radyoda birlikte açılır.
+- **Biz FM** (Kalp, bulut): Her pazar akşamı Kitty'nin sunduğu haftalık radyo programı, Kalp Raporu'ndan kurulur: haftanın havası, telesekreterden haftanın sesleri (gerçek kayıtlar), kavanozdan not, minnet köşesi, öne çıkanlar, haftanın şarkısı. Telefonun Türkçe sesiyle okunur; ses yoksa altyazıyla. Eski yayınlar arşivde.
+- **Prenses ve User155** (Oyun, bulut): Haftalık etkileşimli hikâye, Sezon 1 dört bölüm. Her bölümde ikiniz de kendi seçeneğinizden birini seçersiniz (öbürününki gizli); ikiniz de seçince dört sonuçtan biri açılır. Sonraki bölüm takip eden pazartesi açılır.
+- **Kedimizin Dünyası**: Pamuk her gün hayal haritanızdaki bir yerden kartpostal yollar (albümde birikir); birlikte bakım günleri arttıkça oyuncaklar açılır ve odasında görünür (yumak, oyuncak fare, karton kutu, fiyonklu yatak, tırmalama kulesi, taç yastık).
+- **Hızlı Açılış**: Site artık yaklaşık 160 ayrı dosya yerine tek bir JS ve tek bir CSS paketiyle açılır (küçültülmüş, içerik özetli adla, uzun süre önbellekte). Kaynak dosyalar aynen duruyor; ayrıntı Teknik notlar'da.
+- On dört yeni çıkartma; yeni kayıtlar hikâyelere, Gün Gün Biz'e ve Kalp Haritası'na geçer; Biz panosunda yeni kutular.
+
 ### Telefonuna bildirim (Eln'in iPhone'u)
 
 Ardoş bir şey gönderince Eln'in kilit ekranına düşer: dürt, sarıl, günaydın / iyi geceler, zamanlı sürpriz (açılış anında), hikâye, radyo, kare, pinpon daveti, mektup, Barış Köprüsü'ndeki her şey... Kurulum Eln'in ana salonunda bir kart olarak çıkar (ayrıca zil → "Telefonuna bildirim"): App Store'dan ücretsiz **ntfy** uygulaması → "+" ile kasadaki kanal adına abone ol → **Deneme gönder** → **Geldi**. "Geldi" denince Ardoş'a haber gider; Ardoş zilden kurulumu görür ve ona deneme gönderebilir. Kanal adı kasada (`config.ntfyTopicHer`). Bildirimler artık iki yönlü: Eln'in yaptıkları da eskisi gibi Ardoş'un telefonuna gider.
@@ -306,7 +325,8 @@ Başka bir ad seçersen hediye kartındaki QR'ı ve `index.html`'deki `og:image`
 
 ## Teknik notlar
 - Bulut listeleri her zaman en yeni kayıtları getirir (varsayılan 500). Ağır veriler ayrı kayıtta durur ve sadece gerektiğinde iner: Günün Sesi sesleri (`dvaudio`), panelden yüklenen sesler (`vaudio`), kartpostalların büyük fotoğrafı (`pcimg`), Bakü Günlüğü'nün büyük fotoğrafları (`kfull`). Böylece bir yıl sonra bile kale her açılışta birkaç MB'tan fazlasını indirmez (Supabase ücretsiz planında aylık 5 GB trafik var).
-- Derleme yok. Tek dış kütüphane `js/vendor/supabase.js` (supabase-js, MIT), sadece bulut ayarı varsa yüklenir. Yazı tipleri Google Fonts'tan (Fredoka, Great Vibes, Caveat, Nunito).
+- **Paket (Hızlı Açılış):** Kaynak sayfa `dev.html`; bütün `css/` ve `js/` dosyaları orada sırasıyla listelenir ve geliştirirken o açılır. Yayına giden `index.html` bundan üretilir: `node tools/bundle.mjs` hepsini esbuild ile küçültüp `dist/kale.<özet>.js` ve `dist/kale.<özet>.css` olarak yazar (her dosya kendi try/catch'inde; biri bozulsa diğerleri çalışır). Bir dosyayı değiştirdikten ya da `dev.html`'e yeni dosya ekledikten sonra paketi yeniden üret; `node tools/bundle.mjs --check` güncel olup olmadığını söyler. Harita verisi (`js/harita-veri.js`) pakete girmez, oda açılınca yüklenir.
+- Netlify'da derleme adımı yok: üretilmiş paket depoda durur. Tek dış kütüphane `js/vendor/supabase.js` (supabase-js, MIT), sadece bulut ayarı varsa yüklenir. Yazı tipleri Google Fonts'tan (Fredoka, Great Vibes, Caveat, Nunito).
 - Hava durumu: [Open-Meteo](https://open-meteo.com/) (anahtarsız). Ulaşılamazsa site sessizce idare eder.
 - Telefon için tasarlandı; masaüstünde de çalışır. Hareket azaltma tercihine uyar.
 

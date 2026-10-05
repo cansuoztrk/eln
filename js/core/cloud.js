@@ -96,6 +96,21 @@
         const { error } = await client.from('kale').delete().eq('id', id);
         if (error) throw error;
       },
+      // Bütün kayıtlar (Kale Yedeği), eskiden yeniye, 500'erlik sayfalarla; skip: atlanacak türler
+      async dump(skip, onp) {
+        let out = [], from = 0;
+        for (;;) {
+          let q = client.from('kale').select('*').eq('space', space);
+          if (skip && skip.length) q = q.not('kind', 'in', `(${skip.join(',')})`);
+          const { data, error } = await q.order('created_at', { ascending: true }).range(from, from + 499);
+          if (error) throw error;
+          out = out.concat((await Promise.all(data.map(decodeRow))).filter(Boolean));
+          onp && onp(out.length);
+          if (data.length < 500) break;
+          from += 500;
+        }
+        return out;
+      },
       async send(msg) {
         return ch.send({ type: 'broadcast', event: 'm', payload: { d: await K.vault.seal(msg) } });
       },
@@ -164,6 +179,11 @@
         localStorage.setItem(KEY, JSON.stringify(rows().filter((r) => r.id !== id)));
         bc.postMessage({ t: 'del', id });
       },
+      async dump(skip, onp) {
+        const all = (await Promise.all(rows().filter((r) => !(skip || []).includes(r.kind)).map(decodeRow))).filter(Boolean);
+        onp && onp(all.length);
+        return all;
+      },
       async send(msg) {
         bc.postMessage({ t: 'm', d: await K.vault.seal(msg) });
       },
@@ -185,6 +205,8 @@
       emitRow(row);
       return row;
     },
+    // Yedek için her şey (hata olursa fırlatır; çağıran söyler)
+    dump: (skip, onp) => (adapter && adapter.dump ? adapter.dump(skip, onp) : Promise.resolve([])),
     async remove(id) {
       if (!adapter) return;
       await adapter.remove(id).catch(() => {});

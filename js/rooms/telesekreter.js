@@ -220,7 +220,7 @@
     return n.length ? [{ icon: 'radio', title: `📼 ${nameOf(other())} sana ${n.length > 1 ? `${n.length} sesli mesaj` : 'sesli bir mesaj'} bıraktı`, text: `${tagOf(n[0].data.tag)[1]} ${tagOf(n[0].data.tag)[2]} · ${mmss(n[0].data.dur || 0)}. Telesekreterin ışığı yanıp sönüyor.`, room: 'telesekreter', cta: 'Dinle' }] : [];
   });
 
-  K.telesekreter = { count: () => msgs().length, unheard: () => (loaded ? unheard().length : 0) };
+  K.telesekreter = { count: () => msgs().length, unheard: () => (loaded ? unheard().length : 0), list: (w) => msgs(w) };
 
   K.room({
     id: 'telesekreter',

@@ -17,7 +17,7 @@
   const other = () => (K.isOwner() ? 'her' : 'me');
   const nameOf = (w) => (w === 'me' ? C.myPet : C.herPet);
   const on = () => Boolean(K.cloud && K.cloud.enabled);
-  const KINDS = ['kedisahip', 'kediad', 'kedionay', 'mama', 'sev', 'oyna'];
+  const KINDS = ['kedisahip', 'kediad', 'kedionay', 'mama', 'sev', 'oyna', 'kedikart'];
   const ping = (title, msg, tags, extra) => K.ping && K.ping(title, msg, tags, Object.assign({ click: K.roomUrl('kedi') }, extra || {}));
 
   let rows = [], loaded = false, root = null;
@@ -137,6 +137,50 @@
 
   /* ---------- Oda ---------- */
   let mode = '', petN = 0, petT = 0, playN = 0, playT = 0, lastLive = 0, trickT = 0;
+  /* ---------- Kedimizin Dünyası: her gün hayal haritamızdan bir kartpostal, bakım günleriyle açılan oyuncaklar ---------- */
+  const KW = () => D.kedidunya || { cards: [], toys: [] };
+  const FALLBACK = [{ ref: 'f1', name: 'Kız Kulesi', place: 'İstanbul', emoji: '🗼' }, { ref: 'f2', name: 'Qız Qalası', place: 'Bakü', emoji: '🏰' }, { ref: 'f3', name: 'Hazar kıyısı', place: 'Bakü', emoji: '🌊' }];
+  function postcard(day) {
+    const pl = (K.harita && K.harita.places && K.harita.places().length ? K.harita.places() : FALLBACK);
+    const p = pl[K.hash(day + 'yer') % pl.length];
+    const cards = KW().cards || [''];
+    const yer = p.place ? `${p.name}, ${p.place.split(',')[0]}` : p.name;
+    const n = p.name;
+    const text = String(cards[K.hash(day + 'kart') % cards.length] || '')
+      .replace(/\{yer\}'den/g, K.ek(n, 'den'))
+      .replace(/\{yer\}'deyim/g, K.ek(n, 'de') + 'yim')
+      .replace(/\{yer\}'de/g, K.ek(n, 'de'))
+      .replace(/\{yer\}'e/g, K.ek(n, 'e'))
+      .replace(/\{yer\}/g, yer);
+    return { day, p, yer, text: K.fill(text) };
+  }
+  const toys = () => (KW().toys || []).filter((t) => careDays() >= t[0]);
+  const album = () => of('kedikart').filter((r, i, a) => a.findIndex((x) => x.data.day === r.data.day) === i);
+  async function keepCard() {
+    const day = T.todayKey();
+    if (!adoption() || of('kedikart').some((r) => r.data.day === day)) return;
+    const c = postcard(day);
+    rows.push({ id: 'tmp-kk', kind: 'kedikart', data: { day, yer: c.yer, emoji: c.p.emoji }, at: Date.now(), who: mine() });
+    const r = await K.cloud.add('kedikart', { day, yer: c.yer, emoji: c.p.emoji });
+    rows = rows.filter((x) => x.id !== 'tmp-kk');
+    push(r);
+    K.stickers.award('kedikart');
+  }
+  function world() {
+    const el = root && K.$('#kdWorld', root);
+    if (!el || !adoption()) return;
+    const c = postcard(T.todayKey());
+    const al = album();
+    const cd = careDays();
+    el.innerHTML = `<p class="card-eyebrow">🌍 ${K.esc(K.ek(shown(), 'in'))} dünyası</p>
+      <div class="kd-post"><div class="kd-post-img" aria-hidden="true"><span>${c.p.emoji}</span><i class="kd-post-cat">🐈</i><b class="kd-stamp">${K.esc(c.p.emoji)}</b></div>
+        <div class="kd-post-txt"><small>${K.esc(T.fmt(T.todayKey()))} · ${K.esc(c.yer)}</small><p class="hand">${K.esc(c.text)}</p><span class="kd-sign">🐾 ${K.esc(shown())}</span></div></div>
+      <p class="muted small">Her gün hayal haritanızdaki bir yerden kartpostal yollar. Albüm: <b>${al.length}</b> kart</p>
+      ${al.length > 1 ? `<div class="kd-album">${al.slice(-14).reverse().map((r) => `<span title="${K.esc(r.data.yer)} · ${K.esc(T.fmtShort(r.data.day))}">${K.esc(r.data.emoji || '📍')}<small>${K.esc(T.fmtShort(r.data.day))}</small></span>`).join('')}</div>` : ''}
+      <p class="card-eyebrow">🧸 Oyuncakları</p>
+      <ul class="kd-toys">${(KW().toys || []).map(([d, id, e, l]) => `<li class="${cd >= d ? 'on' : ''}"><span>${cd >= d ? e : '🔒'}</span><small>${K.esc(l)}${cd >= d ? '' : ` · ${d} gün`}</small></li>`).join('')}</ul>`;
+  }
+
   function render() {
     if (!root || K.activeRoom !== 'kedi') return;
     const ad = adoption();
@@ -160,6 +204,7 @@
         <div class="kd-cat" id="kdCat" role="img" aria-label="${K.esc(shown())}: ${K.esc(moodLine(m))}">${kitten(m)}</div>
         <span class="kd-yarn" id="kdYarn" aria-hidden="true"></span>
         <div class="kd-fx" id="kdFx" aria-hidden="true"></div>
+        ${toys().map(([, id, e]) => `<span class="kd-toy t-${id}" aria-hidden="true">${e}</span>`).join('')}
       </div>
       <div class="kd-tag"><b>${K.esc(shown())}</b>${nm ? '' : ' <small>(adı henüz konmadı)</small>'}<span>${K.esc(s.name)} · ${ageDays() + 1}. gün</span></div>
       <p class="kd-say">${K.esc(moodLine(m))}</p>
@@ -192,6 +237,7 @@
       const t = r.kind === 'mama' ? `${(FD[r.data.f] || ['', '🍽️'])[1]} ${who} besledi${FD[r.data.f] ? `: ${FD[r.data.f][2].toLocaleLowerCase('tr')}` : ''}` : r.kind === 'sev' ? `🤲 ${who} sevdi (${r.data.n} okşama)` : r.kind === 'oyna' ? `🧶 ${who} oynadı (${r.data.n} yakalama)` : r.kind === 'kedisahip' ? `🐾 ${who} onu kapıda buldu ve sahiplendi` : `🎀 Adı kondu: ${name()}`;
       return `<li><span>${K.esc(t)}</span><small>${K.esc(K.ago(r.at))}</small></li>`;
     }).join('')}</ul>`;
+    world();
   }
   const scene = () => root && K.$('.kd-scene', root);
   function hearts(x, y, emo, n = 1) {
@@ -423,7 +469,7 @@
     if (love(mine()) < 22) return [{ icon: 'paw', title: `🥺 ${shown()} seni özledi`, text: 'Bir süredir onu sevmedin. Kokunu arıyor.', room: 'kedi', cta: 'Sev' }];
     return [];
   });
-  K.kedi = { name: shown, mood: () => (adoption() ? mood().k : ''), adopted: () => Boolean(adoption()) };
+  K.kedi = { name: shown, mood: () => (adoption() ? mood().k : ''), adopted: () => Boolean(adoption()), postcard, album: () => album().length };
 
   K.room({
     id: 'kedi',
@@ -447,6 +493,7 @@
         <div class="kd-bars kd-after" id="kdBars"></div>
         <div class="kd-acts kd-after" id="kdActs"></div>
         <section class="card kd-name kd-after" id="kdName" hidden></section>
+        <section class="card kd-after kd-world" id="kdWorld"></section>
         <section class="card kd-after" id="kdTricks"></section>
         <section class="card kd-after" id="kdLog"></section>`;
       el.addEventListener('click', (e) => {
@@ -507,6 +554,7 @@
     enter() {
       mode = '';
       render();
+      if (loaded) keepCard().then(world);
     },
     leave() {
       commitPet();
