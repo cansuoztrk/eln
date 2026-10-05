@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- KK:BAS -->
+<title>Kızıl Kapsül</title>
+<meta name="description" content="Kızıl Kapsül: istasyon patlamadan önce kaçış kapsülüne binecek 3 temiz kişiyi bulmaya çalıştığınız sosyal çıkarım oyunu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Saira+Stencil+One&display=swap">
+<link rel="stylesheet" href="assets/css/kapsul.css">
+<!-- /KK:BAS -->
+</head>
+<body data-gorunum="ana">
+<!-- KK:GOVDE -->
+<div id="uygulama" lang="tr">
+<a class="atla-link" href="#icerik">İçeriğe geç</a>
+
+<header class="ana-nav">
+  <a class="logo" href="#ana" aria-label="Kızıl Kapsül ana sayfa">
+    <span class="logo-isaret" aria-hidden="true"></span>
+    <span>KIZIL KAPSÜL</span>
+  </a>
+  <nav aria-label="Bölümler">
+    <ul class="nav-bolum">
+      <li><a href="#brifing">Brifing</a></li>
+      <li><a href="#roller">Roller</a></li>
+      <li><a href="#tur">Tur akışı</a></li>
+      <li><a href="#final">Final</a></li>
+      <li><a href="#yenilikler">Yenilikler</a></li>
+      <li><a href="#habbo">Habbo'da</a></li>
+    </ul>
+  </nav>
+  <div class="nav-eylem">
+    <a class="dugme ince" href="#kurucu" data-hedef="kurucu">Kurucu Paneli</a>
+    <a class="dugme ince birincil" href="#oyna" data-hedef="oyna">Oyna</a>
+  </div>
+</header>
+
+<main id="icerik">
+
+<!-- ================= ANA SAYFA ================= -->
+<div id="gorunum-ana" class="gorunum">
+  <section class="hero" id="ana">
+    <div class="hero-metin">
+      <p class="eyebrow">KERBEROS-7 YÖRÜNGE İSTASYONU · ACİL DURUM PROTOKOLÜ 03</p>
+      <h1 class="hero-baslik"><span>KIZIL</span><span>KAPSÜL</span></h1>
+      <p class="hero-giris">Oksijen bitiyor. Tek kurtuluş üç kişilik bir kaçış kapsülü. Ama aranızda sabotajcılar var. Kapsüle tek bir hain binerse kalkışta infilak eder.</p>
+      <div class="hero-eylem">
+        <a class="dugme birincil buyuk" href="#oyna">Simülasyonu başlat</a>
+        <a class="dugme buyuk" href="#kurucu">Habbo'da yönet</a>
+      </div>
+      <dl class="hero-olcu">
+        <div><dt>Oyuncu</dt><dd>7–12</dd></div>
+        <div><dt>Tur aşaması</dt><dd>4 + gece</dd></div>
+        <div><dt>Kapsül</dt><dd>3 koltuk</dd></div>
+        <div><dt>Hain yeter</dt><dd>1</dd></div>
+      </dl>
+    </div>
+    <div class="hero-gorsel" aria-hidden="true">
+      <div class="isik-cark"></div>
+      <div class="hero-o2" id="hero-o2" style="--o2:38">
+        <div class="hero-o2-ic"><span>O₂</span><b id="hero-o2-deger">%38</b><small>KRİTİK</small></div>
+      </div>
+      <div class="kapsul hero-kapsul">
+        <div class="kapsul-govde">
+          <div class="koltuk"><img data-avatar="1207" data-olcek="3" alt=""></div>
+          <div class="koltuk"><img data-avatar="88231" data-olcek="3" alt=""></div>
+          <div class="koltuk supheli"><span>?</span></div>
+        </div>
+        <div class="kapsul-alev"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="serit" aria-hidden="true">
+    <div class="serit-ic">
+      <span>UYARI · O₂ SEVİYESİ KRİTİK</span><span>KAÇIŞ KAPSÜLÜ HAZIR · 3 KOLTUK</span><span>SABOTAJ SİNYALİ TESPİT EDİLDİ</span><span>ŞALTER PANELİ 2/3 YEŞİL</span><span>TELEFON HATTI AÇIK</span>
+      <span>UYARI · O₂ SEVİYESİ KRİTİK</span><span>KAÇIŞ KAPSÜLÜ HAZIR · 3 KOLTUK</span><span>SABOTAJ SİNYALİ TESPİT EDİLDİ</span><span>ŞALTER PANELİ 2/3 YEŞİL</span><span>TELEFON HATTI AÇIK</span>
+    </div>
+  </div>
+
+  <section class="bolum" id="brifing">
+    <header class="bolum-ust"><p class="eyebrow">GÖREV BRİFİNGİ</p><h2>Üç koltuk, bir karar</h2></header>
+    <div class="brifing">
+      <div class="brifing-metin">
+        <p>İstasyonun oksijeni her tur azalıyor. Hayatta kalmanın tek yolu üç kişilik kaçış kapsülü. Mürettebat içinde sabotajcılar var: yalan söylüyor, şalterleri kırmızı bırakıyor, telefon bilgisini çarpıtıyorlar.</p>
+        <p>Her tur iki kişi teyit kabininde şifre dinler, üç kişi şalter odasına girer, biri telefonu açar ve Gizli Kaptan oylama açılıp açılmayacağına karar verir. Oksijen bittiğinde ya da istasyonda çok az kişi kaldığında kapsül fırlatılır.</p>
+      </div>
+      <div class="kazanma">
+        <div class="kazanma-kart t-masum"><span class="etiket-kucuk">MÜRETTEBAT KAZANIR</span><p>Kapsüldeki 3 kişinin üçü de temizse kapsül yörüngeye ulaşır.</p></div>
+        <div class="kazanma-kart t-hain"><span class="etiket-kucuk">HAİNLER KAZANIR</span><p>Kapsülde tek bir hain varsa kalkışta patlar. İstasyonda 3 temiz kişi kalmazsa da hainler kazanır.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum" id="roller">
+    <header class="bolum-ust"><p class="eyebrow">PERSONEL DOSYALARI</p><h2>Roller fısıltıyla dağıtılır</h2><p class="bolum-alt">Kartı çevir, o rolün taktiklerini gör.</p></header>
+    <div class="dosyalar">
+      <article class="dosya-kart t-masum">
+        <div class="dosya-on">
+          <header><span>DOSYA K7-01</span><i class="takim-cip">MASUM</i></header>
+          <img data-avatar="314" data-olcek="4" alt="" class="dosya-avatar">
+          <h3>Mürettebat</h3>
+          <p>Yalan söyleyenleri yakala ve kapsüle sadece masumları bindir.</p>
+          <p class="dosya-guc"><b>Gücü</b> Mantık ve hafıza. Kabinde duyduğu kelime doğru kelimedir.</p>
+        </div>
+        <ul class="dosya-arka">
+          <li>Kabinde duyduğunu aynen söyle.</li>
+          <li>Şalterini aç: kırmızı her şalter oksijeni hızlandırır.</li>
+          <li>Panel sayısıyla "bastım" diyenleri karşılaştır.</li>
+        </ul>
+        <button type="button" class="dosya-cevir" aria-expanded="false">Taktikleri gör</button>
+      </article>
+      <article class="dosya-kart t-hain">
+        <div class="dosya-on">
+          <header><span>DOSYA K7-02</span><i class="takim-cip">ANA HAİN</i></header>
+          <img data-avatar="7741" data-olcek="4" alt="" class="dosya-avatar">
+          <h3>Suikastçı</h3>
+          <p>Yalan söyler, görevleri bozar, kapsüle sızmaya çalışır.</p>
+          <p class="dosya-guc"><b>Özel güç</b> O tur oylama yapıldıysa gece 1 masumu öldürür.</p>
+        </div>
+        <ul class="dosya-arka">
+          <li>Kabinde hain kelimesini duyarsın. Masum kelimesini tahmin et.</li>
+          <li>Şalteri hep kırmızı bırakma; sayılar seni ele verir.</li>
+          <li>Gece, seni en çok suçlayanı ya da halkın en güvendiğini hedefle.</li>
+        </ul>
+        <button type="button" class="dosya-cevir" aria-expanded="false">Taktikleri gör</button>
+      </article>
+      <article class="dosya-kart t-hain">
+        <div class="dosya-on">
+          <header><span>DOSYA K7-03</span><i class="takim-cip">HAİN YAMAĞI</i></header>
+          <img data-avatar="52005" data-olcek="4" alt="" class="dosya-avatar">
+          <h3>Yancı</h3>
+          <p>Suikastçı'yı tanır, korur, kafa karıştırır.</p>
+          <p class="dosya-guc"><b>Gücü</b> Görev bozabilir, öldüremez. Kapsüle binen tek hain o da olabilir.</p>
+        </div>
+        <ul class="dosya-arka">
+          <li>Suikastçı şüphe çekince dikkati bir masuma çevir.</li>
+          <li>Telefonu sen açarsan bilgiyi çarpıt.</li>
+          <li>Finalde ortağına oy ver; tek hain yeter.</li>
+        </ul>
+        <button type="button" class="dosya-cevir" aria-expanded="false">Taktikleri gör</button>
+      </article>
+      <article class="dosya-kart t-hal">
+        <div class="dosya-on">
+          <header><span>DOSYA K7-04</span><i class="takim-cip">MASUM · BOZUK ALGI</i></header>
+          <img data-avatar="90210" data-olcek="4" alt="" class="dosya-avatar">
+          <h3>Halüsinatif</h3>
+          <p>Aslında masumdur ama algıları bozuktur. Amacı masum olduğunu kanıtlayıp kapsüle binmek.</p>
+          <p class="dosya-guc"><b>Kabin Laneti</b> şifreyi alakasız duyar. <b>Şalter Laneti</b> renkleri ters görür.</p>
+        </div>
+        <ul class="dosya-arka">
+          <li>Kelimen bambaşka çıktıysa sorun sende olabilir.</li>
+          <li>Şalterin "zaten yeşil" görünüyorsa gerçekte kırmızıdır.</li>
+          <li>Telefondan gelecek "masumdur" bilgisi en büyük kozun.</li>
+        </ul>
+        <button type="button" class="dosya-cevir" aria-expanded="false">Taktikleri gör</button>
+      </article>
+      <article class="dosya-kart t-kaptan">
+        <div class="dosya-on">
+          <header><span>DOSYA K7-05</span><i class="takim-cip">OTORİTE</i></header>
+          <img data-avatar="4404" data-olcek="4" alt="" class="dosya-avatar">
+          <h3>Gizli Kaptan</h3>
+          <p>Kimse kim olduğunu bilmez. Tur sonlarında oylama yapılıp yapılmayacağına tek başına karar verir.</p>
+          <p class="dosya-guc"><b>Büyük ödül</b> En az 1 kez oylama başlatırsa finalde 1. koltuğu kendisi seçer.</p>
+        </div>
+        <ul class="dosya-arka">
+          <li>Oylama, gece Suikastçı'yı serbest bırakır.</li>
+          <li>Hiç oylama açmazsan finalde söz hakkın olmaz.</li>
+          <li>Kimliğini sakla; Suikastçı'nın ilk hedefi olursun.</li>
+        </ul>
+        <button type="button" class="dosya-cevir" aria-expanded="false">Taktikleri gör</button>
+      </article>
+      <article class="dosya-kart t-masum genisleme">
+        <div class="dosya-on">
+          <header><span>DOSYA K7-06</span><i class="takim-cip">GENİŞLEME</i></header>
+          <img data-avatar="61616" data-olcek="4" alt="" class="dosya-avatar">
+          <h3>Medik</h3>
+          <p>İsteğe bağlı rol. Oylama gecelerinde bir kişiyi korur.</p>
+          <p class="dosya-guc"><b>Gücü</b> Aynı kişiyi üst üste iki gece koruyamaz.</p>
+        </div>
+        <ul class="dosya-arka">
+          <li>Kurtardığın gece "saldırı püskürtüldü" duyurulur.</li>
+          <li>Bu, Suikastçı'nın hâlâ hayatta olduğunu kanıtlar.</li>
+          <li>Halkın en güvendiği kişi Suikastçı'nın da hedefidir.</li>
+        </ul>
+        <button type="button" class="dosya-cevir" aria-expanded="false">Taktikleri gör</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="bolum" id="tur">
+    <header class="bolum-ust"><p class="eyebrow">TUR SİSTEMİ</p><h2>Bir tur dört aşamada geçer</h2><p class="bolum-alt">Her turun başında bir istasyon olayı çekilir. Oylama yapılan turlar geceyle biter.</p></header>
+    <ol class="tur-akisi">
+      <li class="asama">
+        <div class="asama-gorsel g-kabin" aria-hidden="true"><span class="mini-kabin"><i>ELMA</i></span><span class="mini-kabin"><i class="kirmizi">ARMUT</i></span></div>
+        <span class="asama-no">01</span>
+        <h3>Kabin turu</h3>
+        <p class="asama-tur">Yüzleşme</p>
+        <p>Rastgele 2 kişi teyit kabinine girer. Kurucu ikisine de gizli bir kelime ya da sayı fısıldar. Masumlar aynı kelimeyi duyar, hain aynı kategoriden farklı bir kelime, halüsinatif alakasız bir kelime.</p>
+        <p class="asama-olay"><b>Olay</b> 3-2-1 sayılır, ikisi aynı anda söyler. Tutmuyorsa biri yalan söylüyor ya da halüsinatif.</p>
+      </li>
+      <li class="asama">
+        <div class="asama-gorsel g-salter" aria-hidden="true"><span class="mini-salter yesil"></span><span class="mini-salter kirmizi"></span><span class="mini-salter yesil"></span><b>2/3</b></div>
+        <span class="asama-no">02</span>
+        <h3>Şalter odası</h3>
+        <p class="asama-tur">Aksiyon</p>
+        <p>3 kişi sırayla tek tek odaya girer. Şalterler kırmızı başlar, amaç hepsini yeşil yapmak. Hainler kırmızı bırakabilir ya da güven kazanmak için yeşil yapar. Şalter lanetli halüsinatif kırmızıyı yeşil görür ve dokunmaz.</p>
+        <p class="asama-olay"><b>Olay</b> Ana panel sadece toplamı gösterir. "Ben bastım, o basmadı" tartışması başlar.</p>
+      </li>
+      <li class="asama">
+        <div class="asama-gorsel g-telefon" aria-hidden="true"><span class="mini-telefon"></span><span class="mini-telex">2. KİŞİ HAİNDİR</span></div>
+        <span class="asama-no">03</span>
+        <h3>Telefon</h3>
+        <p class="asama-tur">İstihbarat</p>
+        <p>Halkın seçtiği 1 kişi telefonu açar. Kurucu ona odadakilerle ilgili net ve doğru bir bilgi verir: "Şalter odasındaki 2. kişi haindir" ya da "Kabine giren Ahmet masumdur".</p>
+        <p class="asama-olay"><b>Olay</b> Telefonu açan kişi bilgiyi herkese duyurur. Hainse çarpıtabilir.</p>
+      </li>
+      <li class="asama">
+        <div class="asama-gorsel g-kaptan" aria-hidden="true"><span>PAS</span><span class="mini-kol"></span><span>OYLAMA</span></div>
+        <span class="asama-no">04</span>
+        <h3>Kaptan'ın kararı</h3>
+        <p class="asama-tur">Final karar</p>
+        <p>Her şey konuşulur. Gizli Kaptan, kimliğini belli etmeden PAS ya da OYLAMA der. Oylamada en çok oyu alan hava kilidinden atılır.</p>
+        <p class="asama-olay"><b>Gece</b> Oylama yapıldıysa güvenlik duvarı kalkar ve Suikastçı 1 masumu öldürebilir.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="bolum" id="kaptan">
+    <header class="bolum-ust"><p class="eyebrow">KAPTAN'IN KUMARI</p><h2>Güvenli ama kör, riskli ama yetkili</h2></header>
+    <div class="kumar">
+      <div class="kumar-kart">
+        <h3>A · Pas geçiyorum</h3>
+        <ul><li>Oylama yapılmaz, kimse elenmez.</li><li>Gece kimse ölmez.</li><li>Kaptan yetki kazanmaz.</li></ul>
+      </div>
+      <div class="kumar-ayrac" aria-hidden="true"><span class="mini-kol buyuk"></span></div>
+      <div class="kumar-kart risk">
+        <h3>B · Oylama başlat</h3>
+        <ul><li>Sandık kurulur, en çok oyu alan atılır.</li><li>Gece Suikastçı 1 masumu öldürebilir.</li><li>Kaptan risk aldığı için yetki kazanır: finalde 1. koltuğu o seçer.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum" id="final">
+    <header class="bolum-ust"><p class="eyebrow">FIRLATMA ANI</p><h2>Kalanlar masaya toplanır</h2></header>
+    <div class="final-anlat">
+      <ol class="final-adim">
+        <li><b>Kaptan ortaya çıkar.</b> Kimliğini açıklar.</li>
+        <li><b>Hiç oylama yapmadıysa</b> söz hakkı yoktur; 3 koltuğu da halk oylamasıyla seçersiniz. Hainlerin sızması çok kolaylaşır.</li>
+        <li><b>Yetkiyi kazandıysa</b> 1. koltuğa binecek kişiyi doğrudan seçer. Kalan 2 koltuğu halk seçer.</li>
+        <li><b>Fırlatma.</b> Kapsüldeki 3 kişi de temizse mürettebat kazanır. İçeride tek hain varsa kapsül patlar.</li>
+      </ol>
+      <div class="final-koltuk" aria-hidden="true">
+        <div class="koltuk-diyagram"><span class="k1">1<small>Kaptan</small></span><span class="k2">2<small>Halk</small></span><span class="k3">3<small>Halk</small></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bolum" id="yenilikler">
+    <header class="bolum-ust"><p class="eyebrow">YENİ MEKANİKLER</p><h2>Temel oyunun üstüne eklenenler</h2><p class="bolum-alt">Kurucu Paneli'nde her biri açılıp kapatılabilir; simülasyonda hepsi çalışır.</p></header>
+    <ul class="yamalar">
+      <li class="yama"><b>Oksijen saati</b><p>Her tur O₂ %20 düşer, kırmızı kalan her şalter %6 daha. Sabotaj oyunu kısaltır, bilgi azalır. %0 olunca final.</p></li>
+      <li class="yama"><b>İstasyon olayları</b><p>10 olay kartı: Oksijen Sızıntısı, Yedek Tüp, Radyo Paraziti, Çift Hat, Güç Dalgalanması, Güvenlik Kamerası, Karantina, Kızıl Alarm, Çift Kabin, Sakin Vardiya.</p></li>
+      <li class="yama"><b>Eşzamanlı söyleme</b><p>Kabinden çıkanlar 3-2-1 sayılınca aynı anda söyler. Önce söyleyeni kopyalamak mümkün değil.</p></li>
+      <li class="yama"><b>Gizli halüsinatif</b><p>İsteğe bağlı olarak halüsinatif kendini Mürettebat sanar. Şalter laneti ancak böyle gerçekten işler.</p></li>
+      <li class="yama"><b>Sessiz gece kanıtı</b><p>Oylama yapıldı ama gece kimse saldırıya uğramadıysa Suikastçı artık aramızda değildir.</p></li>
+      <li class="yama"><b>Kimlik taraması</b><p>Atılan kişinin kimliği gizli kalır, takımı ya da rolü açıklanır. Kurucu seçer.</p></li>
+      <li class="yama"><b>Medik rolü</b><p>Oylama gecelerinde birini korur. Kurtarılan gece Suikastçı'nın hâlâ hayatta olduğunu kanıtlar.</p></li>
+      <li class="yama"><b>Kendine oy yok</b><p>Ne sandıkta ne finalde kimse kendine oy veremez. Herkes birine güvenmek zorunda.</p></li>
+      <li class="yama"><b>ARIA</b><p>Simülasyondaki taktik bilgisayar. Sadece senin bildiklerini bilir, her kanıtı olasılığa çevirir. Zor seviyede kapalı.</p></li>
+      <li class="yama"><b>Seyir defteri ve şüphe panosu</b><p>Kim ne dedi, panel ne gösterdi, her şey tur tur kaydedilir. Herkese kendi notunu iliştir.</p></li>
+      <li class="yama"><b>Kara kutu</b><p>Oyun bitince kim hangi turda yalan söyledi, kim sabotaj yaptı, telefon nasıl çarpıtıldı, hepsi açılır.</p></li>
+      <li class="yama"><b>Hayalet modu ve rozetler</b><p>Ölünce rolleri görerek izlemeye devam et. 13 rozet; Kızıl Usta için zor seviyede kazanman gerek.</p></li>
+    </ul>
+  </section>
+
+  <section class="bolum" id="habbo">
+    <header class="bolum-ust"><p class="eyebrow">HABBO'DA NASIL OYNATILIR</p><h2>Kurucu için oda rehberi</h2></header>
+    <div class="habbo-rehber">
+      <ol class="rehber-adim">
+        <li><b>Odayı hazırla.</b> Ortaya bir toplantı masası, iki köşeye birer kapalı kabin (duş kabini ya da telefon kulübesi mobisi), ayrı bir köşeye şalter odası ve görünür bir yere telefon mobisi koy.</li>
+        <li><b>Kadroyu gir.</b> Kurucu Paneli'ne Habbo adlarını yapıştır. Panel rolleri dağıtır ve her oyuncu için fısıltı metnini hazırlar.</li>
+        <li><b>Fısılda.</b> Her oyuncuya kendi metnini fısılda. Ekranını yayınlıyorsan "Rolleri göster" kapalı kalsın.</li>
+        <li><b>Turu yönet.</b> Panel kabine girecek 2 kişiyi, kelime çiftini, şalter odasına girecek 3 kişiyi seçer. Sonuçları işaretledikçe duyuru metinleri hazırlanır.</li>
+        <li><b>Telefonu çaldır.</b> Halk kişiyi seçince panel gerçek bir bilgi üretir. Sadece o kişiye fısılda.</li>
+        <li><b>Kaptan'ı dinle.</b> Kaptan kararını sana fısıldar, sen duyurursun. Oylama, gece ve oksijen hesabını panel tutar.</li>
+      </ol>
+      <aside class="rehber-not">
+        <p class="etiket-kucuk">KURUCU İPUÇLARI</p>
+        <ul>
+          <li>Habbo sohbeti yaklaşık 100 karakterle sınırlı; paneldeki her metnin yanında karakter sayısı yazar.</li>
+          <li>Tartışmalar için paneldeki sayacı kullan: 60 saniye çoğu tur için yeterli.</li>
+          <li>Şalter lanetli halüsinatife ışığının yeşil yandığını söyle; o "zaten açıkmış" deyip dokunmaz.</li>
+        </ul>
+        <a class="dugme birincil" href="#kurucu">Kurucu Paneli'ni aç</a>
+      </aside>
+    </div>
+  </section>
+
+  <footer class="alt">
+    <p><b>KIZIL KAPSÜL</b> · Habbo için tasarlanmış sosyal çıkarım oyunu. İyi olan kazansın.</p>
+    <div class="alt-eylem"><a class="dugme ince" href="#oyna">Simülasyonu başlat</a><a class="dugme ince" href="#kurucu">Kurucu Paneli</a></div>
+  </footer>
+</div>
+
+<!-- ================= KURULUM ================= -->
+<section id="gorunum-oyna" class="gorunum kurulum" hidden>
+  <header class="bolum-ust"><p class="eyebrow">SİMÜLASYON</p><h1>Mürettebatı topla</h1><p class="bolum-alt">Botlara karşı oyna. Botlar her kanıtı tartar, yalan söyler, birbirini suçlar.</p></header>
+  <div class="kurulum-izgara">
+    <form id="kurulum-formu" class="kurulum-formu" autocomplete="off">
+      <div class="alan">
+        <label for="kur-ad">Habbo adın</label>
+        <input id="kur-ad" maxlength="18" placeholder="Sen" spellcheck="false">
+      </div>
+      <div class="alan">
+        <label for="kur-sayi">Mürettebat sayısı <output id="kur-sayi-deger" for="kur-sayi">8</output></label>
+        <input id="kur-sayi" type="range" min="7" max="12" value="8">
+        <p class="kur-dagilim" id="kur-dagilim"></p>
+      </div>
+      <fieldset class="alan">
+        <legend>Zorluk</legend>
+        <div class="segment">
+          <label><input type="radio" name="zorluk" value="kolay"><span><b>Kolay</b><small>Saf rakipler, ARIA hep açık</small></span></label>
+          <label><input type="radio" name="zorluk" value="normal" checked><span><b>Normal</b><small>Turda 1 ARIA sorgusu</small></span></label>
+          <label><input type="radio" name="zorluk" value="zor"><span><b>Zor</b><small>Keskin rakipler, ARIA yok</small></span></label>
+        </div>
+      </fieldset>
+      <div class="alan-ikili">
+        <div class="alan">
+          <label for="kur-rol">Rolün</label>
+          <select id="kur-rol">
+            <option value="rastgele">Rastgele (önerilen)</option>
+            <option value="murettebat">Mürettebat</option>
+            <option value="suikastci">Suikastçı</option>
+            <option value="yanci">Yancı</option>
+            <option value="halusinatif">Halüsinatif</option>
+            <option value="kaptan">Gizli Kaptan</option>
+            <option value="medik">Medik</option>
+          </select>
+        </div>
+        <div class="alan">
+          <label for="kur-lanet">Halüsinatif laneti</label>
+          <select id="kur-lanet">
+            <option value="rastgele">Rastgele</option>
+            <option value="kabin">Kabin laneti</option>
+            <option value="salter">Şalter laneti</option>
+          </select>
+        </div>
+        <div class="alan">
+          <label for="kur-kimlik">Atılanın kimliği</label>
+          <select id="kur-kimlik">
+            <option value="gizli">Gizli kalsın</option>
+            <option value="takim">Takımı açıklansın</option>
+            <option value="rol">Rolü açıklansın</option>
+          </select>
+        </div>
+      </div>
+      <div class="alan anahtarlar">
+        <label class="anahtar" for="kur-olaylar"><input type="checkbox" id="kur-olaylar" checked><span class="anahtar-ray" aria-hidden="true"></span><span>İstasyon olayları<small>Her tur başında bir olay kartı</small></span></label>
+        <label class="anahtar" for="kur-medik"><input type="checkbox" id="kur-medik"><span class="anahtar-ray" aria-hidden="true"></span><span>Medik rolü<small>Genişleme: gece bir kişiyi korur</small></span></label>
+        <label class="anahtar" for="kur-halbilir"><input type="checkbox" id="kur-halbilir"><span class="anahtar-ray" aria-hidden="true"></span><span>Halüsinatif rolünü bilsin<small>Kapalıyken kendini Mürettebat sanar</small></span></label>
+      </div>
+      <fieldset class="alan">
+        <legend>Anlatım hızı</legend>
+        <div class="segment iki">
+          <label><input type="radio" name="hiz" value="normal" checked><span><b>Normal</b></span></label>
+          <label><input type="radio" name="hiz" value="hizli"><span><b>Hızlı</b></span></label>
+        </div>
+      </fieldset>
+      <button class="dugme birincil buyuk" type="submit">Simülasyonu başlat</button>
+    </form>
+    <aside class="rozet-panel">
+      <header><p class="etiket-kucuk">ROZETLER</p><b id="rozet-sayi">0 / 13</b></header>
+      <ul class="rozet-izgara" id="rozet-izgara"></ul>
+      <p class="kucuk-not">Rozetler sadece bu tarayıcıda saklanır.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= OYUN ================= -->
+<section id="gorunum-oyun" class="gorunum oyun" hidden aria-label="Kızıl Kapsül simülasyonu">
+  <header class="hud">
+    <div class="hud-sol">
+      <button type="button" class="hud-dugme" id="oyun-cik" aria-label="Oyundan çık">← Çık</button>
+      <div class="hud-tur"><span class="etiket-kucuk">TUR</span><b id="hud-tur">–</b></div>
+      <ol class="fazlar" id="hud-fazlar" aria-label="Tur aşamaları"></ol>
+    </div>
+    <div class="hud-o2" id="hud-o2-kutu"><span class="etiket-kucuk">O₂</span><span class="o2-bar"><i id="hud-o2-dolu"></i></span><b id="hud-o2">%100</b></div>
+    <div class="hud-sag">
+      <button type="button" class="hud-dugme rol-rozet" id="hud-rol" aria-pressed="false">ROLÜ GÖSTER</button>
+      <button type="button" class="hud-dugme" id="hud-aria">ARIA</button>
+      <button type="button" class="hud-dugme" id="hud-ses" aria-pressed="true">SES AÇIK</button>
+      <button type="button" class="hud-dugme" id="hud-hiz" title="Anlatım hızı">1×</button>
+    </div>
+  </header>
+  <div class="hayalet-serit" id="hayalet-serit" hidden>
+    <span><b>HAYALET MODU</b> · <span id="hayalet-neden"></span> Artık bütün rolleri görüyorsun.</span>
+    <button type="button" class="dugme ince" id="hayalet-atla">Sonuca atla</button>
+  </div>
+  <div class="oyun-govde">
+    <section class="sahne" id="sahne" aria-live="polite">
+      <div class="sahne-ust">
+        <span class="etiket-kucuk" id="sahne-faz"></span>
+        <h2 id="sahne-baslik">Hazırlanıyor</h2>
+        <p id="sahne-alt"></p>
+      </div>
+      <div class="sahne-icerik" id="sahne-icerik"></div>
+      <div class="sahne-eylem" id="sahne-eylem"></div>
+    </section>
+    <aside class="ekip" aria-label="Mürettebat">
+      <h3 class="etiket-kucuk">MÜRETTEBAT <small>· etikete tıklayıp not al</small></h3>
+      <ul id="ekip-liste" class="ekip-liste"></ul>
+    </aside>
+    <aside class="yan" aria-label="Telsiz ve kayıtlar">
+      <div class="sekmeler" role="tablist">
+        <button type="button" class="sekme" role="tab" id="sekme-telsiz" data-sekme="telsiz" aria-selected="true">Telsiz <span class="rozet-sayi" hidden>0</span></button>
+        <button type="button" class="sekme" role="tab" data-sekme="defter" aria-selected="false">Seyir Defteri</button>
+        <button type="button" class="sekme" role="tab" data-sekme="aria" aria-selected="false">ARIA</button>
+      </div>
+      <div class="sekme-panel" id="panel-telsiz" role="tabpanel">
+        <div class="telsiz-kutu" id="telsiz-kutu"><ol class="telsiz" id="telsiz"></ol></div>
+        <form class="soz-formu" id="soz-formu">
+          <label for="soz-hedef" class="etiket-kucuk">SÖZ AL</label>
+          <select id="soz-hedef"></select>
+          <div class="soz-dugmeler">
+            <button type="button" class="dugme ince tehlike" data-soz="sucla">Şüpheli</button>
+            <button type="button" class="dugme ince" data-soz="savun">Temiz</button>
+            <button type="button" class="dugme ince" data-soz="masumum">Masumum</button>
+          </div>
+        </form>
+      </div>
+      <div class="sekme-panel defter" id="panel-defter" role="tabpanel" hidden></div>
+      <div class="sekme-panel aria" id="panel-aria" role="tabpanel" hidden></div>
+    </aside>
+  </div>
+  <div class="onay-katman" id="cikis-onay" hidden>
+    <div class="onay-kutu" role="dialog" aria-modal="true" aria-labelledby="cikis-baslik">
+      <h3 id="cikis-baslik">Oyundan çıkılsın mı?</h3>
+      <p>Bu simülasyon kaybolur. Rozetler ve ayarların kalır.</p>
+      <div class="secenekler"><button type="button" class="dugme tehlike" id="cikis-evet">Çık</button><button type="button" class="dugme" id="cikis-hayir">Oyuna dön</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= KURUCU PANELİ ================= -->
+<section id="gorunum-kurucu" class="gorunum kurucu" hidden>
+  <div class="kurucu-ust">
+    <header class="bolum-ust"><p class="eyebrow">HABBO İÇİN</p><h1>Kurucu Paneli</h1><p class="bolum-alt">Rolleri dağıt, fısıltıları kopyala, turu adım adım yönet. Her şey bu tarayıcıda kaydedilir.</p></header>
+    <div class="kurucu-araclar">
+      <div class="o2-mini"><span class="etiket-kucuk">O₂</span><span class="o2-bar"><i id="kurucu-o2-dolu"></i></span><b id="kurucu-o2">%100</b></div>
+      <div class="sayac" id="sayac-kutu">
+        <b id="sayac-goster">1:00</b>
+        <div class="sayac-dugmeler">
+          <button type="button" class="dugme ince" data-sure="30">30 sn</button>
+          <button type="button" class="dugme ince" data-sure="60">60 sn</button>
+          <button type="button" class="dugme ince" data-sure="90">90 sn</button>
+          <button type="button" class="dugme ince" data-sure="120">2 dk</button>
+          <button type="button" class="dugme ince birincil" id="sayac-basla">Başlat</button>
+          <button type="button" class="dugme ince" id="sayac-sifir">Sıfırla</button>
+        </div>
+      </div>
+      <div class="kurucu-anahtar">
+        <label class="anahtar" for="kurucu-gizle"><input type="checkbox" id="kurucu-gizle"><span class="anahtar-ray" aria-hidden="true"></span><span>Rolleri göster<small>Yayın yapıyorsan kapalı tut</small></span></label>
+        <button type="button" class="dugme ince tehlike" id="kurucu-sifirla">Yeni oyun</button>
+      </div>
+    </div>
+  </div>
+  <div class="onay-satir" id="kurucu-sifirla-onay" hidden>
+    <span>Kadro, roller ve tur kayıtları silinsin mi?</span>
+    <button type="button" class="dugme ince tehlike" id="kurucu-sifirla-evet">Evet, sıfırla</button>
+    <button type="button" class="dugme ince" id="kurucu-sifirla-hayir">Vazgeç</button>
+  </div>
+  <nav class="kurucu-adimlar" aria-label="Kurucu adımları">
+    <button type="button" data-adim="kadro">1 · Kadro</button>
+    <button type="button" data-adim="roller">2 · Roller</button>
+    <button type="button" data-adim="tur">3 · Turlar</button>
+    <button type="button" data-adim="final">4 · Final</button>
+  </nav>
+  <div id="kurucu-icerik" class="kurucu-icerik"></div>
+</section>
+
+</main>
+</div>
+
+<script src="assets/js/veri.js"></script>
+<script src="assets/js/inanc.js"></script>
+<script src="assets/js/motor.js"></script>
+<script src="assets/js/ses.js"></script>
+<script src="assets/js/piksel.js"></script>
+<script src="assets/js/oyun-arayuz.js"></script>
+<script src="assets/js/kurucu.js"></script>
+<script src="assets/js/ana.js"></script>
+<!-- /KK:GOVDE -->
+</body>
+</html>
