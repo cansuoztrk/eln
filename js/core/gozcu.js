@@ -1,7 +1,7 @@
 /* Kale 2.0 — Hata Gözcüsü ve çevrimdışı işareti.
    Bir telefonda bir şey bozulursa (yakalanmamış hata, açılamayan bir modül) sessizce not düşülür: bu cihazda son
    yirmi not, bulutta günde en fazla beş kayıt (aynı hata günde bir kez). Ardoş'un ana salonunda "Eln'in telefonunda
-   bir şey takıldı" kartı çıkar; bir sonraki turda düzeltilir. İnternet yokken üstte küçük bir işaret: kale açık,
+   bir şey takıldı" kartı çıkar; Ardoş bir sonraki güncellemede düzeltir. İnternet yokken üstte küçük bir işaret: kale açık,
    yazılanlar bağlantı gelince gider. Kayıtlar: hata {msg, src, room, ua} */
 (function () {
   'use strict';
@@ -69,7 +69,7 @@
     K.ui.modal({
       label: 'Hata Gözcüsü',
       cls: 'hg-sheet',
-      html: `<h2>🛠️ Hata Gözcüsü</h2><p class="muted">Telefonlarda yakalanan hatalar. Bir sonraki turda bunları düzeltmesi için bu listeyi Claude'a gösterebilirsin.</p>
+      html: `<h2>🛠️ Hata Gözcüsü</h2><p class="muted">Telefonlarda yakalanan hatalar. Ardoş bir sonraki güncellemede bunları düzeltecek.</p>
         <ul class="hg-list">${list.map((r) => `<li><small>${r.who === 'her' ? C.herPet : C.myPet} · ${K.esc(K.ago(r.at))}${r.data.room ? ` · ${K.esc(r.data.room)}` : ''}</small><code>${K.esc(r.data.msg)}</code><small>${K.esc(r.data.src || '')} · ${K.esc(r.data.ua || '')}</small></li>`).join('') || '<li class="muted">Kayıt yok. Her şey yolunda.</li>'}</ul>`,
     });
   }
@@ -79,7 +79,7 @@
     const fresh = rows.filter((r) => r.at > seen && Date.now() - r.at < 4 * 864e5);
     if (!fresh.length) return [];
     const her = fresh.filter((r) => r.who === 'her').length;
-    return [{ key: 'hata', icon: 'key', title: `🛠️ ${her ? `${K.ek(C.herPet, 'in')} telefonunda` : 'Kalede'} ${fresh.length} hata yakalandı`, text: 'Hata Gözcüsü kaydetti. Listeyi aç, bir sonraki turda düzelteyim.', run: show, cta: 'Listeyi aç' }];
+    return [{ key: 'hata', icon: 'key', title: `🛠️ ${her ? `${K.ek(C.herPet, 'in')} telefonunda` : 'Kalede'} ${fresh.length} hata yakalandı`, text: 'Hata Gözcüsü kaydetti. Listeye bak; Ardoş bir sonraki güncellemede düzeltsin.', run: show, cta: 'Listeyi aç' }];
   });
   K.gozcu = { note, show, list: () => K.store.get('hatalar', []) };
 })();

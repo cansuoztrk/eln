@@ -1,6 +1,6 @@
-# Netlify: derleme yok, depo kökü olduğu gibi yayınlanır. Özel içerik zaten şifreli (assets/vault).
+# Netlify artık yalnız taşınma köprüsünü yayınlar (kopru/): eski adres ve QR, kaleyi yeni adrese (Cloudflare Pages) taşır.
 [build]
-  publish = "."
+  publish = "kopru"
   command = ""
 
 # Service worker her zaman taze gelsin (yeni sürümler hemen yüklensin)
