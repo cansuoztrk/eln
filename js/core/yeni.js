@@ -20,7 +20,7 @@
     pick.slice().reverse().forEach((v) => (v.items || []).forEach((it) => items.some((x) => x[0] === it[0]) || items.push(it)));
     return { v: all.length ? all[all.length - 1].v : 0, title: (pick[pick.length - 1] || {}).title, items };
   }
-  const NOROOM = ['kaydir', 'hatirlat', 'gece', 'gunbatimi', 'aynigok', 'canli', 'kapak', 'mevsim', 'akilli', 'gece2', 'beraber', 'aynisaniye', 'yirmibir', 'cevrimdisi'];
+  const NOROOM = ['kaydir', 'hatirlat', 'gece', 'gunbatimi', 'aynigok', 'canli', 'kapak', 'mevsim', 'akilli', 'gece2', 'beraber', 'aynisaniye', 'yirmibir', 'cevrimdisi', 'postaci', 'yeniyil', 'ilkkar', 'bildirim', 'mozaikpul'];
   const ALIAS = { uykubiz: 'gece' };
   const target = (id) => ALIAS[id] || id.replace(/21$/, '');
   const roomOk = (id) => {
@@ -49,6 +49,14 @@
       if (id === 'nfc') return Boolean(K.kisayol && K.kisayol.nfc && (K.isOwner() ? C.ntfyTopicHer : C.ntfyTopic));
       if (['canli', 'kapak', 'mevsim', 'akilli', 'gece2', 'yirmibir', 'cevrimdisi'].includes(id)) return true;
       if (id === 'beraber' || id === 'aynisaniye') return Boolean(K.cloud && K.cloud.enabled);
+      if (id === 'panorama') return Boolean(K.panorama && K.$('#yolPano'));
+      if (id === 'egbak' || id === 'kanatses') return Boolean(K.atolye);
+      if (id === 'faceid') return Boolean(K.faceid && window.PublicKeyCredential && !K.faceid.state());
+      if (id === 'takvimabone') return Boolean(K.takvimabone && K.cloud && K.cloud.enabled);
+      if (id === 'seslikomut') return Boolean(K.seslikomut && K.seslikomut.ok());
+      if (id === 'sor') return Boolean(K.sor && K.ara);
+      if (id === 'postaci') return Boolean(K.postaci);
+      if (['yeniyil', 'ilkkar', 'bildirim', 'mozaikpul'].includes(id)) return true;
       return roomOk(id);
     });
   }
@@ -74,7 +82,7 @@
       K.$$('.yn-segs i', view).forEach((s, k) => s.classList.toggle('done', k <= i));
       K.$('.yn-stage', view).innerHTML = `<div class="yn-card" data-id="${K.esc(id)}"><div class="yn-ic">${A.icon(ic)}</div><h2>${K.esc(title)}</h2><p>${K.esc(K.fill(text))}</p></div>`;
       const last = i === list.length - 1;
-      const go = NOROOM.includes(id) ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' || id === 'kisayol' || id === 'widget' || id === 'nfc' ? 'Kur' : id === 'atolye' ? 'Boya' : id === 'dock' ? 'Düzenle' : id === 'kesit' ? 'Haritaya git' : id === 'opucuk' ? 'Öp' : id === 'nabiz' ? 'Ölç' : id === 'cicek' ? 'Çiçeğe bak' : id === 'salon' ? 'Panoya bak' : id === 'endise' ? 'Kalp menüsünü aç' : 'Dene'}</button>`;
+      const go = NOROOM.includes(id) ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' || id === 'kisayol' || id === 'widget' || id === 'nfc' ? 'Kur' : id === 'atolye' ? 'Boya' : id === 'dock' ? 'Düzenle' : id === 'kesit' ? 'Haritaya git' : id === 'opucuk' ? 'Öp' : id === 'nabiz' ? 'Ölç' : id === 'cicek' ? 'Çiçeğe bak' : id === 'salon' ? 'Panoya bak' : id === 'endise' || id === 'seslikomut' ? 'Kalp menüsünü aç' : id === 'faceid' || id === 'takvimabone' || id === 'egbak' || id === 'kanatses' ? 'Kur' : id === 'sor' ? 'Sor' : id === 'panorama' ? 'Yola bak' : 'Dene'}</button>`;
       K.$('.yn-foot', view).innerHTML = `${go}<button type="button" class="btn ${go ? 'ghost' : 'red'}" data-yn-next>${last ? 'Kaleye dön' : 'Sıradaki'}</button>`;
       K.audio.sfx.tap();
     };
@@ -120,6 +128,15 @@
               mp && mp.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 350);
           }
+          if (id === 'panorama') {
+            K.go('');
+            return setTimeout(() => K.$('#yolPano') && K.$('#yolPano').scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
+          }
+          if (id === 'egbak' || id === 'kanatses') return K.atolye.open();
+          if (id === 'faceid') return K.faceid.sheet();
+          if (id === 'takvimabone') return K.takvimabone.sheet();
+          if (id === 'seslikomut') return K.kalp && K.kalp.openMenu();
+          if (id === 'sor') return K.ara.open();
           if (id === 'opucuk') return K.dokunus.kiss();
           if (id === 'nabiz') return K.dokunus.pulse();
           if (id === 'cicek') {

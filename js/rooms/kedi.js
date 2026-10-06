@@ -469,7 +469,7 @@
     if (love(mine()) < 22) return [{ icon: 'paw', title: `🥺 ${shown()} seni özledi`, text: 'Bir süredir onu sevmedin. Kokunu arıyor.', room: 'kedi', cta: 'Sev' }];
     return [];
   });
-  K.kedi = { name: shown, mood: () => (adoption() ? mood().k : ''), adopted: () => Boolean(adoption()), postcard, album: () => album().length };
+  K.kedi = { name: shown, mood: () => (adoption() ? mood().k : ''), adopted: () => Boolean(adoption()), postcard, album: () => album().length, svg: () => kitten(mood()) };
 
   K.room({
     id: 'kedi',

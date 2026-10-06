@@ -26,7 +26,7 @@
         <button class="brand" id="brand" aria-label="Ana salona dön">${A.kitty({ cls: 'brand-kitty', label: 'Kitty' })}<span class="brand-name">${K.esc(C.herName)}'in Krallığı</span>${K.isOwner() ? '<span class="owner-badge">Kale sahibi</span>' : ''}</button>
         <div class="top-actions">
           <a class="icon-btn mail-btn" href="#mektuplar" id="mailBtn" hidden aria-label="Yeni mektup var">${A.icon('letter')}<span class="count" id="mailCount">1</span></a>
-          <a class="icon-btn" href="#album" aria-label="Çıkartma albümü">${A.icon('sticker')}<span class="count" id="topStickers">0</span></a>
+          <a class="icon-btn" href="#album" aria-label="Pul Albümü">${A.icon('sticker')}<span class="count" id="topStickers">0</span></a>
           <button class="icon-btn" id="musicBtn" aria-pressed="false" aria-label="Müzik kutusunu aç ya da kapat">${A.ui('music')}</button>
         </div>
       </header>
@@ -1053,7 +1053,8 @@
       }
     });
   }
-  K.on('unlocked', (data) => {
+  K.on('unlocked', async (data) => {
+    if (K.odalar) await K.odalar;
     const { config, ...rest } = data || {};
     Object.assign(C, config || {});
     Object.assign(D, rest);
@@ -1138,6 +1139,7 @@
           <label for="gateAnswer">${K.esc(C.gateQuestion)}</label>
           <div class="row"><input class="input" id="gateAnswer" name="gateAnswer" type="text" placeholder="Nota ne yazmıştın?" autocapitalize="off" spellcheck="false"><button class="btn red" type="submit" id="gateSubmit">Aç</button></div>
           <p class="gate-msg" id="gateMsg" aria-live="polite">Bu kapı sadece o notu yazan prensese açılır.</p>
+          <button type="button" class="btn soft small gate-faceid" id="gateFaceId" hidden>🔐 Face ID ile aç</button>
         </form>
       </div>
     </div>`);
@@ -1179,12 +1181,37 @@
       const r = K.$('#gateBow', g).getBoundingClientRect();
       K.fx.burst(r.left + r.width / 2, r.top + r.height / 2, { count: 16, power: 6 });
       if (g.classList.contains('asked')) return;
-      if (await restoreP) return open();
+      if (await restoreP) {
+        // "Her açılışta Face ID sorsun" açıksa kapı ancak yüzünü tanıyınca açılır
+        if (K.faceid && K.faceid.locked() && !(await K.faceid.verify())) {
+          K.$('#gateHint', g).innerHTML = 'Face ID doğrulanamadı. Tekrar denemek için <b>fiyonka</b> dokun.';
+          return;
+        }
+        return open();
+      }
       if (!(await K.vault.available())) {
         K.$('#gateHint', g).innerHTML = 'Kale bu şekilde açılamıyor. Siteyi kendi bağlantısından (https ile) aç.';
         return;
       }
       ask();
+    });
+    // Face ID: tarayıcı verileri silinmiş olsa bile passkey'deki anahtarla aç
+    const fb = K.$('#gateFaceId', g);
+    if (K.faceid && window.PublicKeyCredential) K.faceid.supported().then((ok) => (fb.hidden = !ok));
+    fb.addEventListener('click', async () => {
+      const msg = K.$('#gateMsg', g);
+      msg.classList.remove('err');
+      msg.textContent = 'Kitty yüzüne bakıyor...';
+      let ok = false;
+      try {
+        ok = await K.faceid.unlock();
+      } catch (err) {}
+      if (ok) {
+        msg.textContent = 'Kitty seni tanıdı! Kapı açılıyor...';
+        return open();
+      }
+      msg.classList.add('err');
+      msg.textContent = 'Face ID ile açılamadı. Notu yazarak açabilirsin.';
     });
     K.$('#gateQuiz', g).addEventListener('submit', async (e) => {
       e.preventDefault();

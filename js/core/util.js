@@ -315,8 +315,27 @@
   K.canNotify = () => Boolean(C.ntfyTopic);
   K.notify = (title, message, tags, extra) => ntfyPost(C.ntfyTopic, title, message, tags, extra);
   K.pingHer = (title, message, tags, extra) => (K.isOwner && K.isOwner() ? ntfyPost(C.ntfyTopicHer, title, message, tags, extra) : Promise.resolve(false));
+  // Bildirimden cevap: sarılma, kalp, öpücük gibi bildirimlerin altında "Geri sarıl" ve "Kalp" düğmeleri. Düğme kale
+  // açılmadan doğrudan öbürünün kanalına bildirim gönderir (ntfy http eylemi).
+  const REPLY_TAGS = ['hugging_face', 'kiss', 'heart', 'sparkling_heart', 'two_hearts', 'revolving_hearts', 'heartpulse', 'wave', 'thought_balloon', 'pleading_face', 'heart_eyes', 'smiling_face_with_three_hearts', 'love_letter', 'cupid'];
+  const replyActions = (click) => {
+    const owner = K.isOwner && K.isOwner();
+    const back = owner ? C.ntfyTopic : C.ntfyTopicHer;
+    const who = owner ? C.herPet : C.myPet;
+    if (!back) return null;
+    const root = location.origin + location.pathname;
+    const act = (label, title, tag) => ({ action: 'http', label, url: 'https://ntfy.sh/', method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: back, title, message: 'Bildirimden, kale açılmadan 💌', tags: [tag], priority: 4, click: root }), clear: true });
+    return [act('🤗 Geri sarıl', `🤗 ${who} da sana sarıldı`, 'hugging_face'), act('💗 Kalp', `💗 ${who} sana kalp gönderdi`, 'heart'), { action: 'view', label: 'Kaleyi aç', url: click || root }];
+  };
+  K.replyActions = replyActions;
   K.ping = (title, message, tags, extra) => {
     const x = Object.assign({ click: K.roomUrl('') }, extra || {});
+    if (x.actions === undefined && (x.reply || (tags || []).some((t) => REPLY_TAGS.includes(t)))) {
+      const a = replyActions(x.click);
+      a && (x.actions = a);
+    }
+    if (x.actions === false) delete x.actions;
+    delete x.reply;
     return K.isOwner && K.isOwner() ? K.pingHer(title, message, tags, x) : K.notify(title, message, tags, x);
   };
   // Rolden bağımsız: 'me' → User155'in kanalı, 'her' → Eln'in kanalı (hatırlatıcı gibi kendiliğinden gidenler için)

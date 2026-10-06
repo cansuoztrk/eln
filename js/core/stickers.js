@@ -136,6 +136,56 @@
     { id: 'calmalistesi', name: 'DJ', hint: 'Şarkı Defteri\'ni çalma listesi olarak kopyala', icon: 'music', color: '#EDE3FF', bonus: true },
     { id: 'kedikart', name: 'Kartpostal Albümü', hint: 'Kedimizin ilk kartpostalını al', icon: 'paw', color: '#FFEBD2', bonus: true },
     { id: 'muhur', name: 'Kırılan Mühür', hint: 'Bu çıkartma ilk buluşmada açılır', icon: 'hugs', color: '#FFD6E5', bonus: true },
+    { id: 'postaci', name: 'Postacı Kitty', hint: 'Kitty\'nin getirdiği bir mektubu aç', icon: 'letter', color: '#FFE9D6', bonus: true },
+    { id: 'egbak', name: 'Eğ ve Bak', hint: 'Telefonu eğince kalenin derinleştiğini gör', icon: 'star', color: '#E8E2FF', bonus: true },
+    { id: 'agac', name: 'Anı Ağacı', hint: 'Anı Ağacı\'nın dallarına bak', icon: 'lily', color: '#DDF5E6', bonus: true },
+    { id: 'faceid', name: 'Yüzünle Aç', hint: 'Kaleyi Face ID ile açmayı kur', icon: 'key', color: '#E6F4FF', bonus: true },
+    { id: 'takvimabone', name: 'Takvimde Biz', hint: 'Kale takvimini telefonuna ekle', icon: 'calendar', color: '#FFF0C9', bonus: true },
+    { id: 'geriyukle', name: 'Geri Dönüş', hint: 'Bir yedeği kaleye geri yükle', icon: 'hourglass', color: '#E3F0FF', bonus: true },
+    { id: 'gunesposta', name: 'Güneş Postası', hint: 'Güneşin doğuşuna bir not iliştir', icon: 'sun', color: '#FFF3C4', bonus: true },
+    { id: 'goktakvimi', name: 'Gök Takvimi', hint: 'Gök Takvimi\'ne bir dilek bırak', icon: 'moon', color: '#E0DBFF', bonus: true },
+    { id: 'yeniyil', name: 'İki Gece Yarısı', hint: 'Yılbaşını iki şehirde, iki kez kutla', icon: 'party', color: '#FFE0EA', bonus: true },
+    { id: 'kardanadam', name: 'Kardan Adam', hint: 'İlk karda kardan adamı birlikte tamamla', icon: 'snow', color: '#E6F4FF', bonus: true },
+    { id: 'bulusalim', name: 'İlk Adımlar', hint: 'Ortada Buluşalım yolunda yürümeye başla', icon: 'map', color: '#DDF1FF', bonus: true },
+    { id: 'ortada', name: 'Ortada Buluştuk', hint: 'Adımlarınız yolun ortasında buluşsun', icon: 'hugs', color: '#FFD6E5', bonus: true },
+    { id: 'yerler', name: 'Kalbimin Haritası', hint: 'Bulunduğun yere bir kalp bırak', icon: 'heart', color: '#FFE0EC', bonus: true },
+    { id: 'rota', name: 'Rota Çizildi', hint: 'Birlikte yürüyeceğiniz bir rota hazırla', icon: 'map', color: '#E8F7EE', bonus: true },
+    { id: 'pasaport', name: 'Rota Pasaportu', hint: 'Bir rotayı baştan sona gez', icon: 'ticket', color: '#FFF0D6', bonus: true },
+    { id: 'saklambac', name: 'Saklambaç', hint: 'Kalede saklananı bul', icon: 'door', color: '#FDE6F0', bonus: true },
+    { id: 'siramasal', name: 'Sıra Masal', hint: 'Birlikte bir masal kitabını bitir', icon: 'book', color: '#EDE3FF', bonus: true },
+    { id: 'boyama', name: 'Boyama Kitabı', hint: 'Bir sayfayı birlikte boya', icon: 'palette', color: '#FFE9D6', bonus: true },
+    { id: 'sevgidili', name: 'Sevgi Dili', hint: 'Sevgi dili sorularını ikiniz de cevaplayın', icon: 'chat', color: '#FFE0EA', bonus: true },
+    { id: 'pazar', name: 'Pazar Mektubu', hint: 'Haftanın beş sorusunu cevapla', icon: 'note', color: '#FFF3C4', bonus: true },
+    { id: 'bizpedia', name: 'Bizpedia Yazarı', hint: 'Bizpedia\'ya bir madde yaz', icon: 'book', color: '#E3F0FF', bonus: true },
+    { id: 'ruya', name: 'Rüya Defteri', hint: 'Bir rüyanı yaz', icon: 'moon', color: '#E8E2FF', bonus: true },
+    { id: 'altinruya', name: 'Altın Rüya', hint: 'İkiniz de aynı rüyada birbirinizi görün', icon: 'star', color: '#FFF0B8', bonus: true },
+    { id: 'yanbolum', name: 'Yan Bölüm', hint: 'Prenses\'in bir yan bölümünü oyna', icon: 'crown', color: '#FFE0EC', bonus: true },
+    { id: 'kittyesor', name: 'Kitty\'ye Sor', hint: 'Kitty\'ye kale hakkında bir soru sor', icon: 'question', color: '#FDE6F0', bonus: true },
+    { id: 'seslikomut', name: 'Sesli Komut', hint: 'Kitty\'ye sesle bir şey söyle', icon: 'mic', color: '#E6F4FF', bonus: true },
+    { id: 'muhuratolye', name: 'Mühür Ustası', hint: 'Kendi mum mührünü tasarla', icon: 'letter', color: '#FFD6E5', bonus: true },
+    { id: 'tebrik', name: 'Kart Atölyesi', hint: 'Hareketli bir tebrik kartı gönder', icon: 'gift', color: '#FFE9D6', bonus: true },
+    { id: 'piyano', name: 'Piyanist', hint: 'Bir melodiyi baştan sona çal', icon: 'music', color: '#EEE8FF', bonus: true },
+    { id: 'birlikteizle', name: 'Aynı Saniye', hint: 'Bir videoyu birlikte izle', icon: 'film', color: '#E9E4FF', bonus: true },
+    { id: 'adimiz', name: 'Gökteki Adımız', hint: 'İsimlerinizi yıldızlarda bul', icon: 'sky', color: '#E0DBFF', bonus: true },
+    { id: 'fiyonk1', name: 'İlk Altın Fiyonk', hint: 'Kalede saklı ilk altın fiyonku bul', icon: 'bow', color: '#FFF0B8', bonus: true },
+    { id: 'altinfiyonk', name: 'Altın Taç', hint: 'On iki altın fiyonkun hepsini bul', icon: 'crown', color: '#FFE9A8', bonus: true },
+    { id: 'altinoda', name: 'Altın Oda', hint: 'Gizli Altın Oda\'ya gir', icon: 'crown', color: '#FFF0B8', bonus: true },
+    { id: 'muze', name: 'Müze Ziyaretçisi', hint: 'Kale Müzesi\'ni gez', icon: 'frame', color: '#F6EBDD', bonus: true },
+    { id: 'muzedefter', name: 'Ziyaretçi Defteri', hint: 'Müzenin defterine bir satır yaz', icon: 'pencil', color: '#FFF0D6', bonus: true },
+    { id: 'muzekart', name: 'Hediyelik Eşya', hint: 'Müzedeki bir eserden kartpostal yap', icon: 'frame', color: '#FFE9D6', bonus: true },
+    { id: 'mozaik', name: 'Kalp Mozaiği', hint: 'Kalp Mozaiği\'ne bak', icon: 'heart', color: '#FFE0EC', bonus: true },
+    { id: 'mozaiktamam', name: 'Tamamlanan Kalp', hint: 'Mozaikteki bir kalbi doldurun', icon: 'heart', color: '#FFD6E5', bonus: true },
+    { id: 'mozaikduvar', name: 'Duvar Kâğıdı', hint: 'Kalp Mozaiği\'ni duvar kâğıdı yap', icon: 'frame', color: '#FDE6F0', bonus: true },
+    { id: 'belgesel', name: 'Belgesel İzleyicisi', hint: 'Zaman Tüneli\'nin bir bölümünü sonuna kadar izle', icon: 'film', color: '#E6DDF5', bonus: true },
+    { id: 'anlar', name: 'On Saniye', hint: 'Bugünün on saniyesini çek', icon: 'camera', color: '#FFE6D6', bonus: true },
+    { id: 'anlar30', name: 'Otuz An', hint: 'Otuz gün on saniye çek', icon: 'camera', color: '#FFD9C2', bonus: true },
+    { id: 'anlarfilm', name: 'Ayın Filmi', hint: 'Bir ayın anlarını film olarak izle', icon: 'film', color: '#FFE6D6', bonus: true },
+    { id: 'dgfilm', name: 'Mumlar Söndü', hint: 'Doğum günü filminde mumları üfle', icon: 'cake', color: '#FFE3EE', bonus: true },
+    { id: 'yillik', name: 'Yıllık', hint: 'Yıllık Kitabı\'nı yazdır', icon: 'book', color: '#FFF0E0', bonus: true },
+    { id: 'kutu', name: 'Kutunun Sesi', hint: 'Kavuşma Kutusu\'ndaki kartı okut', icon: 'gift', color: '#FFE6EC', bonus: true },
+    { id: 'kutubaski', name: 'Kutu Hazır', hint: 'Kavuşma Kutusu kartlarını bas', icon: 'gift', color: '#FFE9D6', bonus: true },
+    { id: 'kutunotlar', name: 'Yirmi Bir Not', hint: 'Kutudaki bütün notları çevir', icon: 'note', color: '#FFD6E5', bonus: true },
+    { id: 'kule2', name: 'Hazar\'ın Sırrı', hint: 'Kilitli Kule 2\'nin sandığını açın', icon: 'key', color: '#DDEBFF', bonus: true },
   ];
   const REQUIRED = DEFS.filter((d) => !d.bonus);
 
@@ -153,12 +203,12 @@
     all[id] = K.time.todayKey();
     K.store.set('stickers', all);
     K.audio.sfx.chime();
-    K.fx.toast(`<b>Yeni çıkartma!</b> ${K.esc(def.name)}`, { icon: art(def, 'mini'), cls: 'toast-sticker', duration: 4200 });
+    K.fx.toast(`<b>Yeni pul!</b> ${K.esc(def.name)} · albümüne damgalandı`, { icon: art(def, 'mini'), cls: 'toast-sticker', duration: 4200 });
     K.emit('sticker', id);
     if (!def.bonus && REQUIRED.every((d) => all[d.id])) {
       setTimeout(() => {
         K.fx.confetti({ count: 160 });
-        K.fx.toast('<b>Bütün çıkartmaları topladın!</b> Albümde gizli bir mektup açıldı.', { icon: K.art.icon('key'), duration: 6000 });
+        K.fx.toast('<b>Bütün pulları topladın!</b> Albümde gizli bir mektup açıldı.', { icon: K.art.icon('key'), duration: 6000 });
       }, 1600);
     }
     return true;

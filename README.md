@@ -172,6 +172,42 @@ Küsünce de buradayız. Saatlerce konuşamadığımız o anlar için:
 - **Hata Gözcüsü**: telefonlarda yakalanan hatalar cihazda ve (günde en fazla beş) bulutta not edilir; Ardoş'un ana salonunda kart ve liste.
 - Kalede Yeni'de 16 sayfa, dokuz yeni çıkartma, Eln'in alarmı ilk kurulumda Bakü saatiyle 10:00 önerir.
 
+### 28. aşama: Kalenin en büyük güncellemesi
+
+**Yeni yüz**
+- **İki Şehir Arası Yol** (ana salon): yana kayan uzun bir şerit; İstanbul'dan Bakü'ye on durak, her biri bir odaya açılır. İki şehrin gökyüzü gerçek güneş yüksekliğiyle renklenir, gece pencereler yanar, Pamuk yürür; Ortada Buluşalım'daki adımlar yolda iki küçük figür olarak ilerler.
+- **Pul Albümü**: çıkartmalar delikli kenarlı, damgalı pullar oldu (Seri I / Seri II sayfaları).
+- **Postacı Kitty**: sen yokken gelen önemli şeyler (notlu kalpler, mektuplar, sesler) Kitty'nin çantasında birikir, kaleye girince tek tek dağıtılır.
+- **Eğ ve Bak** (telefonu eğince derinlik) ve **Kanatların Sesi** (her kanadın kendi ortam sesi); ikisi de Tema Atölyesi'nden açılır/kapanır.
+- **Anı Ağacı**: notlu her kalp bir yaprak, her ay bir dal, her 21'i bir çiçek.
+
+**Temel**
+- **Face ID ile aç**: WebAuthn (largeBlob, yoksa PRF) ile kasa anahtarı cihazın güvenli alanında saklanır; telefonun verileri silinse bile kale yüzle açılır. İsteğe bağlı fiyonk kilidi.
+- **Bildirimden cevap**: iPhone bildirimine basılı tutunca "Geri sarıl", "Kalp" ve "Kaleyi aç".
+- **Telefon takvimine abonelik**: 21'ler, yıldönümleri, sözler, sınavlar, dolunaylar, yıldız kayışları ve iki yılbaşı gece yarısı. Kale bu listeyi şifreleyip buluta koyar; Cloudflare Pages fonksiyonu `functions/takvim.js` bağlantıdaki anahtarla çözüp `.ics` olarak verir (`webcal://…/takvim?t=…`). Anahtar yalnızca abonelik bağlantısında durur.
+- **Paket ikiye bölündü**: çekirdek (`dist/kale.<özet>.js`, ertelenmiş) ve odalar (`dist/odalar.<özet>.js`, eşzamansız). Giriş ekranı odalar inmeden açılır; kasa açılınca odalar beklenir.
+- **Yedekten geri yükleme** ve **Depo** göstergesi (Yedek odası): indirilen yedek dosyası kimlikleri ve tarihleriyle geri yüklenir; türlere göre bulut kullanımı.
+
+**Gök, yol, oyun, kalp**
+- **Güneş Postası**, **Gök Takvimimiz** (dolunay adları, yıldız kayışları, 2 Ağustos 2027 tutulması, bir yıl sonra açılan dilekler), **İki Gece Yarısı** (yılbaşında iki geri sayım), **İlk Kar** (ilk kar hangi şehre düşerse birlikte kardan adam).
+- **Ortada Buluşalım**: iki kişinin adımları 1.758 km'lik yolu iki uçtan kapatır. Adımlar iPhone Sağlık'tan **kendiliğinden** gelir: odadaki rehberle bir kez Kestirme kurulur, Otomasyon her gece 23:30'da günün adım sayısını kaleye yollar (elle giriş de var).
+- **Kalbimin Haritası**, **Birlikte Yürüyeceğimiz Rota** (durak fotoğrafı + on saniyelik ses, gezene pasaport damgası).
+- **Saklambaç**, **Sıra Masal**, **Birlikte Boyama**, **Sevgi Dili Testi**, **Pazar Soruları**, **Bizpedia**, **Rüya Defteri**.
+- **Prenses Sezon 2** (romantik komedi): sezon haritası, fragman, çanta ve gardırop, üç farklı son, iki kişinin yazdığı yan bölümler.
+
+**Plan III'ten gelenler**
+- **Kitty'ye Sor** (arama kutusunda soru), **Sesli Komut** (kalp menüsünde mikrofon), **Mum Mühür Atölyesi**, **Hareketli Tebrik Kartı**, **İkili Piyano**, **Birlikte İzle** (YouTube, iki telefonda aynı saniye), **Gökyüzündeki Adımız** (isim harfleri gerçek yıldızlara bağlanır, balkondan bakılacak yön yazar).
+- **Altın Fiyonk Avı**: on iki odaya saklanan altın fiyonklar ve bilmeceleri; hepsi bulununca Kitty'nin fiyonku altın olur ve gizli **Altın Oda** açılır.
+- **Kale Müzesi**: numaralı giriş bileti, yana kaydırılan fotoğraf duvarı (çerçeveler, müze etiketleri, Türkçe sesli rehber), Söz Salonu, Kavanoz Vitrini, Ses Odası, ziyaretçi defteri, bir eserden kartpostal.
+- **Kalp Mozaiği**: bütün fotoğraflar zaman sırasıyla kalp biçimli ızgarayı doldurur (80 → 143 → 275 kare); tamamlanan kalp telefon duvar kâğıdı olur.
+- **Zaman Tüneli Belgeseli**: her ay o ayın sayıları, kareleri (Ken Burns), notları (harf harf), bir telesekreter sesi ve On Saniyelik Anlar klipleriyle tarayıcıda üretilen müzikli bir bölüm. Ortak film motoru: `js/core/belgesel.js`.
+- **On Saniyelik Anlar**: her gün iki şehirden birer on saniyelik video (onunki, seninkini çekene kadar perdeli); ay takvimi ve "Ayın filmi".
+- **Doğum Günü Filmi**: onun tarafında doğum gününün gece yarısına (Bakü) kadar görünmez; bir yılın kareleri, kavanoz notları, Ardoş'un ithaf yazısı ve sesleri; sonunda mikrofona üflenen mumlu pasta ve yalnızca onun telefonunda kalan bir dilek.
+- **Yıllık Kitabı**: bir yıl ay ay A5 kitap (kareler, notlar, sözler, telesekreter dökümü, elle yazılacak iki mektup sayfası).
+- **Kavuşma Kutusu**: ilk buluşmada verilecek gerçek kutunun hazırlığı (21 not, Pamuk'un çizimi, QR'lı ses kartı; A5 baskı). QR ya da NFC etiketi okutulunca oda onun için açılır ve kutunun sesi çalar. QR kodlayıcı kalenin içinde (`js/core/qr.js`), dışarıya istek atmaz.
+- **Kilitli Kule 2**: dört kilitli yeni iki kişilik kaçış odası (Mors fenerli kelime, görünmeyen kayalarla rota, deniz kabuğu melodisi, yırtık mektup).
+- Hata Gözcüsü mesajları artık "Ardoş" diyor. Kalede Yeni'de 33 sayfa, 50 yeni pul.
+
 ### Telefonuna bildirim (Eln'in iPhone'u)
 
 Ardoş bir şey gönderince Eln'in kilit ekranına düşer: dürt, sarıl, günaydın / iyi geceler, zamanlı sürpriz (açılış anında), hikâye, radyo, kare, pinpon daveti, mektup, Barış Köprüsü'ndeki her şey... Kurulum Eln'in ana salonunda bir kart olarak çıkar (ayrıca zil → "Telefonuna bildirim"): App Store'dan ücretsiz **ntfy** uygulaması → "+" ile kasadaki kanal adına abone ol → **Deneme gönder** → **Geldi**. "Geldi" denince Ardoş'a haber gider; Ardoş zilden kurulumu görür ve ona deneme gönderebilir. Kanal adı kasada (`config.ntfyTopicHer`). Bildirimler artık iki yönlü: Eln'in yaptıkları da eskisi gibi Ardoş'un telefonuna gider.
@@ -344,7 +380,9 @@ Netlify'ın ücretsiz planı ayda 300 kredi veriyor ve her yayın 15 kredi (ayda
 4. **Production branch:** `claude/eln-romantic-memory-site-969djo` (siteyi içeren dal). **Framework preset:** None. **Build command:** boş. **Build output directory:** `/`.
 5. **Save and Deploy.** Bundan sonra dala her gönderimde site kendiliğinden güncellenir. Başlıklar `_headers` dosyasından gelir.
 
-**Eski adres ve taşınma köprüsü:** Hediye kartındaki QR ve eski bağlantılar `elnin-kralligi.netlify.app`'e gider. `kopru/` klasöründeki sayfa o adreste çalışmak için hazır: açan kişinin cihazındaki yerel eşyaları (çıkartmalar, sarılma borcu, bahçe, mühürler, ayarlar; kasa anahtarı hariç) adresin `#tasi:` kısmında yeni adrese taşır, eski service worker'ı kaldırır ve yeni kaleye geçirir (`js/core/tasi.js` alır). Yeni adres belli olunca `kopru/index.html`'deki `NEW` satırı ona göre düzeltilir ve `netlify.toml`'da `publish = "kopru"` yapılır; Netlify kredisi yenilendiğinde (ya da Deploys → Trigger deploy ile) bir kez yayınlanır, sonra **Site configuration → Build & deploy → Stop builds** ile Netlify durdurulur. Eln yeni adreste şifresini bir kez yeniden girer; bulut ayarları kasada olduğu için kendiliğinden gelir.
+**Yeni adres:** https://elnin-kralligi.pages.dev/ (kendi alan adı şimdilik yok).
+
+**Eski adres ve taşınma köprüsü:** Hediye kartındaki QR ve eski bağlantılar `elnin-kralligi.netlify.app`'e gider. `kopru/` klasöründeki sayfa o adreste çalışmak için hazır (`NEW` yeni adrese ayarlı, `netlify.toml` artık `publish = "kopru"`): açan kişinin cihazındaki yerel eşyaları (çıkartmalar, sarılma borcu, bahçe, mühürler, ayarlar; kasa anahtarı hariç) adresin `#tasi:` kısmında yeni adrese taşır, eski service worker'ı kaldırır ve yeni kaleye geçirir (`js/core/tasi.js` alır). Yeni adres belli olunca `kopru/index.html`'deki `NEW` satırı ona göre düzeltilir ve `netlify.toml`'da `publish = "kopru"` yapılır; Netlify kredisi yenilendiğinde (ya da Deploys → Trigger deploy ile) bir kez yayınlanır, sonra **Site configuration → Build & deploy → Stop builds** ile Netlify durdurulur. Eln yeni adreste şifresini bir kez yeniden girer; bulut ayarları kasada olduğu için kendiliğinden gelir.
 
 ### Eski: Netlify kurulumu
 
@@ -362,7 +400,7 @@ Başka bir ad seçersen hediye kartındaki QR'ı ve `index.html`'deki `og:image`
 
 ## Teknik notlar
 - Bulut listeleri her zaman en yeni kayıtları getirir (varsayılan 500). Ağır veriler ayrı kayıtta durur ve sadece gerektiğinde iner: Günün Sesi sesleri (`dvaudio`), panelden yüklenen sesler (`vaudio`), kartpostalların büyük fotoğrafı (`pcimg`), Bakü Günlüğü'nün büyük fotoğrafları (`kfull`). Böylece bir yıl sonra bile kale her açılışta birkaç MB'tan fazlasını indirmez (Supabase ücretsiz planında aylık 5 GB trafik var).
-- **Paket (Hızlı Açılış):** Kaynak sayfa `dev.html`; bütün `css/` ve `js/` dosyaları orada sırasıyla listelenir ve geliştirirken o açılır. Yayına giden `index.html` bundan üretilir: `node tools/bundle.mjs` hepsini esbuild ile küçültüp `dist/kale.<özet>.js` ve `dist/kale.<özet>.css` olarak yazar (her dosya kendi try/catch'inde; biri bozulsa diğerleri çalışır). Bir dosyayı değiştirdikten ya da `dev.html`'e yeni dosya ekledikten sonra paketi yeniden üret; `node tools/bundle.mjs --check` güncel olup olmadığını söyler. Harita verisi (`js/harita-veri.js`) pakete girmez, oda açılınca yüklenir.
+- **Paket (Hızlı Açılış):** Kaynak sayfa `dev.html`; bütün `css/` ve `js/` dosyaları orada sırasıyla listelenir ve geliştirirken o açılır. Yayına giden `index.html` bundan üretilir: `node tools/bundle.mjs` hepsini esbuild ile küçültüp `dist/kale.<özet>.js` (çekirdek), `dist/odalar.<özet>.js` (odalar, eşzamansız) ve `dist/kale.<özet>.css` olarak yazar (her dosya kendi try/catch'inde; biri bozulsa diğerleri çalışır). Bir dosyayı değiştirdikten ya da `dev.html`'e yeni dosya ekledikten sonra paketi yeniden üret; `node tools/bundle.mjs --check` güncel olup olmadığını söyler. Harita verisi (`js/harita-veri.js`) pakete girmez, oda açılınca yüklenir.
 - Netlify'da derleme adımı yok: üretilmiş paket depoda durur. Tek dış kütüphane `js/vendor/supabase.js` (supabase-js, MIT), sadece bulut ayarı varsa yüklenir. Yazı tipleri Google Fonts'tan (Fredoka, Great Vibes, Caveat, Nunito).
 - Hava durumu: [Open-Meteo](https://open-meteo.com/) (anahtarsız). Ulaşılamazsa site sessizce idare eder.
 - Telefon için tasarlandı; masaüstünde de çalışır. Hareket azaltma tercihine uyar.

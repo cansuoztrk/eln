@@ -39,7 +39,7 @@
   async function upload(blob) {
     const b64 = await new Promise((res) => {
       const fr = new FileReader();
-      fr.onload = () => res(String(fr.result).split(',')[1] || '');
+      fr.onload = () => res(String(fr.result).split(';base64,')[1] || '');
       fr.onerror = () => res('');
       fr.readAsDataURL(blob);
     });

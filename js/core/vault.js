@@ -42,6 +42,8 @@
     V.ok = true;
     V.who = who || 'her';
     K.store.set('vault', { kid: m.kid, k: b64(raw), who: V.who });
+    // Paketli sürümde odalar ayrı pakette arkadan iner: açılış olayı onlar yüklenince yayılır
+    if (K.odalar) await K.odalar;
     K.emit('unlocked', data);
     return true;
   }
@@ -82,6 +84,18 @@
         return await useRaw(unb64(saved.k), m, saved.who);
       } catch (e) {
         K.store.del('vault');
+        return false;
+      }
+    },
+    // Face ID ile saklanmış anahtar kaydıyla aç ({kid, k, who}; K.store 'vault' ile aynı biçim)
+    saved: () => K.store.get('vault'),
+    async fromSaved(saved) {
+      if (V.ok) return true;
+      const m = await meta();
+      if (!m || !subtle || !saved || saved.kid !== m.kid || !saved.k) return false;
+      try {
+        return await useRaw(unb64(saved.k), m, saved.who);
+      } catch (e) {
         return false;
       }
     },

@@ -100,7 +100,7 @@
       cls: 'letter-modal',
       label: l.title,
       html: `<div class="la">
-        <div class="la-env" style="--env:${l.color}"><span class="la-flap"></span><span class="la-seal">${A.bow()}</span></div>
+        <div class="la-env" style="--env:${l.color}"><span class="la-flap"></span><span class="la-seal ${K.muhur ? 'mh-var' : ''}">${K.muhur ? K.muhur.svg('me', 'la-mh') : A.bow()}</span></div>
         <article class="la-paper">
           <p class="la-kicker">${K.esc(l.title)}</p>
           <div class="la-text">${K.paras(l.body)}</div>

@@ -103,7 +103,9 @@
     if (K.widget) out.push({ room: '', run: () => K.widget.open(), ic: 'frame', n: '📱', u: '', t: "Kale Widget'ı", s: 'Ana ekranda ve kilit ekranında kale' });
     if (K.kisayol && K.kisayol.nfc) out.push({ room: '', run: () => K.kisayol.nfc(), ic: 'key', n: '🏷️', u: '', t: 'NFC Anahtarlık', s: 'Etikete dokun, ona sarılma gitsin' });
     if (K.atolye) out.push({ room: '', run: () => K.atolye.open(), ic: 'palette', n: '🎨', u: '', t: 'Tema Atölyesi', s: 'Kaleni kendi renginle boya' });
-    out.push({ room: 'album', ic: 'sticker', n: Object.keys(K.stickers.got()).length, u: 'çıkartma', t: 'Çıkartma albümü', s: `Zorunlulardan ${K.stickers.done()}/${K.stickers.total}` });
+    if (K.takvimabone && K.cloud && K.cloud.raw) out.push({ room: '', run: () => K.takvimabone.sheet(), ic: 'calendar', n: '📅', u: '', t: 'Takvim Aboneliği', s: 'Her 21\'i telefonunun takviminde' });
+    if (K.faceid && window.PublicKeyCredential) out.push({ room: '', run: () => K.faceid.sheet(), ic: 'key', n: '🔐', u: '', t: 'Face ID ile Giriş', s: K.faceid.state() ? 'Kuruldu' : 'Şifresiz, güvenli giriş' });
+    out.push({ room: 'album', ic: 'sticker', n: Object.keys(K.stickers.got()).length, u: 'pul', t: 'Pul Albümü', s: `Zorunlulardan ${K.stickers.done()}/${K.stickers.total}` });
     return out;
   }
   function biz() {

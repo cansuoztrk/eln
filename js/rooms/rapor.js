@@ -116,6 +116,8 @@
     if (oz && M.ozlem) lines.push(fillM(s.ozlem.me === s.ozlem.her ? M.ozlem.esit : M.ozlem.biri, { kim: nameOf(s.ozlem.me > s.ozlem.her ? 'me' : 'her'), n: oz }));
     if (r.hi.length && M.vurgu) lines.push(fillM(M.vurgu, { olay: r.hi[0][1].toLocaleLowerCase('tr') }));
     if (r.note && M.not) lines.push(fillM(M.not, { kim: nameOf(r.note.who), not: r.note.data.note }));
+    const pz = K.pazar && K.pazar.quote(r.w);
+    if (pz) lines.push(fillM(M.pazar || 'Pazar Sohbeti\'nde {kim} "{soru}" sorusuna şöyle yazmış: "{cevap}"', { kim: nameOf(pz.who), soru: pz.q, cevap: pz.a }));
     if (!lines.length) return '';
     const sel = fillM(K.pick(M.selam || ['Sevgili {herPet} ve {myPet},'], rnd));
     const kap = fillM(K.pick(M.kapanis || ['Gelecek hafta görüşürüz.'], rnd));

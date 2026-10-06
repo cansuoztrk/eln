@@ -238,6 +238,7 @@
 
   // Kale Kitabı da aynı posteri kullanır
   K.skyPoster = (sk) => poster(sk).svg;
+  K.yildizlar = { STARS, altAz };
 
   K.room({
     id: 'yildizlar',

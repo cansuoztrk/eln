@@ -58,6 +58,7 @@
     if (!x) return;
     w = x;
     paint();
+    K.emit('gercekhava', w);
     const ci = cat(w.ist.code), cb = cat(w.baku.code);
     same = ci && ci === cb ? ci : null;
     if (same && loaded) note();

@@ -9,7 +9,7 @@
   const T = K.time;
 
   const YD = () => D.yedek || { intro: [] };
-  const MEDIA = ['tsses', 'photo', 'vaudio', 'sfimg', 'sahneimg', 'pcimg', 'ozurses', 'kfull', 'kareimg', 'hkses', 'hkimg', 'dvaudio'];
+  const MEDIA = ['tsses', 'photo', 'vaudio', 'sfimg', 'sahneimg', 'pcimg', 'ozurses', 'kfull', 'kareimg', 'hkses', 'hkimg', 'dvaudio', 'rotafoto', 'anlarvid'];
   const nameOf = (w) => (w === 'me' ? C.myPet : C.herPet);
   let root = null, busy = false, last = null;
 
@@ -90,6 +90,73 @@
     K.$('#ydSum', root).innerHTML = last ? `<span><b class="tnum">${K.num(last.n)}</b><small>kayıt</small></span><span><b class="tnum">${K.num(last.her)}</b><small>${K.esc(nameOf('her'))}</small></span><span><b class="tnum">${K.num(last.me)}</b><small>${K.esc(nameOf('me'))}</small></span><span><b class="tnum">${last.kinds}</b><small>tür</small></span>` : '';
   }
 
+  /* ---------- Yedekten geri yükle ---------- */
+  async function readBackup(file) {
+    const st = K.$('#ydGeri', root);
+    let j = null;
+    try {
+      j = JSON.parse(await file.text());
+    } catch (e) {}
+    const rows = j && Array.isArray(j.rows) ? j.rows.filter((r) => r && r.id && r.kind && r.data && r.at && (r.who === 'me' || r.who === 'her')) : [];
+    if (!rows.length) return (st.innerHTML = '<p class="yd-err">Bu dosya bir Kale Yedeği değil ya da boş. "Sadece yazılar" ya da "Her şey" ile inen .json dosyasını seç.</p>');
+    const list = rows.map((r) => ({ id: r.id, kind: r.kind, who: r.who, at: new Date(r.at).getTime(), data: r.data }));
+    const first = Math.min(...list.map((r) => r.at)), last = Math.max(...list.map((r) => r.at));
+    st.innerHTML = `<p><b>${K.num(list.length)}</b> kayıt · ${K.esc(T.fmt(new Date(first)))} – ${K.esc(T.fmt(new Date(last)))}${j.media ? ' · fotoğraf ve seslerle' : ''}</p>
+      <p class="muted small">Yalnız bulutta olmayanlar geri eklenir; var olanlara dokunulmaz. Her kayıt kendi tarihine döner.</p>
+      <div class="row center"><button type="button" class="btn red" data-yd-geri>Eksikleri geri yükle</button></div><p class="yd-st" id="ydGeriSt" aria-live="polite"></p>`;
+    K.$('[data-yd-geri]', st).addEventListener('click', async (e) => {
+      e.currentTarget.disabled = true;
+      const out = K.$('#ydGeriSt', st);
+      const res = await K.cloud.restore(list, (n, a) => (out.textContent = `${K.num(n)}/${K.num(list.length)} · ${K.num(a)} geri geldi`));
+      out.innerHTML = `✅ <b>${K.num(res.added)}</b> kayıt geri geldi, ${K.num(res.had)} tanesi zaten vardı${res.failed ? `, ${K.num(res.failed)} eklenemedi (internet?)` : ''}.${res.added ? ' Odalar yenilenince görünür.' : ''}`;
+      if (res.added) {
+        K.audio.sfx.success();
+        K.stickers.award('geriyukle');
+        setTimeout(() => out.insertAdjacentHTML('beforeend', ' <button type="button" class="btn soft small" onclick="location.reload()">Yenile</button>'), 400);
+      }
+    });
+  }
+  /* ---------- Depo: bulut ne kadar dolu, en çok ne yer kaplıyor ---------- */
+  const LIMIT = 500 * 1024 * 1024;
+  const KIND_NAME = { kareimg: 'Günün Karesi fotoğrafları', hkimg: 'Hikâye fotoğrafları', pcimg: 'Kartpostallar', photo: 'Fotoğraflar', kfull: 'Günlük fotoğrafları', sfimg: 'Sofra fotoğrafları', sahneimg: 'Film sahneleri', tsses: 'Telesekreter sesleri', vaudio: 'Ses kayıtları', ozurses: 'Sesli özürler', hkses: 'Sesli hikâyeler', dvaudio: 'Günün Sesi', anlarvid: 'On saniyelik anlar', rotadurak: 'Rota durakları', page: 'Defter sayfaları', hata: 'Hata kayıtları' };
+  async function measure(btn) {
+    const box = K.$('#ydDepo', root);
+    btn.disabled = true;
+    box.innerHTML = '<p class="muted">Ölçülüyor...</p>';
+    let rows = [];
+    try {
+      rows = await K.cloud.dump([], (n) => (box.innerHTML = `<p class="muted">${K.num(n)} kayıt ölçüldü...</p>`));
+    } catch (e) {
+      btn.disabled = false;
+      return (box.innerHTML = '<p class="yd-err">Ölçülemedi. İnternetini kontrol et.</p>');
+    }
+    const by = {};
+    let total = 0;
+    rows.forEach((r) => {
+      const n = Math.round(JSON.stringify(r.data).length * 1.37) + 200;
+      total += n;
+      (by[r.kind] = by[r.kind] || { n: 0, b: 0 }).n++;
+      by[r.kind].b += n;
+    });
+    const top = Object.entries(by).sort((a, b) => b[1].b - a[1].b).slice(0, 7);
+    const mb = (b) => (b / 1048576).toFixed(b > 10485760 ? 0 : 1);
+    const pct = Math.min(100, (total / LIMIT) * 100);
+    const hata = rows.filter((r) => r.kind === 'hata' && Date.now() - r.at > 14 * 864e5);
+    box.innerHTML = `<div class="yd-bar" style="--p:${pct.toFixed(1)}%"><i></i></div>
+      <p class="center"><b>${mb(total)} MB</b> / 500 MB <span class="muted small">(ücretsiz bulutun sınırı · %${pct.toFixed(pct < 10 ? 1 : 0)})</span></p>
+      <ul class="yd-top">${top.map(([k, v]) => `<li><span>${K.esc(KIND_NAME[k] || k)}</span><small>${K.num(v.n)} kayıt</small><b>${mb(v.b)} MB</b></li>`).join('')}</ul>
+      <p class="muted small">${pct < 60 ? 'Daha çok yer var; yıllarca yeter.' : 'Dolmaya başladı. Eski büyük fotoğrafları "Her şey" yedeğiyle indirip sakla.'} Anılar hiçbir zaman kendiliğinden silinmez.</p>
+      ${K.isOwner() && hata.length ? `<div class="row center"><button type="button" class="btn ghost small" data-yd-temiz>🧹 ${K.num(hata.length)} eski hata kaydını temizle</button></div>` : ''}`;
+    const t = K.$('[data-yd-temiz]', box);
+    t && t.addEventListener('click', async () => {
+      t.disabled = true;
+      for (const r of hata) await K.cloud.remove(r.id);
+      K.cloud.raw && K.cloud.rawPrune('takvimpub', Date.now() - 864e5);
+      t.textContent = '✓ Temizlendi';
+    });
+    btn.disabled = false;
+  }
+
   K.specialHooks = (K.specialHooks || []).concat(() => {
     if (!K.cloud || !K.cloud.enabled || !D.yedek) return [];
     const p = T.baku();
@@ -102,7 +169,7 @@
     id: 'yedek',
     wing: 'hazine',
     title: 'Kale Yedeği',
-    sub: 'Bütün anılar tek dosyada',
+    sub: 'Yedekle, geri yükle, depoya bak',
     icon: 'house',
     color: '#E9F3FF',
     hidden: () => !D.yedek || !K.cloud || !K.cloud.enabled,
@@ -120,11 +187,26 @@
           <p class="yd-st center" id="ydSt" aria-live="polite"></p>
           <div class="yd-sum" id="ydSum"></div>
           <p class="yd-warn">🔓 İnen dosya şifresizdir: içinde bütün yazışmalarımız var. Kimseyle paylaşma, bulut klasörlerine koyarken dikkat et.</p>
+        </section>
+        <section class="card yd-card">
+          <p class="card-eyebrow">Yedekten geri yükle</p>
+          <p class="muted small">Bir gün bulutta bir şey kaybolursa: daha önce indirdiğin .json yedeğini seç; eksik kayıtlar kendi tarihleriyle geri gelir.</p>
+          <label class="btn soft small yd-file">📂 Yedek dosyasını seç<input type="file" accept=".json,application/json" id="ydFile" hidden></label>
+          <div id="ydGeri"></div>
+        </section>
+        <section class="card yd-card">
+          <p class="card-eyebrow">Depo</p>
+          <p class="muted small">Bulut ne kadar dolu, en çok ne yer kaplıyor?</p>
+          <div class="row center"><button type="button" class="btn soft small" data-yd-olc>📏 Depoyu ölç</button></div>
+          <div id="ydDepo"></div>
         </section>`;
       el.addEventListener('click', (e) => {
         const b = e.target.closest('[data-yd]');
         if (b) run(b.dataset.yd, b);
+        const o = e.target.closest('[data-yd-olc]');
+        if (o) measure(o);
       });
+      K.$('#ydFile', el).addEventListener('change', (e) => e.target.files[0] && readBackup(e.target.files[0]));
     },
     enter() {
       render();

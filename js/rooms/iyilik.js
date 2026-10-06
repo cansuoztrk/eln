@@ -9,6 +9,8 @@
   const T = K.time;
 
   const IY = () => D.iyilik || { intro: '', list: [] };
+  // Liste: kasadaki iyilikler + Sevgi Dilimiz'in dile göre iyilikleri (sıra sabit: kayıtlar sıra numarası tutar)
+  const LIST = () => (IY().list || []).concat(K.sevgidili ? K.sevgidili.extra().map((x) => x.t) : []);
   const mine = () => (K.isOwner() ? 'me' : 'her');
   const other = () => (K.isOwner() ? 'her' : 'me');
   const nameOf = (w) => (w === 'me' ? C.myPet : C.herPet);
@@ -18,8 +20,15 @@
   const doneOn = (w, day) => rows.find((r) => r.kind === 'iyilik' && r.who === w && r.data.day === day) || null;
   // Günün önerisi: ikimize farklı; "başka öner" tuzu yerel
   function pickFor(w, day) {
-    const L = IY().list || [];
+    const L = LIST();
     if (!L.length) return -1;
+    // Haftanın yarısı: iyiliği yapılacak kişinin sevgi diline göre (ikisi de Sevgi Dilimiz'i çözdüyse)
+    const to = w === 'me' ? 'her' : 'me', lang = K.sevgidili && K.sevgidili.topOf(to);
+    if (lang && K.hash(day + 'dil' + w) % 2 === 0) {
+      const base = (IY().list || []).length;
+      const idx = K.sevgidili.extra().map((x, i) => (x.lang === lang ? base + i : -1)).filter((i) => i >= 0);
+      if (idx.length) return idx[(K.hash(day + w) + (w === mine() ? K.store.get('iyilikSalt-' + day, 0) : 0)) % idx.length];
+    }
     const salt = w === mine() ? K.store.get('iyilikSalt-' + day, 0) : 0;
     const a = (K.hash(day + 'me') + salt * 7) % L.length;
     if (w === 'me') return a;
@@ -63,7 +72,7 @@
   function render() {
     if (!root || K.activeRoom !== 'iyilik') return;
     const day = T.todayKey();
-    const L = IY().list || [];
+    const L = LIST();
     const i = pickFor(mine(), day);
     const d = doneOn(mine(), day);
     const od = doneOn(other(), day);
@@ -90,12 +99,12 @@
     K.audio.sfx.sparkle();
     K.stickers.award('iyilik');
     if (streak(mine()) >= 7) K.stickers.award('iyilik7');
-    K.ping(`⭐ ${K.meName()} bugün senin için küçük bir iyilik yaptı`, note || K.fill((IY().list || [])[r.data.i] || ''), ['star'], { click: K.roomUrl('iyilik'), priority: 3 });
+    K.ping(`⭐ ${K.meName()} bugün senin için küçük bir iyilik yaptı`, note || K.fill(LIST()[r.data.i] || ''), ['star'], { click: K.roomUrl('iyilik'), priority: 3 });
     render();
     K.renderSpecials && !K.activeRoom && K.renderSpecials();
   }
   function showDay(k) {
-    const L = IY().list || [];
+    const L = LIST();
     const items = ['her', 'me'].map((w) => {
       const d = doneOn(w, k);
       return `<li>${K.avatar(w, 'rp-av')}<div><b>${K.esc(nameOf(w))}</b>${d ? `<p class="hand">${K.esc(K.fill(L[d.data.i] || ''))}</p>${d.data.note ? `<p class="iy-note">"${K.esc(d.data.note)}"</p>` : ''}` : '<p class="muted">Bu gün yıldız yok.</p>'}</div></li>`;
@@ -119,9 +128,9 @@
     const day = T.todayKey();
     const out = [];
     const od = doneOn(other(), day);
-    if (od && K.store.get('iyilikSeen') !== od.id) out.push({ icon: 'star', title: `⭐ ${nameOf(other())} bugün senin için bir iyilik yaptı`, text: od.data.note ? `"${od.data.note}"` : K.fill((IY().list || [])[od.data.i] || ''), run: () => (K.store.set('iyilikSeen', od.id), K.go('iyilik')), cta: 'Gör' });
+    if (od && K.store.get('iyilikSeen') !== od.id) out.push({ icon: 'star', title: `⭐ ${nameOf(other())} bugün senin için bir iyilik yaptı`, text: od.data.note ? `"${od.data.note}"` : K.fill(LIST()[od.data.i] || ''), run: () => (K.store.set('iyilikSeen', od.id), K.go('iyilik')), cta: 'Gör' });
     const h = T.parts(K.isOwner() ? C.tzIstanbul : C.tzBaku).h;
-    if (!doneOn(mine(), day) && h >= 9) out.push({ icon: 'star', title: `💡 Bugün ${K.ek(nameOf(other()), 'i')} mutlu etmek için`, text: K.fill((IY().list || [])[pickFor(mine(), day)] || ''), room: 'iyilik', cta: 'Yaptım' });
+    if (!doneOn(mine(), day) && h >= 9) out.push({ icon: 'star', title: `💡 Bugün ${K.ek(nameOf(other()), 'i')} mutlu etmek için`, text: K.fill(LIST()[pickFor(mine(), day)] || ''), room: 'iyilik', cta: 'Yaptım' });
     return out;
   });
   K.iyilik = { streak, count: (w) => rows.filter((r) => r.kind === 'iyilik' && (!w || r.who === w)).length };

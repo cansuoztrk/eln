@@ -121,10 +121,11 @@
         .sort((a, b) => visited[b] - visited[a])
         .slice(0, 6);
       flat = recent.map((id) => idx.find((x) => x.room === id && x.group === 'Odalar')).filter(Boolean);
-      box.innerHTML = `<div class="ara-tips">${(AR().tips || []).map((t) => `<button type="button" class="chip" data-ara-tip="${K.esc(t)}">${K.esc(t)}</button>`).join('')}<button type="button" class="chip on" data-ara-lucky>${A.ui('shuffle')} ${K.esc(AR().lucky || 'Şansıma bir kapı')}</button></div>
+      box.innerHTML = `<div class="ara-tips">${(AR().tips || []).concat(K.sor ? ['Geçen ay ne yaptık?', 'En son ne zaman barıştık?', 'Kaç kez özledim dedik?'] : []).map((t) => `<button type="button" class="chip" data-ara-tip="${K.esc(t)}">${K.esc(t)}</button>`).join('')}<button type="button" class="chip on" data-ara-lucky>${A.ui('shuffle')} ${K.esc(AR().lucky || 'Şansıma bir kapı')}</button></div>
         ${flat.length ? `<p class="ara-g">Son girdiklerin</p>${flat.map((it, i) => row(it, i, '')).join('')}` : ''}`;
       sel = 0;
       paintSel();
+      K.sor && K.sor.attach(box, '');
       return;
     }
     const res = search(q).slice(0, 60);
@@ -139,7 +140,8 @@
         flat.push(it);
       });
     });
-    box.innerHTML = html || `<p class="ara-empty">${K.esc(AR().empty)}</p><div class="ara-tips"><button type="button" class="chip on" data-ara-lucky>${A.ui('shuffle')} ${K.esc(AR().lucky || 'Şansıma bir kapı')}</button></div>`;
+    K.sor && K.sor.attach(box, q);
+    box.innerHTML = html || (K.sor && K.sor.isQ(q) ? '' : `<p class="ara-empty">${K.esc(AR().empty)}</p>`) + `<div class="ara-tips"><button type="button" class="chip on" data-ara-lucky>${A.ui('shuffle')} ${K.esc(AR().lucky || 'Şansıma bir kapı')}</button></div>`;
     sel = 0;
     paintSel();
   }

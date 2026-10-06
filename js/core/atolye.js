@@ -18,7 +18,7 @@
   ];
   const FIYONK = [['', 'Kırmızı', '#E3174D'], ['pembe', 'Pembe', '#FF5FA8'], ['mor', 'Mor', '#8F5BE6'], ['mavi', 'Mavi', '#3D8BE0'], ['altin', 'Altın', '#E8B23A'], ['siyah', 'Siyah', '#3A2A33']];
   const DESEN = [['', 'Düz'], ['puantiye', 'Puantiye'], ['kalp', 'Kalpler'], ['cizgi', 'Çizgili'], ['yildiz', 'Yıldızlar']];
-  const DEF = { tema: 'pudra', fiyonk: '', desen: '', kapak: true, kapi: true, rehber: true, ses: true, titresim: true };
+  const DEF = { tema: 'pudra', fiyonk: '', desen: '', kapak: true, kapi: true, rehber: true, ses: true, titresim: true, kanatses: true, egbak: false };
   const get = () => Object.assign({}, DEF, K.store.get('atolye', {}), { tema: K.store.get('tema', 'pudra') });
 
   function apply(o) {
@@ -69,7 +69,7 @@
         <p class="card-eyebrow">Fiyonk rengi</p><div class="at-row" data-g="fiyonk">${FIYONK.map(([id, n, c]) => `<button type="button" class="at-bow" data-v="${id}" aria-label="${n}"><svg viewBox="-60 -42 120 84" aria-hidden="true">${A.bowShape(c)}</svg><small>${n}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Arka plan deseni</p><div class="at-row" data-g="desen">${DESEN.map(([id, n]) => `<button type="button" class="at-pat" data-v="${id}" data-desen-ornek="${id}"><i></i><small>${n}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Hareket ve ses</p>
-        <div class="at-toggles">${[['kapak', 'Oda kapakları', 'Her odanın başında çizimli bir kapak'], ['kapi', 'Kapı geçişi', 'Odaya girerken kapı açılır'], ['rehber', 'Kitty Rehber', 'Yeni bir odada Kitty kısaca anlatır'], ['ses', 'Sesler', 'Dokunuş ve kutlama sesleri'], ['titresim', 'Titreşim', 'Destekleyen telefonlarda']]
+        <div class="at-toggles">${[['kapak', 'Oda kapakları', 'Her odanın başında çizimli bir kapak'], ['kapi', 'Kapı geçişi', 'Odaya girerken kapı açılır'], ['rehber', 'Kitty Rehber', 'Yeni bir odada Kitty kısaca anlatır'], ['ses', 'Sesler', 'Dokunuş ve kutlama sesleri'], ['kanatses', 'Kanat sesleri', 'Her kanadın hafif arka plan sesi: kuşlar, saat, şömine'], ['egbak', 'Eğ ve bak', 'Telefonu eğince ana salon derinleşir'], ['titresim', 'Titreşim', 'Destekleyen telefonlarda']]
           .map(([k, t, d]) => `<label class="at-tg"><span><b>${t}</b><small>${d}</small></span><input type="checkbox" data-tg="${k}"><i aria-hidden="true"></i></label>`)
           .join('')}</div>
         <div class="row"><button type="button" class="btn ghost small" data-at-reset>Varsayılana dön</button></div>`,
@@ -102,6 +102,7 @@
       s = save({ [c.dataset.tg]: c.checked });
       if (c.dataset.tg === 'ses' && c.checked) K.audio.sfx.chime();
       if (c.dataset.tg === 'titresim' && c.checked) K.vibrate(30);
+      K.emit('atolyeTg', { k: c.dataset.tg, v: c.checked });
     });
   }
 

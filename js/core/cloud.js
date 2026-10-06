@@ -96,6 +96,12 @@
         const { error } = await client.from('kale').delete().eq('id', id);
         if (error) throw error;
       },
+      // Yedekten geri yükleme: kimlik, yazan ve tarih aynen korunur (birbirine kimlikle bağlı kayıtlar bozulmasın)
+      async restore(r) {
+        const { error } = await client.from('kale').insert({ id: r.id, space, kind: r.kind, author: r.who === 'me' ? 'me' : 'her', data: await K.vault.seal(r.data), created_at: new Date(r.at).toISOString() });
+        if (error) throw error;
+        return true;
+      },
       // Bütün kayıtlar (Kale Yedeği), eskiden yeniye, 500'erlik sayfalarla; skip: atlanacak türler
       async dump(skip, onp) {
         let out = [], from = 0;
@@ -179,6 +185,14 @@
       async remove(id) {
         localStorage.setItem(KEY, JSON.stringify(rows().filter((r) => r.id !== id)));
         bc.postMessage({ t: 'del', id });
+      },
+      async restore(r) {
+        if (rows().some((x) => x.id === r.id)) throw { code: '23505' };
+        const all = rows();
+        all.push({ id: r.id, kind: r.kind, author: r.who === 'me' ? 'me' : 'her', created_at: new Date(r.at).toISOString(), data: await K.vault.seal(r.data) });
+        all.sort((a, b) => a.created_at.localeCompare(b.created_at));
+        localStorage.setItem(KEY, JSON.stringify(all));
+        return true;
       },
       async dump(skip, onp) {
         const all = (await Promise.all(rows().filter((r) => !(skip || []).includes(r.kind)).map(decodeRow))).filter(Boolean);
@@ -289,6 +303,27 @@
       return row;
     },
     pending: () => queue().length,
+    // Yedekten geri yükle: yalnız bulutta olmayan kayıtlar eklenir (aynı kimlik varsa atlanır). onp(bitti, eklendi)
+    async restore(list, onp) {
+      if (!adapter || !adapter.restore) return { added: 0, had: 0, failed: list.length };
+      let added = 0, had = 0, failed = 0, done = 0;
+      const work = list.slice();
+      const one = async () => {
+        for (let r = work.shift(); r; r = work.shift()) {
+          try {
+            await adapter.restore(r);
+            added++;
+          } catch (e) {
+            if (e && (e.code === '23505' || /duplicate/i.test(e.message || ''))) had++;
+            else failed++;
+          }
+          done++;
+          onp && onp(done, added);
+        }
+      };
+      await Promise.all([one(), one(), one(), one()]);
+      return { added, had, failed };
+    },
     // Yedek için her şey (hata olursa fırlatır; çağıran söyler)
     dump: (skip, onp) => (adapter && adapter.dump ? adapter.dump(skip, onp) : Promise.resolve([])),
     async remove(id) {
@@ -317,6 +352,39 @@
     const s = K.store.get('cloudCfg');
     return s ? (await K.vault.unseal(s)) || {} : {};
   }
+  // Ham REST (Supabase): kasa anahtarıyla şifrelenmemiş kayıtlar
+  const rawHead = (r) => ({ apikey: r.key, Authorization: `Bearer ${r.key}`, 'Content-Type': 'application/json' });
+  cloud.rawList = async (kind, limit = 60) => {
+    const r = cloud.raw;
+    if (!r) return [];
+    try {
+      const res = await fetch(`${r.url}/rest/v1/kale?select=id,author,data,created_at&space=eq.${encodeURIComponent(r.space)}&kind=eq.${encodeURIComponent(kind)}&order=created_at.desc&limit=${limit}`, { headers: rawHead(r) });
+      return res.ok ? (await res.json()).map((x) => ({ id: x.id, who: x.author, at: new Date(x.created_at).getTime(), raw: x.data })) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+  cloud.rawAdd = async (kind, data) => {
+    const r = cloud.raw;
+    if (!r) return false;
+    try {
+      const res = await fetch(`${r.url}/rest/v1/kale`, { method: 'POST', headers: Object.assign(rawHead(r), { Prefer: 'return=minimal' }), body: JSON.stringify({ space: r.space, kind, author: who(), data }) });
+      return res.ok;
+    } catch (e) {
+      return false;
+    }
+  };
+  // Yalnız verilen türdeki, verilen zamandan eski ham kayıtları siler (eski takvim paketleri gibi)
+  cloud.rawPrune = async (kind, beforeMs) => {
+    const r = cloud.raw;
+    if (!r || !kind) return false;
+    try {
+      const res = await fetch(`${r.url}/rest/v1/kale?space=eq.${encodeURIComponent(r.space)}&kind=eq.${encodeURIComponent(kind)}&created_at=lt.${encodeURIComponent(new Date(beforeMs).toISOString())}`, { method: 'DELETE', headers: rawHead(r) });
+      return res.ok;
+    } catch (e) {
+      return false;
+    }
+  };
   cloud.saveLocal = async (cfg) => K.store.set('cloudCfg', await K.vault.seal({ url: cfg.url.trim(), key: cfg.key.trim(), space: cfg.space || 'kale' }));
   cloud.link = async (cfg) => `${location.origin}${location.pathname}#bulut:${encodeURIComponent(await K.vault.seal({ url: cfg.url.trim(), key: cfg.key.trim(), space: cfg.space || 'kale' }))}`;
   // Supabase projesini adım adım dener: bağlantı, yazma, okuma, canlı olay, silme
@@ -422,6 +490,9 @@
       adapter = null;
     }
     cloud.enabled = Boolean(adapter);
+    // Şifresiz ham kayıtlar için (Takvim Aboneliği'nin kendi anahtarıyla şifrelediği paket, Kestirme'den gelen adım
+    // sayısı): yalnız gerçek bulutta; sahte bulutta yok
+    cloud.raw = adapter && q !== 'deneme' && cfg.url && cfg.key ? { url: cfg.url.trim().replace(/\/+$/, ''), key: cfg.key.trim(), space: cfg.space || 'kale' } : null;
     readyResolve(cloud.enabled);
     K.emit('cloud', cloud.enabled);
     if (cloud.enabled) setTimeout(flush, 2500);

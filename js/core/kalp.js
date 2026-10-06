@@ -188,6 +188,7 @@
         <p class="kmenu-to">${K.avatar(o, 'yan-av ' + (K.cloud && K.cloud.otherHere() ? 'on' : ''))}<span><small>${K.esc(K.ek(nameOf(o), 'e'))}</small><b>${K.cloud && K.cloud.otherHere() ? 'Şu an kalede' : 'Kaleye girince görür'}</b></span></p>
         <div class="kmenu-arc">${ona.map(([id, emo, label], i) => `<button type="button" class="kmenu-b" data-km="${id}" style="--i:${i}"><span>${emo}</span><small>${K.esc(label)}</small></button>`).join('')}</div>
         ${K.endise && on() ? `<button type="button" class="kmenu-endise" data-km="endise">🫧 İçim sıkıştı, bana güven ver</button>` : ''}
+        ${K.seslikomut && K.seslikomut.ok() ? `<button type="button" class="kmenu-ses" data-km="ses">🎙️ Kitty, ... <small>sesle söyle</small></button>` : ''}
         ${K.dokunus && on() ? `<div class="kmenu-touch"><button type="button" data-km="opucuk">💋 <small>Uzaktan öpücük</small></button><button type="button" data-km="nabiz">💓 <small>Kalp atışım</small></button></div>` : ''}
         ${K.baris && K.baris.active() ? `<a class="kmenu-bulut" href="#baris" data-km-x>☁️ Aranızda küçük bir bulut var · <b>Köprüye git</b></a>` : ''}
         <div class="kmenu-row">${birlikte.map(([id, ic, label]) => `<button type="button" data-km="${id}" class="${id === 'baris' && K.baris && K.baris.active() ? 'glow' : ''}">${A.icon(ic)}<small>${K.esc(label)}</small></button>`).join('')}</div>
@@ -216,6 +217,10 @@
   async function act(id, btn) {
     const o = other();
     if (id === 'endise') return K.endise && K.endise.open();
+    if (id === 'ses') {
+      closeMenu();
+      return setTimeout(() => K.seslikomut.listen(), 250);
+    }
     if (id === 'opucuk') return K.dokunus.kiss();
     if (id === 'nabiz') return K.dokunus.pulse();
     if (id === 'zamanli') {

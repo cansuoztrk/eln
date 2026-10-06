@@ -116,7 +116,7 @@
   const toB64 = (blob) =>
     new Promise((res) => {
       const r = new FileReader();
-      r.onload = () => res(String(r.result).split(',')[1] || '');
+      r.onload = () => res(String(r.result).split(';base64,')[1] || '');
       r.onerror = () => res('');
       r.readAsDataURL(blob);
     });
