@@ -341,7 +341,7 @@ Netlify'ın ücretsiz planı ayda 300 kredi veriyor ve her yayın 15 kredi (ayda
 1. [dash.cloudflare.com](https://dash.cloudflare.com) üzerinden ücretsiz hesap aç.
 2. **Workers & Pages → Create → Pages → Connect to Git** → GitHub'a izin ver → bu depoyu seç.
 3. **Project name:** `elnin-kralligi` (adres `https://elnin-kralligi.pages.dev` olur; alınmışsa Cloudflare sonuna ek koyar, o adresi not et).
-4. **Production branch:** siteyi içeren dal. **Framework preset:** None. **Build command:** boş. **Build output directory:** `/`.
+4. **Production branch:** `claude/eln-romantic-memory-site-969djo` (siteyi içeren dal). **Framework preset:** None. **Build command:** boş. **Build output directory:** `/`.
 5. **Save and Deploy.** Bundan sonra dala her gönderimde site kendiliğinden güncellenir. Başlıklar `_headers` dosyasından gelir.
 
 **Eski adres ve taşınma köprüsü:** Hediye kartındaki QR ve eski bağlantılar `elnin-kralligi.netlify.app`'e gider. `kopru/` klasöründeki sayfa o adreste çalışmak için hazır: açan kişinin cihazındaki yerel eşyaları (çıkartmalar, sarılma borcu, bahçe, mühürler, ayarlar; kasa anahtarı hariç) adresin `#tasi:` kısmında yeni adrese taşır, eski service worker'ı kaldırır ve yeni kaleye geçirir (`js/core/tasi.js` alır). Yeni adres belli olunca `kopru/index.html`'deki `NEW` satırı ona göre düzeltilir ve `netlify.toml`'da `publish = "kopru"` yapılır; Netlify kredisi yenilendiğinde (ya da Deploys → Trigger deploy ile) bir kez yayınlanır, sonra **Site configuration → Build & deploy → Stop builds** ile Netlify durdurulur. Eln yeni adreste şifresini bir kez yeniden girer; bulut ayarları kasada olduğu için kendiliğinden gelir.
