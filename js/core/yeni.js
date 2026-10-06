@@ -20,7 +20,7 @@
     pick.slice().reverse().forEach((v) => (v.items || []).forEach((it) => items.some((x) => x[0] === it[0]) || items.push(it)));
     return { v: all.length ? all[all.length - 1].v : 0, title: (pick[pick.length - 1] || {}).title, items };
   }
-  const NOROOM = ['kaydir', 'hatirlat', 'gece', 'gunbatimi', 'aynigok'];
+  const NOROOM = ['kaydir', 'hatirlat', 'gece', 'gunbatimi', 'aynigok', 'canli', 'kapak', 'mevsim', 'akilli', 'gece2', 'beraber', 'aynisaniye', 'yirmibir', 'cevrimdisi'];
   const ALIAS = { uykubiz: 'gece' };
   const target = (id) => ALIAS[id] || id.replace(/21$/, '');
   const roomOk = (id) => {
@@ -43,6 +43,12 @@
       if (id === 'opucuk' || id === 'nabiz') return Boolean(K.dokunus && K.cloud && K.cloud.enabled);
       if (id === 'aynigok') return Boolean(K.gercekhava);
       if (id === 'widget') return Boolean(K.widget);
+      if (id === 'atolye') return Boolean(K.atolye);
+      if (id === 'kesit') return Boolean(K.kesit);
+      if (id === 'dock') return Boolean(K.akilli && K.$('#dock'));
+      if (id === 'nfc') return Boolean(K.kisayol && K.kisayol.nfc && (K.isOwner() ? C.ntfyTopicHer : C.ntfyTopic));
+      if (['canli', 'kapak', 'mevsim', 'akilli', 'gece2', 'yirmibir', 'cevrimdisi'].includes(id)) return true;
+      if (id === 'beraber' || id === 'aynisaniye') return Boolean(K.cloud && K.cloud.enabled);
       return roomOk(id);
     });
   }
@@ -68,7 +74,7 @@
       K.$$('.yn-segs i', view).forEach((s, k) => s.classList.toggle('done', k <= i));
       K.$('.yn-stage', view).innerHTML = `<div class="yn-card" data-id="${K.esc(id)}"><div class="yn-ic">${A.icon(ic)}</div><h2>${K.esc(title)}</h2><p>${K.esc(K.fill(text))}</p></div>`;
       const last = i === list.length - 1;
-      const go = NOROOM.includes(id) ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' || id === 'kisayol' || id === 'widget' ? 'Kur' : id === 'opucuk' ? 'Öp' : id === 'nabiz' ? 'Ölç' : id === 'cicek' ? 'Çiçeğe bak' : id === 'salon' ? 'Panoya bak' : id === 'endise' ? 'Kalp menüsünü aç' : 'Dene'}</button>`;
+      const go = NOROOM.includes(id) ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' || id === 'kisayol' || id === 'widget' || id === 'nfc' ? 'Kur' : id === 'atolye' ? 'Boya' : id === 'dock' ? 'Düzenle' : id === 'kesit' ? 'Haritaya git' : id === 'opucuk' ? 'Öp' : id === 'nabiz' ? 'Ölç' : id === 'cicek' ? 'Çiçeğe bak' : id === 'salon' ? 'Panoya bak' : id === 'endise' ? 'Kalp menüsünü aç' : 'Dene'}</button>`;
       K.$('.yn-foot', view).innerHTML = `${go}<button type="button" class="btn ${go ? 'ghost' : 'red'}" data-yn-next>${last ? 'Kaleye dön' : 'Sıradaki'}</button>`;
       K.audio.sfx.tap();
     };
@@ -103,6 +109,17 @@
           if (id === 'endise') return K.kalp && K.kalp.openMenu();
           if (id === 'kisayol') return K.kisayol.open();
           if (id === 'widget') return K.widget.open();
+          if (id === 'atolye') return K.atolye.open();
+          if (id === 'dock') return K.akilli.edit();
+          if (id === 'nfc') return K.kisayol.nfc();
+          if (id === 'kesit') {
+            K.go('');
+            return setTimeout(() => {
+              K.salon && K.salon.tab && K.salon.tab('kale');
+              const mp = K.$('#castleMap');
+              mp && mp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 350);
+          }
           if (id === 'opucuk') return K.dokunus.kiss();
           if (id === 'nabiz') return K.dokunus.pulse();
           if (id === 'cicek') {

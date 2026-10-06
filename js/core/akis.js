@@ -116,6 +116,7 @@
     prenses: () => ({ icon: 'story', room: 'prenses', emoji: '📖', title: 'Hikâyede seçimini yaptı', text: 'Prenses ve User155', weight: 1 }),
     kedikart: (r) => ({ icon: 'paw', room: 'kedi', emoji: '📮', title: `${K.kedi ? K.kedi.name() : 'Kedimiz'} kartpostal yolladı`, text: r.data.yer || '', weight: 1 }),
     aynigok: () => ({ icon: 'sky', room: '', emoji: '🌍', title: 'İki şehrin gökyüzü aynıydı', text: '', weight: 1 }),
+    aynikalp: () => ({ icon: 'star', room: '', emoji: '✨', title: 'Aynı saniyede kalbe dokundunuz', text: 'Gökyüzünden bir yıldız kaydı.', weight: 2 }),
     minnet: () => ({ icon: 'note', room: 'minnet', emoji: '🙏', title: 'Minnet Defteri\'ne bir cümle yazdı', text: 'Seninkini yazınca açılır.', weight: 2 }),
     gorev: (r) => ({ icon: 'star', room: 'gorev', emoji: '🏅', title: 'Haftanın görevini yaptı', text: cut(r.data.note), weight: 2 }),
     onyil: () => ({ icon: 'hourglass', room: 'onyil', emoji: '⏳', title: 'On yıl sonraki bize bir zarf bıraktı', text: 'Mühürlü.', weight: 2 }),
@@ -127,7 +128,7 @@
     kelime: (r) => ({ icon: 'cards', room: 'kelime', emoji: '🔤', title: r.data.won ? `Günün Kelimesi: ${r.data.guesses.length}. denemede buldu` : 'Günün Kelimesi: bulamadı', text: 'Harfler, sen de çözünce açılır.', weight: 1 }),
   };
   // Hikâyelerde gösterilen türler (son iki gün, onun yaptıkları)
-  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk', 'tsmesaj', 'minnet', 'gorev', 'onyil', 'gunbatimi', 'hayal', 'hayalyap', 'barisders', 'pin', 'pingittik', 'yarisma', 'uyandim', 'amiral', 'opucuk', 'nabiz', 'sabahses', 'soz', 'soztut', 'iyilik', 'bulmacacoz', 'emojisarki', 'emojicevap', 'prenses', 'kedikart', 'aynigok'];
+  const STORY = ['hikaye', 'dvoice', 'hava', 'hvcare', 'postcard', 'kphoto', 'pb', 'sfplate', 'sofra', 'sahne', 'ilk', 'dakika', 'song', 'page', 'live', 'letter', 'tale', 'pigeon', 'coin', 'hug', 'answer', 'luck', 'bloom', 'bouquet', 'nerdwin', 'sleep', 'filmview', 'flight', 'cark', 'ev', 'kletter', 'knote', 'selam', 'kucak', 'radyo', 'ppwin', 'kelime', 'durum', 'kare', 'baristi', 'barissoz', 'kural', 'kedisahip', 'kedionay', 'kalpk', 'tsmesaj', 'minnet', 'gorev', 'onyil', 'gunbatimi', 'hayal', 'hayalyap', 'barisders', 'pin', 'pingittik', 'yarisma', 'uyandim', 'amiral', 'opucuk', 'nabiz', 'sabahses', 'soz', 'soztut', 'iyilik', 'bulmacacoz', 'emojisarki', 'emojicevap', 'prenses', 'kedikart', 'aynigok', 'aynikalp'];
   // Gün Gün Biz: büyük fotoğrafları taşımayan bütün türler
   const ALL = STORY.concat(['exam', 'promise', 'opened', 'round', 'filmline', 'r36', 'dusun', 'ozlem', 'ozur', 'bayrak', 'tahmin']);
 

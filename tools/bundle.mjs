@@ -33,7 +33,7 @@ function minify(code, loader) {
 }
 const cssCode = minify(css.map((f) => `/* ${f} */\n${rd(f)}`).join('\n'), 'css');
 const jsCode = minify(
-  js.map((f) => `try {\n${rd(f)}\n} catch (e) { console.error(${JSON.stringify('[kale] ' + f)}, e); }`).join('\n'),
+  js.map((f) => `try {\n${rd(f)}\n} catch (e) { console.error(${JSON.stringify('[kale] ' + f)}, e); window.__kaleHata && window.__kaleHata(${JSON.stringify(f)}, e); }`).join('\n'),
   'js'
 );
 const h = (s) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 10);
@@ -46,9 +46,15 @@ first = true;
 html = html.replace(jsRe, () => (first ? ((first = false), `<script src="${jsName}" defer></script>\n`) : ''));
 html = html.replace('<!doctype html>\n', "<!doctype html>\n<!-- Bu dosya tools/bundle.mjs ile dev.html'den üretilir. Düzenlemeyi dev.html'de yap, sonra: node tools/bundle.mjs -->\n");
 
+// Service worker: önbellek adı ve önceden indirilecek paketler
+const swCur = rd('sw.js');
+const sw = swCur
+  .replace(/^const CACHE = .*;$/m, `const CACHE = 'eln-kale-${jsName.slice(10, 20)}';`)
+  .replace(/^const BUNDLE = .*;$/m, `const BUNDLE = ['${jsName}', '${cssName}'];`);
+
 if (CHECK) {
   const cur = fs.existsSync(path.join(ROOT, 'index.html')) ? rd('index.html') : '';
-  const ok = cur === html && fs.existsSync(path.join(ROOT, cssName)) && fs.existsSync(path.join(ROOT, jsName));
+  const ok = cur === html && sw === swCur && fs.existsSync(path.join(ROOT, cssName)) && fs.existsSync(path.join(ROOT, jsName));
   console.log(ok ? `Paket güncel: ${jsName}, ${cssName}` : 'Paket eski: node tools/bundle.mjs çalıştır.');
   process.exit(ok ? 0 : 1);
 }
@@ -58,6 +64,7 @@ for (const f of fs.readdirSync(path.join(ROOT, 'dist'))) if (/^kale\.[0-9a-f]{10
 fs.writeFileSync(path.join(ROOT, cssName), cssCode);
 fs.writeFileSync(path.join(ROOT, jsName), jsCode);
 fs.writeFileSync(path.join(ROOT, 'index.html'), html);
+fs.writeFileSync(path.join(ROOT, 'sw.js'), sw);
 const kb = (s) => `${Math.round(Buffer.byteLength(s) / 1024)} KB`;
 const raw = (list) => list.reduce((a, f) => a + Buffer.byteLength(rd(f)), 0);
 console.log(`${js.length} JS → ${jsName} (${kb(jsCode)}, kaynak ${Math.round(raw(js) / 1024)} KB)`);

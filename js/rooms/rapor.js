@@ -102,6 +102,26 @@
     return { w, rows: rows.length, stats, top: top ? top[0] : null, hvOf, index, hi, note: notes.length ? K.pick(notes) : null, tips: tips.filter(Boolean).slice(0, 2) };
   }
 
+  // Haftanın Mektubu: Kitty, haftanın kayıtlarından ikisine kısa bir mektup yazar
+  function mektup(r) {
+    const M = D.haftamektup || {};
+    const rnd = K.rng(K.hash('mektup' + r.w));
+    const s = r.stats;
+    const fillM = (t, o = {}) => K.fill(String(t || '').replace(/\{(\w+)\}/g, (m, k) => (o[k] != null ? o[k] : k === 'herPet' ? C.herPet : k === 'myPet' ? C.myPet : m)));
+    const lines = [];
+    const both = Math.min(s.days.me, s.days.her);
+    if (M.gun) lines.push(fillM(both >= 5 ? M.gun.cok : both >= 2 ? M.gun.orta : M.gun.az, { n: both }));
+    if (r.top && M.hava) lines.push(fillM(M.hava[r.top] || M.hava.diger, { hava: (HAVA[r.top] || ['', ''])[1].toLocaleLowerCase('tr') }));
+    const oz = s.ozlem.me + s.ozlem.her;
+    if (oz && M.ozlem) lines.push(fillM(s.ozlem.me === s.ozlem.her ? M.ozlem.esit : M.ozlem.biri, { kim: nameOf(s.ozlem.me > s.ozlem.her ? 'me' : 'her'), n: oz }));
+    if (r.hi.length && M.vurgu) lines.push(fillM(M.vurgu, { olay: r.hi[0][1].toLocaleLowerCase('tr') }));
+    if (r.note && M.not) lines.push(fillM(M.not, { kim: nameOf(r.note.who), not: r.note.data.note }));
+    if (!lines.length) return '';
+    const sel = fillM(K.pick(M.selam || ['Sevgili {herPet} ve {myPet},'], rnd));
+    const kap = fillM(K.pick(M.kapanis || ['Gelecek hafta görüşürüz.'], rnd));
+    return `<div class="rp-mektup"><p class="card-eyebrow">✉️ Kitty'den haftanın mektubu</p><div class="rp-kagit"><p class="rp-sel hand">${K.esc(sel)}</p>${lines.map((l) => `<p>${K.esc(l)}</p>`).join('')}<p class="hand">${K.esc(kap)}</p><p class="rp-imza hand">Kitty 🎀</p></div></div>`;
+  }
+
   async function render() {
     if (!root || K.activeRoom !== 'rapor') return;
     const w = week || latest();
@@ -119,7 +139,7 @@
     const s = r.stats;
     const max = (k) => Math.max(1, s[k].me, s[k].her);
     const row = (k, ic, l) => `<div class="rp-row"><span class="rp-l">${ic} ${K.esc(l)}</span>${['her', 'me'].map((x) => `<span class="rp-v ${x}"><i style="--p:${(s[k][x] / max(k)) * 100}%"></i><b class="tnum">${s[k][x]}</b></span>`).join('')}</div>`;
-    box.innerHTML = `<div class="rp-top"><div class="rp-sky"><span class="rp-emo">${hv[0]}</span><small>Haftanın havası</small><b>${K.esc(hv[1])}</b></div>
+    box.innerHTML = `${mektup(r)}<div class="rp-top"><div class="rp-sky"><span class="rp-emo">${hv[0]}</span><small>Haftanın havası</small><b>${K.esc(hv[1])}</b></div>
         <div class="rp-index" style="--p:${r.index}"><span class="tnum">${r.index}</span><small>Kalp endeksi</small></div></div>
       <div class="rp-mood">${['her', 'me'].map((x) => `<span>${K.avatar(x, 'rp-av')}${K.esc(nameOf(x))}: ${r.hvOf[x] ? `${(HAVA[r.hvOf[x]] || [''])[0]} ${K.esc((HAVA[r.hvOf[x]] || ['', ''])[1])}` : 'hava paylaşmadı'}</span>`).join('')}</div>
       <div class="rp-table"><div class="rp-row rp-h"><span></span><span>${K.esc(C.herPet)}</span><span>${K.esc(C.myPet)}</span></div>
@@ -133,9 +153,9 @@
     if (!K.cloud || !K.cloud.enabled || !D.rapor) return [];
     const w = latest();
     if (K.store.get('rapor-' + mine()) === w || T.now().getTime() - opensAt(w) > 3 * 864e5) return [];
-    return [{ icon: 'cloud', title: '📊 Haftalık Kalp Raporu hazır', text: `${T.fmtShort(w)} – ${T.fmtShort(shift(w, 6))}: haftanın havası, kalp endeksi ve küçük bir öneri.`, room: 'rapor', cta: 'Oku' }];
+    return [{ key: 'rapor', icon: 'cloud', title: '✉️ Kitty\'den haftanın mektubu ve Kalp Raporu', text: `${T.fmtShort(w)} – ${T.fmtShort(shift(w, 6))}: Kitty ikinize yazdı; haftanın havası, kalp endeksi ve küçük bir öneri.`, room: 'rapor', cta: 'Oku' }];
   });
-  K.rapor = { latest, data };
+  K.rapor = { latest, data, mektup };
 
   K.room({
     id: 'rapor',

@@ -13,11 +13,15 @@
   const myPet = () => (K.isOwner() ? C.myPet : C.herPet);
   const otherPet = () => (K.isOwner() ? C.herPet : C.myPet);
   const topic = () => (K.isOwner() ? C.ntfyTopicHer : C.ntfyTopic);
+  // Ekli kalıplar K.fill'den önce: {otherPet} ondan sonra düz ada dönüşüyor
   const fillP = (s) =>
-    K.fill(String(s || ''))
-      .replace(/\{otherPet\}'a/g, K.ek(otherPet(), 'e'))
-      .replace(/\{otherPet\}/g, otherPet())
-      .replace(/\{mePet\}/g, myPet());
+    K.fill(
+      String(s || '')
+        .replace(/\{otherPet\}'a/g, K.ek(otherPet(), 'e'))
+        .replace(/\{otherPet\}'ın/g, K.ek(otherPet(), 'in'))
+        .replace(/\{otherPet\}/g, otherPet())
+        .replace(/\{mePet\}/g, myPet())
+    );
   const fields = () => [
     ['topic', topic()],
     ['title', fillP(KY().titleText || '🤗 {mePet} sana sarıldı')],
@@ -72,5 +76,36 @@
       }
     });
   }
-  K.kisayol = { open };
+  // NFC Anahtarlık: bir NFC etiketine dokununca telefon ona "sana sarıldı" gönderir (iPhone Kestirmeler otomasyonu)
+  function nfc() {
+    if (!topic()) return K.fx.toast('Bildirim kanalı henüz ayarlanmadı.');
+    const NF = D.nfc || {};
+    const steps = NF.steps || [
+      'Bir NFC etiketi al (NTAG213 yazan küçük yuvarlak çıkartmalar; kırtasiyede ya da internette birkaç liraya). Anahtarlığına, yastığına ya da telefon kılıfına yapıştır.',
+      'iPhone\'da Kestirmeler uygulamasını aç → alttan Otomasyon → sağ üstte + → NFC.',
+      '"Tara"ya dokun, etiketi telefonun üst arkasına yaklaştır. Adını "{otherPet}\'a sarıl" koy.',
+      '"Hemen Çalıştır"ı seç ve "Çalıştırınca bildir"i kapat; böylece sormadan gönderir.',
+      'Yeni boş kestirme → Eylem ekle → "URL\'nin İçeriğini Al". URL olarak aşağıdakini yapıştır.',
+      'Yöntem: POST, İstek Gövdesi: JSON. Aşağıdaki her alanı "Metin" türünde, anahtarıyla birlikte ekle.',
+      'Bitti. Artık etikete dokununca {otherPet}\'ın telefonuna sarılman düşer.',
+    ];
+    const vals = [['URL', 'https://ntfy.sh/'], ...fields().map(([k, v]) => [`Anahtar: ${k} · Tür: Metin`, k === 'title' ? fillP(NF.title || '🏷️ {mePet} anahtarlığa dokundu: sana sarıldı') : v])];
+    const m = K.ui.modal({
+      label: 'NFC Anahtarlık',
+      cls: 'ky-sheet nfc-sheet',
+      html: `<div class="ky-hero nfc-hero" aria-hidden="true"><span class="nfc-tag">🏷️</span><span class="ky-wave"><i></i><i></i><i></i></span><b>Dokun, sarılsın</b></div>
+        <h2>NFC Anahtarlık</h2><p class="muted">${K.esc(fillP(NF.text || 'Küçük bir etikete telefonunu dokundurunca {otherPet}\'ın kilit ekranına "sana sarıldı" düşer. Kale açık olmasa bile çalışır.'))}</p>
+        <ol class="ky-steps">${steps.map((x, i) => `<li><b>${i + 1}</b><p>${K.esc(fillP(x))}</p></li>`).join('')}</ol>
+        <div class="ky-fields">${vals.map(([l, v], i) => `<div class="ky-field"><small>${K.esc(l)}</small><code>${K.esc(v)}</code><button type="button" class="btn ghost small" data-nfc-copy="${i}">${A.ui('copy')}<span class="sr-only">Kopyala</span></button></div>`).join('')}</div>
+        <p class="muted small">Android'de "NFC Tools" uygulamasıyla etikete aynı isteği yazabilirsin. Kanal adı yalnız ikinizde; kimseyle paylaşma.</p>`,
+    });
+    m.body.addEventListener('click', async (e) => {
+      const c = e.target.closest('[data-nfc-copy]');
+      if (!c) return;
+      const ok = await K.copy(vals[+c.dataset.nfcCopy][1]);
+      K.fx.toast(ok ? 'Kopyalandı.' : 'Kopyalanamadı; elle seç.', { duration: 1600, log: false });
+      ok && K.stickers.award('nfc');
+    });
+  }
+  K.kisayol = { open, nfc };
 })();

@@ -25,7 +25,8 @@
   const setting = (w) => rows.filter((r) => r.kind === 'alarm' && r.who === w).sort((a, b) => b.at - a.at)[0] || null;
   const cfg = (w) => {
     const s = setting(w);
-    return s ? s.data : { time: '08:00', days: [1, 2, 3, 4, 5], on: false };
+    // Eln genelde Bakü saatiyle 10'da kalkıyor; ilk kurulumda o önerilir
+    return s ? s.data : w === 'her' ? { time: '10:00', days: [1, 2, 3, 4, 5, 6, 0], on: false } : { time: '08:00', days: [1, 2, 3, 4, 5], on: false };
   };
   const heard = (id) => rows.some((r) => r.kind === 'sabahdinle' && r.data.ref === id);
   const myVoices = () => rows.filter((r) => r.kind === 'sabahses' && r.who === mine()).sort((a, b) => b.at - a.at);

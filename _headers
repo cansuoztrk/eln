@@ -1,0 +1,10 @@
+# Cloudflare Pages ve Netlify ikisi de okur. Service worker her zaman taze; paketler (içerik özetli ad) hiç değişmez.
+/sw.js
+  Cache-Control: no-cache
+
+/dist/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Kale taşındı</title>
+<meta name="theme-color" content="#FFD0E1">
+<style>
+  :root { color-scheme: light; --bg: #FFF3F7; --ink: #4A2138; --soft: #86566F; --bow: #E3174D; --rose: #FF8FB8; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; display: grid; place-items: center; padding: 24px 16px; background: radial-gradient(circle at 50% 30%, #FFE1EC, var(--bg) 70%); color: var(--ink); font: 400 16px/1.5 ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, sans-serif; text-align: center; }
+  main { max-width: 360px; display: grid; gap: 14px; justify-items: center; }
+  .bow { width: 96px; height: auto; animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
+  h1 { margin: 0; font-size: 28px; line-height: 1.15; }
+  p { margin: 0; color: var(--soft); }
+  a.go { display: inline-block; padding: 14px 22px; border-radius: 999px; background: var(--bow); color: #fff; font-weight: 700; text-decoration: none; box-shadow: 0 10px 22px -10px rgba(227, 23, 77, 0.7); }
+  .bar { width: 200px; height: 6px; border-radius: 6px; background: #FFD0E1; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--bow); animation: fill 2.6s linear forwards; }
+  @keyframes fill { to { width: 100%; } }
+  small { color: var(--soft); font-size: 13px; }
+  @media (prefers-reduced-motion: reduce) { .bow, .bar i { animation: none; } .bar i { width: 100%; } }
+</style>
+</head>
+<body>
+<main>
+  <svg class="bow" viewBox="-60 -42 120 84" aria-hidden="true"><g stroke="#2B2024" stroke-width="6" stroke-linejoin="round" fill="#E3174D"><path d="M0 0 C-12 -30 -52 -36 -52 -8 C-52 18 -20 16 0 0 Z"/><path d="M0 0 C12 -30 52 -36 52 -8 C52 18 20 16 0 0 Z"/><ellipse rx="13" ry="12"/></g></svg>
+  <h1>Kale yeni adresine taşındı</h1>
+  <p id="msg">Eşyaların paketleniyor; birazdan yeni kapıdan gireceksin.</p>
+  <div class="bar" aria-hidden="true"><i></i></div>
+  <a class="go" id="go" href="#">Yeni kaleye git</a>
+  <small id="addr"></small>
+  <small>Telefonunun ana ekranına eklediysen yeni adresi de ekle: Safari'de paylaş → Ana Ekrana Ekle.</small>
+</main>
+<script>
+(function () {
+  'use strict';
+  // Yeni adres (Cloudflare Pages). Taşınma bitince bu köprü eski adreste kalır; QR ve eski bağlantılar buraya düşer.
+  var NEW = 'https://elnin-kralligi.pages.dev/';
+  var PREFIX = 'eln-krallik:';
+  var SKIP = ['vault', 'cloudCfg', 'weather', 'presence', 'presenceAt', 'presenceInfo'];
+  var go = document.getElementById('go');
+  document.getElementById('addr').textContent = NEW.replace(/^https:\/\//, '').replace(/\/$/, '');
+  // Eski service worker ve önbellek temizlenir: bundan sonra bu adres yalnız köprü
+  try { navigator.serviceWorker && navigator.serviceWorker.getRegistrations().then(function (rs) { rs.forEach(function (r) { r.unregister(); }); }); } catch (e) {}
+  try { window.caches && caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }); } catch (e) {}
+  var room = location.hash && location.hash.indexOf('#tasi') !== 0 && location.hash.indexOf('#bulut') !== 0 ? location.hash : '';
+  var keys = {}, n = 0;
+  try {
+    Object.keys(localStorage).forEach(function (k) {
+      if (k.indexOf(PREFIX) !== 0) return;
+      var s = k.slice(PREFIX.length);
+      if (SKIP.indexOf(s) >= 0) return;
+      var v = localStorage.getItem(k);
+      if (v && v.length < 200000) { keys[s] = v; n++; }
+    });
+  } catch (e) {}
+  function b64(u8) {
+    var s = '';
+    for (var i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function pack() {
+    var json = JSON.stringify({ v: 1, at: Date.now(), from: location.host, room: room, keys: keys });
+    var bytes = new TextEncoder().encode(json);
+    if (window.CompressionStream) {
+      var cs = new CompressionStream('deflate-raw');
+      return new Response(new Blob([bytes]).stream().pipeThrough(cs)).arrayBuffer().then(function (buf) { return 'z.' + b64(new Uint8Array(buf)); });
+    }
+    return Promise.resolve('j.' + b64(bytes));
+  }
+  function target() {
+    if (!n) return Promise.resolve(NEW + room);
+    return pack().then(function (p) { return NEW + '#tasi:' + p; }, function () { return NEW + room; });
+  }
+  target().then(function (url) {
+    go.href = url;
+    if (!n) document.getElementById('msg').textContent = 'Yeni kapı açık. Birazdan oraya geçiyorsun.';
+    setTimeout(function () { location.replace(url); }, 2600);
+  });
+})();
+</script>
+</body>
+</html>

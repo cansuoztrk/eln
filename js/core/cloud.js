@@ -87,8 +87,8 @@
         if (error) throw error;
         return data ? decodeRow(data) : null;
       },
-      async add(kind, obj) {
-        const { data, error } = await client.from('kale').insert({ space, kind, author: who(), data: await K.vault.seal(obj) }).select().single();
+      async add(kind, obj, id) {
+        const { data, error } = await client.from('kale').insert(Object.assign({ space, kind, author: who(), data: await K.vault.seal(obj) }, id ? { id } : {})).select().single();
         if (error) throw error;
         return decodeRow(data);
       },
@@ -167,8 +167,9 @@
         const r = rows().find((x) => x.id === id);
         return r ? decodeRow(r) : null;
       },
-      async add(kind, obj) {
-        const row = { id: 'r' + Date.now() + Math.random().toString(36).slice(2, 6), kind, author: who(), created_at: new Date().toISOString(), data: await K.vault.seal(obj) };
+      async add(kind, obj, id) {
+        if (id && rows().some((x) => x.id === id)) throw { code: '23505' };
+        const row = { id: id || 'r' + Date.now() + Math.random().toString(36).slice(2, 6), kind, author: who(), created_at: new Date().toISOString(), data: await K.vault.seal(obj) };
         const all = rows();
         all.push(row);
         localStorage.setItem(KEY, JSON.stringify(all));
@@ -190,21 +191,104 @@
     };
   }
 
+  /* ---------------- Çevrimdışı: okuma önbelleği (IndexedDB) ve yazma kuyruğu ---------------- */
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => ((c === 'x' ? Math.random() * 16 : (Math.random() * 4) | 8) | 0).toString(16)));
+  const netErr = (e) => navigator.onLine === false || (e && (e.name === 'TypeError' || /fetch|network|Failed to fetch|Load failed/i.test(String(e.message || e))));
+  let idb = null;
+  const db = () =>
+    (idb = idb || new Promise((res) => {
+      try {
+        const r = indexedDB.open('eln-bulut', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('q');
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => res(null);
+      } catch (e) {
+        res(null);
+      }
+    }));
+  async function idbDo(mode, fn) {
+    const d = await db();
+    if (!d) return null;
+    return new Promise((res) => {
+      try {
+        const tx = d.transaction('q', mode);
+        const req = fn(tx.objectStore('q'));
+        req.onsuccess = () => res(req.result);
+        req.onerror = () => res(null);
+      } catch (e) {
+        res(null);
+      }
+    });
+  }
+  // Başarılı okumalar saklanır; ağ yoksa son hâl döner
+  async function cached(keyParts, run, empty) {
+    const key = JSON.stringify(keyParts);
+    try {
+      const v = await run();
+      if (v != null) idbDo('readwrite', (st) => st.put(v, key));
+      return v;
+    } catch (e) {
+      const old = await idbDo('readonly', (st) => st.get(key));
+      return old != null ? old : empty;
+    }
+  }
+  const queue = () => K.store.get('bulutKuyruk', []);
+  function enqueue(id, kind, obj) {
+    const q = queue();
+    q.push({ id, kind, obj, at: Date.now() });
+    K.store.set('bulutKuyruk', q.slice(-200));
+    K.emit('kuyruk', q.length);
+    return { id, kind, who: who(), at: Date.now(), data: obj, pending: true };
+  }
+  let flushing = false;
+  async function flush() {
+    if (!adapter || flushing || navigator.onLine === false) return;
+    const q = queue();
+    if (!q.length) return;
+    flushing = true;
+    const left = [];
+    for (const it of q) {
+      try {
+        const row = await adapter.add(it.kind, it.obj, it.id);
+        if (row) seenRows.delete(row.id), emitRow(row);
+      } catch (e) {
+        // aynı kimlik zaten yazıldıysa (23505) bırak; ağ hatasıysa sonra tekrar
+        if (netErr(e)) left.push(it);
+      }
+    }
+    K.store.set('bulutKuyruk', left);
+    flushing = false;
+    K.emit('kuyruk', left.length);
+  }
+  window.addEventListener('online', () => setTimeout(flush, 800));
+
   const cloud = (K.cloud = {
     enabled: false,
     ready,
     people: [],
     // Bir türdeki kayıtlar (eskiden yeniye)
-    list: async (kind, limit, opt) => (adapter ? adapter.list(kind, limit, opt).catch(() => []) : []),
+    list: async (kind, limit, opt) => (adapter ? cached(['l', kind, limit, opt], () => adapter.list(kind, limit, opt), []) : []),
     // Birden çok türün kayıtları tek istekte: many(['hava', 'dakika'], { since, before, limit })
-    many: async (kinds, opt) => (adapter && adapter.many ? adapter.many(kinds, opt).catch(() => []) : []),
+    many: async (kinds, opt) => (adapter && adapter.many ? cached(['m', kinds, opt], () => adapter.many(kinds, opt), []) : []),
     // Tek bir kayıt (büyük fotoğraflar gibi, sadece gerektiğinde)
-    get: async (id) => (adapter && adapter.get ? adapter.get(id).catch(() => null) : null),
+    get: async (id) => (adapter && adapter.get ? cached(['g', id], () => adapter.get(id), null) : null),
     async add(kind, obj) {
-      const row = adapter ? await adapter.add(kind, obj).catch(() => null) : null;
+      if (!adapter) return null;
+      const id = uid();
+      let row = null;
+      if (navigator.onLine !== false) {
+        try {
+          row = await adapter.add(kind, obj, id);
+        } catch (e) {
+          if (!netErr(e)) return null;
+        }
+      }
+      // Çevrimdışı: kuyruğa al, bağlantı gelince aynı kimlikle gönder (odalar kimlikle ayıkladığı için çift görünmez)
+      if (!row) row = enqueue(id, kind, obj);
       emitRow(row);
       return row;
     },
+    pending: () => queue().length,
     // Yedek için her şey (hata olursa fırlatır; çağıran söyler)
     dump: (skip, onp) => (adapter && adapter.dump ? adapter.dump(skip, onp) : Promise.resolve([])),
     async remove(id) {
@@ -340,6 +424,7 @@
     cloud.enabled = Boolean(adapter);
     readyResolve(cloud.enabled);
     K.emit('cloud', cloud.enabled);
+    if (cloud.enabled) setTimeout(flush, 2500);
   }
   K.on('unlocked', () => setTimeout(start, 0));
 })();

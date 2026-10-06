@@ -47,6 +47,14 @@
     const by = { her: 0, me: 0 };
     list.forEach((s) => by[s.who]++);
     K.$('#sdCount', root).textContent = `${list.length} şarkı · ${C.herPet} ${by.her} · ${C.myPet} ${by.me}`;
+    // Çalma Listesi Köprüsü: defter YouTube'da tek liste, Spotify ve Apple Music'te arama bağlantıları
+    const ids = list.map((x) => K.pikap.idsOf(x.song)[0]).filter(Boolean).slice(0, 50);
+    const q = (x) => encodeURIComponent(`${x.data.title} ${x.data.artist || ''}`.trim());
+    K.$('#sdKopru', root).innerHTML = list.length
+      ? `<p class="card-eyebrow">🎧 Çalma listesi köprüsü</p><p class="muted small">Defterin tamamını telefonunun müzik uygulamasına taşı.</p>
+        <div class="row">${ids.length ? `<a class="btn red small" href="https://www.youtube.com/watch_videos?video_ids=${ids.join(',')}" target="_blank" rel="noopener">▶ YouTube'da hepsini çal (${ids.length})</a>` : ''}<button type="button" class="btn soft small" data-sd-kopya>📋 Listeyi kopyala</button></div>
+        <ul class="sd-kopru">${list.slice().reverse().map((x) => `<li><span>${K.esc(x.data.title)} <small>${K.esc(x.data.artist || '')}</small></span><a href="https://open.spotify.com/search/${q(x)}" target="_blank" rel="noopener" aria-label="Spotify'da ara">Spotify</a><a href="https://music.apple.com/search?term=${q(x)}" target="_blank" rel="noopener" aria-label="Apple Music'te ara">Apple</a></li>`).join('')}</ul>`
+      : '';
   }
   function play(id) {
     const tv = K.$('#sdTv', root);
@@ -117,7 +125,15 @@
           <button class="btn red small" type="submit">${A.ui('plus')} Deftere yaz</button>
         </form>
         <p class="muted small" id="sdCount"></p>
-        <ul class="sd-list" id="sdList"></ul>`;
+        <ul class="sd-list" id="sdList"></ul>
+        <section class="card sd-kopru-card" id="sdKopru"></section>`;
+      el.addEventListener('click', async (e) => {
+        if (!e.target.closest('[data-sd-kopya]')) return;
+        const txt = songs().map((x) => `${x.data.title} - ${x.data.artist || ''}`).join('\n');
+        const ok = await K.copy(txt);
+        K.fx.toast(ok ? '📋 Liste kopyalandı. Spotify\'da yeni çalma listesine yapıştırıp ekleyebilirsin.' : 'Kopyalanamadı.', { duration: 3000 });
+        ok && K.stickers.award('calmalistesi');
+      });
       K.$('#sdForm', el).addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = K.$('#sdTitle', el).value.trim();

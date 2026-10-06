@@ -188,6 +188,8 @@
   // Kanatların kısa adları (haritadaki kuleler için)
   const SHORT = { sahip: 'Sahip', mevsim: 'Özel Günler', zaman: 'Zaman', anilar: 'Anılar', kalp: 'Kalp', oyun: 'Oyun', hazine: 'Hazine' };
   const wingRooms = (w) => K.rooms.filter((r) => (r.wing || 'hazine') === w.id && visible(r));
+  K.WINGS = WINGS;
+  K.wingRooms = (id) => wingRooms(WINGS.find((w) => w.id === id) || { id });
   function shelfDoors(rooms, visited) {
     // Hareket olan (rozetli) kapılar öne
     const hot = rooms.filter((r) => !r.secret && visited[r.id] && r.badge && r.badge());
@@ -768,12 +770,13 @@
       const t = e.target.closest('.km-t');
       if (t && (e.key === 'Enter' || e.key === ' ')) {
         e.preventDefault();
-        toWing(t.dataset.wing);
+        K.kesit ? K.kesit.open(t.dataset.wing) : toWing(t.dataset.wing);
       }
     });
+    K.toWing = toWing;
     castle.addEventListener('click', (e) => {
       const t = e.target.closest('.km-t');
-      if (t) return toWing(t.dataset.wing);
+      if (t) return K.kesit ? K.kesit.open(t.dataset.wing) : toWing(t.dataset.wing);
       const sh = e.target.closest('[data-shelf]');
       if (sh) {
         const open = K.store.get('shelfOpen', {});
@@ -846,7 +849,7 @@
       out.push({ icon: 'cake', title: `İyi ki doğdun, Prenses ${C.herPet}!`, text: 'Bugün senin günün. Doğum Günü Sarayı açıldı: 23 hediye kutusu, mumlarını bekleyen bir pasta ve açılmayı bekleyen bir mektup.', room: 'saray', big: true });
     if (md === C.togetherDate.slice(5) && years > 0)
       out.push({ icon: 'heart', title: `Mutlu ${years}. yıldönümümüz!`, text: `Tam ${years} yıl önce bugün masalımızın adı kondu. Mektuplar odasında yıldönümü mektubun açıldı.`, room: 'mektuplar', big: true });
-    else if (p.d === +C.togetherDate.slice(8) && T.monthsTogether() > 0)
+    else if (p.d === +C.togetherDate.slice(8) && T.monthsTogether() > 0 && !K.yirmibir)
       out.push({ icon: 'story', title: `Bugün ${T.monthsTogether()}. ayımız!`, text: 'Her ayın 21\'i bizim küçük bayramımız. Bu ayın özeti hazır; bir hikâye gibi izle.', room: 'ozet' });
     if (C.notesDate && md === C.notesDate.slice(5) && p.y > +C.notesDate.slice(0, 4))
       out.push({ icon: 'note', title: 'Not duvarının yıldönümü', text: `${p.y - +C.notesDate.slice(0, 4)} yıl önce bugün ${C.herCity}'de bir duvara ikimizin adını yazdın. Daha sevgili bile değildik.`, room: 'izler', big: true });
@@ -882,9 +885,15 @@
       return;
     }
     box.hidden = false;
+    // Akıllı Ana Salon: kartlar günün saatine ve dokunma alışkanlığına göre dizilir, geridekiler küçülür
+    if (K.akilli) {
+      const r = K.akilli.rank(list);
+      list.length = 0;
+      list.push(...r);
+    }
     box.innerHTML = list
       .map(
-        (s, i) => `<div class="special-card">${A.icon(s.icon)}<div><h3>${K.esc(s.title)}</h3><p>${K.esc(s.text)}</p>
+        (s, i) => `<div class="special-card ${s.mini ? 'mini' : ''}" data-sk="${K.esc(s.key || '')}">${A.icon(s.icon)}<div><h3>${K.esc(s.title)}</h3><p>${K.esc(s.text)}</p>
           <div class="special-actions">${s.run ? `<button type="button" class="btn small" data-sp-run="${i}">${K.esc(s.cta || 'Hemen')}</button>` : `<a class="btn small" href="#${s.room}">${K.esc(s.cta || 'Hemen git')}</a>`}${s.action === 'moon' ? `<button class="btn soft small" data-moon>${A.ui('heart')} Şu an aya bakıyorum</button>` : ''}</div></div></div>`
       )
       .join('');
