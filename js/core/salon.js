@@ -17,7 +17,9 @@
   let tab = K.store.get('salonTab', 'bugun');
 
   // Ana salondaki bölümler hangi sekmeye ait
-  const MAP = [['#kalpBar', 'bugun'], ['#cicek', 'bugun'], ['.together', 'bugun'], ['#special', 'bugun'], ['.sec.today', 'bugun'], ['#install', 'bugun'], ['#gunbatimi', 'bugun'], ['#biz', 'biz'], ['.sec.castle', 'kale']];
+  const MAP = [['#kalpBar', 'bugun'], ['#cicek', 'bugun'], ['.together', 'bugun'], ['#special', 'bugun'], ['.sec.today', 'bugun'], ['#install', 'bugun'], ['#gunbatimi', 'bugun'], ['#biz', 'biz'], ['.sec.castle', 'kale'], ['#anilar', 'anilar']];
+  // Kale 4.0'da alttaki sekme çubuğu dördüncü bir sekme ekler: Anılar
+  const TABS = () => SL().tabs.map((x) => x[0]).concat(['anilar']);
   function mark() {
     MAP.forEach(([sel, t]) => {
       const el = K.$(sel);
@@ -28,14 +30,15 @@
     if (nx && nx.classList.contains('deck-dots')) nx.classList.add('tp', 'tp-bugun');
   }
   function set(t, opt = {}) {
-    if (!SL().tabs.some((x) => x[0] === t)) t = 'bugun';
+    if (!TABS().includes(t)) t = 'bugun';
     tab = t;
     K.store.set('salonTab', t);
     mark();
-    document.body.classList.remove('tab-bugun', 'tab-biz', 'tab-kale');
+    document.body.classList.remove('tab-bugun', 'tab-biz', 'tab-kale', 'tab-anilar');
     document.body.classList.add('tab-' + t);
     K.$$('.salon-tabs [data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
     if (t === 'biz') biz();
+    K.emit('salonTab', t);
     if (opt.scroll) {
       const bar = K.$('.salon-tabs');
       bar && window.scrollTo({ top: Math.max(0, bar.getBoundingClientRect().top + window.scrollY - 70), behavior: K.reduced ? 'auto' : 'smooth' });
@@ -46,7 +49,7 @@
   function reveal(el) {
     const p = el && el.closest && el.closest('.tp');
     if (!p) return;
-    const t = ['bugun', 'biz', 'kale'].find((x) => p.classList.contains('tp-' + x));
+    const t = ['bugun', 'biz', 'kale', 'anilar'].find((x) => p.classList.contains('tp-' + x));
     if (t && t !== tab) set(t);
   }
 

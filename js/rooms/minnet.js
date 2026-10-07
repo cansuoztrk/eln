@@ -8,6 +8,7 @@
   const D = window.ELN;
   const C = D.config;
   const T = K.time;
+  const yz = (t, w) => (K.yazitipi ? K.yazitipi.html(t, w) : K.esc(t));
 
   const MN = () => D.minnet || { intro: [], ideas: [], placeholder: 'Bugün sana minnettarım çünkü...' };
   const mine = () => (K.isOwner() ? 'me' : 'her');
@@ -37,8 +38,8 @@
     const k = day(), me = mine(), o = other();
     const m = of(k, me), t = of(k, o);
     K.$('#mnToday', root).innerHTML = `<p class="card-eyebrow">${K.esc(T.fmt(k, true))}</p>
-      ${m ? `<div class="mn-pair"><div class="mn-line me"><small>Sen</small><p class="hand">Bugün sana minnettarım çünkü ${K.esc(m.data.text)}</p></div>
-        <div class="mn-line ${t ? '' : 'wait'}"><small>${K.esc(nameOf(o))}</small>${t ? `<p class="hand">Bugün sana minnettarım çünkü ${K.esc(t.data.text)}</p>` : `<p>${K.esc(nameOf(o))} henüz yazmadı. Yazınca burada açılır.</p>`}</div></div>`
+      ${m ? `<div class="mn-pair"><div class="mn-line me"><small>Sen</small><p class="hand">${yz('Bugün sana minnettarım çünkü ' + m.data.text, m.who)}</p></div>
+        <div class="mn-line ${t ? '' : 'wait'}"><small>${K.esc(nameOf(o))}</small>${t ? `<p class="hand">${yz('Bugün sana minnettarım çünkü ' + t.data.text, t.who)}</p>` : `<p>${K.esc(nameOf(o))} henüz yazmadı. Yazınca burada açılır.</p>`}</div></div>`
         : `<form class="mn-form" autocomplete="off"><label class="mn-lead" for="mnText">Bugün sana minnettarım çünkü...</label><textarea class="textarea" id="mnText" rows="2" maxlength="200" placeholder="${K.esc(MN().placeholder || '')}"></textarea>
           <div class="br-chips">${(MN().ideas || []).map((x) => `<button type="button" class="chip" data-mn-idea>${K.esc(x)}</button>`).join('')}</div>
           <button class="btn red" type="submit">${A.ui('heart')} Yaz ve mühürle</button>${t ? `<p class="mn-note">🔒 ${K.esc(nameOf(o))} bugünkünü yazdı; seninki gelince açılır.</p>` : ''}</form>`}`;

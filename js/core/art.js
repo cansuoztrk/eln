@@ -9,7 +9,11 @@
   /* ---------------- Hello Kitty ---------------- */
   // Tüm göz çeşitleri çizilir; hangisinin görüneceğini CSS sınıfı seçer (is-heart, is-happy, is-sleep, is-wink)
   function kitty(opt = {}) {
-    const { crown = false, bow = '#E3174D', blush = true, cls = '', label = 'Hello Kitty' } = opt;
+    // Kitty'nin Gardırobu: seçilen kıyafet ve fiyonk rengi her çizimde (giysi: false ile kapatılır)
+    const gy = opt.giysi !== false && K.giysi ? K.giysi : null;
+    const { crown: crown0 = false, blush = true, cls = '', label = 'Hello Kitty' } = opt;
+    const bow = opt.bow || (gy && gy.renk()) || '#E3174D';
+    const crown = crown0 && !(gy && gy.secili().bas);
     const id = 'kt' + ++uid;
     const earL = 'M30 104 C20 62 26 26 48 19 C64 14 94 34 114 55 Z';
     const earR = 'M210 104 C220 62 214 26 192 19 C176 14 146 34 126 55 Z';
@@ -37,6 +41,7 @@
   <ellipse cx="116.5" cy="139.6" rx="3.2" ry="1.8" fill="#fff" opacity=".75"/>
   ${crown ? crownSvg() : ''}
   <g class="k-bow" transform="translate(184 42) rotate(-14) scale(.86)">${bowShape(bow)}</g>
+  ${gy ? `<g class="k4-giysi">${gy.svg()}</g>` : ''}
 </svg>`;
   }
 
@@ -359,9 +364,36 @@
     kintsugi: `${heartPath(32, 40, 2.3, '#FF8FB8')}<path d="M31 22 L27 30 L35 36 L29 44 L33 52 M35 36 L42 33" fill="none" stroke="#E8B53A" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>`,
     flag: `<path d="M16 60 V6" ${s}/><circle cx="16" cy="6" r="3" fill="#FFD34E" ${s} stroke-width="2"/><path d="M16 10 C26 4 34 16 46 10 C50 8 54 8 57 10 V34 C51 30 45 36 37 36 C29 36 25 30 16 34 Z" fill="#fff" ${s}/>${heartPath(36, 24, 0.55, '#FF8FB8')}`,
     pot: `<path d="M24 14 C22 10 26 8 24 4 M32 14 C30 10 34 8 32 4 M40 14 C38 10 42 8 40 4" fill="none" ${s} stroke-width="2.2"/><path d="M10 26 H54 V44 C54 52 48 56 40 56 H24 C16 56 10 52 10 44 Z" fill="#FF8FB8" ${s}/><rect x="8" y="20" width="48" height="8" rx="4" fill="#fff" ${s}/><path d="M10 34 H4 M54 34 H60" ${s}/>${heartPath(32, 42, 0.9, '#fff')}`,
+
+    // ---- Kale 4.0 ikon ailesi: yeni odalar (aynı el, aynı çizgi) ----
+    hanger: `<path d="M32 14 A5 5 0 1 1 37 9" fill="none" ${s}/><path d="M32 14 V18 L6 40 C4 42 5 46 8 46 H56 C59 46 60 42 58 40 L32 18" fill="#FFE2EC" ${s}/><path d="M18 46 C18 54 46 54 46 46" fill="#FF8FB8" ${s}/>${heartPath(32, 36, 0.55, '#E3174D')}`,
+    lamp: `<path d="M18 8 H46 L54 32 H10 Z" fill="#FFD0E1" ${s}/><path d="M32 32 V50" ${s}/><path d="M20 56 C20 50 44 50 44 56 Z" fill="#fff" ${s}/><path class="i-isik" d="M14 40 L8 46 M50 40 L56 46 M32 38 V40" stroke="#FFCF3F" stroke-width="3.4" stroke-linecap="round"/>${heartPath(32, 21, 0.62, '#E3174D')}`,
+    curtain: `<rect x="6" y="6" width="52" height="6" rx="3" fill="#fff" ${s}/><rect x="10" y="12" width="44" height="44" fill="#FFF3C4" ${s}/><circle cx="32" cy="30" r="8" fill="#FFCF3F" ${s} stroke-width="2.4"/><path class="i-perde-l" d="M10 12 H24 C22 26 26 40 20 56 H10 Z" fill="#FF8FB8" ${s}/><path class="i-perde-r" d="M54 12 H40 C42 26 38 40 44 56 H54 Z" fill="#FF8FB8" ${s}/>`,
+    desk: `<path d="M4 34 H60" ${s}/><path d="M10 34 V58 M54 34 V58" ${s}/><rect x="14" y="18" width="20" height="16" rx="2" fill="#BFE6FF" ${s}/><path d="M40 34 V20 L52 16 V34" fill="#fff" ${s}/><path d="M44 24 H50 M44 29 H50" ${s} stroke-width="2"/><circle cx="24" cy="12" r="5" fill="#FFCF3F" ${s} stroke-width="2.4"/>${heartPath(24, 27, 0.5, '#E3174D')}`,
+    clock: `<circle cx="32" cy="34" r="24" fill="#fff" ${s}/><path class="i-akrep" d="M32 34 V18" ${s}/><path class="i-yelkovan" d="M32 34 L44 40" ${s}/><circle cx="32" cy="34" r="3" fill="#E3174D"/><path d="M12 10 L20 16 M52 10 L44 16" ${s}/>${heartPath(32, 50, 0.4, '#FF8FB8')}`,
+    window: `<rect x="8" y="8" width="48" height="48" rx="6" fill="#BFE6FF" ${s}/><path d="M8 40 C18 34 28 44 38 38 C46 34 52 38 56 36 V56 H8 Z" fill="#8FD3FF" ${s} stroke-width="2.4"/><path d="M32 8 V56 M8 30 H56" ${s}/><circle cx="20" cy="20" r="5" fill="#FFCF3F" ${s} stroke-width="2.2"/>`,
+    headphones: `<path d="M10 40 V32 A22 22 0 0 1 54 32 V40" fill="none" ${s}/><rect x="6" y="36" width="12" height="20" rx="5" fill="#FF8FB8" ${s}/><rect x="46" y="36" width="12" height="20" rx="5" fill="#FF8FB8" ${s}/><path d="M26 30 C26 26 30 24 32 28 C34 24 38 26 38 30 C38 34 32 38 32 38 C32 38 26 34 26 30 Z" fill="#E3174D" ${s} stroke-width="2.2"/>`,
+    shield: `<path d="M32 6 L54 14 V30 C54 44 44 54 32 58 C20 54 10 44 10 30 V14 Z" fill="#CDBBFF" ${s}/><path d="M32 14 V50 M18 26 H46" stroke="#fff" stroke-width="3" stroke-linecap="round"/>${heartPath(32, 33, 0.9, '#E3174D')}`,
+    duet: `<rect x="8" y="10" width="14" height="24" rx="7" fill="#FF8FB8" ${s}/><rect x="42" y="10" width="14" height="24" rx="7" fill="#8FD3FF" ${s}/><path d="M15 34 V48 C15 54 22 56 32 56 C42 56 49 54 49 48 V34" fill="none" ${s}/>${heartPath(32, 30, 0.85, '#E3174D')}`,
+    tea: `<path d="M22 22 C18 34 18 46 24 54 H40 C46 46 46 34 42 22 Z" fill="#FFB547" ${s}/><path d="M20 22 H44" ${s}/><path d="M14 56 H50" ${s}/><path class="i-buhar" d="M28 16 C26 12 30 10 28 6 M36 16 C34 12 38 10 36 6" fill="none" ${s} stroke-width="2.4"/><path d="M42 30 C50 30 50 42 42 42" fill="none" ${s}/>`,
+    stars2: `<circle cx="20" cy="22" r="12" fill="#FFF2B8" ${s}/><circle cx="26" cy="18" r="10" fill="#2A2266" opacity=".9"/><path d="M44 10 L46.5 16 L53 16.5 L48 20.5 L49.5 27 L44 23.5 L38.5 27 L40 20.5 L35 16.5 L41.5 16 Z" fill="#FFD34E" ${s} stroke-width="2.2"/><path d="M8 50 C20 40 30 54 56 42" fill="none" ${s} stroke-dasharray="2 6"/>${heartPath(48, 48, 0.55, '#E3174D')}`,
+    compass: `<circle cx="32" cy="32" r="25" fill="#fff" ${s}/><circle cx="32" cy="32" r="19" fill="#E0F8EC" ${s} stroke-width="2.2"/><path class="i-igne" d="M32 14 L38 32 L32 50 L26 32 Z" fill="#E3174D" ${s} stroke-width="2.2"/><path d="M32 32 L38 32 L32 50 L26 32 Z" fill="#fff" ${s} stroke-width="2.2"/><circle cx="32" cy="32" r="2.5" fill="${LINE}"/>`,
+    comic: `<rect x="6" y="8" width="52" height="48" rx="4" fill="#fff" ${s}/><path d="M6 30 H58 M28 8 V30 M38 30 V56" ${s}/><path d="M12 22 Q16 14 22 20" fill="none" ${s} stroke-width="2.2"/><path d="M34 14 H52 V24 H40 L36 28 V24 H34 Z" fill="#FFF3C4" ${s} stroke-width="2.2"/>${heartPath(22, 46, 0.7, '#FF8FB8')}<circle cx="48" cy="44" r="5" fill="#8FD3FF" ${s} stroke-width="2.2"/>`,
+    pin: `<circle cx="32" cy="34" r="24" fill="#BFE6FF" ${s}/><path d="M14 26 C22 30 26 22 34 26 C40 30 46 24 54 28 M12 42 C22 38 30 46 40 40" fill="none" stroke="#7ED6A5" stroke-width="5" stroke-linecap="round"/><path class="i-pin" d="M32 40 C24 30 22 26 22 22 A10 10 0 0 1 42 22 C42 26 40 30 32 40 Z" fill="#E3174D" ${s}/><circle cx="32" cy="22" r="3.5" fill="#fff"/>`,
+    poster: `<rect x="12" y="6" width="40" height="52" rx="2" fill="#2A2266" ${s}/><circle cx="16" cy="10" r="2" fill="#FFCF3F"/><circle cx="48" cy="10" r="2" fill="#FFCF3F"/><path d="M18 44 L26 34 L32 40 L38 30 L46 44 Z" fill="#FF8FB8" ${s} stroke-width="2.2"/><circle cx="24" cy="20" r="1.6" fill="#fff"/><circle cx="40" cy="16" r="1.6" fill="#fff"/><circle cx="34" cy="24" r="1.2" fill="#fff"/><path d="M18 50 H46" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>`,
+    island: `<path d="M4 46 Q14 42 24 46 T44 46 T60 46" fill="none" stroke="#8FD3FF" stroke-width="3" stroke-linecap="round"/><path d="M10 44 C14 32 50 32 54 44 Z" fill="#FFE27A" ${s}/><path d="M30 40 C30 30 32 22 36 14" fill="none" ${s}/><path d="M36 14 C30 8 22 10 18 16 C24 14 30 14 36 14 C40 8 48 8 52 14 C46 12 40 13 36 14 C38 18 38 24 36 28 C35 22 35 18 36 14" fill="#7ED6A5" ${s} stroke-width="2.4"/>${heartPath(20, 40, 0.45, '#E3174D')}`,
+    palace: `<path d="M8 56 H56" ${s}/><rect x="12" y="28" width="40" height="28" fill="#FFF7FA" ${s}/><path d="M8 28 L32 10 L56 28 Z" fill="#CDBBFF" ${s}/><path d="M20 56 V40 M28 56 V40 M36 56 V40 M44 56 V40" ${s} stroke-width="2.4"/><circle cx="32" cy="21" r="4" fill="#FFD34E" ${s} stroke-width="2"/><path d="M32 10 V4" ${s}/>`,
+    sword: `<path d="M44 6 L58 6 L58 20 L28 50 L14 36 Z" fill="#E1F3FF" ${s}/><path d="M10 32 L32 54" ${s} stroke-width="4"/><path d="M14 46 L6 54 L10 58 L18 50" fill="#FF8FB8" ${s}/>${heartPath(42, 22, 0.55, '#E3174D')}`,
+    cube: `<path d="M32 6 L56 18 V46 L32 58 L8 46 V18 Z" fill="#FFE2EC" ${s}/><path d="M8 18 L32 30 L56 18 M32 30 V58" ${s}/><path d="M32 30 L56 18 V46 L32 58 Z" fill="#FF8FB8" opacity=".55"/><path d="M4 10 V4 H10 M54 4 H60 V10 M4 54 V60 H10 M54 60 H60 V54" fill="none" ${s} stroke-width="2.4"/>`,
+    lines: `<path d="M6 54 C14 40 18 44 24 32 S36 14 58 10" fill="none" stroke="#FF8FB8" stroke-width="4" stroke-linecap="round"/><path d="M6 10 C14 22 22 18 28 30 S40 50 58 54" fill="none" stroke="#8FD3FF" stroke-width="4" stroke-linecap="round"/>${heartPath(26, 33, 0.85, '#E3174D')}<circle cx="6" cy="54" r="3" fill="${LINE}"/><circle cx="6" cy="10" r="3" fill="${LINE}"/>`,
+    nfc: `<rect x="8" y="24" width="48" height="32" rx="4" fill="#FFD0E1" ${s}/><path d="M8 34 H56" ${s}/><path d="M32 24 C24 14 16 22 32 24 C48 22 40 14 32 24 Z" fill="#E3174D" ${s} stroke-width="2.2"/><path class="i-dalga" d="M42 8 Q46 12 42 16 M48 4 Q55 12 48 20" fill="none" ${s} stroke-width="2.4"/>`,
+    swatch: `<rect x="6" y="20" width="18" height="36" rx="4" fill="#FF8FB8" ${s} transform="rotate(-14 15 38)"/><rect x="22" y="12" width="18" height="40" rx="4" fill="#FFE27A" ${s}/><rect x="40" y="18" width="18" height="36" rx="4" fill="#9FD8FF" ${s} transform="rotate(14 49 36)"/><circle cx="31" cy="44" r="3" fill="${LINE}"/>`,
+    sunrise: `<path d="M4 44 H60" ${s}/><path d="M14 44 A18 18 0 0 1 50 44" fill="#FFD34E" ${s}/><path class="i-isik" d="M32 18 V10 M14 26 L9 21 M50 26 L55 21 M6 36 H1 M58 36 H63" stroke="#FFB547" stroke-width="3.4" stroke-linecap="round"/><path d="M12 52 H52 M20 58 H44" ${s} stroke-width="2.4"/>`,
+    cam2: `<rect x="4" y="18" width="26" height="22" rx="5" fill="#FF8FB8" ${s}/><circle cx="17" cy="29" r="6" fill="#fff" ${s} stroke-width="2.2"/><rect x="34" y="24" width="26" height="22" rx="5" fill="#8FD3FF" ${s}/><circle cx="47" cy="35" r="6" fill="#fff" ${s} stroke-width="2.2"/>${heartPath(32, 52, 0.55, '#E3174D')}`,
+    lens: `<circle cx="26" cy="26" r="16" fill="#E1F3FF" ${s}/><path d="M38 38 L56 56" ${s} stroke-width="5"/><path d="M18 20 Q22 14 28 14" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>${heartPath(26, 29, 0.6, '#E3174D')}`,
   };
   function icon(name, cls = '') {
-    return `<svg class="ic ${cls}" viewBox="0 0 64 64" aria-hidden="true">${ICONS[name] || ICONS.heart}</svg>`;
+    return `<svg class="ic i-${ICONS[name] ? name : 'heart'} ${cls}" viewBox="0 0 64 64" aria-hidden="true">${ICONS[name] || ICONS.heart}</svg>`;
   }
 
   /* ---------------- Arayüz ikonları (24×24, currentColor) ---------------- */

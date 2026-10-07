@@ -382,7 +382,7 @@
       label: 'Kalp',
       cls: 'kv-note',
       html: `<svg class="kv-heart" viewBox="-14 -15 28 25" aria-hidden="true">${A.heartPath(0, 0, 1, (PAL[r.who] || PAL.her)[(r.data.c || 0) % 5])}</svg><p class="card-eyebrow">${K.esc(nameOf(r.who))} · ${K.esc(T.fmtShort(new Date(r.at)))}</p>
-        ${r.data.note ? `<p class="hand kv-text">${K.esc(r.data.note)}</p>` : `<p class="muted">Notsuz bir kalp. Bazen sadece "seni seviyorum" demek yeter.</p>`}`,
+        ${r.data.note ? `<p class="hand kv-text">${K.yazitipi ? K.yazitipi.html(r.data.note, r.who) : K.esc(r.data.note)}</p>` : `<p class="muted">Notsuz bir kalp. Bazen sadece "seni seviyorum" demek yeter.</p>`}`,
     });
     K.audio.sfx.chime();
   }

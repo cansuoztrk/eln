@@ -679,8 +679,10 @@
       renderDoors();
     }
     const room = K.rooms.find((r) => r.id === id && visible(r));
-    if (room) openRoom(room);
-    else closeRoom();
+    // Kale 4.0: destekleyen tarayıcıda kart ikonundan oda başlığına akış (View Transitions)
+    const sw = () => (room ? openRoom(room) : closeRoom());
+    if (K.gecis && (room ? K.activeRoom !== room.id : Boolean(K.activeRoom))) K.gecis(sw);
+    else sw();
   }
   function openRoom(room) {
     const view = K.$('#roomView');
@@ -743,9 +745,12 @@
     // Odadayken gelen bulut kayıtları ana salon kartlarını değiştirmiş olabilir
     renderSpecials();
     window.scrollTo(0, homeScroll);
-    setTimeout(() => {
-      if (!K.activeRoom) view.hidden = true;
-    }, 450);
+    // Geçiş animasyonu açıksa oda hemen gizlenir (geçişin "sonra" görüntüsü salon olsun)
+    if (document.body.classList.contains('vt')) view.hidden = true;
+    else
+      setTimeout(() => {
+        if (!K.activeRoom) view.hidden = true;
+      }, 450);
     const door = K.$(`.door[data-room="${lastId}"]`);
     door && door.focus({ preventScroll: true });
   }

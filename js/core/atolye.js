@@ -18,8 +18,15 @@
   ];
   const FIYONK = [['', 'Kırmızı', '#E3174D'], ['pembe', 'Pembe', '#FF5FA8'], ['mor', 'Mor', '#8F5BE6'], ['mavi', 'Mavi', '#3D8BE0'], ['altin', 'Altın', '#E8B23A'], ['siyah', 'Siyah', '#3A2A33']];
   const DESEN = [['', 'Düz'], ['puantiye', 'Puantiye'], ['kalp', 'Kalpler'], ['cizgi', 'Çizgili'], ['yildiz', 'Yıldızlar']];
-  const DEF = { tema: 'pudra', fiyonk: '', desen: '', kapak: true, kapi: true, rehber: true, ses: true, titresim: true, kanatses: true, egbak: false, k3: true };
-  const get = () => Object.assign({}, DEF, K.store.get('atolye', {}), { tema: K.store.get('tema', 'pudra') });
+  const DEF = { tema: 'pudra', fiyonk: '', desen: '', kapak: true, kapi: true, rehber: true, ses: true, titresim: true, kanatses: true, egbak: false, tasarim: 'k4', gunrengi: true, uykuisigi: true, elyazim: true };
+  // Tasarım: 'k4' (Kale 4.0, varsayılan) · 'k3' (Kale 3.0) · 'klasik'. Eski "k3 kapalı" seçimi klasik sayılır.
+  const TASARIM = [['k4', 'Kale 4.0', 'Pastel Pop'], ['k3', 'Kale 3.0', 'Pembe porselen'], ['klasik', 'Klasik', 'Puantiyeli kâğıt']];
+  const get = () => {
+    const st = K.store.get('atolye', {});
+    const o = Object.assign({}, DEF, st, { tema: K.store.get('tema', 'pudra') });
+    if (!st.tasarim && st.k3 === false) o.tasarim = 'klasik';
+    return o;
+  };
 
   function apply(o) {
     const s = o || get();
@@ -30,8 +37,11 @@
     s.desen ? (root.dataset.desen = s.desen) : delete root.dataset.desen;
     root.classList.toggle('kapaksiz', !s.kapak);
     root.classList.toggle('kapisiz', !s.kapi);
-    // Kale 3.0 tasarımı varsayılan; kapatılınca klasik görünüm
-    document.body && document.body.classList.toggle('k3', s.k3 !== false);
+    // Kale 4.0, Kale 3.0'ın üstüne kurulu bir katman: 4.0'da iki sınıf birden durur
+    if (document.body) {
+      document.body.classList.toggle('k3', s.tasarim === 'k4' || s.tasarim === 'k3');
+      document.body.classList.toggle('k4', s.tasarim === 'k4');
+    }
     const th = PALET.find((x) => x[0] === s.tema) || PALET[0];
     const m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', th[3]);
@@ -67,17 +77,18 @@
       cls: 'at-sheet',
       html: `<div class="at-preview" aria-hidden="true"><div class="at-mini"><span class="at-kitty">${A.kitty({ cls: 'at-k' })}</span><b>Kalenin yeni rengi</b><i class="at-btn">Bir kapı seç</i><span class="at-chip">♥ 21</span></div></div>
         <h2>Tema Atölyesi</h2><p class="muted">Kaleni kendi zevkine göre boya. Seçimler bu telefonda kalır; ${K.esc(K.otherName())} kendi kalesini başka renkte görebilir.</p>
+        <p class="card-eyebrow">Tasarım</p><div class="at-tasarim" data-g="tasarim">${TASARIM.map(([id, n, d]) => `<button type="button" data-v="${id}" class="at-ts at-ts-${id}"><i aria-hidden="true"></i><b>${n}</b><small>${d}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Ana renk</p><div class="at-row" data-g="tema">${PALET.map(([id, n, a, b]) => `<button type="button" class="at-sw" data-v="${id}" style="--a:${a};--b:${b}" aria-label="${n}"><i></i><small>${n}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Fiyonk rengi</p><div class="at-row" data-g="fiyonk">${FIYONK.map(([id, n, c]) => `<button type="button" class="at-bow" data-v="${id}" aria-label="${n}"><svg viewBox="-60 -42 120 84" aria-hidden="true">${A.bowShape(c)}</svg><small>${n}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Arka plan deseni</p><div class="at-row" data-g="desen">${DESEN.map(([id, n]) => `<button type="button" class="at-pat" data-v="${id}" data-desen-ornek="${id}"><i></i><small>${n}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Hareket ve ses</p>
-        <div class="at-toggles">${[['k3', 'Kale 3.0 tasarımı', 'Yeni görünüm. Kapatınca klasik puantiyeli kale'], ['kapak', 'Oda kapakları', 'Her odanın başında çizimli bir kapak'], ['kapi', 'Kapı geçişi', 'Odaya girerken kapı açılır'], ['rehber', 'Kitty Rehber', 'Yeni bir odada Kitty kısaca anlatır'], ['ses', 'Sesler', 'Dokunuş ve kutlama sesleri'], ['kanatses', 'Kanat sesleri', 'Her kanadın hafif arka plan sesi: kuşlar, saat, şömine'], ['egbak', 'Eğ ve bak', 'Telefonu eğince ana salon derinleşir'], ['titresim', 'Titreşim', 'Destekleyen telefonlarda']]
+        <div class="at-toggles">${[['gunrengi', 'Günün rengi', 'Kale her sabah rengini o günden alır: günün karesi, hava, iki şehrin gökyüzü'], ['elyazim', 'El yazısı yazı tipleri', 'Notlar yazanın kendi el yazısıyla görünür'], ['uykuisigi', 'Uyku ışığı', 'Gece yarısından sonra kale siyaha ve göz yormayan kırmızı ışığa geçer'], ['kapak', 'Oda kapakları', 'Her odanın başında çizimli bir kapak'], ['kapi', 'Kapı geçişi', 'Odaya girerken kapı açılır'], ['rehber', 'Kitty Rehber', 'Yeni bir odada Kitty kısaca anlatır'], ['ses', 'Sesler', 'Dokunuş ve kutlama sesleri'], ['kanatses', 'Kanat sesleri', 'Her kanadın hafif arka plan sesi: kuşlar, saat, şömine'], ['egbak', 'Eğ ve bak', 'Telefonu eğince ana salon derinleşir'], ['titresim', 'Titreşim', 'Destekleyen telefonlarda']]
           .map(([k, t, d]) => `<label class="at-tg"><span><b>${t}</b><small>${d}</small></span><input type="checkbox" data-tg="${k}"><i aria-hidden="true"></i></label>`)
           .join('')}</div>
         <div class="row"><button type="button" class="btn ghost small" data-at-reset>Varsayılana dön</button></div>`,
     });
     const draw = () => {
-      ['tema', 'fiyonk', 'desen'].forEach((g) => K.$$(`[data-g="${g}"] [data-v]`, m.body).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === (s[g] || '')))));
+      ['tema', 'fiyonk', 'desen', 'tasarim'].forEach((g) => K.$$(`[data-g="${g}"] [data-v]`, m.body).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === (s[g] || '')))));
       K.$$('[data-tg]', m.body).forEach((c) => (c.checked = s[c.dataset.tg] !== false));
     };
     draw();
@@ -87,6 +98,7 @@
         const g = b.closest('[data-g]').dataset.g;
         s = save({ [g]: b.dataset.v || (g === 'tema' ? 'pudra' : '') });
         draw();
+        if (g === 'tasarim') K.emit('tasarim', s.tasarim);
         K.audio.sfx.sparkle();
         if (g === 'tema' && s.tema !== 'pudra') K.stickers.award('pembe');
         K.stickers.award('atolye');
@@ -115,5 +127,5 @@
     box.innerHTML = `<button type="button" class="at-open" data-at-open><span class="at-dots" aria-hidden="true">${PALET.slice(0, 5).map(([, , a]) => `<i style="--a:${a}"></i>`).join('')}</span>🎨 Tema Atölyesi</button>`;
     box.addEventListener('click', (e) => e.target.closest('[data-at-open]') && open());
   });
-  K.atolye = { open, get, apply, save, PALET };
+  K.atolye = { open, get, apply, save, PALET, TASARIM };
 })();
