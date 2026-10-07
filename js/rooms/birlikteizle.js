@@ -107,7 +107,7 @@
     const r = await K.cloud.add('izle', { vid: id, title });
     btn.disabled = false;
     if (!r) return K.fx.toast('Açılamadı.');
-    rows.push(r);
+    rows.some((x) => x.id === r.id) || rows.push(r);
     inp.value = '';
     K.$('#izBaslik', root).textContent = title || 'Birlikte izliyoruz';
     load(id, true);

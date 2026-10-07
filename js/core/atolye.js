@@ -18,7 +18,7 @@
   ];
   const FIYONK = [['', 'Kırmızı', '#E3174D'], ['pembe', 'Pembe', '#FF5FA8'], ['mor', 'Mor', '#8F5BE6'], ['mavi', 'Mavi', '#3D8BE0'], ['altin', 'Altın', '#E8B23A'], ['siyah', 'Siyah', '#3A2A33']];
   const DESEN = [['', 'Düz'], ['puantiye', 'Puantiye'], ['kalp', 'Kalpler'], ['cizgi', 'Çizgili'], ['yildiz', 'Yıldızlar']];
-  const DEF = { tema: 'pudra', fiyonk: '', desen: '', kapak: true, kapi: true, rehber: true, ses: true, titresim: true, kanatses: true, egbak: false };
+  const DEF = { tema: 'pudra', fiyonk: '', desen: '', kapak: true, kapi: true, rehber: true, ses: true, titresim: true, kanatses: true, egbak: false, k3: true };
   const get = () => Object.assign({}, DEF, K.store.get('atolye', {}), { tema: K.store.get('tema', 'pudra') });
 
   function apply(o) {
@@ -30,6 +30,8 @@
     s.desen ? (root.dataset.desen = s.desen) : delete root.dataset.desen;
     root.classList.toggle('kapaksiz', !s.kapak);
     root.classList.toggle('kapisiz', !s.kapi);
+    // Kale 3.0 tasarımı varsayılan; kapatılınca klasik görünüm
+    document.body && document.body.classList.toggle('k3', s.k3 !== false);
     const th = PALET.find((x) => x[0] === s.tema) || PALET[0];
     const m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', th[3]);
@@ -69,7 +71,7 @@
         <p class="card-eyebrow">Fiyonk rengi</p><div class="at-row" data-g="fiyonk">${FIYONK.map(([id, n, c]) => `<button type="button" class="at-bow" data-v="${id}" aria-label="${n}"><svg viewBox="-60 -42 120 84" aria-hidden="true">${A.bowShape(c)}</svg><small>${n}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Arka plan deseni</p><div class="at-row" data-g="desen">${DESEN.map(([id, n]) => `<button type="button" class="at-pat" data-v="${id}" data-desen-ornek="${id}"><i></i><small>${n}</small></button>`).join('')}</div>
         <p class="card-eyebrow">Hareket ve ses</p>
-        <div class="at-toggles">${[['kapak', 'Oda kapakları', 'Her odanın başında çizimli bir kapak'], ['kapi', 'Kapı geçişi', 'Odaya girerken kapı açılır'], ['rehber', 'Kitty Rehber', 'Yeni bir odada Kitty kısaca anlatır'], ['ses', 'Sesler', 'Dokunuş ve kutlama sesleri'], ['kanatses', 'Kanat sesleri', 'Her kanadın hafif arka plan sesi: kuşlar, saat, şömine'], ['egbak', 'Eğ ve bak', 'Telefonu eğince ana salon derinleşir'], ['titresim', 'Titreşim', 'Destekleyen telefonlarda']]
+        <div class="at-toggles">${[['k3', 'Kale 3.0 tasarımı', 'Yeni görünüm. Kapatınca klasik puantiyeli kale'], ['kapak', 'Oda kapakları', 'Her odanın başında çizimli bir kapak'], ['kapi', 'Kapı geçişi', 'Odaya girerken kapı açılır'], ['rehber', 'Kitty Rehber', 'Yeni bir odada Kitty kısaca anlatır'], ['ses', 'Sesler', 'Dokunuş ve kutlama sesleri'], ['kanatses', 'Kanat sesleri', 'Her kanadın hafif arka plan sesi: kuşlar, saat, şömine'], ['egbak', 'Eğ ve bak', 'Telefonu eğince ana salon derinleşir'], ['titresim', 'Titreşim', 'Destekleyen telefonlarda']]
           .map(([k, t, d]) => `<label class="at-tg"><span><b>${t}</b><small>${d}</small></span><input type="checkbox" data-tg="${k}"><i aria-hidden="true"></i></label>`)
           .join('')}</div>
         <div class="row"><button type="button" class="btn ghost small" data-at-reset>Varsayılana dön</button></div>`,

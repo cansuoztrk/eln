@@ -136,7 +136,7 @@
         K.stickers.award('dgfilm');
         if (izle.some((r) => r.data.year === y)) return;
         const r = await K.cloud.add('dgizle', { year: y });
-        r && izle.push(r);
+        r && !izle.some((x) => x.id === r.id) && izle.push(r);
         K.ping(`🎂 ${K.meName()} doğum günü filmini izledi`, 'Mumları üfledi, dileğini tuttu.', ['birthday'], { click: K.roomUrl('dgfilm') });
       },
     });

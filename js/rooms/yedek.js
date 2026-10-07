@@ -9,7 +9,7 @@
   const T = K.time;
 
   const YD = () => D.yedek || { intro: [] };
-  const MEDIA = ['tsses', 'photo', 'vaudio', 'sfimg', 'sahneimg', 'pcimg', 'ozurses', 'kfull', 'kareimg', 'hkses', 'hkimg', 'dvaudio', 'rotafoto', 'anlarvid'];
+  const MEDIA = ['tsses', 'photo', 'vaudio', 'sfimg', 'sahneimg', 'pcimg', 'ozurses', 'kfull', 'kareimg', 'hkses', 'hkimg', 'dvaudio', 'rotafoto', 'anlarvid', 'cerceveimg', 'cocukimg', 'vedaimg'];
   const nameOf = (w) => (w === 'me' ? C.myPet : C.herPet);
   let root = null, busy = false, last = null;
 
@@ -25,7 +25,8 @@
     const st = K.$('#ydSt', root);
     st.textContent = 'Kayıtlar toplanıyor...';
     const rows = await K.cloud.dump(media ? [] : MEDIA, (n) => (st.textContent = `${K.num(n)} kayıt toplandı...`));
-    return rows;
+    // Sonsuz Arşiv'e (R2) taşınmış fotoğraf ve sesler de dosyaya girsin
+    return media && K.r2 ? K.r2.fillAll(rows, (n) => (st.textContent = `Arşivden ${K.num(n)} dosya getirildi...`)) : rows;
   }
   function summary(rows) {
     const by = {};
@@ -195,6 +196,11 @@
           <div id="ydGeri"></div>
         </section>
         <section class="card yd-card">
+          <p class="card-eyebrow">Aylık kendiliğinden yedek</p>
+          <p class="muted small">Her ay kale bu cihazda kendiliğinden şifreli bir yazı yedeği alır (son altı ay durur); Sonsuz Arşiv kuruluysa bir kopyası oraya da gider.</p>
+          <div id="ydAylik"></div>
+        </section>
+        <section class="card yd-card">
           <p class="card-eyebrow">Depo</p>
           <p class="muted small">Bulut ne kadar dolu, en çok ne yer kaplıyor?</p>
           <div class="row center"><button type="button" class="btn soft small" data-yd-olc>📏 Depoyu ölç</button></div>
@@ -205,11 +211,22 @@
         if (b) run(b.dataset.yd, b);
         const o = e.target.closest('[data-yd-olc]');
         if (o) measure(o);
+        const ay = e.target.closest('[data-yd-ay]');
+        if (ay && K.aylikyedek) K.aylikyedek.indir(ay.dataset.ydAy);
+        if (e.target.closest('[data-yd-simdi]') && K.aylikyedek) K.aylikyedek.al(true).then(aylik);
       });
       K.$('#ydFile', el).addEventListener('change', (e) => e.target.files[0] && readBackup(e.target.files[0]));
     },
     enter() {
       render();
+      aylik();
     },
   });
+  async function aylik() {
+    const box = root && K.$('#ydAylik', root);
+    if (!box || !K.aylikyedek) return;
+    const l = await K.aylikyedek.list();
+    box.innerHTML = `${l.length ? `<ul class="yd-top">${l.map((x) => `<li><span>${K.esc(K.arsiv ? K.arsiv.monthName(x.ay) : x.ay)}</span><small>${K.num(x.n)} kayıt · ${size(x.size)}${x.r2 ? ' · arşivde de' : ''}</small><button type="button" class="btn ghost small" data-yd-ay="${K.esc(x.ay)}">İndir</button></li>`).join('')}</ul>` : '<p class="muted small">Bu cihazda henüz aylık yedek yok.</p>'}<div class="row center"><button type="button" class="btn soft small" data-yd-simdi>Şimdi al</button></div>`;
+  }
+  K.yedek = { MEDIA, aylik };
 })();

@@ -83,7 +83,7 @@
     const bid = btn.dataset.smEkle;
     const r = await K.cloud.add('masalcumle', { bid, i: linesOf(bid).length, text });
     if (!r) return (btn.disabled = false), K.fx.toast('Eklenemedi.');
-    lines.push(r);
+    lines.some((x) => x.id === r.id) || lines.push(r);
     K.audio.sfx.paper ? K.audio.sfx.paper() : K.audio.sfx.pop();
     const n = linesOf(bid).length;
     K.stickers.award('siramasal');

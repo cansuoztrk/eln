@@ -10,23 +10,31 @@
   // Tüm göz çeşitleri çizilir; hangisinin görüneceğini CSS sınıfı seçer (is-heart, is-happy, is-sleep, is-wink)
   function kitty(opt = {}) {
     const { crown = false, bow = '#E3174D', blush = true, cls = '', label = 'Hello Kitty' } = opt;
+    const id = 'kt' + ++uid;
     const earL = 'M30 104 C20 62 26 26 48 19 C64 14 94 34 114 55 Z';
     const earR = 'M210 104 C220 62 214 26 192 19 C176 14 146 34 126 55 Z';
     const sil = `<path d="${earL}"/><path d="${earR}"/><ellipse cx="120" cy="121" rx="103" ry="73"/>`;
     const heart = (x, y) =>
       `<path transform="translate(${x} ${y}) scale(1.35)" d="M0 7 C-11 -1 -11 -12 -4.5 -12 C-1.5 -12 0 -9.5 0 -8 C0 -9.5 1.5 -12 4.5 -12 C11 -12 11 -1 0 7 Z"/>`;
+    // Kale 3.0 çizimi: aynı oranlar, yumuşak gölgeli yüz, parlak fiyonk, gözlerde ışık
     return `<svg class="kitty ${cls}" viewBox="0 0 240 200" role="img" aria-label="${label}">
+  <defs>
+    <radialGradient id="${id}h" cx="42%" cy="34%" r="74%"><stop offset="0" stop-color="#fff"/><stop offset=".58" stop-color="#FFFBFC"/><stop offset="1" stop-color="#F1DDE6"/></radialGradient>
+    <radialGradient id="${id}b"><stop offset="0" stop-color="#FF8DB0" stop-opacity=".8"/><stop offset="1" stop-color="#FF8DB0" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${id}n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE68A"/><stop offset="1" stop-color="#FFBE2E"/></linearGradient>
+  </defs>
   <g class="k-head">
-    <g fill="#fff" stroke="${INK}" stroke-width="10" stroke-linejoin="round">${sil}</g>
-    <g fill="#fff">${sil}</g>
+    <g fill="#fff" stroke="${INK}" stroke-width="9" stroke-linejoin="round">${sil}</g>
+    <g fill="url(#${id}h)">${sil}</g>
   </g>
-  ${blush ? `<g class="k-blush" fill="#FF9EBB" opacity=".55"><ellipse cx="56" cy="148" rx="15" ry="8"/><ellipse cx="184" cy="148" rx="15" ry="8"/></g>` : ''}
-  <g class="k-whiskers" stroke="${INK}" stroke-width="5" stroke-linecap="round">
+  ${blush ? `<g class="k-blush"><ellipse cx="56" cy="148" rx="19" ry="11" fill="url(#${id}b)"/><ellipse cx="184" cy="148" rx="19" ry="11" fill="url(#${id}b)"/></g>` : ''}
+  <g class="k-whiskers" stroke="${INK}" stroke-width="4.6" stroke-linecap="round">
     <path d="M6 110 L46 118"/><path d="M2 134 L44 135"/><path d="M8 158 L46 149"/>
     <path d="M234 110 L194 118"/><path d="M238 134 L196 135"/><path d="M232 158 L194 149"/>
   </g>
   ${eyeSets(opt.eyes, heart)}
-  <ellipse class="k-nose" cx="120" cy="142" rx="10.5" ry="7.5" fill="#FFCF3F" stroke="${INK}" stroke-width="4"/>
+  <ellipse class="k-nose" cx="120" cy="142" rx="10.5" ry="7.5" fill="url(#${id}n)" stroke="${INK}" stroke-width="3.6"/>
+  <ellipse cx="116.5" cy="139.6" rx="3.2" ry="1.8" fill="#fff" opacity=".75"/>
   ${crown ? crownSvg() : ''}
   <g class="k-bow" transform="translate(184 42) rotate(-14) scale(.86)">${bowShape(bow)}</g>
 </svg>`;
@@ -35,11 +43,11 @@
   // only verilirse sadece o göz çizilir (CSS'siz resimler için); verilmezse hepsi çizilir, CSS seçer
   function eyeSets(only, heart) {
     const sets = {
-      normal: `<g class="k-eyes k-normal" fill="${INK}"><ellipse class="k-eye-l" cx="80" cy="124" rx="8.5" ry="12"/><ellipse class="k-eye-r" cx="160" cy="124" rx="8.5" ry="12"/></g>`,
+      normal: `<g class="k-eyes k-normal"><ellipse class="k-eye-l" cx="80" cy="124" rx="8.5" ry="12" fill="${INK}"/><ellipse class="k-eye-r" cx="160" cy="124" rx="8.5" ry="12" fill="${INK}"/><g fill="#fff"><circle cx="77.4" cy="118.5" r="2.7"/><circle cx="157.4" cy="118.5" r="2.7"/></g></g>`,
       heart: `<g class="k-eyes k-heart" fill="#E3174D">${heart(80, 128)}${heart(160, 128)}</g>`,
       happy: `<g class="k-eyes k-happy" fill="none" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"><path d="M69 128 Q80 113 91 128"/><path d="M149 128 Q160 113 171 128"/></g>`,
       sleep: `<g class="k-eyes k-sleep" fill="none" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"><path d="M69 122 Q80 132 91 122"/><path d="M149 122 Q160 132 171 122"/></g>`,
-      wink: `<g class="k-eyes k-wink"><ellipse cx="80" cy="124" rx="8.5" ry="12" fill="${INK}"/><path d="M149 128 Q160 113 171 128" fill="none" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"/></g>`,
+      wink: `<g class="k-eyes k-wink"><ellipse cx="80" cy="124" rx="8.5" ry="12" fill="${INK}"/><circle cx="77.4" cy="118.5" r="2.7" fill="#fff"/><path d="M149 128 Q160 113 171 128" fill="none" stroke="${INK}" stroke-width="5.5" stroke-linecap="round"/></g>`,
     };
     if (only) return sets[only].replace(/class="k-eyes k-\w+"/, 'class="k-eyes"');
     return Object.values(sets).join('');
@@ -53,13 +61,17 @@
     const dot = dots
       ? `<g fill="#fff" opacity=".92">${DOTS.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}"/><circle cx="${-x}" cy="${y}" r="${r}"/>`).join('')}</g>`
       : `<g fill="#fff" opacity=".35"><ellipse cx="-34" cy="-12" rx="7" ry="4" transform="rotate(-20 -34 -12)"/><ellipse cx="34" cy="-12" rx="7" ry="4" transform="rotate(20 34 -12)"/></g>`;
-    return `<g stroke="${stroke}" stroke-width="6" stroke-linejoin="round" fill="${color}">
+    // Rengi ne olursa olsun: alt kanatlarda hafif gölge, üstte parlaklık (Kale 3.0)
+    return `<g stroke="${stroke}" stroke-width="5.6" stroke-linejoin="round" fill="${color}">
       <path d="M0 0 C-12 -30 -52 -36 -52 -8 C-52 18 -20 16 0 0 Z"/>
       <path d="M0 0 C12 -30 52 -36 52 -8 C52 18 20 16 0 0 Z"/>
     </g>
+    <g fill="#000" opacity=".1"><path d="M-3 2 C-18 14 -42 16 -48 2 C-38 10 -18 8 -3 2 Z"/><path d="M3 2 C18 14 42 16 48 2 C38 10 18 8 3 2 Z"/></g>
     ${dot}
-    <g fill="none" stroke="${stroke}" stroke-width="4" stroke-linecap="round"><path d="M-14 -5 C-24 -13 -34 -15 -41 -11"/><path d="M14 -5 C24 -13 34 -15 41 -11"/></g>
-    <ellipse cx="0" cy="0" rx="13" ry="12" fill="${color}" stroke="${stroke}" stroke-width="6"/>`;
+    <g fill="#fff" opacity=".3"><ellipse cx="-38" cy="-19" rx="9" ry="4.2" transform="rotate(-24 -38 -19)"/><ellipse cx="38" cy="-19" rx="9" ry="4.2" transform="rotate(24 38 -19)"/></g>
+    <g fill="none" stroke="${stroke}" stroke-width="3.6" stroke-linecap="round"><path d="M-14 -5 C-24 -13 -34 -15 -41 -11"/><path d="M14 -5 C24 -13 34 -15 41 -11"/></g>
+    <ellipse cx="0" cy="0" rx="13" ry="12" fill="${color}" stroke="${stroke}" stroke-width="5.6"/>
+    <ellipse cx="-4" cy="-4" rx="4.5" ry="2.6" fill="#fff" opacity=".38"/>`;
   }
 
   function crownSvg() {

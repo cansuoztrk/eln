@@ -98,7 +98,7 @@
       if (pin && !pinned(p.id)) {
         pin.disabled = true;
         const r = await K.cloud.add('muzesec', { ref: p.id });
-        r && sec.push(r);
+        r && !sec.some((x) => x.id === r.id) && sec.push(r);
         pin.textContent = '✓ Kalıcı koleksiyonda';
         K.audio.sfx.sparkle();
         render();
@@ -194,7 +194,7 @@
           if (!text) return inp.focus();
           const r = await K.cloud.add('muzedefter', { text });
           if (!r) return K.fx.toast('Yazılamadı.');
-          defter.push(r);
+          defter.some((x) => x.id === r.id) || defter.push(r);
           inp.value = '';
           K.stickers.award('muzedefter');
           K.ping(`🏛 ${K.meName()} müzenin defterine yazdı`, text, ['classical_building'], { click: K.roomUrl('muze') });

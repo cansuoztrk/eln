@@ -19,6 +19,7 @@
     rotadurak: ['Rota durağı', 'thumb', 'foto', 'name'],
     mozaik: ['Mozaik karesi', 'thumb', '', ''],
     anlar: ['On saniyelik an', 'thumb', '', 'text'],
+    cercevefoto: ['Dolan çerçeve', 'thumb', 'full', 'note'],
   };
   const NOTE = {
     kalpk: ['Kavanozdan bir kalp', 'note'],

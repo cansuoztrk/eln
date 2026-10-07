@@ -167,7 +167,7 @@
           const name = `Melodi ${rows.filter((r) => r.who === mine()).length + 1}`;
           if (K.cloud && K.cloud.enabled) {
             const r = await K.cloud.add('melodi', { name, notes: notes.slice(0, 120) });
-            r && rows.push(r);
+            r && !rows.some((x) => x.id === r.id) && rows.push(r);
             K.ping(`🎹 ${K.meName()} sana bir melodi çaldı`, `"${name}" · ${notes.length} nota. Kalede "Öğret" ile sen de çal.`, ['musical_keyboard'], { click: K.roomUrl('piyano') });
           }
           return render();

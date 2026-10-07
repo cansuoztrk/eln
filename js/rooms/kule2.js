@@ -94,7 +94,7 @@
     K.stickers.award('kule2');
     if (mine() === 'me') {
       const r = await K.cloud.add('kule2bitti', { sec });
-      r && best.push(r);
+      r && !best.some((x) => x.id === r.id) && best.push(r);
     }
     render();
   }

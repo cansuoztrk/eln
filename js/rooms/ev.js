@@ -2,7 +2,8 @@
    Dört oda (salon, mutfak, yatak odası, balkon), her odanın penceresinden seçilen manzara (Boğaz, Hazar, yıldızlar, bahçe),
    salonun duvarında İstanbul ve Bakü saati. Eşyayı seç, odaya dokun, sürükle; her eşyaya bir not bırakılabilir.
    Biri eşya taşırken öbürünün ekranında canlı kayar. Bakü'de akşam olunca evin ışıkları yanar.
-   Kayıtlar: ev {uid, room, it, x, y, s, z, note, gone} (aynı uid'nin son kaydı geçerli) · evwin {room, view} · canlı: ev {t: mv|at} */
+   Sesli tur: her oda için ikimiz de o odanın ne olacağını sesli anlatırız; odanın kapısı açılınca öbürünün sesi çalar.
+   Kayıtlar: ev {uid, room, it, x, y, s, z, note, gone} (aynı uid'nin son kaydı geçerli) · evwin {room, view} · evses {oda, audio, dur} · canlı: ev {t: mv|at} */
 (function () {
   'use strict';
   const K = window.K;
@@ -136,6 +137,7 @@
     if (!root) return;
     const all = state();
     K.$('#evTabs', root).innerHTML = ROOMS.map(([id, n]) => `<button type="button" class="${id === cur ? 'on' : ''}" data-ev-room="${id}">${K.esc(n)}<small>${inRoom(id).length}</small></button>`).join('');
+    sesler();
     K.$('#evViews', root).innerHTML = `<span class="muted small">Pencereden:</span>${VIEWS.map(([id, n]) => `<button type="button" class="chip ${viewOf(cur) === id ? 'on' : ''}" data-ev-view="${id}">${K.esc(n)}</button>`).join('')}`;
     stage();
     tools();
@@ -146,6 +148,33 @@
     K.$('#evStats', root).innerHTML = `<p><b>${all.length}</b> eşya · ${K.esc(nameOf(mine()))} ${mineN}, ${K.esc(nameOf(other()))} ${theirN}${K.cloud.otherHere() ? ` · <span class="dot on"></span>${K.esc(nameOf(other()))} da evde` : ''}</p>
       ${notes.length ? `<ul class="ev-notes">${notes.slice(-8).reverse().map((x) => `<li><span>${itemDef(x.it)[2].startsWith('svg:') ? '♥' : itemDef(x.it)[2]}</span><em class="hand">${K.esc(x.note)}</em><small>${K.esc(ROOMS.find((r) => r[0] === x.room)[1])} · ${K.esc(nameOf(x.last))}</small></li>`).join('')}</ul>` : ''}`;
   }
+
+  /* ---------- Sesli tur ---------- */
+  let sesRows = [];
+  const calindi = new Set();
+  const sesOf = (oda, w) => sesRows.filter((r) => r.data.oda === oda && r.who === w).sort((a, b) => b.at - a.at)[0];
+  function sesler() {
+    const box = K.$('#evSes', root);
+    if (!box) return;
+    const n = ROOMS.find((r) => r[0] === cur)[1];
+    const chip = (w) => {
+      const r = sesOf(cur, w);
+      return r ? `<button type="button" class="chip" data-ev-ses="${r.id}">▶ ${K.esc(nameOf(w))} · ${Math.round(r.data.dur || 0)} sn</button>` : `<span class="chip ghost">${K.esc(nameOf(w))} henüz anlatmadı</span>`;
+    };
+    box.innerHTML = `<p class="card-eyebrow">🎙 ${K.esc(n)} · sesli tur</p><div class="row">${chip(other())}${chip(mine())}</div>
+      <div class="row"><button type="button" class="btn soft small" data-ev-anlat>🎙 ${sesOf(cur, mine()) ? 'Yeniden anlat' : `${K.esc(n)} nasıl olacak, anlat`}</button></div>`;
+  }
+  function kapi(oda) {
+    const r = sesOf(oda, other());
+    if (!r || calindi.has(oda)) return;
+    calindi.add(oda);
+    K.medya.cal(r.data.audio);
+  }
+  K.on('cloud', async (ok) => {
+    if (!ok) return;
+    sesRows = await K.cloud.list('evses', 100);
+    K.cloud.on('evses', (r) => sesRows.some((x) => x.id === r.id) || (sesRows.push(r), K.activeRoom === 'ev' && sesler()));
+  });
 
   /* ---------- Kayıt ---------- */
   async function commit(x, patch) {
@@ -309,6 +338,7 @@
       el.innerHTML = `<div class="room-intro">${K.paras(EV().intro)}</div>
         <div class="seg ev-tabs" id="evTabs" role="tablist"></div>
         <div class="ev-views" id="evViews"></div>
+        <section class="card ev-ses" id="evSes"></section>
         <div class="ev-stage" id="evStage"></div>
         <section class="card ev-tools" id="evTools" hidden></section>
         <section class="card ev-cat"><div class="seg ev-cats" id="evCats"></div><div class="ev-shelf" id="evShelf"></div></section>
@@ -320,7 +350,22 @@
           cur = rm.dataset.evRoom;
           K.store.set('evRoom', cur);
           sel = null;
+          kapi(cur);
           return render();
+        }
+        const sc = e.target.closest('[data-ev-ses]');
+        if (sc) return K.medya.cal(sesRows.find((r) => r.id === sc.dataset.evSes).data.audio);
+        const an = e.target.closest('[data-ev-anlat]');
+        if (an) {
+          const oda = cur;
+          const res = await K.medya.kaydet(an, 40);
+          if (!res) return;
+          const r = await K.cloud.add('evses', { oda, audio: res.audio, dur: res.dur });
+          if (!r) return;
+          sesRows.some((x) => x.id === r.id) || sesRows.push(r);
+          K.stickers.award('evses');
+          K.ping(`🏡 ${K.meName()} evimizin sesli turuna bir oda ekledi: ${K.ev.roomName(oda)}`, 'Kapıyı aç, dinle.', ['house'], { click: K.roomUrl('ev') });
+          return sesler();
         }
         const vw = e.target.closest('[data-ev-view]');
         if (vw) {
@@ -382,6 +427,7 @@
     enter() {
       render();
       loadAll();
+      setTimeout(() => K.activeRoom === 'ev' && kapi(cur), 600);
       clearInterval(clockT);
       clockT = setInterval(tickClocks, 20000);
     },

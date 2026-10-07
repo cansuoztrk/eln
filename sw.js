@@ -1,8 +1,8 @@
 /* Eln'in Krallığı — çevrimdışı çalışma. Kurulumda kalenin iskeleti (paket, kasa, simgeler) önceden indirilir; böylece
    internet yokken, uçakta bile açılır. Sayfalar ve kasa önce ağdan, ağ yoksa son kaydedilen hâlden; paket dosyaları adı
    içeriğe göre değiştiği için doğrudan önbellekten. CACHE ve BUNDLE satırlarını tools/bundle.mjs yazar. */
-const CACHE = 'eln-kale-b9a0542a01';
-const BUNDLE = ['dist/kale.41529067ba.js', 'dist/odalar.eab1be3c21.js', 'dist/kale.5f8862523e.css'];
+const CACHE = 'eln-kale-f6f1850045';
+const BUNDLE = ['dist/kale.10e9cfd6bb.js', 'dist/odalar.647b01313a.js', 'dist/kale.e59f3678b1.css'];
 const CORE = ['./', 'manifest.webmanifest', 'assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/vault/keys.json', 'assets/vault/private.bin', 'js/vendor/supabase.js'].concat(BUNDLE);
 
 self.addEventListener('install', (e) => {

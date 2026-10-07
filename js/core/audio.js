@@ -147,7 +147,38 @@
     });
     return { events: ev, beats: beat + 1, bpm: 110 };
   }
-  const melodies = { waltz: buildWaltz(), birthday: buildBirthday() };
+  // Anonim halk ezgileri (telifsiz). Notalar abcnotation.com'daki geleneksel derlemelerden; bir oktav yukarıda çalınır.
+  // Yazım: "nota:sekizlik" ("z" sus), "|" ölçü çizgisi okunurken atlanır.
+  const parseTune = (str) => str.split(/\s+/).filter((x) => x && x !== '|' && x !== '||').map((t) => { const [n, l] = t.split(':'); return [n, +l]; });
+  function buildTune(str, chords, bar, bpm, up = 12) {
+    const ev = [];
+    let beat = 0;
+    parseTune(str).forEach(([n, len]) => {
+      if (n !== 'z') ev.push({ beat, m: midi(n) + up, len, vol: 0.22 });
+      beat += len;
+    });
+    (chords || []).forEach(([at, notes, len]) => notes.forEach((n, i) => ev.push({ beat: at, m: midi(n), len: len || bar, vol: i ? 0.05 : 0.11 })));
+    return { events: ev.sort((a, b) => a.beat - b.beat), beats: Math.ceil(beat + 2), bpm };
+  }
+  // Sarı Gelin (Erzurum; Türk, Azerbaycan ve Ermeni geleneğinde ortak anonim aşk türküsü), 10/8, Mi Frig
+  const SARI_GELIN =
+    'z:2 E4:1 E4:2 B4:3 | B4:2 A4:3 B4:1 A4:1 B4:3 | B4:2 B4:.5 C5:.5 B4:1.5 A4:.5 A4:1.5 G4:.5 A4:1 B4:1 z:1 | B4:2 C#5:1 A4:2 G4:1.5 F4:.5 G4:.5 A4:.5 A4:1 z:1 | G4:2 A4:1 F4:2 E4:2 E4:.5 G4:.5 G4:1 z:1 | F4:2 G4:1 E4:2 E4:5 ' +
+    '|| z:2 G4:1 G4:2 A4:2 A4:3 | A4:2 G4:3 A4:1 G4:1 A4:1 B4:2 | B4:1 z:1 G4:1 A4:2 B4:2 B4:3 | B4:2 B4:.5 C5:.5 A4:2 A4:1.5 G4:.5 A4:.5 B4:.5 B4:1 z:1 | B4:2 C#5:1 A4:2 G4:1.5 F4:.5 G4:.5 A4:.5 A4:1 z:1 | G4:2 A4:1 F4:2 E4:2 E4:.5 G4:.5 G4:1 z:1 | F4:2 G4:1 E4:2 E4:5';
+  const SG_CH = [];
+  for (let b = 0; b < 13; b++) SG_CH.push([b === 0 ? 0 : 8 + (b - 1) * 10, [b % 3 === 2 ? 'A2' : 'E2', 'B3', b % 3 === 2 ? 'E4' : 'G3'], b === 0 ? 8 : 10]);
+  // Üsküdar'a Gider İken (İstanbul'un anonim aşk şarkısı, Kâtibim), 4/4, Mi minör
+  const USK_A = 'E4:3 B4:1 B4:2 B4:2 | C5:1 B4:1 C5:1 D5:1 B4:2 B4:2 | A4:2 A4:1 A4:1 G4:2 A4:2 | B4:8 | ';
+  const USK_B1 = 'B4:1 C5:1 B4:1 A4:1 G4:1 F#4:1 G4:1 A4:1 | B4:1 C5:1 B4:1 A4:1 G4:1 F#4:1 E4:2 | ';
+  const USKUDAR =
+    USK_A + USK_A +
+    'E4:3 F#4:1 G4:2 A4:2 | B4:1 C5:1 B4:1 A4:1 G4:1 F#4:1 E4:2 | F#4:3 G4:1 F#4:1 E4:1 D#4:1 E4:1 | F#4:8 | ' +
+    'E4:3 F#4:1 G4:2 A4:2 | B4:1 C5:1 B4:1 A4:1 G4:1 F#4:1 E4:2 | A4:1 G4:1 G4:1 F#4:1 F#4:1 E4:1 D#4:1 F#4:1 | E4:8 | ' +
+    USK_B1 + 'F#4:1 G4:1 G4:1 F#4:1 F#4:1 E4:1 D#4:1 E4:1 | F#4:3 D#4:1 C4:2 B3:2 | ' + USK_B1 + 'F#4:1 G4:1 G4:1 F#4:1 F#4:1 E4:1 E4:1 D#4:1 | E4:3 D#4:1 E4:1 F#4:1 G4:1 A4:1 | ' +
+    USK_B1 + 'F#4:1 G4:1 G4:1 F#4:1 F#4:1 E4:1 D#4:1 E4:1 | F#4:3 D#4:1 C4:2 B3:2 | ' + USK_B1 + 'F#4:1 G4:1 G4:1 F#4:1 F#4:1 E4:1 E4:1 D#4:1 | E4:8';
+  const EM = ['E2', 'G3', 'B3'], BM = ['B1', 'D#3', 'F#3'];
+  const USK_PLAN = 'e e b e e e b e e e b b e e b e e e b b e e b e e e b b e e b e'.split(' ');
+  const USK_CH = USK_PLAN.map((c, i) => [i * 8, c === 'b' ? BM : EM, 8]);
+  const melodies = { waltz: buildWaltz(), birthday: buildBirthday(), sarigelin: buildTune(SARI_GELIN, SG_CH, 10, 200), uskudar: buildTune(USKUDAR, USK_CH, 8, 210) };
 
   // Bir melodiyi bir kez (ya da döngüde) çalar. onNote(ev) görsel senkron için.
   function play(name, opt = {}) {
@@ -207,7 +238,9 @@
       this.gain.gain.setValueAtTime(0.0001, ctx.currentTime);
       this.gain.gain.exponentialRampToValueAtTime(1, ctx.currentTime + 1.2);
       this.gain.connect(musicBus);
-      this.handle = play('waltz', { loop: true, dest: this.gain, vol: 0.85 });
+      // Kalenin melodisi: Kalenin Melodisi odasında seçilen (yoksa Eln'in Valsi)
+      const pick = (this.pick && this.pick()) || 'waltz';
+      this.handle = play(melodies[pick] ? pick : 'waltz', { loop: true, dest: this.gain, vol: 0.85 });
       K.store.set('music', true);
       K.emit('music', true);
     },
@@ -230,6 +263,12 @@
     },
     toggle() {
       this.on ? this.stop() : this.start();
+    },
+    // Melodi değişince çalan müziği yenisiyle yeniden başlat
+    restart() {
+      if (!this.on) return;
+      this.stop(false);
+      setTimeout(() => this.start(), 750);
     },
     wanted: () => K.store.get('music', true),
   };

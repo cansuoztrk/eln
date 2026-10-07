@@ -42,7 +42,7 @@
       if (!title) return;
       r = await K.cloud.add('rota', { rid: 'r' + Date.now().toString(36), title: title.slice(0, 60) });
       if (!r) return K.fx.toast('Kaydedilemedi.');
-      routes.push(r);
+      routes.some((x) => x.id === r.id) || routes.push(r);
     }
     draft = { r, rec: null, ses: null, img: null };
     const m = K.ui.modal({ label: 'Rota', cls: 'rt-sheet', html: '<div data-rt-body></div>', onClose: () => ((draft = null), render()) });

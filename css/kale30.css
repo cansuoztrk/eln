@@ -1,0 +1,501 @@
+/* =========================================================
+   Kale 3.0 — yeni tasarım dili (body.k3). Klasik görünüm Tema Atölyesi'nden geri açılır.
+   Fikir: "pembe porselen". Puantiyeli kâğıt yerine ipek gibi yumuşak bir zemin, cam katmanlar,
+   ince çizgiler, renkli gölgeler; başlıklarda yumuşak serifli Fraunces, arayüzde ve gövdede yuvarlak Nunito.
+   Bileşen kuralları :where(.k3) ile yazıldı: özgüllükleri temel kurallarla aynı kalır, odaların kendi
+   özel kuralları her zaman kazanır. Renkler önce belirteçlerden (token) değişir.
+   ========================================================= */
+body.k3 {
+  --k3-bg: var(--blush);
+  --k3-surface: #ffffff;
+  --k3-surface-2: #fffafc;
+  --k3-ink: #2c1422;
+  --k3-text: #452636;
+  --k3-muted: #86677a;
+  --k3-hair: rgba(110, 40, 75, 0.11);
+  --k3-hair-2: rgba(110, 40, 75, 0.18);
+  --k3-red: var(--bow);
+  --k3-red-deep: var(--bow-shadow);
+  --k3-gold: #f2bf4a;
+  --k3-glass: rgba(255, 255, 255, 0.72);
+  --k3-shadow: 0 1px 2px rgba(64, 18, 40, 0.05), 0 12px 30px -16px rgba(184, 30, 84, 0.3);
+  --k3-shadow-lg: 0 2px 6px rgba(64, 18, 40, 0.06), 0 34px 70px -28px rgba(120, 20, 60, 0.45);
+  --k3-ring: 0 0 0 4px color-mix(in srgb, var(--bow) 16%, transparent);
+  --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+
+  /* Eski belirteçler yeni değerlere bağlanır: 130 oda kendiliğinden yeni yüzeylere geçer */
+  --cream: var(--k3-surface);
+  --paper: var(--k3-surface-2);
+  --plum: var(--k3-text);
+  --plum-soft: var(--k3-muted);
+  --plum-faint: #b79aac;
+  --glass: var(--k3-glass);
+  --shadow-s: 0 1px 2px rgba(64, 18, 40, 0.05), 0 6px 16px -10px rgba(184, 30, 84, 0.3);
+  --shadow: var(--k3-shadow);
+  --r-xl: 30px;
+  --r-lg: 22px;
+  --r-md: 16px;
+  --r-sm: 11px;
+  --font-display: 'Nunito', 'Fredoka', ui-rounded, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Nunito', ui-rounded, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  color: var(--k3-text);
+  background-color: var(--k3-bg);
+  background-image:
+    radial-gradient(1100px 620px at -10% -8%, color-mix(in srgb, var(--rose) 38%, transparent), transparent 62%),
+    radial-gradient(900px 560px at 112% 6%, rgba(232, 220, 255, 0.7), transparent 60%),
+    radial-gradient(900px 700px at 50% 112%, rgba(255, 231, 214, 0.6), transparent 60%),
+    radial-gradient(circle, color-mix(in srgb, var(--bow) 6%, transparent) 1.2px, transparent 1.7px);
+  background-size: auto, auto, auto, 26px 26px;
+  background-attachment: fixed, fixed, fixed, scroll;
+}
+/* Tema Atölyesi'nde renk seçilmemişse Kale 3.0'ın kendi pembe tonları */
+html:not([data-tema]) body.k3 {
+  --blush: #fff7f9;
+  --petal: #ffe7ef;
+  --petal-2: #ffd8e5;
+  --rose: #f59ab9;
+  --rose-deep: #e23f74;
+  --rose-shadow: #b52a5c;
+  --line: var(--k3-hair);
+}
+
+/* ---------- Gece (Gece Modu ile birlikte) ---------- */
+body.k3.gece-modu,
+body.k3.night {
+  --k3-bg: #150e1b;
+  --k3-bg-2: #1d1424;
+  --k3-surface: #221829;
+  --k3-surface-2: #2a1e33;
+  --k3-ink: #fbeef5;
+  --k3-text: #ecdbe6;
+  --k3-muted: #b49eb1;
+  --k3-hair: rgba(255, 255, 255, 0.09);
+  --k3-hair-2: rgba(255, 255, 255, 0.16);
+  --k3-glass: rgba(34, 24, 41, 0.72);
+  --k3-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 34px -18px rgba(0, 0, 0, 0.8);
+  --k3-shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.35), 0 34px 70px -28px rgba(0, 0, 0, 0.9);
+  --petal: #3a2534;
+  --petal-2: #4a2c40;
+  --plum-faint: #8d7488;
+  background-image:
+    radial-gradient(1100px 620px at -10% -8%, rgba(150, 40, 90, 0.35), transparent 62%),
+    radial-gradient(900px 560px at 112% 6%, rgba(80, 60, 160, 0.35), transparent 60%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.05) 1.2px, transparent 1.7px);
+  background-size: auto, auto, 26px 26px;
+}
+
+/* ---------- Yazı ---------- */
+:where(body.k3) h1,
+:where(body.k3) h2,
+:where(body.k3) h3 {
+  color: var(--k3-ink);
+  letter-spacing: -0.01em;
+}
+:where(body.k3) .card-eyebrow {
+  font: 700 11px/1.2 var(--font-display);
+  letter-spacing: 0.14em;
+  color: var(--rose-deep);
+}
+:where(body.k3) .sec-title {
+  font-family: var(--font-serif);
+  font-weight: 650;
+  font-variation-settings: 'SOFT' 100, 'opsz' 72;
+  letter-spacing: -0.015em;
+  color: var(--k3-ink);
+}
+:where(body.k3) .sec-title .script,
+:where(body.k3) .sec-title em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  color: var(--k3-red);
+}
+:where(body.k3) .muted,
+:where(body.k3) .sec-sub {
+  color: var(--k3-muted);
+}
+
+/* ---------- Üst çubuk ---------- */
+:where(body.k3) .topbar {
+  background: var(--k3-glass);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  border-bottom: 1px solid var(--k3-hair);
+  box-shadow: 0 8px 24px -22px rgba(120, 20, 60, 0.6);
+}
+:where(body.k3) .brand-name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-variation-settings: 'SOFT' 100, 'opsz' 40;
+  letter-spacing: -0.01em;
+  color: var(--k3-ink);
+}
+:where(body.k3) .icon-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--k3-hair);
+  background: var(--k3-glass);
+  color: var(--k3-ink);
+  box-shadow: 0 1px 2px rgba(64, 18, 40, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+:where(body.k3) .icon-btn .count {
+  background: var(--k3-red);
+  box-shadow: 0 0 0 2px var(--k3-surface);
+}
+
+/* ---------- Düğmeler ---------- */
+:where(body.k3) .btn {
+  border-radius: 999px;
+  font: 800 15px/1.1 var(--font-display);
+  letter-spacing: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--b) 82%, #fff), var(--b));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(64, 18, 40, 0.12), 0 10px 22px -10px var(--bs);
+  transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.3), box-shadow 0.2s, filter 0.2s;
+}
+:where(body.k3) .btn:active {
+  transform: scale(0.97) translateY(1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 10px -6px var(--bs);
+}
+:where(body.k3) .btn.soft {
+  color: var(--k3-red);
+  background: var(--k3-surface);
+  box-shadow: inset 0 0 0 1px var(--k3-hair-2), 0 1px 2px rgba(64, 18, 40, 0.05), 0 8px 18px -12px rgba(184, 30, 84, 0.35);
+}
+:where(body.k3) .btn.ghost {
+  color: var(--k3-ink);
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--k3-hair-2);
+}
+:where(body.k3) .btn.small {
+  font-size: 13.5px;
+  min-height: 38px;
+}
+:where(body.k3) .chip {
+  border: 1px solid var(--k3-hair-2);
+  background: var(--k3-surface);
+  color: var(--k3-text);
+  font: 600 13.5px/1.2 var(--font-display);
+}
+:where(body.k3) .chip.on,
+:where(body.k3) .chip[aria-pressed='true'],
+:where(body.k3) .chip[aria-selected='true'] {
+  background: var(--k3-ink);
+  border-color: var(--k3-ink);
+  color: var(--k3-surface);
+}
+
+/* ---------- Kart, alan ---------- */
+:where(body.k3) .card {
+  border: 1px solid var(--k3-hair);
+  border-radius: var(--r-lg);
+  box-shadow: var(--k3-shadow);
+}
+:where(body.k3) .input,
+:where(body.k3) .textarea {
+  border: 1.5px solid var(--k3-hair-2);
+  border-radius: 14px;
+  background: var(--k3-surface);
+  color: var(--k3-text);
+}
+:where(body.k3) .input:focus,
+:where(body.k3) .textarea:focus {
+  border-color: var(--k3-red);
+  box-shadow: var(--k3-ring);
+}
+
+/* ---------- Pencere: telefonda alttan açılan sayfa ---------- */
+:where(body.k3) .modal-back {
+  background: rgba(36, 10, 26, 0.36);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
+}
+:where(body.k3) .modal-panel {
+  background: var(--k3-surface);
+  border: 1px solid var(--k3-hair);
+  border-radius: 28px;
+  box-shadow: var(--k3-shadow-lg);
+}
+@media (max-width: 600px) {
+  :where(body.k3) .modal {
+    place-items: end center;
+    padding: calc(28px + env(safe-area-inset-top, 0px)) 0 0;
+  }
+  :where(body.k3) .modal-panel {
+    width: 100%;
+    max-height: calc(100% - 8px);
+    border-radius: 28px 28px 0 0;
+    border-bottom: 0;
+    padding-top: 30px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(100%);
+    opacity: 1;
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  :where(body.k3) .modal-panel::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--k3-hair-2);
+    transform: translateX(-50%);
+  }
+  :where(body.k3) .modal.in .modal-panel {
+    transform: none;
+  }
+}
+:where(body.k3) .modal h3 {
+  font-family: var(--font-serif);
+  font-weight: 650;
+  font-variation-settings: 'SOFT' 100, 'opsz' 48;
+}
+
+/* ---------- Bildirimler: üstte, kısa, cam ---------- */
+body.k3 .toasts,
+body.k3.has-dock:not(.in-room) .toasts,
+body.k3.has-voice .toasts,
+body.k3.has-voice.has-dock:not(.in-room) .toasts {
+  top: calc(var(--top-h) + env(safe-area-inset-top, 0px) + 8px);
+  bottom: auto;
+  align-content: start;
+}
+:where(body.k3) .toast {
+  border: 1px solid var(--k3-hair);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--k3-surface) 88%, transparent);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: var(--k3-shadow-lg);
+  font-size: 14px;
+  padding: 8px 14px 8px 8px;
+  transform: translateY(-16px) scale(0.97);
+  color: var(--k3-text);
+}
+:where(body.k3) .toast.in {
+  transform: none;
+}
+:where(body.k3) .toast b {
+  color: var(--k3-red);
+  font-weight: 700;
+}
+:where(body.k3) .toast-ic {
+  width: 36px;
+  height: 36px;
+}
+:where(body.k3) .toast-ic .ic {
+  width: 32px;
+  height: 32px;
+}
+
+/* ---------- Ana salon: kahraman ---------- */
+:where(body.k3) .hero {
+  background:
+    radial-gradient(700px 360px at 18% 0%, rgba(255, 190, 214, 0.75), transparent 70%),
+    radial-gradient(640px 340px at 92% 12%, rgba(214, 200, 255, 0.7), transparent 70%),
+    linear-gradient(180deg, #ffe4ee 0%, #fff1f6 52%, transparent 100%);
+  border-bottom: 0;
+}
+:where(body.k3) .greet-word {
+  font: 600 clamp(16px, 4.4vw, 20px) / 1.2 var(--font-display);
+  letter-spacing: 0.01em;
+  color: var(--k3-muted);
+}
+:where(body.k3) .greet-name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 560;
+  font-variation-settings: 'SOFT' 100, 'opsz' 144;
+  font-size: clamp(46px, 13vw, 84px);
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  padding-bottom: 0.08em;
+  background: linear-gradient(100deg, #b30f3c 0%, #e5174f 38%, #ff6f99 70%, #e5174f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 8px 18px rgba(229, 23, 79, 0.18));
+}
+:where(body.k3) .hero-sub {
+  color: var(--k3-muted);
+}
+:where(body.k3) .hero-clock,
+:where(body.k3) .gtag {
+  background: var(--k3-glass);
+  border: 1px solid var(--k3-hair);
+  box-shadow: 0 1px 2px rgba(64, 18, 40, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: var(--font-display);
+}
+
+/* ---------- Ana salon sekmeleri: iOS gibi parçalı kontrol ---------- */
+:where(body.k3) .salon-tabs {
+  background: color-mix(in srgb, var(--k3-surface) 70%, transparent);
+  border: 1px solid var(--k3-hair);
+  box-shadow: 0 10px 26px -18px rgba(120, 20, 60, 0.55);
+  border-radius: 18px;
+  padding: 4px;
+}
+:where(body.k3) .salon-tabs button {
+  border-radius: 14px;
+  font: 700 14px/1.1 var(--font-display);
+  color: var(--k3-muted);
+}
+:where(body.k3) .salon-tabs button[aria-selected='true'] {
+  background: var(--k3-surface);
+  color: var(--k3-red);
+  box-shadow: 0 1px 2px rgba(64, 18, 40, 0.08), 0 6px 16px -10px rgba(184, 30, 84, 0.5);
+}
+
+/* ---------- Alt çubuk ---------- */
+:where(body.k3) .dock {
+  background: var(--k3-glass);
+  box-shadow: 0 0 0 1px var(--k3-hair), 0 20px 44px -18px rgba(120, 20, 60, 0.55);
+  backdrop-filter: blur(24px) saturate(1.7);
+  -webkit-backdrop-filter: blur(24px) saturate(1.7);
+}
+
+/* ---------- Özel kartlar ---------- */
+:where(body.k3) .special-card {
+  background: var(--k3-surface);
+  border: 1px solid var(--k3-hair);
+  border-radius: 20px;
+  box-shadow: var(--k3-shadow);
+}
+:where(body.k3) .special-card h3 {
+  font-family: var(--font-display);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Oda başlığı ve kapak ---------- */
+:where(body.k3) .room-head {
+  background: var(--k3-glass);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  border-bottom: 1px solid var(--k3-hair);
+}
+:where(body.k3) .room-title {
+  font-family: var(--font-serif);
+  font-weight: 650;
+  font-variation-settings: 'SOFT' 100, 'opsz' 48;
+  letter-spacing: -0.015em;
+  color: var(--k3-ink);
+}
+:where(body.k3) .room-sub {
+  color: var(--k3-muted);
+}
+:where(body.k3) .room-back {
+  border: 1px solid var(--k3-hair);
+  background: var(--k3-surface);
+  box-shadow: 0 1px 2px rgba(64, 18, 40, 0.06);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--k3-ink);
+}
+:where(body.k3) .room-view {
+  background-color: var(--k3-bg);
+}
+:where(body.k3) .oda-kapak {
+  border-radius: 26px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 1px 2px rgba(64, 18, 40, 0.06), 0 18px 36px -22px rgba(120, 20, 60, 0.5);
+}
+:where(body.k3) .ok-desen {
+  opacity: 0.25;
+}
+:where(body.k3) .ok-yazi b {
+  font: italic 620 clamp(26px, 7.4vw, 36px) / 1.02 var(--font-serif);
+  font-variation-settings: 'SOFT' 100, 'opsz' 72;
+  letter-spacing: -0.02em;
+  color: var(--k3-ink);
+  text-shadow: none;
+}
+:where(body.k3) .ok-yazi small {
+  font-family: var(--font-display);
+  letter-spacing: 0.14em;
+}
+:where(body.k3) .ok-kemer {
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(74, 33, 56, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+:where(body.k3) .room-intro {
+  color: var(--k3-text);
+}
+
+/* ---------- Kapı (giriş) ---------- */
+:where(body.k3) .gate {
+  background: radial-gradient(900px 600px at 50% -10%, #ff8db0 0%, #e5174f 45%, #8e0b31 100%);
+}
+:where(body.k3) .gate-curtain {
+  opacity: 0.55;
+  mix-blend-mode: soft-light;
+}
+:where(body.k3) .gate-stage {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 40px 90px -30px rgba(60, 0, 20, 0.7), inset 0 1px 0 #fff;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-radius: 34px;
+}
+:where(body.k3) .gate-title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 620;
+  font-variation-settings: 'SOFT' 100, 'opsz' 144;
+  letter-spacing: -0.03em;
+  color: var(--k3-red);
+}
+:where(body.k3) .gate-eyebrow {
+  font-family: var(--font-display);
+  letter-spacing: 0.18em;
+}
+
+/* ---------- Kitty: hafif yüzen gölge ---------- */
+:where(body.k3) .hero-kitty .kitty,
+:where(body.k3) .gate-kitty .kitty {
+  filter: drop-shadow(0 14px 18px rgba(120, 20, 60, 0.16));
+}
+
+/* ---------- Gece ince ayarları ---------- */
+:where(body.k3.gece-modu) .hero,
+:where(body.k3.night) .hero {
+  background: radial-gradient(700px 360px at 18% 0%, rgba(160, 40, 100, 0.45), transparent 70%), radial-gradient(640px 340px at 92% 12%, rgba(90, 70, 190, 0.45), transparent 70%), linear-gradient(180deg, #2a1838 0%, #1d1428 60%, transparent 100%);
+}
+:where(body.k3.gece-modu) .greet-name,
+:where(body.k3.night) .greet-name {
+  background: linear-gradient(100deg, #ffc2d6, #ff7aa2 50%, #ffd6e4);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(body.k3) .modal-panel {
+    transition: none;
+  }
+}
+
+/* ---------- Kalenin Melodisi ---------- */
+.km-satir { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.km-satir:last-of-type { border-bottom: 0; }
+.km-satir b { display: block; font-family: var(--font-display); color: var(--plum); }
+.km-satir small { display: block; color: var(--plum-soft); font-size: 12.5px; line-height: 1.35; }
+.km-plak { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle, #fff 0 18%, #2c1422 19% 100%); color: #fff; font-size: 0; box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.12); }
+.km-satir.secili .km-plak { background: radial-gradient(circle, #fff 0 18%, var(--bow) 19% 100%); animation: km-don 3s linear infinite; }
+@keyframes km-don { to { transform: rotate(360deg); } }
+.km-calan { font: 800 11px/1.2 var(--font-display); letter-spacing: 0.06em; color: var(--bow); text-transform: uppercase; }
+.km-canli { display: grid; justify-items: center; gap: 4px; min-height: 0; }
+.km-canli b { font: 600 42px/1 var(--font-serif, var(--font-display)); color: var(--bow); }
+.km-canli span { font-size: 13px; color: var(--plum-soft); }
+.km-canli i { --p: 0; display: block; width: min(260px, 80%); height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--bow) calc(var(--p) * 100%), var(--line) 0); }
+@media (max-width: 420px) { .km-satir { grid-template-columns: 34px minmax(0, 1fr) auto; } .km-satir > :last-child { grid-column: 2 / -1; justify-self: start; } }
+@media (prefers-reduced-motion: reduce) { .km-satir.secili .km-plak { animation: none; } }

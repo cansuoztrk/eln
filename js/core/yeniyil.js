@@ -105,7 +105,7 @@
       b.disabled = true;
       const r = await K.cloud.add('yeniyil', { y: m.y, t: 'paket', msg });
       if (!r) return (b.disabled = false), K.fx.toast('Gönderilemedi.');
-      rows.push(r);
+      rows.some((x) => x.id === r.id) || rows.push(r);
       K.audio.sfx.whoosh();
       K.ping(`🎁 ${m.y}'den sana bir paket var`, `${K.meName()} yeni yıla senden bir saat önce girdi ve sana yeni yılı gönderdi.`, ['gift'], { click: K.roomUrl(''), priority: 5 });
       paint();

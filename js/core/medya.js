@@ -80,5 +80,48 @@
     }
     return cache[key];
   }
-  K.medya = { image, thumb, blobUrl, toB64, rowUrl };
+  // Düğmeli ses kaydı: ilk dokunuşta başlar, ikincide (ya da süre dolunca) biter; buluta yükler.
+  // Döner: {audio: tsses kimliği, dur, url} ya da null. Kayıt sürerken düğme "⏹ Bitir (3 sn)" olur.
+  const active = new WeakMap();
+  async function kaydet(btn, max = 15) {
+    const cur = active.get(btn);
+    if (cur) return cur.stop(), null;
+    const label = btn.textContent;
+    const r = await K.mikrofon.start(max, (s) => (btn.textContent = `⏹ Bitir (${Math.round(s)} sn)`));
+    if (!r) return null;
+    active.set(btn, r);
+    btn.classList.add('kayitta');
+    const res = await r.done;
+    active.delete(btn);
+    btn.classList.remove('kayitta');
+    btn.textContent = label;
+    if (!res || res.dur < 0.6) return K.fx.toast('Kayıt çok kısa oldu.'), null;
+    btn.disabled = true;
+    const au = await K.mikrofon.upload(res.blob);
+    btn.disabled = false;
+    if (!au) return K.fx.toast('Ses kaydedilemedi; biraz daha kısa dene.'), null;
+    return { audio: au.id, dur: res.dur, url: res.url };
+  }
+  // Bir ses kaydını çal (aynı anda tek ses); from/to saniye verilirse yalnız o aralık
+  let now = null;
+  async function cal(id, o = {}) {
+    now && now.pause();
+    const url = await rowUrl(id, 'b64');
+    if (!url) return K.fx.toast('Ses açılamadı.'), null;
+    const a = new Audio(url);
+    a.volume = o.volume == null ? 1 : o.volume;
+    if (o.from) a.currentTime = o.from;
+    if (o.loop) a.loop = true;
+    K.audio.music && K.audio.music.on && K.audio.music.stop(false);
+    a.play().catch(() => {});
+    if (o.to) {
+      const t = setInterval(() => {
+        if (a.currentTime >= o.to || a.paused) clearInterval(t), a.pause(), o.onEnd && o.onEnd();
+      }, 100);
+    } else if (o.onEnd) a.onended = o.onEnd;
+    now = a;
+    return a;
+  }
+  const sus = () => now && (now.pause(), (now = null));
+  K.medya = { image, thumb, blobUrl, toB64, rowUrl, kaydet, cal, sus };
 })();

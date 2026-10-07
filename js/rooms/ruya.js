@@ -54,7 +54,7 @@
     const sen = K.$('#rySen', root).checked;
     const r = await K.cloud.add('ruya', { day: today(), text, sen, his });
     if (!r) return (btn.disabled = false), K.fx.toast('Postalanamadı.');
-    rows.push(r);
+    rows.some((x) => x.id === r.id) || rows.push(r);
     his = '';
     K.audio.sfx.sparkle();
     K.stickers.award('ruya');

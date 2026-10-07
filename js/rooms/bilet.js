@@ -213,6 +213,9 @@
 
   K.bilet = {
     get: cur,
+    // Uçuşun evresi: before | board | air (q: 0–1) | landed | together | after; over(q): "Gürcistan'ın üstünde"
+    phase: () => (cur() ? phase(cur()) : null),
+    over,
     reveal: (f, preview) => reveal(f || cur() || SAMPLE, preview),
     // Ona göre ana salondaki çip: uçuş günü uçağı gösterir
     where() {

@@ -215,7 +215,7 @@
           const r = await K.cloud.add('tebrik', draft);
           b.disabled = false;
           if (!r) return K.fx.toast('Gönderilemedi.');
-          rows.push(r);
+          rows.some((x) => x.id === r.id) || rows.push(r);
           draft = null;
           sel = -1;
           K.audio.sfx.whoosh();

@@ -33,7 +33,7 @@
     if (!city) return;
     const r = await K.cloud.add('ilkkar', { kis: s, city });
     if (r) {
-      first.push(r);
+      first.some((x) => x.id === r.id) || first.push(r);
       document.body.classList.add('ilkkar');
       K.renderSpecials && !K.activeRoom && K.renderSpecials();
       K.ping(`❄️ ${K.ek(city === 'ist' ? C.myCity : C.herCity, 'e')} ilk kar düştü`, 'Kalede kardan adam sahnesi açıldı. Gel, birlikte yapalım.', ['snowflake'], { click: K.roomUrl('') });

@@ -99,7 +99,7 @@
     const r = await K.cloud.add('dilek', { ev: btn.dataset.gtDilek, title: btn.dataset.t, text, open: Date.now() + 365 * 864e5 });
     btn.disabled = false;
     if (!r) return K.fx.toast('Kutuya atılamadı.');
-    rows.push(r);
+    rows.some((x) => x.id === r.id) || rows.push(r);
     K.audio.sfx.sparkle();
     K.fx.rain({ count: 24, shapes: ['star'], colors: ['#FFFFFF', '#FFE38A', '#CDB8FF'] });
     K.stickers.award('goktakvimi');

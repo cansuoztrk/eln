@@ -112,7 +112,7 @@
       btn.textContent = '💗 Gönder';
       return K.fx.toast('Gönderilemedi, tekrar dene.');
     }
-    rows.push(r);
+    rows.some((x) => x.id === r.id) || rows.push(r);
     URL.revokeObjectURL(draft.url);
     draft = null;
     K.store.set('anlarAylar', [...new Set([...K.store.get('anlarAylar', []), today().slice(0, 7)])].slice(-24));

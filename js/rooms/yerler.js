@@ -80,7 +80,7 @@
           const place = (K.$('#yrYer', m.body).value || '').trim().slice(0, 60), note = (K.$('#yrNot', m.body).value || '').trim().slice(0, 140);
           const r = await K.cloud.add('yer', { lat, lng, place, note });
           if (!r) return (b.disabled = false), K.fx.toast('Kaydedilemedi.');
-          rows.push(r);
+          rows.some((x) => x.id === r.id) || rows.push(r);
           m.close();
           tab = 'benim';
           render();

@@ -195,7 +195,7 @@
     K.$('#glMsg', root).innerHTML = `<p class="hand">${K.esc(line)}</p><p class="muted small">Ekran kısıldı. Ses açıksa zamanlayıcı bitince yavaşça susacak.</p>`;
     if (K.voice && K.voice.has('iyi-geceler')) K.$('#glMsg', root).insertAdjacentHTML('beforeend', K.voice.btn('iyi-geceler', 'Sesimle iyi geceler'));
     K.$('#glMsg', root).scrollIntoView({ behavior: K.reduced ? 'auto' : 'smooth', block: 'center' });
-    K.stickers.award('gece');
+    K.stickers.award('uykucu');
   }
   // Sabah: kaleye ilk gelişte uyku raporu
   K.on('built', () => {

@@ -100,7 +100,7 @@
     const r = await K.cloud.add('adim', { day: T.todayKey(), steps: n });
     btn.disabled = false;
     if (!r) return K.fx.toast('Kaydedilemedi.');
-    man.push(r);
+    man.some((x) => x.id === r.id) || man.push(r);
     inp.value = '';
     changed();
     K.audio.sfx.success();

@@ -58,7 +58,7 @@
     btn.disabled = true;
     const r = await K.cloud.add('pazar', { w: wk(), a });
     if (!r) return (btn.disabled = false), K.fx.toast('Kaydedilemedi.');
-    rows.push(r);
+    rows.some((x) => x.id === r.id) || rows.push(r);
     K.audio.sfx.chime();
     K.stickers.award('pazar');
     const ot = of(wk(), other());

@@ -77,7 +77,7 @@
         K.store.set('belgeselGordu', [...new Set([...K.store.get('belgeselGordu', []), ym])].slice(-24));
         if (watched(ym, mine())) return;
         const r = await K.cloud.add('belgeselizle', { ym });
-        r && seen.push(r);
+        r && !seen.some((x) => x.id === r.id) && seen.push(r);
         K.stickers.award('belgesel');
         render();
       },

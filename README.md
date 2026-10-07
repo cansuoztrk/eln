@@ -208,6 +208,35 @@ Küsünce de buradayız. Saatlerce konuşamadığımız o anlar için:
 - **Kilitli Kule 2**: dört kilitli yeni iki kişilik kaçış odası (Mors fenerli kelime, görünmeyen kayalarla rota, deniz kabuğu melodisi, yırtık mektup).
 - Hata Gözcüsü mesajları artık "Ardoş" diyor. Kalede Yeni'de 33 sayfa, 50 yeni pul.
 
+### 29. aşama: Kale 3.0
+
+**Yeni tasarım dili**
+- **Kale 3.0** (`css/kale30.css`): Fraunces başlıklar ve Nunito gövde, yumuşak cam üst çubuk, ince çizgili kartlar, degrade düğmeler, alttan açılan sayfalar (telefonda modallar), üstte bildirimler, gece moduna özel koyu tonlar. Tema Atölyesi'ndeki "Kale 3.0 tasarımı" anahtarıyla klasik puantiyeli kaleye dönülebilir. Kitty yeniden çizildi (yumuşak gölgeli baş, göz parıltısı, parlak fiyonk); resmî Sanrio çizimleri kopyalanmadı.
+- **Kalenin Melodisi**: kale açılırken çalan müzik seçilebilir. Hazır seçenekler halk şarkılarından tarayıcıda çalınan düzenlemeler: **Sarı Gelin** (10/8) ve **Üsküdar'a Gider İken**. Notalar telif dışı geleneksel ezgilerin ABC kayıtlarından (abcnotation.com) alındı; kayıt ya da şarkı sözü yok. **Mırıldan**: mikrofona söylenen ezgi perde tanımayla notaya dönüşür; İkili Piyano'da çalınan melodiler ve Ortak Beste de seçilebilir. Seçim iki tarafta ortaktır.
+
+**Ses ve dokunuş** (Plan V)
+- Kalp menüsünde **uzaktan okşama**, **alın öpücüğü** ve **battaniye** (onun ekranında sabaha kadar). **Uzun Sessizlik**: iki gün kaleden ses çıkmazsa Kitty ikinize aynı soruyu sorar, cevaplar birlikte açılır. **Yıl Dönümü Motoru** (özel günlerde arşivden kısa bir film), **Özlem Barometresi**, **Aynı Şarkı Saati** (İstanbul 22:00).
+- Odalar: **Uyku Fısıltısı**, **Kalp Atışı** (atış hızı kayıttan ölçülür, uyku zamanlayıcısı), **Adının Yüz Hâli**, **Gülüş Kavanozu** (kötü havada ana salonda "Gülüşünü dinle"), **El Ele**, **Birlikte Nefes** (4-7-8), **Kitty Seni Gördü** (teselli sesi).
+
+**Gelecek, mektup, hayal**
+- **Boş Çerçeveler**, **Geleceğin Gazetesi** (on yıl mühürlü), **Yıl Dönümü Sözleri** ("Tuttun mu?"), **Bir Yıl Önce Bugün** (ana salon kartı; ilk yıl dolana kadar "bir ay önce"), **Ömür Takvimi** (elli yıl, her hafta bir nokta).
+- **El Yazısı** (çizgiler zamanıyla kaydedilir, açılınca satır satır yeniden yazılır), **Şu Zaman Aç** (yirmi zarf, açılınca haber gider), **Kazı Kazan Mektup**, **Çocukluk Mektupları** (fotoğrafın arkasına).
+- **Bizim Şehir** (Karadeniz ile Hazar arasında, binalar anı adlı, akşam pencereler yanar), **Mutfaklarımız** (sesli tarif defteri, son sayfa birlikte pişirilecek ilk yemeğe ayrılı), **Dilek Fenerleri** (her ayın 21'i), **Evimizin Sesli Turu** (Hayalimizdeki Ev'in oda kapısı açılınca o odanın sesi).
+
+**Kavuşma**
+- **Kavuşma Modu**: Biniş Kartı'na uçuş girilince ana salonun başında saniye saniye geri sayım; uçuş sırasında uçağın yeri ("Şu an Gürcistan'ın üstünde"), inişte havai fişek; indikten dönüşe kadar **Aynı Şehir** görünümü. **Havaalanı Tabelası** (tam ekran karşılama), **İlk Bakış** ("Gördüm" anı iki şehrin saatiyle; her yıl İlk Bakış Günü).
+- **Kâğıt Halka Zinciri**, **Veda Değil** (ayrılıktan sonra her sabah bir zarf), **İlk Gün Senaryosu**, **Ortak Bavul** (yola çıkmadan bir gün önce hatırlatma), **Birinci Yıl Töreni** (21 Mayıs 2027; yıl mektupları törene kadar mühürlü), **İlk Buluşma Pasaportu** (haritadaki "Gittik!"ler damga olur).
+- Oyunlar: **Ortak Yapboz** (parçaların yarısı her birinde), **Anı Bulmacası** (ayın yazılarından kendiliğinden çengel bulmaca), **Ortak Beste** (16 vuruş; biten parça kalenin marşı), **Müzik Kutusu** (kolu çevirdikçe çalar).
+
+**Temel**
+- **Sonsuz Arşiv** (`functions/arsiv/[[path]].js`, `js/core/r2.js`): büyük fotoğraf ve sesler Cloudflare R2'ye gider (10 GB'a kadar ücretsiz), Supabase'te yalnızca işaret kalır. İçerik R2'ye de kasanın anahtarıyla şifrelenmiş gider; işlev silmeye izin vermez. Kurulmadıkça hiçbir şey değişmez. Kurulum:
+  1. Cloudflare → R2 → kova oluştur (ör. `kale-arsiv`).
+  2. Pages projesi → Settings → Functions → R2 bucket bindings: değişken adı `ARSIV`, kova `kale-arsiv`.
+  3. Settings → Environment variables → **Secret** olarak `ARSIV_KEY` (uzun, rastgele bir dize).
+  4. Aynı dizeyi `private/content.mjs` → `config.arsivKey`'e yaz, `node tools/vault.mjs pack` ve paketle.
+- **Aylık Kendiliğinden Yedek** (`js/core/aylikyedek.js`): her ay ilk açılışta, kale bir dakika boş kalınca bütün yazıların şifreli yedeği cihazın tarayıcı deposuna girer (son altı ay); Sonsuz Arşiv kuruluysa bir kopyası oraya da gider. Kale Yedeği odasında listelenir, "İndir" geri yüklenebilir JSON verir.
+- Pul düzeltmeleri: aynı kimliği paylaşan iki pul ayrıldı ("Uykucu Prenses", "Kilit Ekranı"); Prenses ikinci sezon pulu eklendi. Kalede Yeni'de 35 sayfa, 73 yeni pul.
+
 ### Telefonuna bildirim (Eln'in iPhone'u)
 
 Ardoş bir şey gönderince Eln'in kilit ekranına düşer: dürt, sarıl, günaydın / iyi geceler, zamanlı sürpriz (açılış anında), hikâye, radyo, kare, pinpon daveti, mektup, Barış Köprüsü'ndeki her şey... Kurulum Eln'in ana salonunda bir kart olarak çıkar (ayrıca zil → "Telefonuna bildirim"): App Store'dan ücretsiz **ntfy** uygulaması → "+" ile kasadaki kanal adına abone ol → **Deneme gönder** → **Geldi**. "Geldi" denince Ardoş'a haber gider; Ardoş zilden kurulumu görür ve ona deneme gönderebilir. Kanal adı kasada (`config.ntfyTopicHer`). Bildirimler artık iki yönlü: Eln'in yaptıkları da eskisi gibi Ardoş'un telefonuna gider.

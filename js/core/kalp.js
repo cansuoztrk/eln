@@ -190,6 +190,7 @@
         ${K.endise && on() ? `<button type="button" class="kmenu-endise" data-km="endise">🫧 İçim sıkıştı, bana güven ver</button>` : ''}
         ${K.seslikomut && K.seslikomut.ok() ? `<button type="button" class="kmenu-ses" data-km="ses">🎙️ Kitty, ... <small>sesle söyle</small></button>` : ''}
         ${K.dokunus && on() ? `<div class="kmenu-touch"><button type="button" data-km="opucuk">💋 <small>Uzaktan öpücük</small></button><button type="button" data-km="nabiz">💓 <small>Kalp atışım</small></button></div>` : ''}
+        ${ek().length ? `<div class="kmenu-touch kmenu-ek">${ek().map((x) => `<button type="button" data-km="${x.id}">${x.emo} <small>${K.esc(x.label)}</small></button>`).join('')}</div>` : ''}
         ${K.baris && K.baris.active() ? `<a class="kmenu-bulut" href="#baris" data-km-x>☁️ Aranızda küçük bir bulut var · <b>Köprüye git</b></a>` : ''}
         <div class="kmenu-row">${birlikte.map(([id, ic, label]) => `<button type="button" data-km="${id}" class="${id === 'baris' && K.baris && K.baris.active() ? 'glow' : ''}">${A.icon(ic)}<small>${K.esc(label)}</small></button>`).join('')}</div>
         <p class="kmenu-hint">${K.esc(KP().hint || '')}</p>
@@ -214,8 +215,15 @@
     document.body.classList.remove('kmenu-open');
     setTimeout(() => m.remove(), 280);
   }
+  // Başka modüllerin menüye eklediği dokunuşlar (Saçını okşa, Alnından öp...): K.kalpEk.push({id, emo, label, ok, run})
+  const ek = () => (K.kalpEk || []).filter((x) => !x.ok || x.ok());
   async function act(id, btn) {
     const o = other();
+    const x = (K.kalpEk || []).find((e) => e.id === id);
+    if (x) {
+      closeMenu();
+      return x.run(btn);
+    }
     if (id === 'endise') return K.endise && K.endise.open();
     if (id === 'ses') {
       closeMenu();

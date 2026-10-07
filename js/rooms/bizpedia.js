@@ -56,7 +56,7 @@
       if (!del && (!title || !body)) return K.fx.toast('Başlık ve açıklama yaz.', { duration: 1800 });
       const r = await K.cloud.add('madde', { mid: e ? e.mid : 'm' + Date.now().toString(36), title: title || e.title, body, first: K.$('#bpF', m.body).value || '', room: e ? e.room : '' });
       if (!r) return K.fx.toast('Kaydedilemedi.');
-      rows.push(r);
+      rows.some((x) => x.id === r.id) || rows.push(r);
       m.close();
       openId = r.data.mid;
       K.audio.sfx.paper ? K.audio.sfx.paper() : K.audio.sfx.pop();

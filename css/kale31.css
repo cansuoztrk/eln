@@ -1,0 +1,111 @@
+/* =========================================================
+   Faz 29 — Plan V'in odaları (Kale 3.0 belirteçleriyle). Klasik görünümde de çalışır.
+   ========================================================= */
+
+/* ---------- Yakınlık: saçını okşa, alın öpücüğü, battaniye ---------- */
+.yk-oksa { position: fixed; inset: 0; z-index: 170; display: grid; grid-template-rows: auto 1fr auto; background: linear-gradient(180deg, #3a2030, #1f1119); color: #fff; opacity: 0; transition: opacity 0.3s; touch-action: none; }
+.yk-oksa.in { opacity: 1; }
+.yk-ipucu { margin: 0; padding: calc(env(safe-area-inset-top, 0px) + 22px) 20px 10px; text-align: center; font-weight: 700; }
+.yk-sac { width: 100%; height: 100%; }
+.yk-iz { position: absolute; inset: 0; pointer-events: none; }
+.yk-iz i, .yk-dalga i { position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 214, 230, 0.55), transparent 70%); animation: yk-iz 1.2s ease-out forwards; }
+@keyframes yk-iz { from { transform: scale(0.4); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
+.yk-alt { padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 18px); }
+.yk-dalga { position: fixed; inset: 0; z-index: 165; pointer-events: none; }
+.yk-dalga i { width: 160px; height: 160px; margin: -80px 0 0 -80px; background: radial-gradient(circle, rgba(255, 196, 220, 0.6), transparent 70%); animation-duration: 1.4s; }
+.hero-kitty { position: relative; }
+.yk-alin { position: absolute; left: 44%; top: 30%; width: 13%; transform: rotate(-8deg); pointer-events: none; animation: yk-alin 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.yk-alin svg { width: 100%; display: block; }
+@keyframes yk-alin { from { transform: scale(0) rotate(-30deg); } }
+.yk-alin-ov { position: fixed; left: 50%; top: 40%; z-index: 190; font-size: 96px; transform: translate(-50%, -50%); animation: yk-ov 2.4s ease forwards; pointer-events: none; }
+@keyframes yk-ov { 0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; } 25% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; } 80% { opacity: 1; } 100% { transform: translate(-50%, -70%) scale(1); opacity: 0; } }
+body.battaniye { background-image: repeating-linear-gradient(45deg, rgba(229, 120, 90, 0.07) 0 6px, transparent 6px 12px), repeating-linear-gradient(-45deg, rgba(229, 120, 90, 0.07) 0 6px, transparent 6px 12px) !important; }
+body.battaniye .hero { box-shadow: inset 0 -40px 60px -40px rgba(255, 150, 90, 0.35); }
+.yk-kitty { width: 110px; margin: 0 auto; }
+.yk-cevap { margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--petal); }
+.yk-cevap.me { background: #e6f1ff; }
+.yk-cevap p { margin: 0 0 4px; }
+.yk-cevap cite { font-style: normal; font-size: 12px; color: var(--plum-soft); }
+.yk-tv { min-height: 200px; border-radius: 16px; overflow: hidden; background: #000; margin: 10px 0; }
+
+/* ---------- Yastık Fısıltıları ---------- */
+.fs-yastik { position: relative; width: 210px; height: 120px; margin: 4px auto 12px; border-radius: 46px; background: linear-gradient(160deg, #fff, #efe8ff); box-shadow: inset 0 -10px 22px rgba(120, 90, 200, 0.18), 0 18px 30px -18px rgba(90, 60, 160, 0.6); }
+.fs-yastik span { position: absolute; left: 50%; top: 50%; width: 60%; height: 2px; background: rgba(120, 90, 200, 0.2); transform: translate(-50%, -50%); border-radius: 2px; }
+.fs-boncuk { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin: 8px 0 10px; }
+.fs-boncuk i { aspect-ratio: 1; border-radius: 50%; background: var(--line); }
+.fs-boncuk i.on { background: radial-gradient(circle at 35% 30%, #fff, #b9a6f6 60%); box-shadow: 0 0 8px rgba(185, 166, 246, 0.7); }
+.fs-ov { position: fixed; inset: 0; z-index: 175; display: grid; place-content: center; justify-items: center; gap: 14px; background: radial-gradient(circle at 50% 40%, rgba(40, 24, 70, 0.92), rgba(10, 6, 20, 0.97)); color: #e9e0ff; opacity: 0; transition: opacity 0.8s; }
+.fs-ov.in { opacity: 1; }
+.fs-ay { width: 110px; height: 110px; border-radius: 50%; box-shadow: inset -26px -8px 0 0 #fdf3c4; filter: drop-shadow(0 0 30px rgba(253, 243, 196, 0.5)); animation: fs-ay 4s ease-in-out infinite; }
+@keyframes fs-ay { 50% { transform: translateY(-8px); } }
+.fs-ov p { margin: 0; font: 600 18px var(--font-display); }
+
+/* ---------- Kalp Atışım ---------- */
+.ka-kalp { width: 120px; margin: 6px auto 10px; }
+.ka-kalp.buyuk { width: 170px; }
+.ka-kalp svg { width: 100%; display: block; filter: drop-shadow(0 14px 22px rgba(229, 23, 79, 0.35)); }
+.ka-kalp.atiyor svg { animation: ka-atis var(--atis, 0.83s) ease-in-out infinite; }
+@keyframes ka-atis { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.14); } 30% { transform: scale(0.98); } 45% { transform: scale(1.08); } }
+.ka-zaman { gap: 6px; align-items: center; }
+
+/* ---------- Adının Yüz Hâli ---------- */
+.ah-sayac { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: baseline; gap: 6px; margin-bottom: 12px; }
+.ah-sayac b { font: 650 44px/1 var(--font-serif, var(--font-display)); color: var(--bow); }
+.ah-sayac span { color: var(--plum-soft); }
+.ah-sayac i { --p: 0; grid-column: 1 / -1; width: min(280px, 100%); height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--bow) calc(var(--p) * 100%), var(--line) 0); }
+.ah-raf { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; padding: 10px; border-radius: 14px; background: linear-gradient(180deg, #f6ede4, #ead9c6); box-shadow: inset 0 -6px 0 #d8c1a8; }
+.ah-kaset { display: grid; gap: 1px; padding: 6px 9px 5px; border: 0; border-radius: 6px; background: #2c1422; color: #fff; text-align: left; cursor: pointer; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.1); max-width: 150px; }
+.ah-kaset.her { background: #b30f3c; }
+.ah-kaset.me { background: #2b5d8f; }
+.ah-kaset span { font: 700 12px/1.2 var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ah-kaset small { font-size: 10px; opacity: 0.75; }
+.ah-haller { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+
+/* ---------- Gülüş Kavanozu ---------- */
+.gl-kavanoz { width: 130px; display: block; margin: 0 auto 8px; }
+.gl-ts { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.gl-kes { display: grid; gap: 8px; margin-top: 10px; padding: 12px; border-radius: 14px; background: var(--petal); }
+.gl-kes label { display: grid; gap: 4px; font-size: 13px; color: var(--plum-soft); }
+
+/* ---------- El Ele ---------- */
+.ee-sahne { --sicak: 0; position: relative; height: 340px; border-radius: 24px; overflow: hidden; display: grid; place-items: center; touch-action: none; user-select: none; -webkit-user-select: none; background: radial-gradient(circle at 50% 45%, color-mix(in srgb, #ffd166 calc(var(--sicak) * 100%), #ffd6e5), color-mix(in srgb, #ff9f6e calc(var(--sicak) * 100%), #fff3f7) 75%); transition: background 0.6s; }
+.ee-sahne.birlikte { box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.6), inset 0 0 0 3px rgba(229, 23, 79, 0.25); }
+.ee-eller { position: relative; width: 190px; height: 240px; }
+.ee-el { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.4s; }
+.ee-el path { fill: rgba(255, 255, 255, 0.5); stroke: #b30f3c; stroke-width: 2.5; stroke-linejoin: round; }
+.ee-el.o path { stroke: #2b5d8f; }
+.ee-el.ben { transform: translateX(-28%) rotate(-8deg); opacity: 0.55; }
+.ee-el.o { transform: translateX(28%) rotate(8deg) scaleX(-1); opacity: 0.55; }
+.ee-el.ben.on { opacity: 1; }
+.ee-el.o.on { opacity: 1; }
+.ee-sahne.birlikte .ee-el.ben { transform: translateX(-4%) rotate(-3deg); }
+.ee-sahne.birlikte .ee-el.o { transform: translateX(4%) rotate(3deg) scaleX(-1); }
+.ee-sahne.birlikte .ee-el path { fill: rgba(255, 255, 255, 0.75); }
+.ee-durum { position: absolute; left: 0; right: 0; bottom: 18px; display: grid; justify-items: center; gap: 2px; text-align: center; color: var(--plum); pointer-events: none; }
+.ee-durum b { font: 650 34px/1 var(--font-serif, var(--font-display)); color: var(--bow); font-variant-numeric: tabular-nums; }
+.ee-durum span { font-size: 14px; }
+.ee-sayi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.ee-sayi b { display: block; font: 800 18px var(--font-display); color: var(--plum); }
+.ee-sayi small { color: var(--plum-soft); font-size: 12px; }
+
+/* ---------- Birlikte Nefes ---------- */
+.nf-sahne { position: relative; height: 320px; display: grid; place-items: center; }
+.nf-daire { position: absolute; width: 240px; height: 240px; border-radius: 50%; transform: scale(0.45); transition: opacity 0.6s; will-change: transform; }
+.nf-daire.ben { background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, 0.9), rgba(143, 211, 255, 0.75) 60%, rgba(91, 160, 230, 0.6)); box-shadow: 0 20px 50px -20px rgba(60, 120, 200, 0.6); }
+.nf-daire.o { background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, 0.6), rgba(255, 170, 200, 0.45) 60%, rgba(229, 23, 79, 0.25)); transform-origin: center; margin-left: 46px; opacity: 0; }
+.nf-sahne.bir .nf-daire.o { margin-left: 0; mix-blend-mode: multiply; }
+.nf-yazi { position: relative; display: grid; justify-items: center; gap: 2px; text-align: center; pointer-events: none; }
+.nf-yazi b { font: 650 30px/1.1 var(--font-serif, var(--font-display)); color: var(--plum); }
+.nf-yazi span { font-size: 13.5px; color: var(--plum-soft); }
+
+/* ---------- Kitty Seni Gördü ---------- */
+.ts-kitty { width: 120px; margin: 0 auto; }
+.ts-dalga { display: flex; justify-content: center; gap: 4px; height: 40px; align-items: center; margin: 10px 0; }
+.ts-dalga i { width: 4px; height: 30%; border-radius: 2px; background: var(--bow); animation: bg-dalga 0.9s ease-in-out infinite alternate; }
+.ts-dalga i:nth-child(3n) { animation-delay: -0.3s; }
+.ts-dalga i:nth-child(3n + 1) { animation-delay: -0.6s; }
+.ts-satir { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ka-kalp.atiyor svg, .fs-ay, .ts-dalga i, .yk-iz i, .yk-dalga i { animation: none; }
+}

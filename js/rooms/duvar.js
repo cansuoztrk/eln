@@ -258,7 +258,7 @@
   async function share() {
     await draw();
     const blob = await new Promise((r) => cv.toBlob(r, 'image/png'));
-    K.stickers.award('duvar');
+    K.stickers.award('kilitekran');
     if (!blob) return K.fx.toast('Görsel hazırlanamadı.');
     const name = `kilit-ekrani-${opt.theme}.png`;
     const file = new File([blob], name, { type: 'image/png' });
