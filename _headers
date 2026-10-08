@@ -8,3 +8,21 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: same-origin
+
+/assets/ar/kitty.usdz
+  Content-Type: model/vnd.usdz+zip
+
+/assets/ar/kitty.glb
+  Content-Type: model/gltf-binary
+
+/assets/ar/kale.usdz
+  Content-Type: model/vnd.usdz+zip
+
+/assets/ar/kale.glb
+  Content-Type: model/gltf-binary
+
+/assets/ar/tabela.usdz
+  Content-Type: model/vnd.usdz+zip
+
+/assets/ar/tabela.glb
+  Content-Type: model/gltf-binary

@@ -1,0 +1,185 @@
+/* Oda: Masada Kitty (AR) — üç model kartı (Pastel Pop): pastel sahnede önizleme, boy etiketi, "Masana koy" */
+.room-arkitty {
+  --ak-ink: var(--k4-ink, #3A1F2D);
+  --ak-card: var(--k4-card, #FFFFFF);
+}
+.ak-liste {
+  display: grid;
+  gap: 18px;
+  margin: 14px 0 18px;
+}
+@media (min-width: 760px) {
+  .ak-liste {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.ak-kart {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 14px 16px;
+  background: var(--ak-card);
+  color: var(--ak-ink);
+  border: 3px solid var(--ak-ink);
+  border-radius: 24px;
+  box-shadow: 0 4px 0 var(--ak-ink);
+}
+.ak-kitty { --ak-ton: #FFE3EE; --ak-nokta: rgba(255, 143, 184, 0.35); }
+.ak-kale { --ak-ton: #ECE5FF; --ak-nokta: rgba(205, 187, 255, 0.55); }
+.ak-tabela { --ak-ton: #FFF3C9; --ak-nokta: rgba(255, 210, 110, 0.5); }
+
+/* Önizleme sahnesi: pastel zemin + puantiye; iPhone'da Quick Look bağlantısı */
+.ak-sahne {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  margin-bottom: 4px;
+  border: 2.5px solid var(--ak-ink);
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: var(--ak-ton, #FFF0F5);
+  background-image: radial-gradient(circle, var(--ak-nokta, rgba(255, 143, 184, 0.3)) 2.4px, transparent 3px);
+  background-size: 26px 26px;
+  -webkit-tap-highlight-color: transparent;
+}
+.ak-sahne img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: ak-suzul 5.5s ease-in-out infinite;
+}
+.ak-kale .ak-sahne img { animation-delay: -1.8s; }
+.ak-tabela .ak-sahne img { animation-delay: -3.6s; }
+a.ak-sahne:active img {
+  transform: scale(0.97);
+}
+@keyframes ak-suzul {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.ak-boy {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 4px 10px;
+  font: 600 13px/1.2 var(--font-display);
+  color: var(--ak-ink);
+  background: #fff;
+  border: 2px solid var(--ak-ink);
+  border-radius: 999px;
+  box-shadow: 0 2px 0 var(--ak-ink);
+  pointer-events: none;
+}
+.ak-kart .card-eyebrow {
+  margin: 0;
+}
+.ak-ad {
+  margin: 0;
+  font: 600 23px/1.1 var(--font-display);
+  color: var(--ak-ink);
+}
+.ak-metin {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  flex: 1;
+}
+.ak-eylem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.ak-eylem .ak-koy {
+  flex: 1 1 auto;
+}
+.ak-eylem .btn {
+  border: 2.5px solid var(--ak-ink);
+  box-shadow: 0 4px 0 var(--ak-ink);
+}
+.ak-eylem .btn:active {
+  box-shadow: 0 1px 0 var(--ak-ink);
+}
+
+/* Nasıl? ve masaüstü notu */
+.ak-nasil,
+.ak-not {
+  border: 3px solid var(--ak-ink);
+  border-radius: 24px;
+  box-shadow: 0 4px 0 var(--ak-ink);
+}
+.ak-adim {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 6px;
+}
+.ak-adim li::marker {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--k4-red, #E3174D);
+}
+.ak-nasil .muted {
+  margin: 10px 0 0;
+}
+.ak-not {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.ak-not p {
+  margin: 0;
+}
+.ak-not .card-eyebrow {
+  margin-bottom: 6px;
+}
+.ak-qr {
+  flex: none;
+  padding: 6px;
+  background: #fff;
+  border: 2.5px solid var(--ak-ink);
+  border-radius: 16px;
+  line-height: 0;
+}
+.ak-qr svg {
+  width: 120px;
+  height: 120px;
+}
+@media (max-width: 480px) {
+  .ak-not {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Gece: sahne koyu, yıldızlı */
+body.night .ak-sahne,
+body.gece-modu .ak-sahne {
+  background-color: #2A1D3A;
+  background-image: radial-gradient(circle, rgba(255, 226, 122, 0.55) 1.2px, transparent 1.8px), radial-gradient(circle, rgba(255, 214, 236, 0.28) 2px, transparent 2.6px);
+  background-size: 38px 38px, 26px 26px;
+  background-position: 7px 11px, 0 0;
+}
+body.gece-modu .ak-kart,
+body.gece-modu .ak-nasil,
+body.gece-modu .ak-not {
+  --ak-card: #2E2140;
+  --ak-ink: #120A1C;
+  color: #F3E6F0;
+}
+body.gece-modu .ak-ad {
+  color: #FFE6F0;
+}
+body.gece-modu .ak-nasil,
+body.gece-modu .ak-not {
+  background: var(--ak-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ak-sahne img {
+    animation: none;
+  }
+}
