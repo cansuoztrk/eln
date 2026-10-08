@@ -72,8 +72,40 @@
       <p class="card-eyebrow">Amblem</p><div class="mh-row">${AMBLEM.map(([id, n]) => `<button type="button" class="btn ${d.amblem === id ? 'red' : 'soft'} small" data-mh="amblem:${id}">${n}</button>`).join('')}</div>
       ${d.amblem === 'harf' ? `<input class="input mh-harf-in" id="mhHarf" maxlength="1" value="${K.esc(d.harf)}" aria-label="Harf">` : ''}
       <p class="card-eyebrow">Kenar</p><div class="mh-row">${KENAR.map(([id, n]) => `<button type="button" class="btn ${d.kenar === id ? 'red' : 'soft'} small" data-mh="kenar:${id}">${n}</button>`).join('')}</div>
-      <div class="row"><button type="button" class="btn red" data-mh-kaydet>Mührümü kaydet</button><button type="button" class="btn ghost small" data-mh-dene>Kırmayı dene</button></div>`;
+      <div class="row"><button type="button" class="btn red" data-mh-kaydet>Mührümü kaydet</button><button type="button" class="btn ghost small" data-mh-dene>Kırmayı dene</button><button type="button" class="btn ghost small" data-mh-kalip>🔨 Gerçek mühür kalıbı</button></div>`;
     K.$('#mhIkimiz', root).innerHTML = ['her', 'me'].map((w) => `<figure>${svg(w)}<figcaption>${K.esc(K.ek(nameOf(w), 'in'))} mührü</figcaption></figure>`).join('');
+  }
+  /* ---------- Gerçek mühür kalıbı: pirinç mühür yapan bir atölyeye gönderilecek tek renk vektör ---------- */
+  function kalipSvg(d, ayna) {
+    const emb = d.amblem === 'harf' ? `<text x="50" y="64" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="44" font-weight="700">${K.esc(String(d.harf || '?').charAt(0).toLocaleUpperCase('tr'))}</text>` : (SHAPE[d.amblem] || SHAPE.kalp);
+    const ring = d.kenar === 'inci' ? Array.from({ length: 22 }, (_, i) => { const a = (i / 22) * Math.PI * 2; return `<circle cx="${(50 + Math.cos(a) * 40).toFixed(2)}" cy="${(50 + Math.sin(a) * 40).toFixed(2)}" r="2.2"/>`; }).join('') : d.kenar === 'yaprak' ? Array.from({ length: 12 }, (_, i) => `<ellipse cx="50" cy="10.5" rx="2.6" ry="5.2" transform="rotate(${i * 30} 50 50)"/>`).join('') : '<circle cx="50" cy="50" r="40" fill="none" stroke="#000" stroke-width="2.4"/>';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="1000" height="1000"><rect width="100" height="100" fill="#fff"/><g ${ayna ? 'transform="translate(100 0) scale(-1 1)"' : ''}><circle cx="50" cy="50" r="47" fill="none" stroke="#000" stroke-width="2.6"/><g fill="#000" stroke="#000" stroke-width=".4">${ring}</g><g fill="#000" stroke="none" transform="translate(50 50) scale(1.25) translate(-50 -50)">${emb}</g></g></svg>`;
+  }
+  function kalip() {
+    const d = Object.assign({}, draft || design(mine()));
+    const m = K.ui.modal({
+      label: 'Gerçek mühür kalıbı',
+      cls: 'mh-kalip',
+      html: `<p class="card-eyebrow">Kavuşma kutusuna gerçek bir mühür</p><h2>Pirinç mühür kalıbı</h2>
+        <div class="mh-kalip-iki"><figure>${kalipSvg(d, false)}<figcaption>Mühürde görünecek hâli</figcaption></figure><figure>${kalipSvg(d, true)}<figcaption>Kalıba kazınacak (aynalı)</figcaption></figure></div>
+        <div class="cl-dugmeler"><button class="btn small" type="button" data-mk="svg">SVG indir (atölye için)</button><button class="btn ghost small" type="button" data-mk="png">PNG indir</button></div>
+        <ol class="muted small"><li>"Özel tasarım mum mühür" ya da "custom wax seal stamp" yapan bir atölyeye SVG dosyasını gönder (çoğu 25 mm ya da 30 mm çap yapar).</li><li>Atölye genelde aynalamayı kendisi yapar: düz hâlini gönder, "aynalı mı istiyorsunuz?" diye sorarlarsa aynalı dosyayı ver.</li><li>Mumun rengi: ${K.esc((RENK.find((x) => x[0] === d.renk) || RENK[0])[1])}. Mum çubuğunu da aynı renkte sipariş edebilirsin.</li></ol>`,
+    });
+    m.el.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-mk]');
+      if (!b) return;
+      const svgStr = kalipSvg(d, false);
+      if (b.dataset.mk === 'svg') return K.download('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr), 'muhur-kalibi.svg'), K.stickers.award('muhurkalip');
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 2000;
+        c.getContext('2d').drawImage(img, 0, 0, 2000, 2000);
+        K.download(c.toDataURL('image/png'), 'muhur-kalibi.png');
+        K.stickers.award('muhurkalip');
+      };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+    });
   }
   K.on('cloud', async (ok) => {
     if (!ok) return;
@@ -101,6 +133,7 @@
           K.audio.sfx.tap();
           return render();
         }
+        if (e.target.closest('[data-mh-kalip]')) return kalip();
         if (e.target.closest('[data-mh-dene]')) {
           const box = K.$('#mhOnizle', el);
           return breakOpen(box, mine(), () => render())();

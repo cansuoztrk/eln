@@ -111,7 +111,14 @@
       root = el;
       el.innerHTML = `<div class="room-intro"><p>Bir yılın kalesi tek kitapta: ay ay kareler, kavanoz notları, barış sözleri, minnetler ve telesekreter dökümü. Sonunda elle yazmanız için iki boş "gelecek yıla mektup" sayfası var. Yazdır'dan PDF olarak kaydet ya da bir kırtasiyede A5 bastır.</p></div>
         <div class="yk-yillar" id="ykYil"></div><div class="row center"><button type="button" class="btn red big" data-yk-ac>${A.icon('book')} Yıllığı hazırla</button></div>
-        <p class="muted small center">Yıl bitmeden de hazırlanabilir; kitap o güne kadarki sayfaları içerir.</p>`;
+        <p class="muted small center">Yıl bitmeden de hazırlanabilir; kitap o güne kadarki sayfaları içerir.</p>
+        <details class="card yk-baski"><summary>📦 Ciltli kitap olarak bastır ve Bakü'ye gönder</summary>
+          <ol><li><b>PDF'i al:</b> "Yıllığı hazırla" → Yazdır → <i>PDF olarak kaydet</i>. Kâğıt boyutu A5, kenar boşluğu "yok" ya da "varsayılan".</li>
+            <li><b>Bir baskı servisi seç:</b> A5 ciltli (hardcover) kitap basan bir fotokitap ya da "print on demand" servisi. Türkiye'de fotokitap/kitap baskısı yapan matbaalar; yurt dışında Lulu ya da Blurb gibi servisler A5 PDF'i doğrudan kabul eder.</li>
+            <li><b>Kapak:</b> ilk sayfa kapak olarak tasarlandı; servis ayrı kapak isterse ilk sayfayı kapak, ikinci sayfayı iç kapak olarak yükle. Sırt yazısı: "Bizim Yılımız · N. yıl".</li>
+            <li><b>Kâğıt:</b> fotoğraflar için mat kuşe 150 g önerilir; iki boş mektup sayfasına kalemle yazılabilsin diye parlak olmayan kâğıt seç.</li>
+            <li><b>Gönderim:</b> doğrudan Bakü'deki adrese kargolat ya da önce sana gelsin, mektup sayfalarını elle yaz, sonra gönder. Kavuşma kutusuna koymak da güzel bir seçenek.</li></ol>
+          <p class="muted small">İpucu: Yıl dönümünden 3–4 hafta önce sipariş ver; baskı ve uluslararası kargo zaman alır.</p></details>`;
       el.addEventListener('click', (e) => {
         const y = e.target.closest('[data-yk]');
         if (y) return (pick = +y.dataset.yk), render();

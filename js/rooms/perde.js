@@ -56,7 +56,7 @@
   }
   // Alıcı tarafı: perdeler kapalı bir karşılama
   function karsila(r) {
-    if (K.store.get('perdeGor') === r.id) return;
+    if (K.store.get('perdeGor') === r.id || K.$('.pr-ekran')) return;
     K.store.set('perdeGor', r.id);
     const el = K.el(`<div class="pr-ekran" role="dialog" aria-label="Sabah perdesi">
       <div class="pr-gun"><div class="pr-gunes"></div><p class="pr-cumle hand">${K.yazitipi ? K.yazitipi.html(r.data.cumle, r.who) : K.esc(r.data.cumle)}</p><p class="pr-kim">— ${K.esc(nameOf(r.who))}, ${K.esc(T.hm ? new Date(r.at).toTimeString().slice(0, 5) : '')}</p><button class="btn" type="button" data-pr-kapat>Günaydın 💗</button></div>

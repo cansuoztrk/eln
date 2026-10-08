@@ -59,7 +59,7 @@
     title: 'Tanıştığımız Gece',
     sub: () => (acik() ? '6 Aralık 2025, saat saat' : 'Birinci yıl dönümünde açılır'),
     icon: 'stars2',
-    color: '#2A2266',
+    color: '#DCD6F7',
     hidden: () => !K.cloud || !K.cloud.enabled,
     badge: () => (acik() && !K.stickers.got().tanisma ? 'Açıldı' : ''),
     init(el) {

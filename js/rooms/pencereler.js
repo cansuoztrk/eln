@@ -32,7 +32,7 @@
     return `<figure class="pn-pencere ${sehir}"><div class="pn-cerceve">${id
       ? `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&playsinline=1&controls=0&modestbranding=1" allow="autoplay; encrypted-media; picture-in-picture" title="${K.esc(ad)} canlı"></iframe>`
       : `<div class="pn-bos"><p>${K.esc(ad)} penceresi henüz kurulmadı.</p><a class="btn ghost small" href="${ARA[sehir]}" target="_blank" rel="noopener">YouTube'da canlı yayın bul ›</a></div>`}</div>
-      <figcaption><b>${K.esc(ad)}</b><span class="pn-canli">● CANLI</span><span class="tnum">${sehir === 'ist' ? T.istTime() : T.bakuTime()}</span></figcaption></figure>`;
+      <figcaption><b>${K.esc(ad)}</b><span class="pn-canli">● CANLI</span><span class="tnum">${T.hm(sehir === 'ist' ? C.tzIstanbul : C.tzBaku)}</span></figcaption></figure>`;
   }
   function ciz() {
     if (!root || K.activeRoom !== 'pencereler') return;

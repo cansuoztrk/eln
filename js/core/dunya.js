@@ -49,5 +49,108 @@
     const n = (s) => s.toLocaleLowerCase('tr').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ı/g, 'i').replace(/ə/g, 'e');
     return SEHIR.find((s) => n(s[0]) === n(ad || '')) || null;
   };
-  K.dunya = { load, proj, unproj, km, kutu, SEHIR, sehirBul, veri: H };
+  /* ---------- Dokunmatik harita: sürükle, yakınlaştır, dokun ---------- */
+  const BOLGE = {
+    dunya: [[70, -170], [-50, 175]],
+    avrupa: [[63, -10], [35, 45]],
+    kafkas: [[44, 25], [37, 51]],
+    istanbul: [[41.25, 28.6], [40.85, 29.35]],
+    baku: [[40.6, 49.6], [40.3, 50.1]],
+  };
+  function harita(el, opt = {}) {
+    let vb = kutu(opt.ilk || BOLGE.kafkas, 0.05, opt.oran || 1.25);
+    let isaret = opt.isaretler || [], cizgi = opt.cizgiler || [];
+    el.classList.add('dn-harita');
+    el.innerHTML = `<svg class="dn-svg" viewBox="${vb.join(' ')}" preserveAspectRatio="xMidYMid slice"><rect class="dn-deniz" x="-2000" y="-2000" width="6000" height="6000"/><path class="dn-kara" d="${H().world}"/><path class="dn-sinir" d="${H().br || ''}"/><g class="dn-ust"></g></svg>
+      <div class="dn-tuslar"><button type="button" data-dn="+" aria-label="Yakınlaştır">+</button><button type="button" data-dn="-" aria-label="Uzaklaştır">−</button></div>
+      <div class="dn-bolge">${[['dunya', 'Dünya'], ['avrupa', 'Avrupa'], ['kafkas', 'Türkiye–Kafkasya'], ['istanbul', 'İstanbul'], ['baku', 'Bakü']].map(([k, a]) => `<button type="button" data-dn-b="${k}">${a}</button>`).join('')}</div>`;
+    const svg = el.querySelector('svg');
+    const ust = el.querySelector('.dn-ust');
+    const olcek = () => vb[2] / 400;
+    function boya() {
+      svg.setAttribute('viewBox', vb.join(' '));
+      const s = olcek();
+      el.querySelector('.dn-sinir').setAttribute('stroke-width', 0.6 * s);
+      el.querySelector('.dn-kara').setAttribute('stroke-width', 0.6 * s);
+      ust.innerHTML = cizgi.map(([a, b, renk]) => {
+        const [x1, y1] = proj(a[0], a[1]), [x2, y2] = proj(b[0], b[1]);
+        return `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${renk || '#E3174D'}" stroke-width="${2.6 * s}" stroke-dasharray="${5 * s} ${4 * s}" stroke-linecap="round" fill="none"/>`;
+      }).join('') + isaret.map((m) => {
+        const [x, y] = proj(m.lat, m.lng);
+        return `<g><path transform="translate(${x} ${y}) scale(${s})" d="M0 0 C-7 -9 -9 -13 -9 -17 A9 9 0 0 1 9 -17 C9 -13 7 -9 0 0 Z" fill="${m.renk || '#E3174D'}" stroke="#3A1F2D" stroke-width="2"/>${m.etiket ? `<text x="${x}" y="${y - 30 * s}" font-size="${12 * s}" text-anchor="middle" class="dn-etiket">${String(m.etiket).replace(/[<&]/g, '')}</text>` : ''}</g>`;
+      }).join('');
+    }
+    const ekranAdres = (cx, cy) => {
+      const r = svg.getBoundingClientRect();
+      const kk = Math.min(vb[2] / r.width, vb[3] / r.height); // "slice": kısa kenar sığar
+      const ox = vb[0] + (vb[2] - r.width * kk) / 2, oy = vb[1] + (vb[3] - r.height * kk) / 2;
+      return [ox + (cx - r.left) * kk, oy + (cy - r.top) * kk, kk];
+    };
+    function zoom(f, cx, cy) {
+      const [px, py] = cx == null ? [vb[0] + vb[2] / 2, vb[1] + vb[3] / 2] : ekranAdres(cx, cy);
+      const w = Math.max(0.4, Math.min(H().W, vb[2] * f)), h = w * (vb[3] / vb[2]);
+      vb = [px - (px - vb[0]) * (w / vb[2]), py - (py - vb[1]) * (h / vb[3]), w, h];
+      boya();
+    }
+    let surukle = null, iki = null;
+    const parmak = new Map();
+    svg.addEventListener('pointerdown', (e) => {
+      svg.setPointerCapture(e.pointerId);
+      parmak.set(e.pointerId, [e.clientX, e.clientY]);
+      if (parmak.size === 2) {
+        const [a, b] = [...parmak.values()];
+        iki = { d: Math.hypot(a[0] - b[0], a[1] - b[1]) };
+        surukle = null;
+      } else surukle = { x: e.clientX, y: e.clientY, vb: vb.slice(), oynadi: false };
+    });
+    svg.addEventListener('pointermove', (e) => {
+      if (!parmak.has(e.pointerId)) return;
+      parmak.set(e.pointerId, [e.clientX, e.clientY]);
+      if (iki && parmak.size === 2) {
+        const [a, b] = [...parmak.values()];
+        const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+        zoom(iki.d / d, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+        iki.d = d;
+        return;
+      }
+      if (!surukle) return;
+      const dx = e.clientX - surukle.x, dy = e.clientY - surukle.y;
+      if (Math.abs(dx) + Math.abs(dy) > 6) surukle.oynadi = true;
+      const kk = ekranAdres(0, 0)[2];
+      vb = [surukle.vb[0] - dx * kk, surukle.vb[1] - dy * kk, vb[2], vb[3]];
+      boya();
+    });
+    const birak = (e) => {
+      parmak.delete(e.pointerId);
+      if (parmak.size < 2) iki = null;
+      if (surukle && !surukle.oynadi && e.type === 'pointerup' && opt.onTap) {
+        const [x, y] = ekranAdres(e.clientX, e.clientY);
+        const [la, ln] = unproj(x, y);
+        opt.onTap(la, ln);
+      }
+      surukle = null;
+    };
+    svg.addEventListener('pointerup', birak);
+    svg.addEventListener('pointercancel', birak);
+    svg.addEventListener('wheel', (e) => (e.preventDefault(), zoom(e.deltaY > 0 ? 1.2 : 0.83, e.clientX, e.clientY)), { passive: false });
+    el.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-dn]');
+      if (b) return zoom(b.dataset.dn === '+' ? 0.6 : 1.6);
+      const g = e.target.closest('[data-dn-b]');
+      if (g) (vb = kutu(BOLGE[g.dataset.dnB], 0.05, opt.oran || 1.25)), boya();
+    });
+    boya();
+    return {
+      guncelle(i, c) {
+        isaret = i || isaret;
+        cizgi = c || cizgi;
+        boya();
+      },
+      odakla(noktalar, pay) {
+        vb = kutu(noktalar, pay == null ? 0.3 : pay, opt.oran || 1.25);
+        boya();
+      },
+    };
+  }
+  K.dunya = { load, proj, unproj, km, kutu, SEHIR, sehirBul, veri: H, harita, BOLGE };
 })();
