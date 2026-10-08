@@ -237,6 +237,31 @@ Küsünce de buradayız. Saatlerce konuşamadığımız o anlar için:
 - **Aylık Kendiliğinden Yedek** (`js/core/aylikyedek.js`): her ay ilk açılışta, kale bir dakika boş kalınca bütün yazıların şifreli yedeği cihazın tarayıcı deposuna girer (son altı ay); Sonsuz Arşiv kuruluysa bir kopyası oraya da gider. Kale Yedeği odasında listelenir, "İndir" geri yüklenebilir JSON verir.
 - Pul düzeltmeleri: aynı kimliği paylaşan iki pul ayrıldı ("Uykucu Prenses", "Kilit Ekranı"); Prenses ikinci sezon pulu eklendi. Kalede Yeni'de 35 sayfa, 73 yeni pul.
 
+### 30. aşama: Kale 4.0 "Pastel Pop"
+
+**Baştan yeni bir arayüz** (`css/kale40.css`, `js/core/kale4.js`)
+- **Pastel Pop tasarım dili**: tombul Fredoka başlıklar, Nunito gövde, koyu mürdüm kalın çizgiler, sert ofset gölgeli "çıkartma" kartlar, düz pastel dolgular, puantiyeli zemin. Gece ve **Uyku Işığı** (00:00–06:00 siyah ve göz yormayan kırmızı) kendi tonlarında. Tema Atölyesi'nde üç tasarım: Kale 4.0, Kale 3.0, Klasik.
+- **Çok oda için yeni gezinme**: alttaki sekme çubuğu (Bugün · Biz · ♥ · Kale · Anılar). **Kale** sekmesi 180+ odayı niyet raflarına dizer ("Ona bir şey gönder", "Birlikte, şimdi", "Oyna", "Anılarımız", "Kavuşmaya doğru", "Gelecek", "Kendini iyi hisset", "Özel günler", "Kalenin araçları"); üstte anında arama (Türkçe harf duyarsız), "Sana özel" raf (onun şu an olduğu oda, favoriler, son girilenler), "Henüz girmediklerin", basılı tutunca favori, canlı kale haritası (onun olduğu kulenin penceresi yanar, gerçek yağmur/kar). **Anılar** sekmesi: bütün fotoğraf, yazı ve sesler ay ay tek akışta. **Ben** sayfası (sağ üstteki yüz): tema, bildirimler, salonu düzenle (Bugün sekmesinin bölümlerini sırala, küçült, gizle), pul albümü, yedek. Oda başında niyet yolu ve ★, sonunda "benzer odalar"; kapıdan odaya akış (View Transitions).
+- **Günün Rengi** (`js/core/gunrengi.js`): kale her sabah rengini günün karesinden, kalbin havasından ya da gerçek havadan alır. **Hareketli ikon ailesi**: 24 yeni ikon, dokununca her biri kendi hareketini yapar. **Bir saniyede açılış**: iskelet ekranlar, ekran dışı bölümleri erteleme, açılış süresi ölçümü. **Tasarım Kataloğu** (yalnız kale sahibi): renkler, yazı, düğmeler, kartlar, bütün ikonlar ve yeni oda iskeleti.
+
+**Kitty ve yazı**
+- **Yaşayan Kitty** (`js/core/yasayan.js`): göz kırpar, parmağa/telefonun eğimine bakar, gece uyur (Z'ler), dokununca esneyip zıplar; havaya ve takvime göre şemsiye, atkı, güneş gözlüğü, bere, Noel şapkası, sınav haftasında gözlük. Ana salonda **Pamuk ile Kitty** sahneleri (sabah, öğle, akşam, gece, yağmur). **Kitty'nin Gardırobu** (pullarla açılan parçalar), **Kitty'nin Günlüğü** (her akşam iki satır).
+- **Bizim Yazı Karakterlerimiz** (`js/core/yazitipi.js`): harfler bir kez kılavuzlu karede yazılır, çizgiler sadeleştirilip saklanır; kavanoz notları, minnet cümleleri ve kalenin el yazısı yerleri yazanın kendi el yazısıyla çizilir.
+
+**Dört büyük dünya**
+- **Hafıza Sarayı** (three.js r149, yalnız odaya girince yüklenir): her ay bir salon; duvarlarda o ayın fotoğrafları, masada mektuplar, köşede kalp kavanozu; sürükleyerek bakılır, dokunarak yürünür; WebGL yoksa 2B yedek.
+- **Bizim Ada**: iki kedinin aynı anda yürüdüğü izometrik ada; 17 eşya, beş aşamada büyüyen ev (son aşama birinci yılda), aynı banka oturunca gün batımı.
+- **Kale Macerası**: iki kişilik beş bölüm (biri Kitty, biri Pamuk; basınç plakaları, yalnız birinin gördüğü ipuçları, aynı anda basılan düğmeler).
+- **Masada Kitty (AR)**: iPhone'da Quick Look, Android'de Scene Viewer ile Kitty, kale maketi ve havaalanı tabelası masaya konur (`assets/ar/`, `tools/ar_model.py` üretir; `_headers` doğru türleri verir).
+
+**Plan VI'nın odaları**: Ders Arkadaşı Kitty, Rastgele Aynı An, Sabah Perdesi, Konuşan Fotoğraflar, İki Hayat Çizgisi, Sesli Kitabımız, Zor Gün Protokolü, İki Sesli Şarkı (iki kayıt ses zarflarıyla hizalanır), Kokular ve Tatlar, Tanıştığımız Gece (6 Aralık 2026'da açılır), Bir Gün Bizde, Canlı Pencereler, Şehir Keşif Kartları, Sıra Çizgi Roman, Neredeyiz? (dokunmatik dünya haritası), Fiyonk Lambası (akıllı lamba webhook'u), Poster Seti (altı baskıya hazır poster), Konuşan Kutu (nesne başına NFC/QR). Mum Mühür'de gerçek mühür kalıbı dışa aktarımı, Yıllık'ta ciltli baskı rehberi.
+
+**Altyapı**
+- **Kalenin kendi bildirimleri** (`functions/push/[[path]].js`, `js/core/webpush.js`): ana ekrandaki kale (iOS 16.4+) doğrudan Web Push alır; içerik uçtan uca şifreli (RFC 8291, aes128gcm; test vektörüyle doğrulandı), VAPID imzalı. Zamanlı bildirimler ntfy'de kalır. Kurulum: Sonsuz Arşiv kurulu olmalı; Ben → "Kalenin kendi bildirimleri" → (kale sahibi) anahtar çifti üret → Pages gizlileri `VAPID_PUBLIC`, `VAPID_PRIVATE`, `VAPID_SUB`.
+- **Canlı katman** (`workers/canli/`, `js/core/canlikatman.js`): anlık olaylar Cloudflare Durable Object odasından geçer; öbürü bağlı değilse Supabase'e düşer. Kurulum: `cd workers/canli && npx wrangler deploy && npx wrangler secret put CANLI_KEY`; adresi ve anahtarı `config.canliUrl` / `config.canliKey`'e yaz, kasayı paketle.
+- **Test robotu** (`tools/ci.mjs`, `.github/workflows/kale-test.yml`): sözdizimi, paket güncelliği, pul tutarlılığı ve iki sayfanın tarayıcıda hatasız açılması her gönderimde denetlenir. Yerelde: `node tools/ci.mjs`.
+- Kalede Yeni'de 32 sayfa, 48 yeni pul.
+
 ### Telefonuna bildirim (Eln'in iPhone'u)
 
 Ardoş bir şey gönderince Eln'in kilit ekranına düşer: dürt, sarıl, günaydın / iyi geceler, zamanlı sürpriz (açılış anında), hikâye, radyo, kare, pinpon daveti, mektup, Barış Köprüsü'ndeki her şey... Kurulum Eln'in ana salonunda bir kart olarak çıkar (ayrıca zil → "Telefonuna bildirim"): App Store'dan ücretsiz **ntfy** uygulaması → "+" ile kasadaki kanal adına abone ol → **Deneme gönder** → **Geldi**. "Geldi" denince Ardoş'a haber gider; Ardoş zilden kurulumu görür ve ona deneme gönderebilir. Kanal adı kasada (`config.ntfyTopicHer`). Bildirimler artık iki yönlü: Eln'in yaptıkları da eskisi gibi Ardoş'un telefonuna gider.

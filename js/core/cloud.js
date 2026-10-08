@@ -336,6 +336,8 @@
     // Canlı, kaydedilmeyen mesajlar: çizim, dokunuş, birlikte sarılma
     send: (e, payload) => adapter && adapter.send(Object.assign({ e, who: who(), t: Date.now() }, payload)).catch(() => {}),
     onLive: (e, fn) => (live[e] = live[e] || []).push(fn),
+    // Başka bir taşıyıcıdan (Cloudflare canlı katmanı) gelen canlı mesajı aynı dinleyicilere dağıt
+    _canliAl: (msg) => msg && msg.e && emit(live, msg.e, msg),
     onPresence: (fn) => presenceFn.push(fn),
     other: () => (who() === 'me' ? 'her' : 'me'),
     otherHere: () => cloud.people.includes(cloud.other()),

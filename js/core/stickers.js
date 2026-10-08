@@ -307,6 +307,7 @@
     { id: 'macera4', name: 'Boğaz\'dan Hazar\'a', hint: 'Kale Macerası\'nın 4. bölümü', icon: 'bridge', color: '#E0F8EC', bonus: true },
     { id: 'macera5', name: 'Sonunda Bir Arada', hint: 'Kale Macerası\'nın 5. bölümü', icon: 'plane', color: '#E0F8EC', bonus: true },
     { id: 'macerason', name: 'Kale Macerası Tamam', hint: 'Kale Macerası\'nın beş bölümünü bitir', icon: 'sword', color: '#FFE9B8', bonus: true },
+    { id: 'webpush', name: 'Kendi Zilim', hint: 'Kalenin kendi bildirimlerini aç', icon: 'nfc', color: '#E1F3FF', bonus: true },
   ];
   const REQUIRED = DEFS.filter((d) => !d.bonus);
 

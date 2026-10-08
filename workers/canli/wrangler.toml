@@ -1,0 +1,14 @@
+# Kalenin canlı katmanı (Cloudflare Worker + Durable Object)
+# Kurulum: npx wrangler deploy  ·  npx wrangler secret put CANLI_KEY
+# Sonra Kale Paneli'ne (kasada config.canliUrl ve config.canliKey) worker adresini ve aynı anahtarı yaz.
+name = "kale-canli"
+main = "index.js"
+compatibility_date = "2024-09-23"
+
+[[durable_objects.bindings]]
+name = "ODA"
+class_name = "Oda"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Oda"]

@@ -57,7 +57,9 @@
       if (id === 'sor') return Boolean(K.sor && K.ara);
       if (id === 'postaci') return Boolean(K.postaci);
       if (['yeniyil', 'ilkkar', 'bildirim', 'mozaikpul'].includes(id)) return true;
-      if (id === 'k3') return Boolean(K.atolye);
+      if (id === 'k3' || id === 'k4' || id === 'gunrengi') return Boolean(K.atolye);
+      if (id === 'k4kale' || id === 'k4anilar' || id === 'k4ben' || id === 'yasayan') return Boolean(K.kale4);
+      if (id === 'webpush') return Boolean(K.webpush && K.webpush.destek());
       if (id === 'yakinlik') return Boolean(K.yakinlik && K.cloud && K.cloud.enabled);
       if (id === 'kavusmamodu' || id === 'gecmisbugun') return Boolean(K.cloud && K.cloud.enabled);
       return roomOk(id);
@@ -85,7 +87,7 @@
       K.$$('.yn-segs i', view).forEach((s, k) => s.classList.toggle('done', k <= i));
       K.$('.yn-stage', view).innerHTML = `<div class="yn-card" data-id="${K.esc(id)}"><div class="yn-ic">${A.icon(ic)}</div><h2>${K.esc(title)}</h2><p>${K.esc(K.fill(text))}</p></div>`;
       const last = i === list.length - 1;
-      const go = NOROOM.includes(id) ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' || id === 'kisayol' || id === 'widget' || id === 'nfc' ? 'Kur' : id === 'atolye' ? 'Boya' : id === 'dock' ? 'Düzenle' : id === 'kesit' ? 'Haritaya git' : id === 'opucuk' ? 'Öp' : id === 'nabiz' ? 'Ölç' : id === 'cicek' ? 'Çiçeğe bak' : id === 'salon' ? 'Panoya bak' : id === 'endise' || id === 'seslikomut' || id === 'yakinlik' ? 'Kalp menüsünü aç' : id === 'k3' ? 'Tema Atölyesi' : id === 'faceid' || id === 'takvimabone' || id === 'egbak' || id === 'kanatses' ? 'Kur' : id === 'sor' ? 'Sor' : id === 'panorama' ? 'Yola bak' : 'Dene'}</button>`;
+      const go = NOROOM.includes(id) ? '' : `<button type="button" class="btn red" data-yn-go="${K.esc(id)}">${id === 'telefon' || id === 'kisayol' || id === 'widget' || id === 'nfc' ? 'Kur' : id === 'atolye' ? 'Boya' : id === 'dock' ? 'Düzenle' : id === 'kesit' ? 'Haritaya git' : id === 'opucuk' ? 'Öp' : id === 'nabiz' ? 'Ölç' : id === 'cicek' ? 'Çiçeğe bak' : id === 'salon' ? 'Panoya bak' : id === 'endise' || id === 'seslikomut' || id === 'yakinlik' ? 'Kalp menüsünü aç' : id === 'k3' || id === 'k4' || id === 'gunrengi' ? 'Tema Atölyesi' : id === 'k4kale' ? 'Kaleye bak' : id === 'k4anilar' ? 'Anılara bak' : id === 'k4ben' ? 'Aç' : id === 'webpush' ? 'Aç' : id === 'yasayan' ? 'Salona bak' : id === 'faceid' || id === 'takvimabone' || id === 'egbak' || id === 'kanatses' ? 'Kur' : id === 'sor' ? 'Sor' : id === 'panorama' ? 'Yola bak' : 'Dene'}</button>`;
       K.$('.yn-foot', view).innerHTML = `${go}<button type="button" class="btn ${go ? 'ghost' : 'red'}" data-yn-next>${last ? 'Kaleye dön' : 'Sıradaki'}</button>`;
       K.audio.sfx.tap();
     };
@@ -139,7 +141,12 @@
           if (id === 'faceid') return K.faceid.sheet();
           if (id === 'takvimabone') return K.takvimabone.sheet();
           if (id === 'seslikomut' || id === 'yakinlik') return K.kalp && K.kalp.openMenu();
-          if (id === 'k3') return K.atolye.open();
+          if (id === 'k3' || id === 'k4' || id === 'gunrengi') return K.atolye.open();
+          if (id === 'k4kale') return K.kale4.sekme('kale');
+          if (id === 'k4anilar') return K.kale4.sekme('anilar');
+          if (id === 'k4ben') return K.kale4.ben();
+          if (id === 'yasayan') return K.kale4.sekme('bugun');
+          if (id === 'webpush') return K.webpush.sheet();
           if (id === 'sor') return K.ara.open();
           if (id === 'opucuk') return K.dokunus.kiss();
           if (id === 'nabiz') return K.dokunus.pulse();

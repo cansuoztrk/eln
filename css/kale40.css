@@ -2061,3 +2061,13 @@ body.k4 .k4-raf {
   color: #3a1f2d;
   box-shadow: 0 2px 0 var(--k4-line, var(--line));
 }
+
+/* Kitty rehber balonu sekme çubuğunun üstünde dursun */
+body.k4.has-dock .rehber {
+  bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+}
+:where(body.k4) .rh-bubble,
+:where(body.k4) .rehber .card {
+  border: var(--k4-bw) solid var(--k4-line);
+  box-shadow: var(--k4-sh);
+}

@@ -232,6 +232,7 @@
     const btn = ([id, ad, ik]) => K.el(`<button type="button" class="k4-tab" data-k4tab="${id}" aria-label="${ad}">${A.icon(ik)}<span>${ad}</span></button>`);
     SEKME.slice(0, 2).forEach((s) => dock.insertBefore(btn(s), kalp));
     SEKME.slice(2).forEach((s) => dock.appendChild(btn(s)));
+    K.dockTray && K.dockTray.uzunBas(K.$('[data-k4tab="bugun"]', dock));
     cubukBoya();
   }
   function cubukBoya() {
@@ -278,6 +279,7 @@
       ['album', 'sticker', 'Pul Albümü', `${n} pul`, () => K.go('album')],
       ['yeni', 'gift', 'Kalede yeni ne var?', 'Son güncellemenin sayfaları', () => K.yeni && K.yeni.open && K.yeni.open(true)],
       ['telefon', 'chat', 'Bildirimler', 'Telefonuna kale bildirimi', () => (K.telefon && K.telefon.sheet ? K.telefon.sheet() : K.go('panel'))],
+      ['webpush', 'nfc', 'Kalenin kendi bildirimleri', 'ntfy olmadan, doğrudan iPhone\'a', () => K.webpush && K.webpush.sheet()],
       ['faceid', 'key', 'Face ID ile giriş', K.faceid && K.faceid.state && K.faceid.state() ? 'Kuruldu' : 'Şifresiz, güvenli', () => K.faceid && K.faceid.sheet()],
       ['takvim', 'calendar', 'Takvim aboneliği', '21\'ler telefonunun takviminde', () => K.takvimabone && K.takvimabone.sheet()],
       ['widget', 'frame', "Kale Widget'ı", 'Ana ekranda kale', () => K.widget && K.widget.open()],
@@ -285,7 +287,7 @@
       ['yedek', 'house', 'Kale Yedeği', 'Yedekle, geri yükle, aylık yedekler', () => K.go('yedek')],
       ['panel', 'key', 'Kale Paneli', 'Kale sahibinin ayarları', () => K.go('panel')],
       ['kilit', 'door', 'Bu cihazda kilitle', 'Bir dahaki girişte şifre sorulur', () => K.$('#footLock') && K.$('#footLock').click()],
-    ].filter((x) => (x[0] !== 'panel' || K.isOwner()) && (x[0] !== 'faceid' || K.faceid) && (x[0] !== 'takvim' || K.takvimabone) && (x[0] !== 'widget' || K.widget) && (x[0] !== 'siri' || K.kisayol));
+    ].filter((x) => (x[0] !== 'panel' || K.isOwner()) && (x[0] !== 'faceid' || K.faceid) && (x[0] !== 'takvim' || K.takvimabone) && (x[0] !== 'widget' || K.widget) && (x[0] !== 'siri' || K.kisayol) && (x[0] !== 'webpush' || K.webpush));
     const m = K.ui.modal({
       label: 'Ben',
       cls: 'k4-bensayfa',

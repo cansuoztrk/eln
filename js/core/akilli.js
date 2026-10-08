@@ -145,7 +145,12 @@
       },
       true
     );
-    const home = K.$('[data-dock="home"]', dock);
+    uzunBas(K.$('[data-dock="home"]', dock));
+  }
+  // Basılı tutunca en sevdiğin odalar tepsisi (Salon düğmesi; Kale 4.0'da Bugün sekmesi de)
+  function uzunBas(home) {
+    if (!home || home._uzun) return;
+    home._uzun = true;
     let t = 0, held = false;
     home.addEventListener('pointerdown', () => {
       held = false;
@@ -159,6 +164,7 @@
     home.addEventListener('click', (e) => held && (e.stopImmediatePropagation(), e.preventDefault(), (held = false)), true);
     home.addEventListener('contextmenu', (e) => e.preventDefault());
   }
+  K.dockTray = { tray, uzunBas };
 
   /* ---------- Gece Kalesi 2 ---------- */
   function night() {
