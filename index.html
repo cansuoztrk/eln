@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="tr" data-vakit="gece">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Eln</title>
+  <meta name="description" content="Bu sayfa dünyada yalnızca bir kişi için yazıldı.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#13060d">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:title" content="Eln">
+  <meta property="og:description" content="Bu sayfa dünyada yalnızca bir kişi için yazıldı.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/og.jpg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Eln">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/ikon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/ikon-180.png">
+  <link rel="stylesheet" href="css/yazi.css">
+  <link rel="stylesheet" href="css/eln.css?v=3">
+</head>
+<body>
+  <canvas id="ipek" aria-hidden="true"></canvas>
+  <canvas id="sahne" aria-hidden="true"></canvas>
+  <div class="buketler" id="buketler" aria-hidden="true"></div>
+  <div class="gok-isigi" aria-hidden="true"></div>
+  <div class="yagmur" id="yagmur" hidden aria-hidden="true"></div>
+  <div class="tane" aria-hidden="true"></div>
+  <div class="vinyet" aria-hidden="true"></div>
+
+  <!-- Anahtar yoksa -->
+  <section id="kilit" class="kilit" hidden>
+    <div class="kilit-ic">
+      <div class="monogram buyuk" aria-hidden="true"><span>E</span></div>
+      <p class="kilit-baslik">Bu kapı yalnızca bir kişiye açılır.</p>
+      <p class="kilit-alt">Sana gönderilen bağlantıyla gel.</p>
+      <details class="kilit-form">
+        <summary>Bağlantım var</summary>
+        <form id="anahtarFormu">
+          <input id="anahtarGirdi" type="text" autocomplete="off" spellcheck="false" placeholder="Bağlantıyı buraya yapıştır">
+          <button type="submit" class="dugme ince">Aç</button>
+        </form>
+      </details>
+    </div>
+  </section>
+
+  <!-- Açılış töreni: ipeğin üstünde mühürlü bir zarf -->
+  <div id="giris" class="giris" hidden>
+    <div class="giris-satirlar" id="girisSatirlar" aria-live="polite"></div>
+    <div class="gz" id="gz" hidden>
+      <div class="gz-zarf" id="gzZarf">
+        <div class="gz-arka"></div>
+        <div class="gz-mektup kagit-yuzey" id="gzMektup">
+          <span class="mektup-sus" id="mektupSus"></span>
+          <svg class="gz-el" id="gzEl" aria-hidden="true"></svg>
+          <p class="gz-satir" id="gzSatir"></p>
+          <p class="gz-imza" id="gzImza"></p>
+        </div>
+        <div class="gz-cep kagit-yuzey"></div>
+        <div class="gz-kapak"><div class="yuz on"></div><div class="yuz astar"></div></div>
+        <div class="kurdele"></div>
+        <span class="kurdele-uc sol"></span>
+        <span class="kurdele-uc sag"></span>
+        <span id="gzCicek"></span>
+        <button class="gz-muhur" id="gzMuhur" type="button" aria-label="Mührü aç">
+          <svg class="halka" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="halka-iz" cx="60" cy="60" r="56"></circle>
+            <circle class="halka-dolu" cx="60" cy="60" r="56"></circle>
+          </svg>
+          <span class="mum sol"></span>
+          <span class="mum sag"></span>
+        </button>
+      </div>
+      <p class="giris-ipucu" id="girisIpucu"></p>
+    </div>
+    <button class="giris-gec" id="girisGec" type="button" hidden>geç</button>
+  </div>
+
+  <!-- Üst çubuk -->
+  <header class="ust" id="ust" hidden>
+    <button class="monogram" id="menuAc" type="button" aria-label="İçindekiler" data-imlec><span>E</span></button>
+    <div class="ust-orta" id="ustOrta" aria-hidden="true"></div>
+    <button class="ses-dugme" id="sesDugme" type="button" aria-label="Müziği aç ya da kapat" data-imlec>
+      <span></span><span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- Aşağıda: iki şehir arasındaki ince çizgi; sayfa bittikçe mesafe kapanır -->
+  <div class="ray" id="ray" hidden aria-hidden="true">
+    <span class="ray-sehir">İstanbul</span>
+    <span class="ray-cizgi"><i class="ray-dolu"></i><b class="ray-nokta"></b></span>
+    <span class="ray-sehir">Bakü</span>
+    <span class="ray-km" id="rayKm">1.758 km</span>
+  </div>
+
+  <main id="ana" hidden>
+    <!-- 0. Açılış -->
+    <section class="bolum acilis" id="acilis" data-sahne="ad">
+      <p class="ust-yazi" id="tarihYazi"></p>
+      <div class="kamee" id="kamee" hidden><img alt=""></div>
+      <h1 class="acilis-ad" id="acilisAd">Eln</h1>
+      <p class="acilis-selam" id="selam"></p>
+      <div class="sayac" id="sayac" aria-label="Birlikte geçen zaman">
+        <div><b data-s="g">0</b><span>gün</span></div>
+        <i></i>
+        <div><b data-s="s">00</b><span>saat</span></div>
+        <i></i>
+        <div><b data-s="d">00</b><span>dakika</span></div>
+        <i></i>
+        <div><b data-s="sn">00</b><span>saniye</span></div>
+      </div>
+      <p class="sayac-alt" id="sayacAlt"></p>
+      <a class="asagi" href="#bugun" data-imlec aria-label="Aşağı in"><span></span></a>
+    </section>
+
+    <!-- I. Bugün -->
+    <section class="bolum bugun" id="bugun" data-sahne="gok">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">I</span>
+        <p class="eyebrow">Bugün</p>
+        <h2 class="baslik" id="bugunBaslik"></h2>
+      </header>
+
+      <div class="kap">
+        <div class="ozel-gun" id="ozelGun" hidden data-goster></div>
+
+        <article class="kart not-karti" data-goster>
+          <p class="eyebrow">Bugünün notu</p>
+          <blockquote class="not-metni" id="gununNotu"></blockquote>
+          <p class="imza-kucuk" data-imza></p>
+        </article>
+
+        <article class="kart soru-karti" id="soruKarti" data-goster>
+          <div class="soru-ust">
+            <p class="eyebrow">Günün sorusu</p>
+            <span class="soru-no" id="soruNo"></span>
+          </div>
+          <h3 class="soru" id="gununSorusu"></h3>
+          <form class="soru-form" id="soruFormu">
+            <label class="gizli" for="cevap">Cevabın</label>
+            <textarea id="cevap" rows="3" placeholder="Buraya yaz…"></textarea>
+            <div class="soru-alt">
+              <span class="soru-ipucu">Cevabın sadece bu telefonda saklanır.</span>
+              <button class="dugme" type="submit" data-imlec>Kalbime kaydet</button>
+            </div>
+          </form>
+          <div class="cevap-hali" id="cevapHali" hidden>
+            <p class="cevap-metni" id="cevapMetni"></p>
+            <p class="cevap-tarih" id="cevapTarih"></p>
+            <div class="ben-cevap" id="benCevap" hidden>
+              <p class="eyebrow">Benim cevabım</p>
+              <p class="ben-metin" id="benMetin"></p>
+            </div>
+            <div class="cevap-dugmeler">
+              <button class="dugme" type="button" id="cevapGonder" data-imlec>Gönder</button>
+              <button class="dugme ince" type="button" id="cevapDuzenle" data-imlec>Düzenle</button>
+            </div>
+          </div>
+        </article>
+
+        <div class="iki-sehir" data-goster>
+          <article class="kart sehir" id="sehirBaku">
+            <p class="eyebrow">Bakü · sen</p>
+            <p class="sehir-saat" data-saat="baku">--:--</p>
+            <p class="sehir-hava" id="havaBaku">&nbsp;</p>
+            <div class="ay" id="ay" aria-hidden="true"><svg viewBox="-50 -50 100 100"><circle r="46" class="ay-golge"></circle><path class="ay-isik" d=""></path></svg></div>
+            <p class="ay-ad" id="ayAd"></p>
+          </article>
+          <article class="kart sehir">
+            <p class="eyebrow">İstanbul · ben</p>
+            <p class="sehir-saat" data-saat="ist">--:--</p>
+            <p class="sehir-hava" id="havaIst">&nbsp;</p>
+            <p class="sehir-not">Sen benden bir saat ilerisin.<br>Yani sen benim geleceğimsin.</p>
+          </article>
+        </div>
+
+        <div class="iki-mini" data-goster>
+          <a class="kart mini" href="#sebepler" data-imlec>
+            <p class="eyebrow">Bugünün sebebi</p>
+            <p class="mini-metin" id="sebepMini"></p>
+            <span class="mini-ok">Hepsi →</span>
+          </a>
+          <a class="kart mini" href="#sarkilar" data-imlec>
+            <p class="eyebrow">Bugünün şarkısı</p>
+            <p class="mini-metin" id="sarkiMini"></p>
+            <span class="mini-ok">Dinle →</span>
+          </a>
+        </div>
+
+        <div class="yaklasan" id="yaklasan" data-goster></div>
+
+        <button class="lamba-dugme" id="lambaDugme" type="button" data-goster data-imlec>
+          <span class="lamba-alev" aria-hidden="true"></span>
+          <span><b id="lambaYazi"></b><small id="lambaAlt"></small></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- II. Hikâyemiz -->
+    <section class="bolum hikaye" id="hikaye" data-sahne="gok">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">II</span>
+        <p class="eyebrow">Hikâyemiz</p>
+        <h2 class="baslik">Bir bildirimle başladı</h2>
+      </header>
+      <div class="kap hikaye-kap">
+        <div class="hikaye-ip" aria-hidden="true"><i id="hikayeIp"></i></div>
+        <div id="hikayeListe"></div>
+      </div>
+    </section>
+
+    <!-- III. Mesafe -->
+    <section class="bolum mesafe" id="mesafe" data-sahne="ikiz">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">III</span>
+        <p class="eyebrow">Mesafe</p>
+      </header>
+      <div class="kap mesafe-kap">
+        <div class="mesafe-sehirler" data-goster>
+          <div><span>İstanbul</span><b data-saat="ist">--:--</b></div>
+          <div><span>Bakü</span><b data-saat="baku">--:--</b></div>
+        </div>
+        <p class="mesafe-sayi" id="mesafeSayi" data-goster><span id="mesafeKm">1.758</span><small>km</small></p>
+        <p class="mesafe-metin" id="mesafeMetin" data-goster></p>
+        <button class="tut" id="tutDugme" type="button" data-imlec aria-label="Basılı tut">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="halka-iz" cx="60" cy="60" r="56"></circle>
+            <circle class="halka-dolu" cx="60" cy="60" r="56"></circle>
+          </svg>
+          <span class="tut-ic" id="tutIc" aria-hidden="true"></span>
+        </button>
+        <p class="mesafe-ipucu" id="mesafeIpucu"></p>
+        <div class="mesafe-sonra" id="mesafeSonra" hidden>
+          <p id="mesafeSonraMetin"></p>
+          <button class="dugme ince" type="button" id="sarilGonder" data-imlec>Ona da söyle</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- IV. Yüzün (fotoğraf varsa) -->
+    <section class="bolum yuzun" id="yuzun" data-sahne="gok" hidden>
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">IV</span>
+        <p class="eyebrow">Yüzün</p>
+        <h2 class="baslik">Bakmaya doyamadıklarım</h2>
+      </header>
+      <div class="galeri" id="galeri"></div>
+    </section>
+
+    <!-- V. Mektuplar -->
+    <section class="bolum mektuplar" id="mektuplar" data-sahne="gok">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">V</span>
+        <p class="eyebrow">Açılınca oku</p>
+        <h2 class="baslik">Sana mektuplar</h2>
+        <p class="bolum-alt">Her biri, ihtiyacın olduğu güne mühürlendi.</p>
+      </header>
+      <div class="kap-genis zarflar" id="zarflar"></div>
+
+      <div class="kap yaz-kap" data-goster>
+        <article class="kart yaz-karti" id="yazKarti">
+          <p class="eyebrow" id="yazBaslik"></p>
+          <p class="yaz-alt" id="yazAlt"></p>
+          <form id="yazFormu">
+            <p class="yaz-hitap" id="yazHitap"></p>
+            <label class="gizli" for="yazMetin">Mektubun</label>
+            <textarea id="yazMetin" rows="6" placeholder="…"></textarea>
+            <div class="soru-alt">
+              <span class="soru-ipucu" id="yazSayac"></span>
+              <button class="dugme" type="submit" data-imlec>Mühürle ve gönder</button>
+            </div>
+          </form>
+          <div class="muhur-anim" id="muhurAnim" hidden aria-hidden="true"><span class="muhur"><b>E</b></span></div>
+          <ol class="yazilanlar" id="yazilanlar"></ol>
+        </article>
+      </div>
+    </section>
+
+    <!-- VI. Sebepler -->
+    <section class="bolum sebepler" id="sebepler" data-sahne="kalp">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">VI</span>
+        <p class="eyebrow">Seni sevmemin sebepleri</p>
+        <h2 class="baslik">Her gün bir tane daha</h2>
+      </header>
+      <div class="kap sebep-kap" data-goster>
+        <p class="sebep-no" id="sebepNo"></p>
+        <blockquote class="sebep" id="sebepMetni" aria-live="polite"></blockquote>
+        <div class="sebep-dugmeler">
+          <button class="ok-dugme" id="sebepGeri" type="button" aria-label="Önceki" data-imlec>←</button>
+          <button class="ok-dugme" id="sebepIleri" type="button" aria-label="Sonraki" data-imlec>→</button>
+        </div>
+        <div class="sebep-cizgiler" id="sebepCizgiler" aria-hidden="true"></div>
+        <p class="sebep-alt" id="sebepAlt"></p>
+      </div>
+    </section>
+
+    <!-- VII. Şarkılarımız -->
+    <section class="bolum sarkilar" id="sarkilar" data-sahne="gok">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">VII</span>
+        <p class="eyebrow">Şarkılarımız</p>
+        <h2 class="baslik">Bugün bunu dinle</h2>
+      </header>
+      <div class="kap">
+        <div class="gunun-sarkisi" id="gununSarkisi" data-goster></div>
+        <details class="sarki-liste" data-goster>
+          <summary data-imlec>Bütün şarkılarımız</summary>
+          <ol id="sarkiListe"></ol>
+        </details>
+        <p class="sarki-not" data-goster>Bu sayfada çalan piyano ise her gün yeniden yazılıyor. Bugünkü melodi bir daha aynısıyla çalmayacak.</p>
+      </div>
+    </section>
+
+    <!-- VIII. Cevap defteri -->
+    <section class="bolum defter" id="defter" data-sahne="gok" hidden>
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">VIII</span>
+        <p class="eyebrow">Cevap defteri</p>
+        <h2 class="baslik">Senin cümlelerin</h2>
+        <p class="bolum-alt">Her gün bir soru, her gün bir cevap. Zamanla bir kitap olacak.</p>
+      </header>
+      <div class="kap defter-liste" id="defterListe"></div>
+    </section>
+
+    <!-- IX. Bir gün -->
+    <section class="bolum birgun" id="birgun" data-sahne="gok">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">IX</span>
+        <p class="eyebrow">Bir gün</p>
+        <h2 class="baslik">Gökyüzüne yazdıklarım</h2>
+        <p class="bolum-alt">Yıldızlara dokun.</p>
+      </header>
+      <div class="kap">
+        <div class="takimyildiz" id="takimyildiz" data-goster>
+          <svg id="yildizSvg" viewBox="0 0 100 100" aria-label="Yıldızlar"></svg>
+        </div>
+        <p class="yildiz-metin" id="yildizMetin" aria-live="polite"></p>
+        <button class="zarf zarf-buyuk" id="onYilZarf" type="button" data-imlec data-goster></button>
+
+        <article class="kart kapsul" id="kapsul" data-goster>
+          <p class="eyebrow" id="kapsulBaslik"></p>
+          <p class="yaz-alt" id="kapsulAlt"></p>
+          <form id="kapsulFormu">
+            <label class="gizli" for="kapsulMetin">Not</label>
+            <textarea id="kapsulMetin" rows="4" placeholder="…"></textarea>
+            <div class="soru-alt"><span></span><button class="dugme" type="submit" data-imlec>Kapsüle koy</button></div>
+          </form>
+          <div class="kapsul-kilitli" id="kapsulKilitli" hidden></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- X. Son söz -->
+    <section class="bolum son" id="son" data-sahne="kalp">
+      <header class="bolum-bas" data-goster>
+        <span class="rakam">X</span>
+        <p class="eyebrow">Son söz</p>
+      </header>
+      <div class="kap son-metin" id="sonMetin"></div>
+      <div class="kap son-diller" id="sonDiller"></div>
+      <div class="imza" id="imza" data-goster><svg id="imzaSvg" aria-hidden="true"></svg><span class="gizli" id="imzaYazi"></span></div>
+      <div class="son-zambak" id="sonZambak" data-goster></div>
+      <div class="sifir" data-goster><span>0</span><small>km</small></div>
+      <p class="yarin" id="yarin" data-goster></p>
+      <p class="ziyaret" id="ziyaret"></p>
+    </section>
+  </main>
+
+  <!-- İçindekiler -->
+  <div class="menu" id="menu" hidden>
+    <button class="menu-kapat" id="menuKapat" type="button" aria-label="Kapat" data-imlec>×</button>
+    <nav>
+      <ol id="menuListe"></ol>
+    </nav>
+    <p class="menu-alt" id="menuAlt"></p>
+  </div>
+
+  <!-- Mektup okuyucu -->
+  <div class="okuyucu" id="okuyucu" hidden role="dialog" aria-modal="true" aria-labelledby="okuyucuBaslik">
+    <div class="okuyucu-arka" data-kapat></div>
+    <article class="kagit" id="kagit">
+      <span class="kagit-cicek" id="kagitCicek" aria-hidden="true"></span>
+      <button class="kagit-kapat" type="button" data-kapat aria-label="Kapat" data-imlec>×</button>
+      <p class="kagit-ust" id="okuyucuUst"></p>
+      <h3 class="kagit-baslik" id="okuyucuBaslik"></h3>
+      <div class="kagit-govde" id="okuyucuGovde"></div>
+      <p class="kagit-imza" id="okuyucuImza"></p>
+    </article>
+  </div>
+
+  <!-- Fotoğraf büyük -->
+  <div class="isik-kutusu" id="isikKutusu" hidden>
+    <img alt="" id="isikResim">
+    <p id="isikNot"></p>
+  </div>
+
+  <!-- Kayan yıldız ve dilek -->
+  <button class="kayan" id="kayan" type="button" hidden aria-label="Kayan yıldız"><i></i></button>
+  <div class="dilek" id="dilek" hidden role="dialog" aria-modal="true">
+    <div class="dilek-ic kart">
+      <p class="dilek-soru" id="dilekSoru"></p>
+      <p class="yaz-alt" id="dilekAlt"></p>
+      <form id="dilekFormu">
+        <label class="gizli" for="dilekMetin">Dilek</label>
+        <textarea id="dilekMetin" rows="3" placeholder="…"></textarea>
+        <div class="soru-alt"><button class="dugme ince" type="button" id="dilekKapat">Sadece içimden</button><button class="dugme" type="submit">Gökyüzüne yaz</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Gece lambası -->
+  <div class="lamba" id="lamba" hidden>
+    <span id="lambaCicek"></span>
+    <div class="mumluk" aria-hidden="true">
+      <div class="alev"><i></i><b></b></div>
+      <div class="fitil"></div>
+      <div class="govde"></div>
+    </div>
+    <p class="lamba-satir" id="lambaSatir"></p>
+    <p class="lamba-kapat">dokun ve kapat</p>
+  </div>
+
+  <div class="imlec" aria-hidden="true"><i></i><b></b></div>
+  <div class="bildiri" id="bildiri" role="status"></div>
+
+  <noscript><p class="noscript">Bu sayfa JavaScript ile açılıyor.</p></noscript>
+  <script type="module" src="js/app.js?v=3"></script>
+</body>
+</html>
