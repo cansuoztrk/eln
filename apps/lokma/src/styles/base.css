@@ -1,0 +1,223 @@
+/* Lokma — design tokens and base styles.
+   A Turkish kitchen in daylight: linen and cream surfaces, pomegranate (nar)
+   accent, olive for "on track", saffron for carbs, aubergine for fat.
+   Light and dark themes; the app follows the system unless the user picks
+   one (data-theme on <html>). */
+
+:root {
+  /* brand */
+  --nar: #e2434b;
+  --nar-2: #f0636a;
+  --nar-ink: #ffffff;
+  --nar-soft: #fde6e4;
+  --olive: #3f8f4a;
+  --olive-soft: #e3f1df;
+  --saffron: #f0a030;
+  --saffron-soft: #fdf0d9;
+  --copper: #c4692e;
+
+  /* macros & trackers */
+  --protein: #ec5a68;
+  --carbs: #f0a030;
+  --fat: #7a6af0;
+  --fiber: #3f8f4a;
+  --water: #2f9fe0;
+  --tea: #b4502a;
+
+  /* neutrals (warm, slightly red-biased) */
+  --bg: #fbf6f0;
+  --bg-2: #f5ede3;
+  --surface: #ffffff;
+  --surface-2: #f6efe7;
+  --surface-3: #efe5da;
+  --line: #eadfd3;
+  --ink: #2b201c;
+  --ink-2: #6c5d55;
+  --ink-3: #a29289;
+  --shadow: 0 1px 2px rgba(60, 30, 20, 0.06), 0 8px 24px rgba(60, 30, 20, 0.07);
+  --shadow-lg: 0 18px 50px rgba(60, 30, 20, 0.18);
+  --overlay: rgba(30, 16, 12, 0.45);
+  --track: #f0e6dc;
+
+  --radius: 20px;
+  --radius-sm: 14px;
+  --radius-xs: 10px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tabbar-h: 72px;
+  --font-display: 'Fredoka', 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --nar: #ff5f66;
+    --nar-2: #ff7d83;
+    --nar-ink: #1a0b0b;
+    --nar-soft: #3a1c1d;
+    --olive: #6cc072;
+    --olive-soft: #1f3321;
+    --saffron: #ffb547;
+    --saffron-soft: #3a2c14;
+    --copper: #e08a4f;
+    --protein: #ff7482;
+    --carbs: #ffb547;
+    --fat: #9a8cff;
+    --fiber: #6cc072;
+    --water: #55b8f2;
+    --tea: #e07a4c;
+    --bg: #14100e;
+    --bg-2: #1a1512;
+    --surface: #211a17;
+    --surface-2: #2a221e;
+    --surface-3: #342a25;
+    --line: #3a2f2a;
+    --ink: #f7efe8;
+    --ink-2: #c7b8af;
+    --ink-3: #8d7e76;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.55);
+    --overlay: rgba(0, 0, 0, 0.6);
+    --track: #33291f;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --nar: #ff5f66;
+  --nar-2: #ff7d83;
+  --nar-ink: #1a0b0b;
+  --nar-soft: #3a1c1d;
+  --olive: #6cc072;
+  --olive-soft: #1f3321;
+  --saffron: #ffb547;
+  --saffron-soft: #3a2c14;
+  --copper: #e08a4f;
+  --protein: #ff7482;
+  --carbs: #ffb547;
+  --fat: #9a8cff;
+  --fiber: #6cc072;
+  --water: #55b8f2;
+  --tea: #e07a4c;
+  --bg: #14100e;
+  --bg-2: #1a1512;
+  --surface: #211a17;
+  --surface-2: #2a221e;
+  --surface-3: #342a25;
+  --line: #3a2f2a;
+  --ink: #f7efe8;
+  --ink-2: #c7b8af;
+  --ink-3: #8d7e76;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.55);
+  --overlay: rgba(0, 0, 0, 0.6);
+  --track: #33291f;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+svg {
+  display: block;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--ink-2);
+}
+
+.faint {
+  color: var(--ink-3);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* desktop / web demo: centre a phone-width column */
+@media (min-width: 600px) {
+  body {
+    background: radial-gradient(120% 80% at 50% 0%, var(--bg-2), var(--bg));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
