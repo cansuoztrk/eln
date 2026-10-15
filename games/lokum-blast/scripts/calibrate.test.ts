@@ -64,6 +64,9 @@ it('calibrate', () => {
     const med = quantile(sorted, 0.5);
     let moves = Math.min(quantile(sorted, Math.min(q, 0.97)), Math.ceil(med * 2.2));
     if (id <= 5) moves = Math.ceil(moves * 1.25) + 2; // first-time players need slack
+    // Picking the best board variant on these seeds overfits a little: hold-out
+    // runs on unseen seeds win ~8 points less often, so pay that back.
+    else moves = Math.ceil(moves * 1.08);
     moves = Math.max(10, moves);
     out[String(id)] = [moves, best!.salt];
     report.push(`${String(id).padStart(3)} salt=${best!.salt} stuck=${best!.stuck}/${SEEDS} moves=${moves} target=${target.toFixed(2)} med=${quantile(sorted, 0.5)}`);

@@ -65,6 +65,7 @@ Bu belge oyundaki **bütün satın alınabilir öğeleri**, **Türkiye’ye öze
 | `bundle_sultan` | Sultan Sandığı | 25.000 altın + her güçlendiriciden 15 + 72 saat sınırsız can | Tüketilir | **$24.99** | ~₺1.150 | **₺549,99** |
 | `no_ads` | Reklamsız Paket | Zorunlu reklamlar kalıcı olarak kalkar + 1.000 altın | Tüketilmez | **$4.99** | ~₺230 | **₺99,99** |
 | `theme_saray` | Altın Saray Teması | Premium mücevher teması | Tüketilmez | **$2.99** | ~₺140 | **₺69,99** |
+| `pass_premium` | Çarşı Pass Premium *(her 28 günlük sezon için 1 kez)* | Premium ödül yolu: 30 kademe boyunca altın, güçlendirici, sınırsız can, Altın Saray teması | Tüketilir (sezonluk) | **$4.99** | ~₺230 | **₺99,99** |
 | `vip_monthly` | Tekir Kulübü (Aylık) | Bkz. §4 | Otomatik yenilenen abonelik | **$5.99/ay** | ~₺275 | **₺99,99/ay** |
 | `vip_yearly` | Tekir Kulübü (Yıllık) | Bkz. §4 (%44 tasarruf) | Otomatik yenilenen abonelik | **$39.99/yıl** | ~₺1.840 | **₺699,99/yıl** |
 
@@ -98,6 +99,13 @@ Türkiye ile aynı mantığı (otomatik çevrimin bir oranı) aşağıdaki pazar
 - **Tanıtım teklifi (App Store “Introductory Offer”):** İlk ay **₺49,99**, “ödedikçe öde” tipinde. Abonelik dönüşümünü ciddi artırır.
 - **Günlük giriş zorunluluğu:** Hediye her gün **uygulamaya girince** alınıyor. Abonelik böylece aynı zamanda bir **tutundurma** aracı olur.
 - Mağaza kuralları gereği satış ekranında yenileme ve iptal metni gösteriliyor (oyunda mevcut).
+
+## 4b. Çarşı Pass Premium (sezon kartı)
+
+- **Fiyat:** ₺99,99 / $4.99, her 28 günlük sezon için ayrı satın alma (tüketilir ürün).
+- **Neden işe yarar:** Sezon kartı, oyuncuya “zaten oynadığım oyundan daha fazla değer” satar. Satın alan oyuncu sezon boyunca her gün gelmek için güçlü bir sebep kazanır (tutundurma) ve her ay yeni bir satın alma kararı oluşur.
+- **Değer:** Premium yolun toplamı 5.800 altın, 36 güçlendirici (≈6.960 altın değerinde), 18 saat sınırsız can ve Altın Saray teması (tek başına ₺69,99). Yani ₺99,99’a yaklaşık 12.700 altınlık değer ve bir tema, ₺119,99’luk altın paketinin (4.500 altın) yaklaşık 3 katı.
+- **Tekir Kulübü ile ilişkisi:** Pass VIP’e dahil değil. İki ayrı gelir hattı var: VIP konfor ve reklamsızlık, Pass ise ilerleme ödülleri satıyor.
 
 ## 5. Reklam stratejisi (AdMob + mediation)
 

@@ -195,3 +195,46 @@ describe('i18n tables', async () => {
     }
   });
 });
+
+describe('bazaar pass', async () => {
+  const pass = await import('../src/meta/pass');
+  const { store } = await import('../src/meta/state');
+  it('aligns seasons to the epoch and resets on a new season', () => {
+    const t0 = pass.PASS_EPOCH + 5 * 86_400_000;
+    expect(pass.seasonIndex(t0)).toBe(0);
+    expect(pass.seasonEndsAt(t0)).toBe(pass.PASS_EPOCH + 28 * 86_400_000);
+    expect(pass.seasonIndex(pass.PASS_EPOCH + 28 * 86_400_000)).toBe(1);
+    store.data.pass = { season: 0, points: 900, premium: true, claimedFree: [1], claimedPremium: [] };
+    pass.ensureSeason(pass.PASS_EPOCH + 30 * 86_400_000);
+    expect(store.data.pass.season).toBe(1);
+    expect(store.data.pass.points).toBe(0);
+    expect(store.data.pass.premium).toBe(false);
+  });
+  it('unlocks tiers by points and gates premium claims', () => {
+    pass.ensureSeason();
+    store.data.pass.points = 0;
+    store.data.pass.premium = false;
+    store.data.pass.claimedFree = [];
+    store.data.pass.claimedPremium = [];
+    pass.addPassPoints(250);
+    expect(pass.unlockedTiers()).toBe(2);
+    expect(pass.canClaim('free', 2)).toBe(true);
+    expect(pass.canClaim('free', 3)).toBe(false);
+    expect(pass.canClaim('premium', 1)).toBe(false);
+    const coins = store.data.coins;
+    expect(pass.claimTier('free', 1)).not.toBeNull();
+    expect(store.data.coins).toBeGreaterThan(coins);
+    expect(pass.claimTier('free', 1)).toBeNull();
+    pass.unlockPremium();
+    expect(pass.canClaim('premium', 2)).toBe(true);
+    const all = pass.claimAll();
+    expect(all).not.toBeNull();
+    expect(pass.claimableCount()).toBe(0);
+  });
+  it('caps points at the last tier and classic points per game', () => {
+    pass.addPassPoints(99999);
+    expect(pass.passPoints()).toBe(pass.TIERS * pass.POINTS_PER_TIER);
+    expect(pass.classicPassPoints(100000)).toBe(pass.PASS_POINTS.classicCap);
+    expect(pass.classicPassPoints(1000)).toBe(5);
+  });
+});

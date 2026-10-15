@@ -3,7 +3,7 @@ import { buildSprites } from '../game/sprites';
 import { THEMES, type Theme } from '../game/themes';
 import { duration, num, t } from '../i18n';
 import { DISTRICTS } from '../meta/bazaar';
-import { PRODUCT_BY_ID, PRODUCTS, VIP_PERKS, type Product } from '../meta/catalog';
+import { PRODUCT_BY_ID, PRODUCTS, type Product } from '../meta/catalog';
 import { addCoins, boosterPackPrice, buyBooster, isVip, MAX_REWARDED_GIFTS_PER_DAY, REWARDED_COIN_GIFT, spendCoins } from '../meta/economy';
 import { BOOSTERS, store } from '../meta/state';
 import { ads } from '../services/ads';
@@ -94,7 +94,6 @@ export function renderShop(a: ShopActions): HTMLElement {
       ),
     ),
   );
-  void VIP_PERKS;
 
   // Free gift via rewarded ad
   const giftsToday = d.gifts.date === todayKey() ? d.gifts.n : 0;

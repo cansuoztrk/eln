@@ -1920,3 +1920,240 @@ svg {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ───────────── Bazaar Pass ───────────── */
+.pass-modal .modal-card {
+  background: linear-gradient(#4a2d8f, #2a1f6e);
+}
+.pass {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pass-head {
+  text-align: center;
+}
+.pass-season {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gold);
+}
+.pass-ends {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.pass-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 6px;
+}
+.pass-level {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #4a2300;
+  background: linear-gradient(var(--gold), var(--gold-2));
+  box-shadow: 0 3px 0 #b45f00;
+}
+.pass-progress .q-bar {
+  flex: 1;
+  height: 18px;
+}
+.pass-howto {
+  font-size: 13px;
+  color: var(--dim);
+  margin: 0;
+}
+.pass-buy {
+  flex-direction: row;
+  justify-content: space-between;
+  text-align: left;
+  min-height: 64px;
+}
+.pass-buy-txt {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.pass-buy-txt small {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+.pass-active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  color: var(--gold);
+}
+.pass-active svg {
+  width: 28px;
+  height: 28px;
+}
+.pass-claim-all {
+  align-self: center;
+}
+.pass-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pass-row {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr;
+  gap: 6px;
+  align-items: stretch;
+}
+.pass-row-head {
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+.pass-row-head span:last-child {
+  color: var(--gold);
+}
+.pass-tier {
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--dim);
+  border-radius: 10px;
+  background: #0003;
+}
+.pass-row.done .pass-tier {
+  background: var(--green);
+  color: #fff;
+}
+.pass-row.next .pass-tier {
+  background: var(--gold);
+  color: #4a2300;
+  box-shadow: 0 0 12px #ffc94d88;
+}
+.pc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 62px;
+  padding: 6px 4px;
+  border-radius: 14px;
+  background: #ffffff0d;
+  box-shadow: inset 0 0 0 2px #ffffff12;
+  position: relative;
+}
+.pc-premium {
+  background: linear-gradient(#ffc94d1f, #ffc94d0a);
+  box-shadow: inset 0 0 0 2px #ffc94d33;
+}
+.pc-ready {
+  box-shadow: inset 0 0 0 2px var(--green);
+}
+.pc-claimed {
+  opacity: 0.5;
+}
+.pc .btn.small {
+  min-height: 28px;
+  font-size: 13px;
+  padding: 2px 10px;
+}
+.pc-check,
+.pc-lock {
+  width: 18px;
+  height: 18px;
+  color: var(--green);
+}
+.pc-lock {
+  color: var(--dim);
+}
+.pr {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+.pr-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.pr-item svg {
+  display: inline-block;
+}
+.pr-boost svg {
+  width: 20px;
+  height: 20px;
+}
+.pr-theme {
+  color: var(--gold);
+  font-size: 12px;
+}
+.pass-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto 14px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  text-align: left;
+  background: linear-gradient(120deg, #6d3fd1, #3a2a9b);
+  box-shadow: 0 4px 0 #24196b, inset 0 0 0 2px #ffc94d55;
+  position: relative;
+}
+.pass-card.ready {
+  box-shadow: 0 4px 0 #24196b, inset 0 0 0 3px var(--gold), 0 0 22px #ffc94d55;
+}
+.pass-card-ico {
+  width: 46px;
+  height: 46px;
+  flex: none;
+}
+.pass-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.pass-card-info small {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 12px;
+}
+.pass-card-info .q-bar {
+  height: 16px;
+}
+.pass-card-pts {
+  font-weight: 800;
+  color: var(--gold);
+  font-size: 14px;
+}
+.pass-card .nav-badge {
+  position: static;
+}
+.earned-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.pass-earned span svg {
+  width: 30px;
+  height: 30px;
+}

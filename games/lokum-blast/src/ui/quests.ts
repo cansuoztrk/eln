@@ -1,5 +1,6 @@
 import { duration, num, t } from '../i18n';
 import { chestReady, claimChest, claimQuest, ensureQuests, QUEST_CHEST } from '../meta/daily';
+import { claimableCount, passPoints, POINTS_PER_TIER, seasonEndsAt, TIERS, unlockedTiers } from '../meta/pass';
 import { store } from '../meta/state';
 import { audio } from '../services/audio';
 import { coinIcon, ICONS } from './art';
@@ -14,7 +15,7 @@ function msToMidnight(): number {
   return next.getTime() - now.getTime();
 }
 
-export function renderQuests(rerender: () => void): HTMLElement {
+export function renderQuests(rerender: () => void, openPass: () => void): HTMLElement {
   const list = ensureQuests();
   const items = list.map((q, i) => {
     const pct = Math.min(100, (q.progress / q.target) * 100);
@@ -67,5 +68,21 @@ export function renderQuests(rerender: () => void): HTMLElement {
         )
       : null,
   );
-  return h('div', { class: 'screen quests scroll' }, h('h1', { class: 'screen-title' }, t('quests.title')), h('p', { class: 'screen-sub' }, t('quests.reset', { t: duration(msToMidnight()) })), h('div', { class: 'quest-list' }, ...items), chest);
+  const pts = passPoints();
+  const tiers = unlockedTiers(pts);
+  const ready = claimableCount();
+  const passCard = h(
+    'button',
+    { class: `pass-card ${ready ? 'ready' : ''}`, onclick: () => (audio.tap(), openPass()) },
+    h('span', { class: 'pass-card-ico', html: ICONS.ticket }),
+    h(
+      'span',
+      { class: 'pass-card-info' },
+      h('b', {}, t('pass.title')),
+      h('small', {}, t('pass.ends', { t: duration(seasonEndsAt() - Date.now()) })),
+      h('span', { class: 'q-bar' }, h('span', { class: 'q-fill', style: `width:${(Math.min(TIERS, tiers) / TIERS) * 100}%` }), h('span', { class: 'q-num' }, t('pass.tier', { n: `${tiers}/${TIERS}` }))),
+    ),
+    ready ? h('span', { class: 'nav-badge' }, String(ready)) : h('span', { class: 'pass-card-pts' }, `${pts % POINTS_PER_TIER}/${POINTS_PER_TIER}`),
+  );
+  return h('div', { class: 'screen quests scroll' }, h('h1', { class: 'screen-title' }, t('quests.title')), h('p', { class: 'screen-sub' }, t('quests.reset', { t: duration(msToMidnight()) })), passCard, h('div', { class: 'quest-list' }, ...items), chest);
 }

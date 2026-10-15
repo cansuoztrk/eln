@@ -286,10 +286,48 @@ const tr: Record<Key, string> = {
   'offer.value': '5 kat değer',
   'offer.contents': '2.500 altın + her güçlendiriciden 3 + 24 saat sınırsız can',
 
+  'time.d': '{d}g {h}sa',
+
   'time.h': '{h}sa {m}dk',
   'time.m': '{m}dk {s}sn',
 
   'stats.coins': 'Altın',
+
+  'settings.colorblind': 'Renk körü modu',
+
+  'pass.title': 'Çarşı Pass',
+
+  'pass.ends': 'Sezon bitimine {t}',
+
+  'pass.howto': 'Seviye geç, günün bulmacasını çöz, görev tamamla: Pass puanların kendiliğinden birikir.',
+
+  'pass.active': 'Premium aktif',
+
+  'pass.unlock': 'Premium’u aç',
+
+  'pass.premium.desc': 'Her kademede daha büyük ödüller + Altın Saray teması',
+
+  'pass.claimAll': 'Hepsini al',
+
+  'pass.free': 'Ücretsiz',
+
+  'pass.premium': 'Premium',
+
+  'pass.tier': 'Kademe {n}',
+
+  'pass.season.lale': 'Lale Sezonu',
+
+  'pass.season.kahve': 'Kahve Sezonu',
+
+  'pass.season.fener': 'Fener Sezonu',
+
+  'pass.season.cini': 'Çini Sezonu',
+
+  'pass.season.baharat': 'Baharat Sezonu',
+
+  'pass.season.deniz': 'Boğaz Sezonu',
+
+  'product.pass_premium': 'Çarşı Pass Premium',
 };
 
 export default tr;

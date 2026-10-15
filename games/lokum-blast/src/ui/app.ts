@@ -17,6 +17,7 @@ import { h } from './dom';
 import { GameController, startLevelPopup, type Nav } from './game';
 import { navAttention, renderHome } from './home';
 import { anyModal, closeAll, closeTop } from './modal';
+import { showPass } from './pass';
 import { renderQuests } from './quests';
 import { renderShop } from './shop';
 
@@ -169,6 +170,7 @@ export class App implements Nav {
         wheel: () => showWheel(() => this.top?.update()),
         offer: () => showStarterOffer((id) => void this.buy(id)),
         vipGift: () => showVipGift(() => this.refresh()),
+        pass: () => showPass(() => this.refresh()),
       }),
     );
   }
@@ -195,7 +197,13 @@ export class App implements Nav {
   }
 
   quests(): void {
-    this.shell('quests', renderQuests(() => this.refresh()));
+    this.shell(
+      'quests',
+      renderQuests(
+        () => this.refresh(),
+        () => showPass(() => this.refresh()),
+      ),
+    );
   }
 
   private startGame(ctrl: GameController): void {
@@ -218,7 +226,7 @@ export class App implements Nav {
       return;
     }
     const level = makeLevel(store.data.level);
-    startLevelPopup(this, level, () => this.startGame(new GameController(this, { mode: 'journey', level })));
+    startLevelPopup(level, () => this.startGame(new GameController(this, { mode: 'journey', level })));
   }
 
   playClassic(resume = false): void {
@@ -230,7 +238,7 @@ export class App implements Nav {
   playDaily(): void {
     if (store.data.daily.lastWin === todayKey()) return;
     const level = makeDaily(todayKey());
-    startLevelPopup(this, level, () => this.startGame(new GameController(this, { mode: 'daily', level })));
+    startLevelPopup(level, () => this.startGame(new GameController(this, { mode: 'daily', level })));
   }
 
   private back(): void {

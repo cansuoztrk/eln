@@ -78,6 +78,9 @@ export const PRODUCTS: readonly Product[] = [
   { id: 'no_ads', type: 'non_consumable', grant: { removeAds: true, coins: 1000 }, usd: 4.99, try: 99.99, once: true },
   { id: 'theme_saray', type: 'non_consumable', grant: { themes: ['saray'] }, usd: 2.99, try: 69.99, once: true, badge: 'new' },
 
+  // ── Season pass: Çarşı Pass Premium (one per 28-day season) ─────────
+  { id: 'pass_premium', type: 'consumable', grant: {}, usd: 4.99, try: 99.99, badge: 'new' },
+
   // ── Subscription: Tekir Kulübü (VIP) ─────────────────────────────────
   { id: 'vip_monthly', type: 'subscription', grant: {}, usd: 5.99, try: 99.99, period: 'month' },
   { id: 'vip_yearly', type: 'subscription', grant: {}, usd: 39.99, try: 699.99, period: 'year', badge: 'best' },

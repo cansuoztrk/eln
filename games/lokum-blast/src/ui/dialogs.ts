@@ -63,6 +63,7 @@ export function showSettings(onReset: () => void, onLangChange: () => void): voi
     toggle(ICONS.sound, t('settings.sound'), () => s.sound, (v) => store.update((d) => { d.settings.sound = v; audio.setSfx(v); })),
     toggle(ICONS.music, t('settings.music'), () => s.music, (v) => store.update((d) => { d.settings.music = v; audio.setMusic(v); })),
     toggle(ICONS.vibrate, t('settings.haptics'), () => s.haptics, (v) => store.update((d) => { d.settings.haptics = v; })),
+    toggle(ICONS.eye, t('settings.colorblind'), () => s.colorblind, (v) => store.update((d) => { d.settings.colorblind = v; })),
     isNative
       ? toggle(ICONS.bell, t('settings.notifications'), () => s.notifications, (v) => {
           store.update((d) => {

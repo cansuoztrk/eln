@@ -8,6 +8,7 @@ import { haptic } from '../services/platform';
 import { clamp01, ease, type Banner, type Dying, type Flyer, type Floater, type Particle } from './fx';
 import { buildSprites, roundRect, star, type SpriteSet } from './sprites';
 import { alpha, shade, type Theme } from './themes';
+import { store } from '../meta/state';
 
 export type SceneMode = 'play' | 'hammer' | 'bomb' | 'locked';
 
@@ -164,7 +165,7 @@ export class GameScene {
   }
 
   private buildSprites(): void {
-    this.sprites = buildSprites(this.theme, Math.round(this.cell * this.dpr));
+    this.sprites = buildSprites(this.theme, Math.round(this.cell * this.dpr), store.data.settings.colorblind);
   }
 
   private slotCenter(slot: number): { x: number; y: number } {

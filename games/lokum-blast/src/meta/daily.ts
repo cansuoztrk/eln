@@ -5,6 +5,7 @@ import { VIP_PERKS } from './catalog';
 import { applyGrant, isVip } from './economy';
 import { store, type BoosterId, type QuestState } from './state';
 import type { Grant } from './catalog';
+import { addPassPoints, PASS_POINTS } from './pass';
 
 /**
  * Daily retention systems:
@@ -240,6 +241,7 @@ export function claimQuest(i: number): number {
     d.quests.list[i].claimed = true;
     d.coins += q.reward;
   });
+  addPassPoints(PASS_POINTS.quest);
   return q.reward;
 }
 
@@ -254,6 +256,7 @@ export function claimChest(): Grant | null {
   store.update((d) => {
     d.quests.chest = true;
   });
+  addPassPoints(PASS_POINTS.chest);
   return QUEST_CHEST;
 }
 

@@ -15,7 +15,8 @@ it('balance report', () => {
     const lvl = makeLevel(id);
     let wins = 0;
     let movesLeftSum = 0;
-    for (let s = 1; s <= seeds; s++) {
+    const offset = Number(process.env.OFFSET ?? 0);
+    for (let s = 1 + offset; s <= seeds + offset; s++) {
       const sess = new Session('journey', lvl, s);
       const res = autoplay(sess);
       if (res.won) {

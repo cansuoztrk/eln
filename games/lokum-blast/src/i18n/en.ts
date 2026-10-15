@@ -285,10 +285,48 @@ const en = {
   'offer.value': '5× value',
   'offer.contents': '2,500 coins + 3 of every booster + 24h unlimited lives',
 
+  'time.d': '{d}d {h}h',
+
   'time.h': '{h}h {m}m',
   'time.m': '{m}m {s}s',
 
   'stats.coins': 'Coins',
+
+  'settings.colorblind': 'Colorblind mode',
+
+  'pass.title': 'Bazaar Pass',
+
+  'pass.ends': 'Season ends in {t}',
+
+  'pass.howto': 'Win levels, solve the daily puzzle and finish quests — pass points add up automatically.',
+
+  'pass.active': 'Premium active',
+
+  'pass.unlock': 'Unlock Premium',
+
+  'pass.premium.desc': 'Bigger rewards on every tier + the Golden Palace theme',
+
+  'pass.claimAll': 'Claim all',
+
+  'pass.free': 'Free',
+
+  'pass.premium': 'Premium',
+
+  'pass.tier': 'Tier {n}',
+
+  'pass.season.lale': 'Tulip Season',
+
+  'pass.season.kahve': 'Coffee Season',
+
+  'pass.season.fener': 'Lantern Season',
+
+  'pass.season.cini': 'Tile Season',
+
+  'pass.season.baharat': 'Spice Season',
+
+  'pass.season.deniz': 'Bosphorus Season',
+
+  'product.pass_premium': 'Bazaar Pass Premium',
 } as const;
 
 export type Key = keyof typeof en;

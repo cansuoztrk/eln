@@ -42,7 +42,7 @@ npm run build        # üretim derlemesi (dist/)
 ### 2.2 Uygulama içi ürünler: App Store Connect
 1. **Uygulamalar → +** ile uygulamayı oluştur. Bundle ID: `com.tekirstudios.lokumblast`, SKU: `lokumblast-ios`.
 2. **Uygulama İçi Satın Alımlar** bölümüne `docs/04-ekonomi-ve-fiyatlandirma.md` tablosundaki ürünleri **aynı ID’lerle** ekle:
-   - Tüketilir: `coins_600`, `coins_1500`, `coins_4500`, `coins_10000`, `coins_22000`, `coins_60000`, `starter_pack`, `bundle_usta`, `bundle_sultan`
+   - Tüketilir: `coins_600`, `coins_1500`, `coins_4500`, `coins_10000`, `coins_22000`, `coins_60000`, `starter_pack`, `bundle_usta`, `bundle_sultan`, `pass_premium` (oyun, sezon başına bir kez satın alınmasına izin veriyor)
    - Tüketilmez: `no_ads`, `theme_saray`
 3. **Abonelikler:** Bir abonelik grubu oluştur (“Tekir Kulübü”), içine `vip_monthly` (1 ay) ve `vip_yearly` (1 yıl) ekle. Aylık için **tanıtım teklifi** tanımla: “Ödedikçe öde”, 1 ay, ₺49,99.
 4. **Fiyatlandırma:**

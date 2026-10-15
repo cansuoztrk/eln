@@ -66,6 +66,12 @@ blok,bulmaca,puzzle,zeka,küp,lokum,sudoku,kombo,çarşı,kedi,istanbul,beyin,kl
 **Bu sürümdeki yenilikler:**
 > Lokum Blast yayında! 🎉 Tatlı bloklar, dev kombolar ve Tekir’in Kapalıçarşı macerası seni bekliyor.
 
+**Bu sürümdeki yenilikler (1.1):**
+> 🎟️ Çarşı Pass geldi! Oynadıkça kademeleri aç, her 28 günde yeni bir sezon.
+> 👁️ Renk körü modu: her lezzetin kendine ait bir sembolü var.
+> 💡 Takıldığında Tekir sana ipucu veriyor.
+> 🍬 İlk seviyeler artık daha adil ve akıcı.
+
 ## 🇹🇷 Türkçe: Google Play
 
 **Başlık (30):** `Lokum Blast: Blok Bulmaca`
@@ -110,6 +116,12 @@ block,puzzle,brain,cube,sudoku,blast,classic,offline,logic,combo,bazaar,cat,rela
 
 **What’s New:**
 > Lokum Blast is here! 🎉 Sweet blocks, huge combos and Tekir’s Grand Bazaar adventure await.
+
+**What’s New (1.1):**
+> 🎟️ The Bazaar Pass is here! Unlock tiers as you play — a new season every 28 days.
+> 👁️ Colorblind mode: every flavor now has its own symbol.
+> 💡 Stuck? Tekir shows you a hint.
+> 🍬 The first levels are smoother and fairer.
 
 ## 🇬🇧 English: Google Play
 

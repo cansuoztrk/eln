@@ -87,10 +87,13 @@ export class Session {
     if (!this.level) return classicDealOptions(this.score, this.flavors);
     const favor = this.level.goals.filter((g) => g.type === 'flavor').map((g) => g.flavor!);
     const d = this.level.difficulty;
+    // The first levels (and the daily puzzle's easy days) never deal an
+    // unplaceable tray: getting stuck on level 3 loses new players.
+    const early = this.level.id > 0 && this.level.id <= 15;
     return {
-      difficulty: 0.1 + d * 0.6,
-      help: 0.6 - d * 0.25,
-      solvable: 0.96 - d * 0.2,
+      difficulty: early ? d * 0.4 : 0.1 + d * 0.6,
+      help: early ? 0.75 : 0.6 - d * 0.25,
+      solvable: early ? 1 : 0.96 - d * 0.2,
       flavors: this.level.flavors,
       favor,
       goldChance: 0.04,

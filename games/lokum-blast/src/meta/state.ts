@@ -36,7 +36,7 @@ export interface SaveData {
   vipLastDaily: string;
   owned: string[];
   starterOfferUntil: number;
-  settings: { sound: boolean; music: boolean; haptics: boolean; lang: string | null; notifications: boolean };
+  settings: { sound: boolean; music: boolean; haptics: boolean; lang: string | null; notifications: boolean; colorblind: boolean };
   login: { last: string; streak: number; day: number };
   daily: { lastWin: string; streak: number };
   wheel: { lastFree: string; adDate: string; adSpins: number };
@@ -57,6 +57,8 @@ export interface SaveData {
   tutorial: { classic: boolean; journey: boolean; boosters: boolean };
   ads: { lastInterstitial: number; sinceInterstitial: number };
   classicSave: unknown | null;
+  pass: { season: number; points: number; premium: boolean; claimedFree: number[]; claimedPremium: number[] };
+  review: { lastAsk: number; asks: number };
 }
 
 export function defaultSave(now = Date.now()): SaveData {
@@ -79,7 +81,7 @@ export function defaultSave(now = Date.now()): SaveData {
     vipLastDaily: '',
     owned: [],
     starterOfferUntil: 0,
-    settings: { sound: true, music: true, haptics: true, lang: null, notifications: true },
+    settings: { sound: true, music: true, haptics: true, lang: null, notifications: true, colorblind: false },
     login: { last: '', streak: 0, day: 0 },
     daily: { lastWin: '', streak: 0 },
     wheel: { lastFree: '', adDate: '', adSpins: 0 },
@@ -90,6 +92,8 @@ export function defaultSave(now = Date.now()): SaveData {
     tutorial: { classic: false, journey: false, boosters: false },
     ads: { lastInterstitial: 0, sinceInterstitial: 0 },
     classicSave: null,
+    pass: { season: -1, points: 0, premium: false, claimedFree: [], claimedPremium: [] },
+    review: { lastAsk: 0, asks: 0 },
   };
 }
 

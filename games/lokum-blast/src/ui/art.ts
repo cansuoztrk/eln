@@ -48,6 +48,8 @@ export const ICONS = {
   doc: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12h6M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
   restore: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 108-8 8 8 0 00-6 2.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M4 3v5h5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   trash: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.2 13H6.2zM9 7V4h6v3M3 7h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,
+  eye: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg>`,
+  ticket: `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 9a2 2 0 012-2h20a2 2 0 012 2v3a3 3 0 000 6v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3a3 3 0 000-6z" fill="#ffc531" stroke="#c56a00" stroke-width="1.5"/><path d="M20 8v16" stroke="#c56a00" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M11.5 11.5l1.3 2.6 2.9.4-2.1 2 .5 2.9-2.6-1.4-2.6 1.4.5-2.9-2.1-2 2.9-.4z" fill="#fff6c7"/></svg>`,
   infinity: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8a4 4 0 100 8c3 0 7-8 10-8a4 4 0 110 8c-3 0-7-8-10-8z" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>`,
 };
 

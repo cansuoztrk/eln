@@ -1,11 +1,11 @@
 import { SIZE } from '../core/board';
 import { bestMove } from '../core/bot';
-import { makeLevel, starsFor, todayKey, type LevelDef } from '../core/levels';
+import { starsFor, todayKey, type LevelDef } from '../core/levels';
 import { Session, type ClassicSave, type Mode, type MoveResult } from '../core/session';
 import { GameScene } from '../game/scene';
 import { buildSprites } from '../game/sprites';
 import { THEME_BY_ID } from '../game/themes';
-import { duration, num, t } from '../i18n';
+import { num, t } from '../i18n';
 import { questEvent, resetQuestTracking } from '../meta/daily';
 import {
   addCoins,
@@ -22,11 +22,13 @@ import { BOOSTERS, store, type BoosterId } from '../meta/state';
 import { ads } from '../services/ads';
 import { audio } from '../services/audio';
 import { haptic, track } from '../services/platform';
+import { maybeAskReview } from '../services/review';
+import { addPassPoints, classicPassPoints, PASS_POINTS } from '../meta/pass';
 import { BOOSTER_ART, coinIcon, ICONS, starIcon, tekirSVG } from './art';
 import { boosterName } from './chrome';
 import { askNotifications, showBuyBooster, showLives } from './dialogs';
 import { bump, countTo, h } from './dom';
-import { closeAll, modal, toast } from './modal';
+import { anyModal, closeAll, modal, toast } from './modal';
 
 export interface Nav {
   home(): void;
@@ -71,6 +73,9 @@ export class GameController {
   private unsub: () => void;
   private tipTimer: ReturnType<typeof setTimeout> | null = null;
   private goldTipShown = false;
+  private lastInput = Date.now();
+  private hintShown = false;
+  private idleTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(private nav: Nav, params: GameParams) {
     this.mode = params.mode;
@@ -90,7 +95,10 @@ export class GameController {
       goalTarget: (i) => this.centerOf(this.goalEls[i]),
       coinTarget: () => this.centerOf(this.coinPill),
       onCollect: (kind, i) => this.onCollect(kind, i),
-      onInteract: () => this.hideTip(),
+      onInteract: () => {
+        this.lastInput = Date.now();
+        this.hideTip();
+      },
     });
     this.scene.setSession(this.session);
     this.unsub = store.subscribe(() => this.updateCoins());
@@ -106,6 +114,21 @@ export class GameController {
     this.updateHud();
     track('game_start', { mode: this.mode, level: this.level?.id ?? 0 });
     this.maybeTutorial();
+    this.idleTimer = setInterval(() => this.idleCheck(), 1000);
+  }
+
+  /**
+   * New players who stall for a while get a gentle hint (the bot's best move).
+   * Only early on: the first 12 journey levels and the first 3 classic games.
+   */
+  private idleCheck(): void {
+    if (this.ended || this.hintShown || this.scene.mode !== 'play' || anyModal()) return;
+    const early = this.mode === 'journey' ? (this.level?.id ?? 99) <= 12 : this.mode === 'classic' && store.data.stats.games < 3;
+    if (!early || Date.now() - this.lastInput < 9000) return;
+    const move = bestMove(this.session);
+    if (!move) return;
+    this.hintShown = true;
+    this.scene.setHint(move);
   }
 
   destroy(): void {
@@ -113,6 +136,7 @@ export class GameController {
     this.unsub();
     this.scene.destroy();
     if (this.tipTimer) clearTimeout(this.tipTimer);
+    if (this.idleTimer) clearInterval(this.idleTimer);
   }
 
   pause(): void {
@@ -192,7 +216,7 @@ export class GameController {
   private renderGoalIcons(): void {
     if (!this.level) return;
     const theme = THEME_BY_ID[store.data.theme] ?? THEME_BY_ID.lokum;
-    const sp = buildSprites(theme, 72);
+    const sp = buildSprites(theme, 72, store.data.settings.colorblind);
     this.level.goals.forEach((g, i) => {
       const ico = this.goalEls[i].querySelector('.goal-ico') as HTMLElement;
       if (g.type === 'score') {
@@ -272,6 +296,8 @@ export class GameController {
 
   private onMove(res: MoveResult): void {
     this.madeMove = true;
+    this.lastInput = Date.now();
+    this.hintShown = false;
     this.updateHud();
     questEvent({ type: 'move', stats: this.session.stats, mode: this.mode });
     if (res.gold > 0 && !this.goldTipShown && !store.data.tutorial.boosters) {
@@ -501,6 +527,7 @@ export class GameController {
       d.coins += payout;
     });
     questEvent({ type: 'game_end', score: s.score, mode: 'classic' });
+    const passGained = addPassPoints(classicPassPoints(s.score));
     track('classic_end', { score: s.score, best: newBest });
     void ads.init();
 
@@ -541,7 +568,7 @@ export class GameController {
         h('div', { class: 'over-label' }, t('over.score')),
         scoreEl,
         h('div', { class: 'over-best' }, `👑 ${t('over.best')}: ${num(Math.max(prevBest, s.score))}`),
-        coinsLine,
+        h('div', { class: 'earned-row' }, coinsLine, passChip(passGained)),
         doubleBtn,
         h(
           'div',
@@ -552,6 +579,7 @@ export class GameController {
       );
       modal(body, { title: t('over.title'), dismissable: false, className: 'over-modal' });
       countTo(scoreEl, 0, s.score, 900, num);
+      if (newBest && prevBest > 0) setTimeout(() => void maybeAskReview('record'), 1500);
     }, 900);
   }
 
@@ -700,6 +728,7 @@ export class GameController {
     });
     questEvent({ type: isDaily ? 'daily_won' : 'level_won' });
     questEvent({ type: 'game_end', score: s.score, mode: this.mode });
+    const passGained = addPassPoints(isDaily ? PASS_POINTS.daily : PASS_POINTS.levelWin + stars * PASS_POINTS.perStar);
     track(isDaily ? 'daily_win' : 'level_win', { level: level.id, stars, movesLeft: s.movesLeft });
     void ads.init();
 
@@ -750,7 +779,7 @@ export class GameController {
         isDaily ? h('div', { class: 'mascot-sm', html: tekirSVG(110, 'happy', true) }) : null,
         h('div', { class: 'over-label' }, isDaily ? t('daily.win.title') : t('level.win.sub', { n: level.id })),
         bonus > 0 ? h('div', { class: 'over-best' }, `${t('level.bonus')}: +${num(bonus)}`) : null,
-        coinsLine,
+        h('div', { class: 'earned-row' }, coinsLine, passChip(passGained)),
         doubleBtn,
         h(
           'div',
@@ -760,6 +789,7 @@ export class GameController {
         ),
       );
       modal(body, { title: t('level.win.title'), dismissable: false, className: 'win-modal', onClose: () => firstWin && setTimeout(askNotifications, 400) });
+      if (!isDaily && stars === 3) setTimeout(() => void maybeAskReview('win3'), 1800);
     }, 1100);
   }
 
@@ -852,17 +882,18 @@ export class GameController {
     }
     this.tipEl.classList.add('hidden');
   }
-
-  /** Formats the next-life countdown for the out-of-lives screen. */
-  static livesText(ms: number): string {
-    return duration(ms);
-  }
 }
 
-export function startLevelPopup(nav: Nav, level: LevelDef, onStart: () => void): void {
+/** "+40 Pass" chip shown next to coin rewards on end screens. */
+function passChip(n: number): HTMLElement | null {
+  if (n <= 0) return null;
+  return h('div', { class: 'earned pass-earned', title: t('pass.title') }, h('span', { html: ICONS.ticket }), h('b', {}, `+${n}`));
+}
+
+export function startLevelPopup(level: LevelDef, onStart: () => void): void {
   const goals = h('div', { class: 'goals-left big' });
   const theme = THEME_BY_ID[store.data.theme] ?? THEME_BY_ID.lokum;
-  const sp = buildSprites(theme, 72);
+  const sp = buildSprites(theme, 72, store.data.settings.colorblind);
   for (const g of level.goals) {
     let ico: string;
     if (g.type === 'score') ico = starIcon(40);
@@ -892,9 +923,4 @@ export function startLevelPopup(nav: Nav, level: LevelDef, onStart: () => void):
     ),
     { title: level.id > 0 ? t('level.title', { n: level.id }) : t('daily.title'), className: 'level-modal' },
   );
-  void nav;
-}
-
-export function levelFor(id: number): LevelDef {
-  return makeLevel(id);
 }

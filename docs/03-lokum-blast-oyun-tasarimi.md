@@ -138,6 +138,40 @@ Güçlendirici bitince “+” işareti çıkar. Bu, altınla satın almaya ya d
 - **Günlük Görevler:** 9 şablondan her gün 3 görev seçiliyor (sıra temizle, kombo yap, seviye geç, altın lokum topla, güçlendirici kullan…). 3 görev bitince **sandık**: 200 altın + Çekiç + Bomba.
 - **Bildirimler (yerel, sunucu gerekmez):** canlar doldu, günlük hediye/seri hatırlatma (ertesi gün 19:00), 3 ve 7 gün sonra geri kazanım. İzin, **ilk seviye kazanıldıktan sonra** isteniyor, açılışta değil. Bu, izin verme oranını belirgin şekilde artırır.
 
+## 7b. v1.1 eklemeleri
+
+### Çarşı Pass (sezon kartı)
+- **28 günlük sezonlar**, herkes için aynı takvimle (UTC, 1 Ekim 2026’dan başlayarak). Her sezonun bir teması var: Lale, Kahve, Fener, Çini, Baharat, Boğaz.
+- **Pass puanı** normal oyunla birikiyor:
+
+| Etkinlik | Puan |
+|---|---|
+| Seviye kazanma | 40 + yıldız başına 10 (3 yıldızla 70) |
+| Günün Bulmacası | 50 |
+| Görev ödülü alma | 20 |
+| Görev sandığı | 40 |
+| Klasik oyun | her 200 puan için 1 (oyun başına en fazla 60) |
+
+- **30 kademe × 100 puan.** Her gün oynayan bir oyuncu günde 150–250 puanla sezonu 15–20 günde bitirir, ara sıra oynayan ise yarısına gelir. Bu, “az kaldı” gerilimini canlı tutar.
+- **İki ödül yolu:** Ücretsiz yol herkese açık (altın ve güçlendiriciler). **Premium** yol `pass_premium` ile açılıyor (₺99,99 / 4,99 $) ve her kademede daha büyük ödüller veriyor (altın, çoklu güçlendirici, sınırsız can, 30. kademede **Altın Saray teması**). Tema zaten varsa yerine 5.000 altın verilir.
+- Premium sezon ortasında alınırsa geçmiş kademelerin ödülleri de alınabilir. **“Hepsini al”** tek dokunuşla hepsini toplar.
+- Kod: `src/meta/pass.ts`, ekran: `src/ui/pass.ts`. Testler: sezon geçişi, kademe kilidi, premium kapısı, puan tavanı.
+
+### Erişilebilirlik: renk körü modu
+Ayarlar’daki bir anahtar her lezzete ayrı bir sembol çizer: daire, üçgen, kare, elmas, yıldız, artı ve kalp. Hedef ikonları da aynı sembolleri kullanır. Böylece renk ayrımı yapamayan oyuncular lezzet hedeflerini takip edebilir. Erişilebilirlik, Apple’ın öne çıkarma kararlarında da artı puandır.
+
+### Mağaza puanı isteme
+- Sadece mutlu anlarda istenir: 3 yıldızlı seviye kazanma veya yeni klasik rekoru.
+- Sadece bağlı oyuncuya gösterilir: 6+ seviye kazanmış veya 10+ oyun oynamış ve en az 2 oturum açmış olmalı.
+- En fazla 30 günde bir, toplamda 4 kez.
+- **“Oyunu sevdin mi?” ön sorusu yok.** Apple özel puan isteme ekranlarına izin vermiyor, Google da puan kartını filtrelemeyi yasaklıyor.
+
+### Boşta kalınca ipucu
+İlk 12 seviyede ve ilk 3 klasik oyunda, oyuncu 9 saniye hamle yapmazsa botun en iyi hamlesi soluk bir gölge ve el animasyonuyla gösterilir.
+
+### Başlangıç seviyelerinde tam adalet
+İlk 15 seviyede parça dağıtıcı **her zaman** yerleştirilebilir bir tepsi verir ve yardım oranı yüksektir. Seviye kalibrasyonu, seviye başına 32 simülasyonla yeniden yapıldı. Kalibrasyonda kullanılmayan tohumlarla yapılan bağımsız kontrol, kalibrasyonun ~8 puan iyimser kaldığını gösterdi. Bu yüzden 5. seviyeden sonraki hamle bütçelerine %8 pay eklendi. Son bağımsız kontrolde bot kazanma oranı 1–5. seviyelerde **%100**, 6–40. seviyelerde **%83,6** (`OFFSET=5000 FROM=6 TO=40 SEEDS=30 npm run balance`).
+
 ## 8. Temalar
 
 | Tema | Stil | Nasıl açılır |

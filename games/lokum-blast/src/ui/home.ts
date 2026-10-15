@@ -3,6 +3,7 @@ import { duration, num, t } from '../i18n';
 import { bazaarAttention } from '../meta/bazaar';
 import { freeSpinAvailable, loginClaimable, questsAttention, vipGiftClaimable } from '../meta/daily';
 import { DAILY_CHALLENGE_REWARD, isVip } from '../meta/economy';
+import { claimableCount } from '../meta/pass';
 import { store } from '../meta/state';
 import { audio } from '../services/audio';
 import { ICONS, logoSVG, starIcon, tekirSVG } from './art';
@@ -16,6 +17,7 @@ export interface HomeActions {
   wheel(): void;
   offer(): void;
   vipGift(): void;
+  pass(): void;
 }
 
 export function renderHome(a: HomeActions): HTMLElement {
@@ -28,6 +30,7 @@ export function renderHome(a: HomeActions): HTMLElement {
     h('button', { class: `side-btn ${badge ? 'attn' : ''}`, onclick: () => (audio.tap(), fn()) }, h('span', { class: 'side-ico', html: icon }), h('span', { class: 'side-lbl' }, extra ?? label), badge ? h('span', { class: 'dot' }) : null);
   side.append(sideBtn(ICONS.gift, t('login.title'), a.login, loginClaimable() >= 0));
   side.append(sideBtn(ICONS.wheel, t('nav.wheel'), a.wheel, freeSpinAvailable()));
+  side.append(sideBtn(ICONS.ticket, t('pass.title'), a.pass, claimableCount() > 0));
   if (d.starterOfferUntil > Date.now() && !d.owned.includes('starter_pack')) {
     side.append(sideBtn(ICONS.shop, t('offer.starter.title'), a.offer, true, duration(d.starterOfferUntil - Date.now())));
   }

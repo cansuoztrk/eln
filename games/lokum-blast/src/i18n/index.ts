@@ -57,5 +57,6 @@ export function duration(ms: number): string {
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
+  if (h >= 48) return t('time.d', { d: Math.floor(h / 24), h: h % 24 });
   return h > 0 ? t('time.h', { h, m }) : t('time.m', { m, s: String(s).padStart(2, '0') });
 }

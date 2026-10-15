@@ -2,6 +2,7 @@ import { CONFIG } from '../config';
 import { currentLang } from '../i18n';
 import { ENTITLEMENT_NO_ADS, ENTITLEMENT_VIP, fallbackPrice, PRODUCT_BY_ID, PRODUCTS, type Product } from '../meta/catalog';
 import { applyGrant } from '../meta/economy';
+import { ensureSeason, unlockPremium } from '../meta/pass';
 import { store } from '../meta/state';
 import { isNative, platform, track } from './platform';
 
@@ -75,6 +76,10 @@ class IapService {
   async purchase(id: string): Promise<boolean> {
     const def = PRODUCT_BY_ID[id];
     if (!def || (def.once && this.owned(id))) return false;
+    if (id === 'pass_premium') {
+      ensureSeason();
+      if (store.data.pass.premium) return false;
+    }
     track('iap_start', { id });
     let ok = false;
     if (this.demo) {
@@ -101,6 +106,7 @@ class IapService {
     }
     if (ok) {
       applyGrant(def.grant);
+      if (id === 'pass_premium') unlockPremium();
       store.update((d) => {
         if (def.once && !d.owned.includes(id)) d.owned.push(id);
         d.stats.purchases++;

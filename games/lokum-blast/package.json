@@ -1,8 +1,8 @@
 {
   "name": "lokum-blast",
   "private": true,
-  "version": "1.0.0",
-  "description": "Lokum Blast: Block Puzzle — Tekir Games",
+  "version": "1.1.0",
+  "description": "Lokum Blast: Block Puzzle \u2014 Tekir Games",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -13,11 +13,12 @@
     "cap:sync": "npm run build && cap sync",
     "cap:ios": "npm run build && cap sync ios && cap open ios",
     "cap:android": "npm run build && cap sync android && cap open android",
-    "calibrate": "LEVELS=300 SEEDS=16 vitest run --config scripts/vitest.calibrate.ts",
+    "calibrate": "LEVELS=300 SEEDS=32 vitest run --config scripts/vitest.calibrate.ts",
     "balance": "vitest run --config scripts/vitest.balance.ts"
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.2.1",
+    "@capacitor-community/in-app-review": "^8.0.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.5.3",
     "@capacitor/haptics": "^8.0.2",

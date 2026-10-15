@@ -344,6 +344,63 @@ function drawCrate(ctx: Ctx, x: number, y: number, s: number, hp: number): void 
   }
 }
 
+/** Colour-blind helper: a distinct shape per flavor, drawn on top of the block. */
+export function drawFlavorSymbol(ctx: Ctx, flavor: number, x: number, y: number, s: number): void {
+  const cx = x + s / 2;
+  const cy = y + s * 0.52;
+  const r = s * 0.17;
+  ctx.save();
+  ctx.beginPath();
+  switch (flavor % 7) {
+    case 0:
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      break;
+    case 1:
+      ctx.moveTo(cx, cy - r * 1.1);
+      ctx.lineTo(cx + r * 1.05, cy + r * 0.8);
+      ctx.lineTo(cx - r * 1.05, cy + r * 0.8);
+      ctx.closePath();
+      break;
+    case 2:
+      ctx.rect(cx - r * 0.85, cy - r * 0.85, r * 1.7, r * 1.7);
+      break;
+    case 3:
+      ctx.moveTo(cx, cy - r * 1.15);
+      ctx.lineTo(cx + r, cy);
+      ctx.lineTo(cx, cy + r * 1.15);
+      ctx.lineTo(cx - r, cy);
+      ctx.closePath();
+      break;
+    case 4:
+      for (let i = 0; i < 10; i++) {
+        const rad = i % 2 === 0 ? r * 1.15 : r * 0.5;
+        const a = (Math.PI / 5) * i - Math.PI / 2;
+        if (i === 0) ctx.moveTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad);
+        else ctx.lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad);
+      }
+      ctx.closePath();
+      break;
+    case 5: {
+      const w = r * 0.42;
+      ctx.rect(cx - w, cy - r, w * 2, r * 2);
+      ctx.rect(cx - r, cy - w, r * 2, w * 2);
+      break;
+    }
+    case 6:
+      ctx.moveTo(cx, cy + r * 0.95);
+      ctx.bezierCurveTo(cx - r * 1.6, cy - r * 0.1, cx - r * 0.7, cy - r * 1.3, cx, cy - r * 0.45);
+      ctx.bezierCurveTo(cx + r * 0.7, cy - r * 1.3, cx + r * 1.6, cy - r * 0.1, cx, cy + r * 0.95);
+      ctx.closePath();
+      break;
+  }
+  ctx.fillStyle = 'rgba(28,10,42,0.62)';
+  ctx.fill('nonzero');
+  ctx.lineWidth = Math.max(1, s * 0.03);
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.stroke();
+  ctx.restore();
+}
+
 export interface SpriteSet {
   size: number;
   flavors: HTMLCanvasElement[];
@@ -362,10 +419,11 @@ function makeCanvas(px: number): [HTMLCanvasElement, Ctx] {
 }
 
 /** Builds every sprite for a theme at the given device-pixel size. */
-export function buildSprites(theme: Theme, px: number): SpriteSet {
+export function buildSprites(theme: Theme, px: number, symbols = false): SpriteSet {
   const flavors = theme.palette.map((color, i) => {
     const [c, ctx] = makeCanvas(px);
     drawCellStyle(ctx, theme.style, 0, 0, px, color, 1000 + i * 37);
+    if (symbols) drawFlavorSymbol(ctx, i, 0, 0, px);
     return c;
   });
   const [gold, gctx] = makeCanvas(px);
