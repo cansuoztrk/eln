@@ -50,6 +50,7 @@ function header(rel, current, fixedLang) {
 <nav class="nav" aria-label="Main">
 ${link('#oyunlar', t('Oyunlar', 'Games'), 'games')}
 ${link('lokum-blast/', 'Lokum Blast', 'lokum')}
+${link('simit-tycoon/', 'Simit Tycoon', 'simit')}
 ${link('#labs', 'Tekir Labs', 'labs')}
 ${link('basin/', t('Basın', 'Press'), 'press')}
 ${link('destek/', t('Destek', 'Support'), 'support')}
@@ -62,10 +63,7 @@ function footer(rel) {
   return `<footer class="site-footer"><div class="wrap">
 <div>© 2026 Tekir Studios · İstanbul</div>
 <nav aria-label="Footer">
-<a href="${rel}lokum-blast/gizlilik/">Gizlilik</a>
-<a href="${rel}lokum-blast/privacy/">Privacy</a>
-<a href="${rel}lokum-blast/kosullar/">Koşullar</a>
-<a href="${rel}lokum-blast/terms/">Terms</a>
+<a href="${rel}yasal/">${t('Gizlilik ve koşullar', 'Privacy & terms')}</a>
 <a href="${rel}destek/">${t('Destek', 'Support')}</a>
 <a href="${rel}basin/">${t('Basın kiti', 'Press kit')}</a>
 </nav>
@@ -103,7 +101,7 @@ page({
 <h1>Tekir <b>Studios</b></h1>
 <p class="lead">${t('Merak et, oyna, keyfine bak. İstanbul’un sokak kedilerinden ilham alan, herkesin telefonunda yer açacağı tatlı oyunlar ve akıllı uygulamalar yapıyoruz.', 'Curious games and clever apps inspired by the street cats of Istanbul — the kind of thing you keep on your home screen.')}</p>
 <div class="hero-cta">
-<a class="btn" href="${rel}lokum-blast/">${t('Lokum Blast’ı keşfet', 'Discover Lokum Blast')}</a>
+<a class="btn" href="#oyunlar">${t('Oyunlarımızı keşfet', 'Discover our games')}</a>
 <a class="btn ghost" href="#labs">Tekir Labs</a>
 </div>
 </div>
@@ -115,7 +113,7 @@ page({
 <div class="wrap">
 <div class="band-head">
 <p class="eyebrow">Tekir Games</p>
-<h2>${t('İlk oyunumuz: Lokum Blast', 'Our first game: Lokum Blast')}</h2>
+<h2>${t('Oyunlarımız', 'Our games')}</h2>
 </div>
 <div class="feature">
 <div class="phones-wrap">
@@ -137,6 +135,28 @@ page({
 <div class="chips"><span class="chip">${t('Bulmaca', 'Puzzle')}</span><span class="chip">iOS · Android</span><span class="chip">${t('İnternetsiz oynanır', 'Plays offline')}</span><span class="chip">${t('6 dil', '6 languages')}</span></div>
 ${badges}
 <a href="${rel}lokum-blast/">${t('Oyunun sayfası →', 'Game page →')}</a>
+</div>
+</div>
+<div class="feature reverse">
+<div class="phones-wrap">
+<div class="phones" lang="tr">
+<img src="${rel}assets/img/simit/shots/tr/02-cats.jpg" alt="" loading="lazy" width="540" height="1080">
+<img src="${rel}assets/img/simit/shots/tr/01-stands.jpg" alt="Simit Tycoon" loading="lazy" width="540" height="1080">
+<img src="${rel}assets/img/simit/shots/tr/04-night.jpg" alt="" loading="lazy" width="540" height="1080">
+</div>
+<div class="phones" lang="en">
+<img src="${rel}assets/img/simit/shots/en/02-cats.jpg" alt="" loading="lazy" width="540" height="1080">
+<img src="${rel}assets/img/simit/shots/en/01-stands.jpg" alt="Simit Tycoon" loading="lazy" width="540" height="1080">
+<img src="${rel}assets/img/simit/shots/en/04-night.jpg" alt="" loading="lazy" width="540" height="1080">
+</div>
+</div>
+<div class="feature-copy">
+<img class="icon" src="${rel}assets/img/simit-tycoon-icon-512.png" alt="Simit Tycoon" width="96" height="96">
+<h3>Simit Tycoon: ${t('Kedi Kafesi', 'Idle Cat Café')}</h3>
+<p class="muted">${t('Karaköy iskelesinde tek bir simit arabasıyla başla. Çay ocağından kebap salonuna 10 sokak lezzeti aç, her tezgâhın başına sevimli bir kedi müdür koy ve Karaköy’den Adalar’a İstanbul’un lezzet imparatorluğunu kur. Sen yokken bile kazan.', 'Start with a single simit cart on the Karaköy pier. Open 10 street-food stands from tea house to kebab palace, put an adorable cat manager in charge of each, and build an Istanbul food empire from Karaköy to the Princes’ Islands. Earn even while you’re away.')}</p>
+<div class="chips"><span class="chip">Idle Tycoon</span><span class="chip">iOS · Android</span><span class="chip">${t('Sen yokken de kazanır', 'Earns while you’re away')}</span><span class="chip">${t('6 dil', '6 languages')}</span></div>
+${badges}
+<a href="${rel}simit-tycoon/">${t('Oyunun sayfası →', 'Game page →')}</a>
 </div>
 </div>
 </div>
@@ -229,6 +249,65 @@ page({
 </section>`,
 });
 
+
+// ───────────── Simit Tycoon ─────────────
+const simitFeatures = [
+  ['🥯', t('10 sokak lezzeti', '10 street foods'), t('Simit, çay, poğaça, balık ekmek, döner, kumpir, midye, Maraş dondurması, lokum ve kebap.', 'Simit, Turkish tea, poğaça, fish sandwiches, döner, kumpir, stuffed mussels, Maraş ice cream, Turkish delight and kebab.')],
+  ['🐱', t('10 kedi müdür', '10 cat managers'), t('Pamuk, nazar boncuklu Boncuk, fesli Paşa, Van kedisi Sultan… Tezgâhlarını sen yokken bile çalıştırırlar.', 'Pamuk, Boncuk with her evil-eye bead, Paşa in his fez, Sultan the Van cat… They run your stands even while you are away.')],
+  ['🌉', t('8 efsane semt', '8 iconic districts'), t('Karaköy’den Adalar’a; her semtin kendi silüeti ve günün kendi saati. Taşın, lale ve semt rozeti kazan.', 'From Karaköy to the Princes’ Islands, each with its own skyline and time of day. Move on to earn tulips and district badges.')],
+  ['🕊️', t('Martı ve vapur', 'Seagulls & the ferry'), t('Simit kapan martıyı yakala, vapur yanaşınca izdiham saatinde gelirini üçe katla.', 'Catch the simit-stealing seagull and triple your income at rush hour when the ferry docks.')],
+  ['📜', t('Gizli tarifler', 'Secret recipes'), t('Usta tarifinden kozmik tarife 275 tarif ve mahalle şenlikleri.', '275 recipes from the master’s recipe to the cosmic one, plus neighbourhood festivals.')],
+  ['🌙', t('Sen yokken de kazan', 'Earn while you’re away'), t('Kedilerin çalışır, döndüğünde kasan dolu. İnternetsiz oynanır, hesap gerekmez.', 'Your cats keep working and your till is full when you return. Plays offline, no account needed.')],
+];
+page({
+  path: 'simit-tycoon/',
+  title: 'Simit Tycoon',
+  description: 'Simit Tycoon: Idle Cat Café — kedi müdürlerle İstanbul sokak lezzeti imparatorluğu kur. Build an Istanbul street-food empire with cat managers.',
+  current: 'simit',
+  image: '/assets/img/simit-tycoon-feature.jpg',
+  body: (rel) => `
+<section class="hero">
+<div class="lights" aria-hidden="true"></div>
+<div class="wrap">
+<div>
+<img src="${rel}assets/img/simit-tycoon-icon-512.png" alt="" width="104" height="104" style="width:104px;border-radius:26px;box-shadow:0 12px 30px #0008;margin-bottom:18px">
+<h1>Simit Tycoon</h1>
+<p class="lead">${t('Tek bir simit arabasından İstanbul’un en lezzetli imparatorluğuna. Kedi müdürlerini işe al, martıları yakala, vapuru karşıla.', 'From one simit cart to Istanbul’s tastiest food empire. Hire cat managers, catch seagulls, meet the ferry.')}</p>
+<div class="hero-cta">${badges}</div>
+</div>
+<div class="hero-art"><img src="${rel}assets/img/simit/shots/tr/01-stands.jpg" lang="tr" alt="Simit Tycoon" style="border-radius:28px;max-width:300px;margin:auto" width="540" height="1080"><img src="${rel}assets/img/simit/shots/en/01-stands.jpg" lang="en" alt="Simit Tycoon" style="border-radius:28px;max-width:300px;margin:auto" width="540" height="1080"></div>
+</div>
+</section>
+
+<section class="band">
+<div class="wrap">
+<div class="band-head"><p class="eyebrow">${t('Ekran görüntüleri', 'Screenshots')}</p><h2>${t('Bir simit, bir kedi, bir semt daha', 'One more simit, one more cat, one more district')}</h2></div>
+<div class="shots" lang="tr">${['01-stands', '02-cats', '03-districts', '04-night', '05-offline', '06-recipes', '07-welcome'].map((s) => `<img src="${rel}assets/img/simit/shots/tr/${s}.jpg" alt="" loading="lazy" width="540" height="1080">`).join('')}</div>
+<div class="shots" lang="en">${['01-stands', '02-cats', '03-districts', '04-night', '05-offline', '06-recipes', '07-welcome'].map((s) => `<img src="${rel}assets/img/simit/shots/en/${s}.jpg" alt="" loading="lazy" width="540" height="1080">`).join('')}</div>
+</div>
+</section>
+
+<section class="band alt">
+<div class="wrap">
+<div class="grid">${simitFeatures.map(([ico, h3, p]) => `<article class="card"><div class="ico" aria-hidden="true">${ico}</div><h3>${h3}</h3><p class="muted">${p}</p></article>`).join('')}</div>
+</div>
+</section>
+
+<section class="band">
+<div class="wrap">
+<div class="band-head"><p class="eyebrow">${t('Sık sorulanlar', 'FAQ')}</p><h2>${t('Merak edilenler', 'Questions')}</h2></div>
+<div class="faq">
+<details><summary>${t('Oyun ücretsiz mi?', 'Is the game free?')}</summary><div>${t('Evet. Oyun ücretsizdir; isteğe bağlı uygulama içi satın alımlar ve ödüllü reklamlar içerir. Oyunu kesen zorunlu reklam yoktur.', 'Yes. The game is free with optional in-app purchases and rewarded ads. There are no forced ads that interrupt you.')}</div></details>
+<details><summary>${t('Uygulama kapalıyken de kazanıyor muyum?', 'Do I earn while the app is closed?')}</summary><div>${t('Evet. Kedi müdür işe aldığın tezgâhlar sen yokken de çalışır. Kasan başlangıçta 4 saatlik kazanç tutar; mağazadan 24 saate kadar büyütebilirsin.', 'Yes. Stands with a cat manager keep earning while you are away. Your till holds 4 hours of earnings at first and can be upgraded up to 24 hours in the shop.')}</div></details>
+<details><summary>${t('Satın alımlarımı nasıl geri yüklerim?', 'How do I restore my purchases?')}</summary><div>${t('Mağaza sekmesinin altındaki “Satın alımları geri yükle” düğmesine dokun. Aynı Apple Kimliği veya Google hesabıyla giriş yapmış olman gerekir.', 'Tap “Restore purchases” at the bottom of the Shop tab, signed in with the same Apple ID or Google account.')}</div></details>
+<details><summary>${t('Kedi Kulübü aboneliğini nasıl iptal ederim?', 'How do I cancel the Cat Club?')}</summary><div>${t('iPhone: Ayarlar › Apple Kimliği › Abonelikler. Android: Google Play › Profil › Ödemeler ve abonelikler. Yenilemeden en az 24 saat önce iptal etmelisin.', 'iPhone: Settings › Apple ID › Subscriptions. Android: Google Play › Profile › Payments & subscriptions. Cancel at least 24 hours before renewal.')}</div></details>
+<details><summary>${t('Verilerimi nasıl sildiririm?', 'How do I delete my data?')}</summary><div>${t('Oyunda Ayarlar › İlerlemeyi sıfırla ile cihazdaki tüm verini silebilirsin. Reklam ortaklarının tuttuğu veriler için <a href="../destek/">Destek</a> sayfasındaki adrese yazabilirsin.', 'Use Settings › Reset progress to delete all on-device data. For data held by ad partners, email us via the <a href="../destek/">Support</a> page.')}</div></details>
+</div>
+<p style="margin-top:24px" class="muted"><a href="gizlilik/">Gizlilik Politikası</a> · <a href="privacy/">Privacy Policy</a> · <a href="kosullar/">Kullanım Koşulları</a> · <a href="terms/">Terms of Use</a></p>
+</div>
+</section>`,
+});
+
 // ───────────── support ─────────────
 page({
   path: 'destek/',
@@ -253,19 +332,19 @@ page({
 page({
   path: 'basin/',
   title: 'Basın Kiti · Tekir Studios',
-  description: 'Tekir Studios ve Lokum Blast basın kiti: bilgiler, logolar, ekran görüntüleri. Press kit with facts, logos and screenshots.',
+  description: 'Tekir Studios, Lokum Blast ve Simit Tycoon basın kiti: bilgiler, logolar, ekran görüntüleri. Press kit with facts, logos and screenshots.',
   current: 'press',
   body: (rel) => `
 <section class="band"><div class="wrap">
 <div class="band-head"><p class="eyebrow">${t('Basın kiti', 'Press kit')}</p><h1>Tekir Studios</h1>
-<p class="lead">${t('Tekir Studios, İstanbul merkezli bağımsız bir mobil oyun ve uygulama stüdyosu. İlk oyunu Lokum Blast, dünyanın en sevilen bulmaca türünü İstanbul’un renkleriyle buluşturuyor.', 'Tekir Studios is an independent mobile games and apps studio based in Istanbul. Its first game, Lokum Blast, brings the world’s favourite puzzle genre to life with the colours of Istanbul.')}</p></div>
+<p class="lead">${t('Tekir Studios, İstanbul merkezli bağımsız bir mobil oyun ve uygulama stüdyosu. İlk oyunu Lokum Blast, dünyanın en sevilen bulmaca türünü İstanbul’un renkleriyle buluşturuyor. İkinci oyunu Simit Tycoon ise kedi müdürlerle İstanbul’un sokak lezzetlerinden bir imparatorluk kurduğun bir idle tycoon.', 'Tekir Studios is an independent mobile games and apps studio based in Istanbul. Its first game, Lokum Blast, brings the world’s favourite puzzle genre to life with the colours of Istanbul. Its second, Simit Tycoon, is an idle tycoon where cat managers help you build an empire of Istanbul street food.')}</p></div>
 <div class="table-scroll"><table class="facts">
 <tr><th>${t('Stüdyo', 'Studio')}</th><td>Tekir Studios (Tekir Games · Tekir Labs)</td></tr>
 <tr><th>${t('Merkez', 'Based in')}</th><td>İstanbul, ${t('Türkiye', 'Türkiye')}</td></tr>
 <tr><th>${t('Kuruluş', 'Founded')}</th><td>2026</td></tr>
-<tr><th>${t('İlk oyun', 'First game')}</th><td>Lokum Blast: Block Puzzle</td></tr>
+<tr><th>${t('Oyunlar', 'Games')}</th><td>Lokum Blast: Block Puzzle · Simit Tycoon: Idle Cat Café</td></tr>
 <tr><th>${t('Platformlar', 'Platforms')}</th><td>iOS, iPadOS, Android</td></tr>
-<tr><th>${t('İş modeli', 'Business model')}</th><td>${t('Ücretsiz; uygulama içi satın alma, isteğe bağlı reklam, Tekir Kulübü aboneliği', 'Free to play; in-app purchases, optional ads, Tekir Club subscription')}</td></tr>
+<tr><th>${t('İş modeli', 'Business model')}</th><td>${t('Ücretsiz; uygulama içi satın alma, isteğe bağlı reklam, abonelik (Tekir Kulübü, Kedi Kulübü)', 'Free to play; in-app purchases, optional ads, subscriptions (Tekir Club, Cat Club)')}</td></tr>
 <tr><th>${t('Diller', 'Languages')}</th><td>Türkçe, English, Deutsch, Español, Français, Português</td></tr>
 <tr><th>${t('Basın iletişim', 'Press contact')}</th><td><code>${PRESS}</code></td></tr>
 </table></div>
@@ -274,15 +353,17 @@ page({
 <a class="card" href="${rel}assets/img/tekir-studios-dark.svg"><img src="${rel}assets/img/tekir-studios-dark.svg" alt="Tekir Studios logo" loading="lazy"><span>${t('Stüdyo logosu (SVG)', 'Studio logo (SVG)')}</span></a>
 <a class="card" href="${rel}assets/img/lokum-blast-icon-512.png"><img src="${rel}assets/img/lokum-blast-icon-512.png" alt="Lokum Blast icon" loading="lazy" style="width:120px;border-radius:28px"><span>${t('Lokum Blast ikonu (PNG)', 'Lokum Blast icon (PNG)')}</span></a>
 <a class="card" href="${rel}assets/img/lokum-blast-feature.jpg"><img src="${rel}assets/img/lokum-blast-feature.jpg" alt="Lokum Blast key art" loading="lazy" style="border-radius:14px"><span>${t('Ana görsel (1024×500)', 'Key art (1024×500)')}</span></a>
+<a class="card" href="${rel}assets/img/simit-tycoon-icon-512.png"><img src="${rel}assets/img/simit-tycoon-icon-512.png" alt="Simit Tycoon icon" loading="lazy" style="width:120px;border-radius:28px"><span>${t('Simit Tycoon ikonu (PNG)', 'Simit Tycoon icon (PNG)')}</span></a>
+<a class="card" href="${rel}assets/img/simit-tycoon-feature.jpg"><img src="${rel}assets/img/simit-tycoon-feature.jpg" alt="Simit Tycoon key art" loading="lazy" style="border-radius:14px"><span>${t('Simit Tycoon ana görseli (1024×500)', 'Simit Tycoon key art (1024×500)')}</span></a>
+<a class="card" href="${rel}assets/img/simit-tycoon-logo.svg"><img src="${rel}assets/img/simit-tycoon-logo.svg" alt="Simit Tycoon logo" loading="lazy" style="width:200px"><span>${t('Simit Tycoon logosu (SVG)', 'Simit Tycoon logo (SVG)')}</span></a>
 <a class="card" href="${rel}assets/img/tekir-happy.svg"><img src="${rel}assets/img/tekir-happy.svg" alt="Tekir mascot" loading="lazy" style="width:140px"><span>${t('Maskot: Tekir (SVG)', 'Mascot: Tekir (SVG)')}</span></a>
 </div>
 </div></section>`,
 });
 
 // ───────────── legal (from markdown) ─────────────
-const legalDir = join(here, '..', 'games', 'lokum-blast', 'legal');
-function legal(path, file, lang, title, section) {
-  let md = readFileSync(join(legalDir, file), 'utf8');
+function legal(game, path, file, lang, title, section) {
+  let md = readFileSync(join(here, '..', 'games', game, 'legal', file), 'utf8');
   if (section) {
     const parts = md.split(/^## /m);
     const intro = parts[0];
@@ -298,10 +379,25 @@ function legal(path, file, lang, title, section) {
     body: () => `<article class="wrap"><div class="prose">${html}</div></article>`,
   });
 }
-legal('lokum-blast/gizlilik/', 'gizlilik-politikasi.md', 'tr', 'Gizlilik Politikası · Lokum Blast');
-legal('lokum-blast/privacy/', 'privacy-policy.md', 'en', 'Privacy Policy · Lokum Blast');
-legal('lokum-blast/kosullar/', 'terms.md', 'tr', 'Kullanım Koşulları · Lokum Blast', 'Türkçe');
-legal('lokum-blast/terms/', 'terms.md', 'en', 'Terms of Use · Lokum Blast', 'English');
+const GAMES = [
+  ['lokum-blast', 'Lokum Blast'],
+  ['simit-tycoon', 'Simit Tycoon'],
+];
+for (const [slug, name] of GAMES) {
+  legal(slug, `${slug}/gizlilik/`, 'gizlilik-politikasi.md', 'tr', `Gizlilik Politikası · ${name}`);
+  legal(slug, `${slug}/privacy/`, 'privacy-policy.md', 'en', `Privacy Policy · ${name}`);
+  legal(slug, `${slug}/kosullar/`, 'terms.md', 'tr', `Kullanım Koşulları · ${name}`, 'Türkçe');
+  legal(slug, `${slug}/terms/`, 'terms.md', 'en', `Terms of Use · ${name}`, 'English');
+}
+page({
+  path: 'yasal/',
+  title: 'Gizlilik ve Koşullar · Tekir Studios',
+  description: 'Tekir Studios oyunlarının gizlilik politikaları ve kullanım koşulları. Privacy policies and terms of use.',
+  body: (rel) => `<section class="band"><div class="wrap">
+<div class="band-head"><p class="eyebrow">${t('Yasal', 'Legal')}</p><h1>${t('Gizlilik ve koşullar', 'Privacy & terms')}</h1></div>
+<div class="grid">${GAMES.map(([slug, name]) => `<article class="card"><img src="${rel}assets/img/${slug}-icon-180.png" alt="" width="72" height="72" style="width:72px;border-radius:18px"><h3>${name}</h3><p><a href="${rel}${slug}/gizlilik/">Gizlilik Politikası</a><br><a href="${rel}${slug}/privacy/">Privacy Policy</a><br><a href="${rel}${slug}/kosullar/">Kullanım Koşulları</a><br><a href="${rel}${slug}/terms/">Terms of Use</a></p></article>`).join('')}</div>
+</div></section>`,
+});
 
 // ───────────── 404 + static files ─────────────
 page({
@@ -317,7 +413,7 @@ page({
 cpSync(join(here, 'assets'), join(out, 'assets'), { recursive: true });
 writeFileSync(join(out, '.nojekyll'), '');
 writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`);
-const urls = ['', 'lokum-blast/', 'destek/', 'basin/', 'lokum-blast/gizlilik/', 'lokum-blast/privacy/', 'lokum-blast/kosullar/', 'lokum-blast/terms/'];
+const urls = ['', 'lokum-blast/', 'simit-tycoon/', 'destek/', 'basin/', 'yasal/', ...GAMES.flatMap(([slug]) => ['gizlilik/', 'privacy/', 'kosullar/', 'terms/'].map((p) => `${slug}/${p}`))];
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${SITE}/${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 // AdMob requires app-ads.txt at the root of the developer website. Replace the publisher id.
 writeFileSync(join(out, 'app-ads.txt'), `# Replace pub-0000000000000000 with your AdMob publisher ID (AdMob › Apps › app-ads.txt).\ngoogle.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0\n`);

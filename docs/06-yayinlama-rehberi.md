@@ -125,3 +125,29 @@ Gizlilik politikası ve koşullar: `games/lokum-blast/legal/`. Bunları sitende 
 | 5.1.1 Gizlilik politikası URL’si çalışmıyor | Yayından önce siteye koy ⚠️ |
 | 5.1.2 ATT’den önce izleme | AdMob, ATT ve onay formundan **sonra** başlatılıyor ✅ |
 | Geri yükleme butonu yok | Mağaza ve Ayarlar’da var ✅ |
+
+---
+
+## 7. Simit Tycoon için farklar
+
+Adımların hepsi aynı. Sadece kimlikler, ürünler ve kontrol listesi farklı.
+
+| | Simit Tycoon |
+|---|---|
+| Paket kimliği | `com.tekirstudios.simittycoon` |
+| AdMob | Tek bir **ödüllü** reklam birimi yeter (geçiş ve banner yok). `src/config.ts → admob` |
+| RevenueCat yetkileri | `no_ads` ← no_ads, club_monthly, club_yearly · `club` ← club_monthly, club_yearly |
+| Ürünler ve TL fiyatları | `src/meta/catalog.ts` · [09-simit-tycoon-ekonomi-ve-fiyatlandirma.md](09-simit-tycoon-ekonomi-ve-fiyatlandirma.md) |
+| Mağaza metinleri | [10-simit-tycoon-magaza-metinleri.md](10-simit-tycoon-magaza-metinleri.md) |
+| Yasal metinler | `games/simit-tycoon/legal/` → sitede `/simit-tycoon/gizlilik/` ve `/simit-tycoon/kosullar/` (site betiği otomatik üretir) |
+| Yerel ayarlar | `cap add` sonrası `node scripts/native-config.cjs` ve `node scripts/ios-localize.cjs` |
+| Bildirim ikonu | `android/app/src/main/res/drawable/ic_stat_simit.xml` (tek renkli simit halkası) |
+
+### Sandbox kontrol listesi (Simit Tycoon)
+- [ ] Altın paketleri doğru miktarı veriyor; Başlangıç Paketi sadece bir kez alınabiliyor ve satın alınınca teklif kayboluyor
+- [ ] `mult_x2` / `mult_x3` alınınca gelir hemen ×2 / ×6 oluyor ve **Satın alımları geri yükle** yeniden kurulumda geri getiriyor
+- [ ] `no_ads` sonrası ×2 hızlandırma, ×2 çevrimdışı kazanç ve bedava altın video izlemeden geliyor
+- [ ] Kedi Kulübü: gelir ×2, günlük 30 altın, 24 saatlik kasa; abonelik bitince hepsi kalkıyor
+- [ ] Uygulamayı kapatıp 1 saat sonra açınca “Tekrar hoş geldin” ekranı çıkıyor, **×2 Topla** reklamı çalışıyor
+- [ ] Kasa dolunca “Kasan doldu!” bildirimi geliyor (bildirim izni ilk kedi işe alınınca isteniyor)
+- [ ] Cihaz saati ileri alınınca kazanç kasa kapasitesini aşmıyor, geri alınınca kazanç verilmiyor

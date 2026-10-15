@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Simit Tycoon</string>
+    <string name="title_activity_main">Simit Tycoon</string>
+    <string name="package_name">com.tekirstudios.simittycoon</string>
+    <string name="custom_url_scheme">com.tekirstudios.simittycoon</string>
+</resources>

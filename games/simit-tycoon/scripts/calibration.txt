@@ -1,0 +1,33 @@
+TUNING {"laleScale":10000000000,"lalePower":0.4,"laleBonus":0.02,"districtMult":2,"roundScale":100000,"rounds":25,"festivalMult":2}
+d 0 goal=  1.90B after  2h06m (total  2h06m) lale 0 → 78  move=×5.1 income×5.1
+d 1 goal=  8.10T after  4h05m (total  6h11m) lale 78 → 2.19K  move=×34.9 income×178
+d 2 goal= 77.0Qa after  6h05m (total 12h17m) lale 2.19K → 85.3K  move=×76.3 income×13.7K
+d 3 goal=  360Qi after 11h48m (total 24h06m) lale 85.3K → 2.52M  move=×59.0 income×806K
+d 4 goal= 14.0Sp after 12h06m (total 36h12m) lale 2.52M → 175M  move=×138.8 income×112M
+d 5 goal= 43.0Oc after 17h53m (total   2.3d) lale 175M → 4.29B  move=×49.0 income×5.49B
+d 6 goal= 21.0No after 21h59m (total   3.2d) lale 4.29B → 51.6B  move=×24.1 income×132B
+d 7 goal= 11.0Dc after 27h59m (total   4.3d) lale 51.6B → 635B  move=×24.6 income×3.25T
+d 8 goal=  600Dc after 29h59m (total   5.6d) lale 635B → 3.10T  move=×9.8 income×31.7T
+d 9 goal= 13.0aa after 34h00m (total   7.0d) lale 3.10T → 10.9T  move=×7.1 income×224T
+d10 goal= 2.00ab after 35h59m (total   8.5d) lale 10.9T → 80.3T  move=×14.7 income×3.29Qa
+d11 goal= 34.0ab after 38h00m (total  10.1d) lale 80.3T → 252T  move=×6.3 income×20.7Qa
+d12 goal=  810ab after 46h00m (total  12.0d) lale 252T → 887T  move=×7.0 income×145Qa
+d13 goal= 71.0ac after   2.0d (total  14.0d) lale 887T → 5.25Qa  move=×11.8 income×1.72Qi
+d14 goal= 2.00ad after   2.0d (total  16.0d) lale 5.25Qa → 20.1Qa  move=×7.7 income×13.2Qi
+d15 goal= 20.0ad after   2.2d (total  18.2d) lale 20.1Qa → 52.6Qa  move=×5.2 income×68.9Qi
+d16 goal=  830ad after   2.3d (total  20.5d) lale 52.6Qa → 224Qa  move=×8.5 income×587Qi
+d17 goal= 30.0ae after   2.5d (total  23.0d) lale 224Qa → 940Qa  move=×8.4 income×4.93Sx
+d18 goal=  680ae after   3.0d (total  26.0d) lale 940Qa → 3.29Qi  move=×7.0 income×34.5Sx
+d19 goal= 10.0af after   3.0d (total  29.0d) lale 3.29Qi → 9.90Qi  move=×6.0 income×208Sx
+d20 goal=  450af after   3.0d (total  32.0d) lale 9.90Qi → 43.9Qi  move=×8.9 income×1.84Sp
+d21 goal= 10.0ag after   3.2d (total  35.2d) lale 43.9Qi → 155Qi  move=×7.1 income×13.0Sp
+d22 goal=  140ag after   3.3d (total  38.5d) lale 155Qi → 448Qi  move=×5.8 income×75.1Sp
+d23 goal= 4.40ah after   3.5d (total  42.0d) lale 448Qi → 1.74Sx  move=×7.8 income×583Sp
+d24 goal=  130ah after   4.0d (total  46.0d) lale 1.74Sx → 6.82Sx  move=×7.8 income×4.58Oc
+d25 goal= 2.50ai after   4.0d (total  50.0d) lale 6.82Sx → 22.1Sx  move=×6.5 income×29.7Oc
+d26 goal= 19.0ai after   4.0d (total  54.0d) lale 22.1Sx → 51.5Sx  move=×4.7 income×138Oc
+d27 goal=  720ai after   4.2d (total  58.2d) lale 51.5Sx → 212Sx  move=×8.2 income×1.14No
+d28 goal= 14.0aj after   4.3d (total  62.5d) lale 212Sx → 709Sx  move=×6.7 income×7.61No
+d29 goal=  180aj after   4.5d (total  67.0d) lale 709Sx → 1.98Sp  move=×5.6 income×42.4No
+d30 goal= 1.40ak after   5.0d (total  72.0d) lale 1.98Sp → 4.61Sp  move=×4.7 income×198No
+d31 goal= 13.0ak after   5.0d (total  77.0d) lale 4.61Sp → 11.2Sp  move=×4.9 income×963No

@@ -49,6 +49,8 @@
 - [ ] **Çarşı Pass** (sezon kartı) ve **haftalık turnuva**
 - [ ] **Albüm**: Tekir’in İstanbul kartpostal koleksiyonu (koleksiyon metası)
 - [ ] Arapça (RTL) ve Japonca dil desteği
+- [ ] **Çapraz tanıtım:** Lokum Blast ↔ Simit Tycoon. Ayarlar ekranında “Tekir’in diğer oyunları” kartı; Simit Tycoon’da bir “Lokumcu” etkinliği Lokum Blast’ı, Lokum Blast’ta bir “Çay Ocağı” teması Simit Tycoon’u tanıtır
+- [ ] **Simit Tycoon LiveOps:** Boğaz Pass (sezon kartı), haftalık etkinlik semtleri (Ramazan Sokağı, Kurban Bayramı, Yılbaşı), Kedi Albümü kostümleri. Ayrıntı: `docs/08` §8
 
 ## 6. Ölçüm panosu (her gün bakılacak)
 

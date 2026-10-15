@@ -1,0 +1,309 @@
+TUNING {"laleScale":10000000000,"lalePower":0.4,"laleBonus":0.02,"districtMult":2,"roundScale":100000,"rounds":25,"festivalMult":2}
+
+== First session, active tapping, F2P ==
+    1m cash=     566 life=   8.47K idle/s=     200 buys/min= 30.0 pendingLale=0  simit*:50 cay:12 pogaca:4
+    2m cash=   3.34K life=    150K idle/s=   1.47K buys/min= 43.0 pendingLale=1  simit*:68 cay*:30 pogaca:14 balik:6
+    3m cash=   37.3K life=    601K idle/s=   6.76K buys/min=  9.0 pendingLale=3  simit*:100 cay*:32 pogaca*:26 balik:8 doner:1
+    5m cash=    346K life=   3.41M idle/s=   24.8K buys/min= 10.5 pendingLale=6  simit*:100 cay*:50 pogaca*:37 balik:10 doner:5
+   10m cash=    707K life=   42.2M idle/s=    475K buys/min=  6.2 pendingLale=16  simit*:105 cay*:50 pogaca*:50 balik*:32 doner*:26
+   15m cash=   13.7M life=    254M idle/s=   2.07M buys/min=  4.4 pendingLale=34  simit*:113 cay*:52 pogaca*:50 balik*:50 doner*:33 kumpir*:25
+   20m cash=   1.14B life=   1.79B idle/s=   5.67M buys/min=  6.6 pendingLale=75  simit*:126 cay*:58 pogaca*:55 balik*:50 doner*:50 kumpir*:32
+   30m cash=   5.65M life=   15.7B idle/s=   29.9M buys/min= 14.1 pendingLale=179  simit*:200 cay*:100 pogaca*:77 balik*:74 doner*:73 kumpir*:66
+   45m cash=    696M life=   44.7B idle/s=   35.1M buys/min=  1.3 pendingLale=273  simit*:200 cay*:100 pogaca*:100 balik*:100 doner*:79 kumpir*:72
+   60m cash=   32.3B life=   76.3B idle/s=   35.1M buys/min=  0.0 pendingLale=338  simit*:200 cay*:100 pogaca*:100 balik*:100 doner*:79 kumpir*:72
+   90m cash=   31.0B life=    151B idle/s=   48.9M buys/min=  0.2 pendingLale=444  simit*:200 cay*:100 pogaca*:100 balik*:100 doner*:100 kumpir*:76
+  120m cash=    119B life=    239B idle/s=   48.9M buys/min=  0.0 pendingLale=534  simit*:200 cay*:100 pogaca*:100 balik*:100 doner*:100 kumpir*:76
+  events:
+        25s  unlock cay
+        44s  unlock pogaca
+        55s  manager simit
+      1m00s  lifetime 1.00K
+      1m24s  manager cay
+      1m31s  unlock balik
+      2m31s  manager pogaca
+      2m53s  unlock doner
+      4m30s  first recipe
+      5m00s  lifetime 1.00M
+      6m31s  manager balik
+      6m48s  manager doner
+     14m38s  unlock kumpir
+     14m38s  festival 25
+     14m50s  manager kumpir
+     20m00s  lifetime 1.00B
+     21m47s  festival 50
+
+== First session with ×2 ad boost ==
+    1m cash=   9.03K life=   98.0K idle/s=   1.38K buys/min= 60.0 pendingLale=1  simit*:64 cay*:28 pogaca:12 balik:3
+    2m cash=    129K life=   1.38M idle/s=   7.38K buys/min= 31.0 pendingLale=4  simit*:100 cay*:34 pogaca*:29 balik:10 doner:5
+    3m cash=   1.69M life=   5.26M idle/s=   32.8K buys/min= 11.0 pendingLale=7  simit*:100 cay*:50 pogaca*:37 balik:10 doner:5
+    5m cash=    647K life=   40.4M idle/s=    462K buys/min= 14.5 pendingLale=16  simit*:105 cay*:50 pogaca*:50 balik*:32 doner*:25
+   10m cash=   1.11B life=   1.76B idle/s=   5.67M buys/min= 11.4 pendingLale=74  simit*:126 cay*:58 pogaca*:55 balik*:50 doner*:50 kumpir*:32
+   15m cash=   7.44M life=   15.3B idle/s=   29.8M buys/min= 28.0 pendingLale=177  simit*:200 cay*:79 pogaca*:77 balik*:74 doner*:73 kumpir*:66
+   20m cash=   5.56B life=   34.2B idle/s=   32.6M buys/min=  3.6 pendingLale=245  simit*:200 cay*:100 pogaca*:100 balik*:78 doner*:78 kumpir*:71
+   30m cash=   31.8B life=   75.8B idle/s=   35.1M buys/min=  0.3 pendingLale=337  simit*:200 cay*:100 pogaca*:100 balik*:100 doner*:79 kumpir*:72
+   45m cash=   30.3B life=    151B idle/s=   48.9M buys/min=  0.3 pendingLale=443  simit*:200 cay*:100 pogaca*:100 balik*:100 doner*:100 kumpir*:76
+   60m cash=    118B life=    239B idle/s=   48.9M buys/min=  0.0 pendingLale=533  simit*:200 cay*:100 pogaca*:100 balik*:100 doner*:100 kumpir*:76
+  events:
+        13s  unlock cay
+        23s  unlock pogaca
+        31s  manager simit
+        46s  manager cay
+        49s  unlock balik
+      1m00s  lifetime 1.00K
+      1m22s  manager pogaca
+      1m31s  unlock doner
+      1m59s  lifetime 1.00M
+      2m19s  first recipe
+      3m23s  manager balik
+      3m59s  manager doner
+      7m27s  unlock kumpir
+      7m27s  festival 25
+      7m31s  manager kumpir
+     10m00s  lifetime 1.00B
+     10m57s  festival 50
+
+== Casual F2P: 6 min every 2 h, 4 h offline cap (30 days) — the calibration profile ==
+  day  1: district=3 (tour 1) lale=99.2K income×15.9K lifetime=113Qa goal=360Qi run=0 stands=1 recipes=0 active=53m59s
+  day  2: district=4 (tour 1) lale=2.85M income×912K lifetime=5.38Sp goal=14.0Sp run=5.38Sp stands=10 recipes=40 active=1h42m
+  day  3: district=6 (tour 1) lale=4.60B income×5.89B lifetime=52.1Oc goal=21.0No run=0 stands=1 recipes=0 active=2h30m
+  day  5: district=7 (tour 1) lale=54.0B income×138B lifetime=8.04Dc goal=11.0Dc run=8.02Dc stands=10 recipes=55 active=4h06m
+  day  7: district=9 (tour 2) lale=3.12T income×32.0T lifetime=635Dc goal=13.0aa run=10.2Dc stands=10 recipes=57 active=5h41m
+  day 10: district=11 (tour 2) lale=82.8T income×3.39Qa lifetime=2.26ab goal=34.0ab run=0 stands=1 recipes=0 active=8h05m
+  day 14: district=13 (tour 2) lale=890T income×146Qa lifetime=1.55ac goal=71.0ac run=688ab stands=10 recipes=75 active=11h17m
+  day 21: district=16 (tour 3) lale=52.5Qa income×68.8Qi lifetime=48.5ad goal=830ad run=25.6ad stands=10 recipes=84 active=16h53m
+  day 30: district=19 (tour 3) lale=3.32Qi income×34.8Sx lifetime=3.72af goal=10.0af run=2.99af stands=10 recipes=95 active=24h06m
+  moves:
+      2h06m (active 12m00s)  district 1
+      8h05m (active 29m59s)  district 2
+     24h06m (active 53m59s)  district 3
+     32h06m (active  1h17m)  district 4
+       2.2d (active  1h54m)  district 5
+       3.0d (active  2h30m)  district 6
+       4.0d (active  3h18m)  district 7
+       5.3d (active  4h24m)  district 8
+       6.6d (active  5h35m)  district 9
+       8.1d (active  6h35m)  district 10
+      10.0d (active  8h05m)  district 11
+      11.4d (active  9h23m)  district 12
+      13.4d (active 10h59m)  district 13
+      15.6d (active 12h47m)  district 14
+      18.0d (active 14h29m)  district 15
+      20.3d (active 16h23m)  district 16
+      22.6d (active 18h23m)  district 17
+      25.1d (active 20h11m)  district 18
+      28.3d (active 22h48m)  district 19
+
+== Light: 5 min every 4 h ==
+  day  1: district=2 (tour 1) lale=2.67K income×217 lifetime=13.4T goal=77.0Qa run=0 stands=1 recipes=0 active=25m00s
+  day  2: district=3 (tour 1) lale=95.9K income×15.3K lifetime=402Qa goal=360Qi run=298Qa stands=9 recipes=19 active=45m00s
+  day  3: district=4 (tour 1) lale=2.67M income×855K lifetime=193Sx goal=14.0Sp run=192Sx stands=10 recipes=33 active=1h05m
+  day  5: district=6 (tour 1) lale=4.72B income×6.04B lifetime=55.5Oc goal=21.0No run=0 stands=1 recipes=0 active=1h45m
+  day  7: district=7 (tour 1) lale=51.1B income×131B lifetime=513No goal=11.0Dc run=491No stands=10 recipes=55 active=2h25m
+  day 10: district=8 (tour 2) lale=662B income×3.39T lifetime=583Dc goal=600Dc run=570Dc stands=10 recipes=62 active=3h25m
+  day 14: district=10 (tour 2) lale=11.9T income×243T lifetime=1.90ab goal=2.00ab run=1.89ab stands=10 recipes=70 active=4h45m
+  day 21: district=13 (tour 2) lale=895T income×147Qa lifetime=53.4ac goal=71.0ac run=52.6ac stands=10 recipes=77 active=7h05m
+  day 30: district=16 (tour 3) lale=52.0Qa income×68.2Qi lifetime=818ad goal=830ad run=796ad stands=10 recipes=88 active=10h05m
+  moves:
+      4h05m (active 10m00s)  district 1
+     24h05m (active 25m00s)  district 2
+     36h05m (active 40m00s)  district 3
+       2.3d (active 55m01s)  district 4
+       3.5d (active  1h20m)  district 5
+       5.0d (active  1h45m)  district 6
+       6.2d (active  2h10m)  district 7
+       8.2d (active  2h50m)  district 8
+      10.2d (active  3h30m)  district 9
+      12.0d (active  4h05m)  district 10
+      14.2d (active  4h50m)  district 11
+      16.2d (active  5h30m)  district 12
+      18.5d (active  6h20m)  district 13
+      21.3d (active  7h15m)  district 14
+      24.2d (active  8h10m)  district 15
+      27.0d (active  9h05m)  district 16
+
+== Engaged: 10 min every 90 min, ad boost + ad offline ×2, 8 h cap ==
+  day  1: district=5 (tour 1) lale=209M income×134M lifetime=112Sp goal=43.0Oc run=89.0Sp stands=10 recipes=42 active=2h00m
+  day  2: district=8 (tour 2) lale=814B income×4.17T lifetime=21.7Dc goal=600Dc run=0 stands=1 recipes=0 active=3h40m
+  day  3: district=10 (tour 2) lale=17.4T income×357T lifetime=46.0aa goal=2.00ab run=0 stands=1 recipes=0 active=5h20m
+  day  5: district=14 (tour 2) lale=6.04Qa income×1.98Qi lifetime=103ac goal=2.00ad run=0 stands=1 recipes=0 active=8h59m
+  day  7: district=17 (tour 3) lale=227Qa income×596Qi lifetime=901ad goal=30.0ae run=6.23ad stands=10 recipes=84 active=12h39m
+  day 10: district=21 (tour 3) lale=49.4Qi income×2.07Sp lifetime=623af goal=10.0ag run=0 stands=1 recipes=0 active=18h09m
+  day 14: district=25 (tour 4) lale=8.15Sx income×5.47Oc lifetime=218ah goal=2.50ai run=0 stands=1 recipes=0 active=25h10m
+  day 21: district=31 (tour 4) lale=4.59Sp income×197No lifetime=4.88ak goal=13.0ak run=3.24ak stands=10 recipes=128 active=36h50m
+  day 30: district=45 (tour 6) lale=1.32No income×931ab lifetime=400ao goal=461ao run=327ao stands=10 recipes=157 active=2.2d
+  moves:
+      1h40m (active 20m00s)  district 1
+      4h39m (active 39m59s)  district 2
+      7h39m (active 59m59s)  district 3
+     10h39m (active  1h19m)  district 4
+     15h09m (active  1h50m)  district 5
+     27h10m (active  2h20m)  district 6
+     34h40m (active  3h10m)  district 7
+       2.0d (active  3h40m)  district 8
+       2.3d (active  4h30m)  district 9
+       3.0d (active  5h20m)  district 10
+       3.3d (active  6h09m)  district 11
+       4.0d (active  7h09m)  district 12
+       4.4d (active  8h09m)  district 13
+       5.0d (active  8h59m)  district 14
+       5.5d (active 10h19m)  district 15
+       6.1d (active 10h59m)  district 16
+       6.6d (active 12h29m)  district 17
+       7.5d (active 13h59m)  district 18
+       8.4d (active 15h29m)  district 19
+       9.2d (active 16h49m)  district 20
+      10.0d (active 18h09m)  district 21
+      11.0d (active 19h59m)  district 22
+      12.0d (active 21h50m)  district 23
+      13.0d (active 23h30m)  district 24
+      14.0d (active 25h10m)  district 25
+      15.0d (active 26h50m)  district 26
+      16.0d (active 28h30m)  district 27
+      17.2d (active 30h40m)  district 28
+      18.2d (active 32h20m)  district 29
+      19.3d (active 34h10m)  district 30
+      20.4d (active 36h10m)  district 31
+      21.6d (active 38h20m)  district 32
+      22.5d (active 39h50m)  district 33
+      23.2d (active 40h40m)  district 34
+      24.0d (active 41h50m)  district 35
+      24.5d (active 43h10m)  district 36
+      25.3d (active 44h10m)  district 37
+      26.0d (active 45h10m)  district 38
+      26.3d (active 45h50m)  district 39
+      26.6d (active 46h40m)  district 40
+      27.5d (active   2.0d)  district 41
+      28.2d (active   2.0d)  district 42
+      28.5d (active   2.1d)  district 43
+      29.1d (active   2.1d)  district 44
+      29.5d (active   2.1d)  district 45
+
+== Payer: engaged + permanent ×6 (×2, ×3 IAP) + club ×2 ==
+  day  1: district=8 (tour 2) lale=1.87T income×115T lifetime=393Dc goal=600Dc run=220Dc stands=10 recipes=62 active=2h00m
+  day  2: district=13 (tour 2) lale=1.67Qa income×3.29Qi lifetime=5.78ac goal=71.0ac run=1.63ac stands=10 recipes=77 active=3h40m
+  day  3: district=18 (tour 3) lale=3.50Qi income×220Sx lifetime=834ae goal=680ae run=0 stands=1 recipes=0 active=5h20m
+  day  5: district=27 (tour 4) lale=57.9Sx income×1.86No lifetime=33.4ai goal=720ai run=4.11ai stands=10 recipes=114 active=8h59m
+  day  7: district=35 (tour 5) lale=290Sp income×2.39aa lifetime=60.4al goal=96.7al run=8.64al stands=10 recipes=133 active=12h39m
+  day 10: district=52 (tour 7) lale=2.08Dc income×2.25ae lifetime=7.20ar goal=2.74ar run=0 stands=1 recipes=0 active=18h09m
+  day 14: district=73 (tour 10) lale=372ab income×844ai lifetime=3.07ay goal=578ax run=0 stands=1 recipes=0 active=25h10m
+  day 21: district=109 (tour 14) lale=14.1ag income×2.19ar lifetime=27.0bj goal=40.1bj run=0 stands=1 recipes=0 active=36h50m
+  day 30: district=116 (tour 15) lale=3.66ah income×73.0as lifetime=233bl goal=239bl run=203bl stands=10 recipes=275 active=2.2d
+  moves:
+     10m00s (active 10m00s)  district 1
+      1h40m (active 20m00s)  district 2
+      3h10m (active 29m59s)  district 3
+      4h39m (active 39m59s)  district 4
+      6h09m (active 49m59s)  district 5
+      9h09m (active  1h09m)  district 6
+     12h09m (active  1h30m)  district 7
+     15h09m (active  1h50m)  district 8
+     25h40m (active  2h10m)  district 9
+     28h40m (active  2h30m)  district 10
+     31h40m (active  2h50m)  district 11
+     34h40m (active  3h10m)  district 12
+     37h40m (active  3h30m)  district 13
+       2.1d (active  3h50m)  district 14
+       2.2d (active  4h10m)  district 15
+       2.3d (active  4h30m)  district 16
+       2.5d (active  5h00m)  district 17
+       3.0d (active  5h20m)  district 18
+       3.1d (active  5h39m)  district 19
+       3.3d (active  5h59m)  district 20
+       3.4d (active  6h29m)  district 21
+       3.6d (active  6h49m)  district 22
+       4.0d (active  7h09m)  district 23
+       4.2d (active  7h39m)  district 24
+       4.3d (active  7h59m)  district 25
+       4.5d (active  8h29m)  district 26
+       4.6d (active  8h49m)  district 27
+       5.1d (active  9h19m)  district 28
+       5.3d (active  9h49m)  district 29
+       5.5d (active 10h19m)  district 30
+       6.0d (active 10h49m)  district 31
+       6.2d (active 11h19m)  district 32
+       6.3d (active 11h39m)  district 33
+       6.5d (active 12h09m)  district 34
+       6.6d (active 12h29m)  district 35
+       7.1d (active 12h49m)  district 36
+       7.2d (active 13h09m)  district 37
+       7.3d (active 13h29m)  district 38
+       7.4d (active 13h49m)  district 39
+       7.6d (active 14h09m)  district 40
+       8.0d (active 14h29m)  district 41
+       8.1d (active 14h49m)  district 42
+       8.3d (active 15h09m)  district 43
+       8.4d (active 15h29m)  district 44
+       8.5d (active 15h49m)  district 45
+       8.6d (active 16h09m)  district 46
+       9.1d (active 16h29m)  district 47
+       9.2d (active 16h49m)  district 48
+       9.3d (active 17h09m)  district 49
+       9.4d (active 17h29m)  district 50
+       9.6d (active 17h49m)  district 51
+      10.0d (active 18h09m)  district 52
+      10.1d (active 18h29m)  district 53
+      10.3d (active 18h49m)  district 54
+      10.4d (active 19h09m)  district 55
+      10.5d (active 19h29m)  district 56
+      10.6d (active 19h49m)  district 57
+      11.1d (active 20h09m)  district 58
+      11.2d (active 20h29m)  district 59
+      11.3d (active 20h49m)  district 60
+      11.4d (active 21h09m)  district 61
+      11.6d (active 21h30m)  district 62
+      12.0d (active 21h50m)  district 63
+      12.1d (active 22h10m)  district 64
+      12.3d (active 22h30m)  district 65
+      12.4d (active 22h50m)  district 66
+      12.5d (active 23h10m)  district 67
+      13.0d (active 23h30m)  district 68
+      13.1d (active 23h50m)  district 69
+      13.3d (active 24h10m)  district 70
+      13.4d (active 24h30m)  district 71
+      13.5d (active 24h50m)  district 72
+      14.0d (active 25h10m)  district 73
+      14.1d (active 25h30m)  district 74
+      14.3d (active 25h50m)  district 75
+      14.4d (active 26h10m)  district 76
+      14.5d (active 26h30m)  district 77
+      15.0d (active 26h50m)  district 78
+      15.1d (active 27h10m)  district 79
+      15.3d (active 27h30m)  district 80
+      15.4d (active 27h50m)  district 81
+      15.5d (active 28h10m)  district 82
+      16.0d (active 28h30m)  district 83
+      16.1d (active 28h50m)  district 84
+      16.3d (active 29h10m)  district 85
+      16.4d (active 29h30m)  district 86
+      16.5d (active 29h50m)  district 87
+      17.0d (active 30h10m)  district 88
+      17.1d (active 30h30m)  district 89
+      17.3d (active 30h50m)  district 90
+      17.4d (active 31h10m)  district 91
+      17.5d (active 31h30m)  district 92
+      18.0d (active 31h50m)  district 93
+      18.1d (active 32h00m)  district 94
+      18.2d (active 32h20m)  district 95
+      18.3d (active 32h40m)  district 96
+      18.4d (active 33h00m)  district 97
+      18.6d (active 33h20m)  district 98
+      19.1d (active 33h40m)  district 99
+      19.2d (active 34h00m)  district 100
+      19.3d (active 34h10m)  district 101
+      19.4d (active 34h30m)  district 102
+      19.4d (active 34h40m)  district 103
+      19.6d (active 35h00m)  district 104
+      20.1d (active 35h20m)  district 105
+      20.2d (active 35h40m)  district 106
+      20.3d (active 36h00m)  district 107
+      20.4d (active 36h20m)  district 108
+      21.0d (active 36h50m)  district 109
+      21.2d (active 37h20m)  district 110
+      21.5d (active 38h10m)  district 111
+      22.1d (active 38h40m)  district 112
+      23.0d (active 40h10m)  district 113
+      24.0d (active 41h50m)  district 114
+      25.2d (active 44h00m)  district 115
+      27.1d (active 47h00m)  district 116
+
+(simulated in 111.9s)

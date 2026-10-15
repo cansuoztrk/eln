@@ -10,9 +10,9 @@ Mobil pazarda tek bir hit’e bel bağlamak yerine **portföy stratejisi** öner
 |---|---|---|---|---|---|---|---|---|
 | 1 | **Lokum Blast** ✅ | Games | Blok bulmaca + çarşı metası | Reklam + IAP + VIP | ★★★★★ | ✅ hazır | ★★★★ | **bitti** |
 | 2 | **Lokma: AI Kalori** | Labs | Fotoğraftan kalori sayacı | Abonelik | ★★★★★ | ★★★ | ★★★★★ | 5–6 hf |
-| 3 | **Orbita: Planet Merge** | Games | Dairesel yerçekimli birleştirme | Reklam + IAP | ★★★★ | ★★★★ | ★★★★★ | 3–4 hf |
+| 3 | **Orbita: Planet Merge** *(ertelendi)* | Games | Dairesel yerçekimli birleştirme | Reklam + IAP | ★★★★ | ★★★★ | ★★★★★ | 3–4 hf |
 | 4 | **Telve: AI Kahve Falı** | Labs | Eğlence / fal | Abonelik + kredi | ★★★★ | ★★★★ | ★★★★ | 3–4 hf |
-| 5 | **Simit Tycoon** | Games | Idle tycoon | Ödüllü reklam + IAP | ★★★★ | ★★★ | ★★★ | 5–6 hf |
+| 5 | **Simit Tycoon** ✅ *(2. ürün)* | Games | Idle tycoon | Ödüllü reklam + IAP | ★★★★ | ★★★ | ★★★ | 5–6 hf |
 | 6 | **Kelime Çarşısı** | Games | Kaydırmalı kelime oyunu | Reklam + IAP | ★★★★ | ★★★ | ★★★ | 4–5 hf |
 | 7 | **Pati Kafe** | Games | Merge-2 + dekorasyon | IAP ağırlıklı | ★★★★★ | ★★ | ★★★★ | 3–4 ay |
 | 8 | **Nefes** | Labs | Sigara/vape bırakma koçu | Abonelik | ★★★★ | ★★★★ | ★★★★ | 3–4 hf |
@@ -38,7 +38,9 @@ Mobil pazarda tek bir hit’e bel bağlamak yerine **portföy stratejisi** öner
 - **Neden:** Fotoğraflı kalori uygulamaları son iki yılda abonelik gelirinde en hızlı büyüyen kategorilerden biri. Türkçe ve yerel mutfak boşluğu ise hâlâ açık.
 - **Teknik:** Capacitor kamera, küçük bir backend (Supabase/Firebase + Claude API), RevenueCat. Görüntü başına API maliyeti abonelik fiyatının çok altında.
 
-## 3. Orbita: Planet Merge
+## 3. Orbita: Planet Merge *(ertelendi: bkz. Simit Tycoon)*
+
+> **Ekim 2026 notu:** Pazar araştırması, dairesel yerçekimli gezegen birleştirme oyunlarının mağazalarda zaten bulunduğunu ve büyük bir çıkış yapamadığını gösterdi (Godspear’ın *Planet Merge – Space Puzzle* oyunu ve *Sputnika*). Bu yüzden 2. ürün olarak Simit Tycoon öne alındı. Orbita, farklılaştıracak bir kanca (ör. çok oyunculu düello) bulunursa yeniden değerlendirilecek.
 
 - **Kanca:** “Suika (karpuz) oyunu” uzayda ve **dairesel yerçekimiyle** oynanıyor. Gezegenleri merkezdeki yıldıza doğru fırlatıyorsun, aynılar birleşip büyüyor, dış halkayı geçen kaybediyor. Fırlatma noktası çemberin etrafında döner.
 - **Neden:** Birleştirme (merge) videoları TikTok’ta doğal olarak viral oluyor ve dairesel mekanik yeni. Sadece daire fiziği gerektirdiği için motoru küçük.
@@ -50,10 +52,11 @@ Mobil pazarda tek bir hit’e bel bağlamak yerine **portföy stratejisi** öner
 - **Para:** Abonelik veya tekil fal kredisi. Türkiye, Orta Doğu ve Balkanlar’da kanıtlanmış bir kategori.
 - **Not:** Uygulamada “eğlence amaçlıdır” uyarısı zorunlu. Apple bu tür içeriği eğlence kategorisinde kabul ediyor.
 
-## 5. Simit Tycoon
+## 5. Simit Tycoon: Idle Cat Café ✅ *(2. ürün, bu repoda, yayına hazır)*
 
-- **Kanca:** Tek bir simit tezgâhıyla başlıyorsun. Çay ocağı, vapur büfesi, Galata kulesi kafesi açarak bir İstanbul imparatorluğu kuruyorsun. Idle (otomatik gelir) ve yönetici sistemi var.
-- **Para:** Idle türü ödüllü reklamın şampiyonudur (2 kat gelir, hızlandırma, çevrimdışı kazanç). Üstüne yönetici ve süs IAP’leri.
+- **Kanca:** Karaköy iskelesinde tek bir simit arabasıyla başlıyorsun. 10 sokak lezzeti (simit, çay, balık ekmek, döner, kumpir, midye, Maraş dondurması, lokum, kebap…) ve her tezgâhın başında sevimli bir **kedi müdür**. Semtten semte taşınarak (Karaköy → Adalar) İstanbul turunu tamamlıyorsun. Martı yakalama ve vapur izdihamı gibi canlı olaylar var.
+- **Para:** Sadece ödüllü reklam (×2 gelir, ×2 çevrimdışı kazanç, bedava altın) + altın, kalıcı ×2/×3 çarpan, Reklamsız Ödüller ve Kedi Kulübü aboneliği.
+- **Neden öne alındı:** Orbita için yapılan pazar araştırması aynı mekaniğin zaten var olduğunu gösterdi. Kedi temalı idle yemek oyunları (Cat Snack Bar 20 M+ indirme, Eatventure ~40 M) ise kanıtlanmış bir pazar. Ayrıntı: `docs/08`, `docs/09`, `docs/10`.
 
 ## 6. Kelime Çarşısı
 
@@ -97,9 +100,9 @@ Mobil pazarda tek bir hit’e bel bağlamak yerine **portföy stratejisi** öner
 |---|---|
 | **Ay 0–1** | Lokum Blast: hesaplar, AdMob/RevenueCat bağlantısı, TestFlight, soft launch (TR + 2–3 test ülkesi) |
 | **Ay 1–2** | Lokum Blast: metrikleri ölç (D1/D7, ARPDAU), seviye ve ekonomi ince ayarı, global lansman |
-| **Ay 2–3** | **Lokma: AI Kalori** (ilk abonelik geliri) + **Orbita** prototipi |
-| **Ay 3–5** | Orbita yayını, Telve, Lokum Blast’ın ilk büyük güncellemesi (yeni çarşı bölgeleri, etkinlikler) |
-| **Ay 5–8** | Simit Tycoon, Kelime Çarşısı, Nefes |
+| **Ay 1–3** | **Simit Tycoon** soft launch ve global yayın (kod, görseller ve metinler hazır) + **Lokma: AI Kalori** (ilk abonelik geliri) |
+| **Ay 3–5** | Telve, Lokum Blast ve Simit Tycoon’un ilk büyük güncellemeleri (sezon kartı, etkinlik semtleri) |
+| **Ay 5–8** | Kelime Çarşısı, Nefes, Orbita’nın yeniden değerlendirilmesi |
 | **Yıl 2** | Pati Kafe ve Tavla & Okey (ekip büyüdükten sonra) |
 
 ### Ortak teknoloji ve verimlilik
