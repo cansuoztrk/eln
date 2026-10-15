@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Lokum Blast</string>
+    <string name="title_activity_main">Lokum Blast</string>
+    <string name="package_name">com.tekirstudios.lokumblast</string>
+    <string name="custom_url_scheme">com.tekirstudios.lokumblast</string>
+</resources>

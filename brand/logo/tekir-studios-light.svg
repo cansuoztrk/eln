@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1260" height="320" viewBox="0 0 1260 320">
+<defs><clipPath id="badge"><circle cx="160" cy="160" r="128"/></clipPath></defs>
+<circle cx="160" cy="160" r="140" fill="#e0a400"/><circle cx="160" cy="160" r="128" fill="#1a1238"/>
+<g clip-path="url(#badge)"><g transform="translate(36 40) scale(1.24)">
+<defs>
+<radialGradient id="fur7" cx=".5" cy=".38" r=".7"><stop offset="0" stop-color="#c9bcb1"/><stop offset=".65" stop-color="#9c8f84"/><stop offset="1" stop-color="#7d7067"/></radialGradient>
+<linearGradient id="fez8" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5a5a"/><stop offset="1" stop-color="#b3122a"/></linearGradient>
+<linearGradient id="lk9" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb3d1"/><stop offset="1" stop-color="#ff5e9c"/></linearGradient>
+</defs>
+<g class="tekir-tail"><path d="M150 160q40-10 30-50q-5-18 8-22" fill="none" stroke="#8a7d73" stroke-width="15" stroke-linecap="round"/><path d="M178 104q-3-10 9-15" fill="none" stroke="#5c514a" stroke-width="15" stroke-linecap="round"/></g>
+<ellipse cx="100" cy="168" rx="52" ry="28" fill="#8f8278"/>
+<path d="M44 70L52 22l36 30zM156 70l-8-48-36 30z" fill="#8f8278" stroke="#6b5f57" stroke-width="2"/>
+<path d="M54 60l4-28 20 18zM146 60l-4-28-20 18z" fill="#ffb7c5"/>
+<ellipse cx="100" cy="98" rx="62" ry="54" fill="url(#fur7)"/>
+<path d="M86 52q4 14 0 26M100 48v30M114 52q-4 14 0 26" stroke="#5c514a" stroke-width="5" stroke-linecap="round" fill="none"/>
+<path d="M40 92q12 2 18 8M40 108q12-2 18-4M160 92q-12 2-18 8M160 108q-12-2-18-4" stroke="#5c514a" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+<ellipse cx="100" cy="122" rx="30" ry="20" fill="#e9e1d8"/>
+<path d="M70 98q8-9 16 0M114 98q8-9 16 0" fill="none" stroke="#2b1d14" stroke-width="5" stroke-linecap="round"/>
+<path d="M93 110h14l-7 7z" fill="#ff8fa3"/>
+<path d="M100 116v5M100 121q-6 7-12 2M100 121q6 7 12 2" fill="none" stroke="#2b1d14" stroke-width="3.5" stroke-linecap="round"/>
+<g stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".9"><path d="M70 118l-26-4M70 124l-25 4M130 118l26-4M130 124l25 4"/></g>
+<ellipse cx="66" cy="118" rx="8" ry="5" fill="#ff9fb3" opacity=".55"/><ellipse cx="134" cy="118" rx="8" ry="5" fill="#ff9fb3" opacity=".55"/>
+<g transform="rotate(-12 100 40)"><path d="M78 52l6-30h32l6 30z" fill="url(#fez8)"/><ellipse cx="100" cy="52" rx="22" ry="5" fill="#8f0f22"/><ellipse cx="100" cy="22" rx="16" ry="3.5" fill="#d61f38"/><path d="M100 22q15 1 17 19" fill="none" stroke="#1f1610" stroke-width="2.4" stroke-linecap="round"/><path d="M117 40q-5 8-3 16q4 2 7 0q2-8-4-16z" fill="#2b1d14"/><circle cx="117" cy="40" r="2.2" fill="#2b1d14"/></g>
+
+</g></g>
+<text x="330" y="186" font-family="'Baloo 2'" font-weight="800" font-size="132" fill="#1a1238">Tekir <tspan fill="#e0a400">Studios</tspan></text>
+<text x="336" y="256" font-family="'Baloo 2'" font-weight="600" font-size="38" fill="#5a4d8f" letter-spacing="6">İSTANBUL · GAMES &amp; APPS</text>
+</svg>
