@@ -242,3 +242,101 @@ export function stateKey(s: State): string {
   const slots = s.slots.map((x) => (x ? `${x.cat}.${x.count}` : '_')).sort().join(',');
   return `${cols}#${s.stock.join(',')}#${s.waste.join(',')}#${slots}#${s.done.length}`;
 }
+
+// ───────────── boosters & helpers for the UI ─────────────
+
+/**
+ * "Pati" booster: Tekir's paw fetches one missing word of an open shelf from
+ * anywhere (face-down, stock, waste or a column) and shelves it. Free of
+ * moves. Returns null when the shelf has nothing left to fetch.
+ */
+export function pawFetch(state: State, slotIndex: number): MoveResult | null {
+  const slot = state.slots[slotIndex];
+  if (!slot) return null;
+  const s = clone(state);
+  const want = (id: number) => s.cards[id].kind === 'word' && s.cards[id].cat === slot.cat;
+  // Prefer the most buried card: deep face-down first, then stock, then the rest.
+  let taken: number | null = null;
+  const revealed: number[] = [];
+  for (const col of s.columns) {
+    const i = col.down.findIndex(want);
+    if (i >= 0) {
+      taken = col.down.splice(i, 1)[0];
+      break;
+    }
+  }
+  if (taken === null) {
+    const i = s.stock.findIndex(want);
+    if (i >= 0) taken = s.stock.splice(i, 1)[0];
+  }
+  if (taken === null) {
+    const i = s.waste.findIndex(want);
+    if (i >= 0) taken = s.waste.splice(i, 1)[0];
+  }
+  if (taken === null) {
+    for (let c = 0; c < s.columns.length && taken === null; c++) {
+      const col = s.columns[c];
+      const i = col.up.findIndex(want);
+      if (i >= 0) {
+        taken = col.up.splice(i, 1)[0];
+        if (!col.up.length && col.down.length) {
+          col.up.push(col.down.pop()!);
+          revealed.push(c);
+        }
+      }
+    }
+  }
+  if (taken === null) return null;
+  const sl = s.slots[slotIndex]!;
+  sl.count++;
+  sl.top = taken;
+  const completed: number[] = [];
+  if (sl.count >= s.sizes[sl.cat]) {
+    s.done.push(sl.cat);
+    completed.push(sl.cat);
+    s.slots[slotIndex] = null;
+  }
+  return { state: s, completed, revealed };
+}
+
+/** Where a tapped card should go: the most useful legal destination, or null. */
+export function autoTarget(state: State, src: Source, rules: Rules = DEFAULT_RULES): Target | null {
+  const ids = src.from === 'waste' ? state.waste.slice(-1) : state.columns[src.col].up.slice(-src.count);
+  if (!ids.length) return null;
+  const head = state.cards[ids[0]];
+  const slots = state.slots.map((_, i) => i);
+  // 1. Matching open shelf.
+  const open = slots.find((i) => state.slots[i]?.cat === head.cat && head.kind === 'word');
+  if (open !== undefined && canMove(state, src, { to: 'slot', slot: open }, rules)) return { to: 'slot', slot: open };
+  // 2. Category card onto a free shelf.
+  if (head.kind === 'cat') {
+    const free = slots.find((i) => !state.slots[i]);
+    if (free !== undefined) return { to: 'slot', slot: free };
+  }
+  // 3. Onto a same-category word in a column (prefer longer runs).
+  let best: { col: number; len: number } | null = null;
+  state.columns.forEach((col, i) => {
+    if (src.from === 'col' && src.col === i) return;
+    if (!canMove(state, src, { to: 'col', col: i }, rules) || !col.up.length) return;
+    const len = topRunLength(state, i);
+    if (!best || len > best.len) best = { col: i, len };
+  });
+  if (best) return { to: 'col', col: (best as { col: number }).col };
+  // 4. An empty column.
+  const empty = state.columns.findIndex((c, i) => !c.up.length && !c.down.length && canMove(state, src, { to: 'col', col: i }, rules));
+  return empty >= 0 ? { to: 'col', col: empty } : null;
+}
+
+/** The longest movable run starting at `index` in a column's face-up cards, or 0. */
+export function runFrom(state: State, col: number, index: number): number {
+  const up = state.columns[col].up;
+  if (index < 0 || index >= up.length) return 0;
+  const count = up.length - index;
+  return count <= topRunLength(state, col) ? count : 0;
+}
+
+export function stars(state: State, budget: number, bought = false): 1 | 2 | 3 {
+  if (bought) return 1;
+  const left = state.movesLeft / Math.max(1, budget);
+  return left >= 0.25 ? 3 : left >= 0.1 ? 2 : 1;
+}

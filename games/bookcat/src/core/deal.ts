@@ -14,6 +14,12 @@ export interface Layout {
   /** Face-down cards under the top card of each column. */
   depth: number[];
   seed: number;
+  /**
+   * Onboarding deals: a category card starts face up in the first column,
+   * matching the word on top of the second column, so the very first move
+   * the tutorial asks for is always available.
+   */
+  lead?: boolean;
 }
 
 export function buildCards(sizes: number[]): Card[] {
@@ -29,6 +35,13 @@ export function deal(layout: Layout, moves = 999): State {
   const cards = buildCards(layout.sizes);
   const rng = new Rng(layout.seed);
   const order = rng.shuffle(cards.map((c) => c.id));
+  if (layout.lead && layout.columns > 1) {
+    const first = layout.depth[0] ?? 0;
+    const second = first + 1 + (layout.depth[1] ?? 0);
+    const want = cards[order[second]].cat;
+    const at = order.findIndex((id) => cards[id].kind === 'cat' && cards[id].cat === want);
+    [order[first], order[at]] = [order[at], order[first]];
+  }
   const columns = Array.from({ length: layout.columns }, (_, i) => {
     const d = layout.depth[i] ?? 0;
     const down = order.splice(0, d);

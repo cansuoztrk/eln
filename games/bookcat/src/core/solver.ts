@@ -119,20 +119,55 @@ function path(node: Node): Move[] {
   return out.reverse();
 }
 
-/** Next move of a solution from the current position (hint booster). */
+/**
+ * Next move of a winning line from the current position (hint booster):
+ * planner playouts first (fast on any size), exact search for small boards.
+ */
 export function hint(state: State, rules: Rules = DEFAULT_RULES): Move | null {
-  const r = solve(state, { maxNodes: 25_000, rules });
-  return r.solved ? r.moves[0] ?? null : null;
+  const budget = Math.max(1, state.movesLeft);
+  const p = bestPlayout(state, 12, rules, budget);
+  if (p) return p.moves[0] ?? null;
+  if (state.cards.length <= 26) {
+    const r = solve(state, { maxNodes: 20_000, rules });
+    if (r.solved && r.moves.length <= budget) return r.moves[0] ?? null;
+  }
+  const any = playout(state, 1, rules, budget);
+  return any.moves[0] ?? null;
 }
 
 /**
- * A "casual human" bot: always takes the first move by a simple preference
- * order with a little lookahead noise. Its move count estimates how many moves
- * a reasonable player needs, which sets the budget above the solver's optimum.
+ * Planner bot: a greedy player with one-ply evaluation, loop avoidance and a
+ * little noise. It is fast (linear in moves), so it calibrates big levels
+ * where exhaustive search is too slow. A winning playout is a constructive
+ * proof that the level is solvable within that many moves.
  */
-export function greedyPlay(start: State, seed = 1, rules: Rules = DEFAULT_RULES, limit = 400): { won: boolean; moves: number } {
+function scoreMove(s: State, m: Move, next: State, revealed: number, completed: number): number {
+  if (m.type === 'draw') return 1;
+  if (m.type === 'recycle') return 4;
+  let score = 0;
+  const moved = m.src.from === 'waste' ? 1 : m.src.count;
+  if (m.dst.to === 'slot') {
+    score = s.slots[m.dst.slot] ? -10 - moved : -6;
+  } else {
+    const col = s.columns[m.dst.col];
+    const empty = !col.up.length && !col.down.length;
+    const source = m.src.from === 'col' ? s.columns[m.src.col] : null;
+    const emptiesSource = !!source && source.up.length === moved && !source.down.length;
+    if (empty) score = s.slots.some((x) => !x) && s.cards[(m.src.from === 'waste' ? s.waste[s.waste.length - 1] : source!.up[source!.up.length - moved])].kind === 'cat' ? 6 : 3;
+    else score = m.src.from === 'waste' ? -2 : 2;
+    if (emptiesSource && !empty) score -= 2;
+  }
+  return score - revealed * 4 - completed * 15 + (next.done.length > s.done.length ? -5 : 0);
+}
+
+export interface Playout {
+  won: boolean;
+  moves: Move[];
+}
+
+export function playout(start: State, seed = 1, rules: Rules = DEFAULT_RULES, limit = 400): Playout {
   let s: State = { ...start, movesLeft: limit, movesUsed: 0 };
-  let rnd = seed >>> 0 || 1;
+  let rnd = (seed * 2654435761) >>> 0 || 1;
   const rand = () => {
     rnd ^= rnd << 13;
     rnd ^= rnd >>> 17;
@@ -140,18 +175,36 @@ export function greedyPlay(start: State, seed = 1, rules: Rules = DEFAULT_RULES,
     return (rnd >>> 0) / 4294967296;
   };
   const seen = new Map<string, number>();
+  const line: Move[] = [];
   while (!isWon(s) && s.movesLeft > 0) {
     const moves = legalMoves(s, rules);
     if (!moves.length) break;
-    const scored = moves.map((m) => {
-      const next = apply(s, m, rules).state;
-      const loops = seen.get(stateKey(next)) ?? 0;
-      return { m, score: moveRank(s, m) + loops * 4 + rand() * 1.5 };
-    });
-    scored.sort((a, b) => a.score - b.score);
-    s = apply(s, scored[0].m, rules).state;
+    let best: { m: Move; next: State; score: number } | null = null;
+    for (const m of moves) {
+      const r = apply(s, m, rules);
+      const loops = seen.get(stateKey(r.state)) ?? 0;
+      const score = scoreMove(s, m, r.state, r.revealed.length, r.completed.length) + loops * 6 + rand() * 2;
+      if (!best || score < best.score) best = { m, next: r.state, score };
+    }
+    s = best!.next;
+    line.push(best!.m);
     const k = stateKey(s);
     seen.set(k, (seen.get(k) ?? 0) + 1);
   }
-  return { won: isWon(s), moves: s.movesUsed };
+  return { won: isWon(s), moves: line };
+}
+
+export function greedyPlay(start: State, seed = 1, rules: Rules = DEFAULT_RULES, limit = 400): { won: boolean; moves: number } {
+  const p = playout(start, seed, rules, limit);
+  return { won: p.won, moves: p.moves.length };
+}
+
+/** Shortest winning playout over several seeds (null if none wins). */
+export function bestPlayout(start: State, runs = 16, rules: Rules = DEFAULT_RULES, limit = 400): Playout | null {
+  let best: Playout | null = null;
+  for (let i = 1; i <= runs; i++) {
+    const p = playout(start, i, rules, limit);
+    if (p.won && (!best || p.moves.length < best.moves.length)) best = p;
+  }
+  return best;
 }

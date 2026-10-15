@@ -1,8 +1,8 @@
 {
-  "name": "word-solitaire",
+  "name": "bookcat",
   "private": true,
   "version": "1.0.0",
-  "description": "Word association solitaire — Tekir Games",
+  "description": "Bookcat: Word Solitaire (Kitap Kedisi) — Tekir Games",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "cap:sync": "npm run build && cap sync",
     "cap:ios": "npm run build && cap sync ios && cap open ios",
-    "cap:android": "npm run build && cap sync android && cap open android"
+    "cap:android": "npm run build && cap sync android && cap open android",
+    "calibrate": "SCRIPT=scripts/calibrate.test.ts vitest run --config scripts/vitest.scripts.ts"
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.2.1",
