@@ -1,12 +1,15 @@
 import { hashSeed, Rng } from '../core/rng';
 import { CORE } from './core';
+import { EVERYDAY } from './everyday';
+import { EXPERT } from './expert';
+import { WORLD } from './world';
 import type { Category, Lang } from './types';
 import { LANGS } from './types';
 
 export type { Category, Lang };
 export { LANGS };
 
-export const CATEGORIES: readonly Category[] = [...CORE];
+export const CATEGORIES: readonly Category[] = [...CORE, ...EVERYDAY, ...WORLD, ...EXPERT];
 export const CATEGORY_BY_ID: ReadonlyMap<string, Category> = new Map(CATEGORIES.map((c) => [c.id, c]));
 
 /** Normalised word for conflict checks (case/diacritics-insensitive). */

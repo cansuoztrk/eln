@@ -78,6 +78,11 @@ export class Board {
     window.addEventListener('pointerup', this.onUpBound);
     window.addEventListener('pointercancel', this.onUpBound);
     this.resizeObs = new ResizeObserver(() => this.render(false));
+    // Label heights depend on the web fonts; re-measure once they are in.
+    void document.fonts?.ready.then(() => {
+      this.peekCache.clear();
+      this.render(false);
+    });
     this.resizeObs.observe(this.el);
   }
 
@@ -135,17 +140,42 @@ export class Board {
     };
   }
 
+  private peekCache = new Map<number, number>();
+  private peekCw = 0;
+
+  /** Vertical offset that keeps a covered card's whole label visible. */
+  private peek(id: number, m: Metrics): number {
+    if (this.peekCw !== m.cw) {
+      this.peekCache.clear();
+      this.peekCw = m.cw;
+    }
+    let off = this.peekCache.get(id);
+    if (off === undefined) {
+      const label = this.cards.get(id)?.querySelector<HTMLElement>('.word-text, .cat-name');
+      const text = label?.offsetHeight ?? 0;
+      const top = label?.offsetTop ?? 0;
+      off = text > 0 ? Math.round(top + text + m.ch * 0.06) : Math.round(m.ch * 0.3);
+      off = Math.min(Math.round(m.ch * 0.6), Math.max(Math.round(m.ch * 0.24), off));
+      if (text > 0) this.peekCache.set(id, off);
+    }
+    return off;
+  }
+
   private places(m: Metrics): Map<number, Place> {
     const s = this.session.state;
     const out = new Map<number, Place>();
     const seen = new Set<number>();
     s.columns.forEach((col, ci) => {
-      const total = col.down.length + col.up.length;
       const downOff = Math.max(5, Math.round(m.ch * 0.09));
-      let upOff = Math.round(m.ch * 0.3);
-      const need = col.down.length * downOff + Math.max(0, col.up.length - 1) * upOff + m.ch;
+      // A covered card shows exactly its label: one-line words stack tighter than two-line ones.
+      const offs = col.up.slice(0, -1).map((id) => this.peek(id, m));
+      const need = col.down.length * downOff + offs.reduce((a, b) => a + b, 0) + m.ch;
       const avail = m.colBottom - m.colY;
-      if (need > avail && col.up.length > 1) upOff = Math.max(14, Math.floor((avail - m.ch - col.down.length * downOff) / (col.up.length - 1)));
+      if (need > avail && offs.length) {
+        const room = Math.max(offs.length * 14, avail - m.ch - col.down.length * downOff);
+        const scale = room / offs.reduce((a, b) => a + b, 0);
+        for (let i = 0; i < offs.length; i++) offs[i] = Math.max(14, Math.floor(offs[i] * scale));
+      }
       let y = m.colY;
       let z = 10;
       for (const id of col.down) {
@@ -153,12 +183,11 @@ export class Board {
         seen.add(id);
         y += downOff;
       }
-      for (const id of col.up) {
+      col.up.forEach((id, i) => {
         out.set(id, { x: m.colX[ci], y, z: z++, up: true });
         seen.add(id);
-        y += upOff;
-      }
-      void total;
+        y += offs[i] ?? 0;
+      });
     });
     s.stock.forEach((id, i) => {
       out.set(id, { x: m.stockX + Math.min(i, 3) * 0.6, y: m.stockY - Math.min(i, 3) * 0.6, z: 5 + i, up: false });
@@ -397,7 +426,7 @@ export class Board {
 /**
  * Font size as a fraction of the card width: as large as the base size, but
  * small enough that the longest word fits on one line (no mid-word breaks)
- * and long labels stay within three lines.
+ * and long labels stay within three lines; very long words hyphenate.
  */
 function fitText(text: string, kind: Card['kind']): string {
   const words = text.split(/\s+/);
@@ -405,6 +434,8 @@ function fitText(text: string, kind: Card['kind']): string {
   const total = [...text].length;
   const em = kind === 'cat' ? 0.68 : 0.6;
   const room = kind === 'cat' ? 0.84 : 0.9;
-  const size = (base: number) => Math.min(base, room / (longest * em), total > 16 ? base * 0.72 : base).toFixed(3);
+  // Long compounds (German!) stop shrinking at a readable floor and hyphenate instead.
+  const floor = kind === 'cat' ? 0.115 : 0.128;
+  const size = (base: number) => Math.max(floor, Math.min(base, room / (longest * em), total > 16 ? base * 0.72 : base)).toFixed(3);
   return kind === 'cat' ? `--fs:${size(0.2)};--fsb:${size(0.22)}` : `--fs:${size(0.215)};--fsb:${size(0.24)}`;
 }

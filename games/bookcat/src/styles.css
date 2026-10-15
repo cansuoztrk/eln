@@ -398,6 +398,8 @@ svg {
   color: var(--ink);
   line-height: 1.04;
   overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 .word-text,
 .cat-name {
@@ -427,6 +429,8 @@ svg {
   text-transform: uppercase;
   letter-spacing: 0.2px;
   overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 .cat-count {
   position: absolute;
