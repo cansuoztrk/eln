@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      ios:
+        description: 'Also compile the iOS app for the simulator (macOS runner)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Lokum Blast · typecheck, tests, web build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: games/lokum-blast
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/lokum-blast/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v6
+        with:
+          name: lokum-blast-web
+          path: games/lokum-blast/dist
+          retention-days: 14
+
+  android:
+    name: Lokum Blast · Android debug APK
+    needs: web
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: games/lokum-blast
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/lokum-blast/package-lock.json
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Assemble debug APK
+        working-directory: games/lokum-blast/android
+        run: ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v6
+        with:
+          name: lokum-blast-debug-apk
+          path: games/lokum-blast/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+
+  ios:
+    name: Lokum Blast · iOS simulator build
+    if: github.event_name == 'workflow_dispatch' && inputs.ios
+    needs: web
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: games/lokum-blast
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/lokum-blast/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync ios
+      - name: Build for simulator (no signing)
+        run: xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build

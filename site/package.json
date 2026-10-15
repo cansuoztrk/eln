@@ -1,0 +1,14 @@
+{
+  "name": "tekir-studios-site",
+  "private": true,
+  "type": "module",
+  "description": "Static website for Tekir Studios (tekirstudios.com)",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "npx --yes serve@14.2.4 -l 4321 ."
+  },
+  "devDependencies": {
+    "@fontsource/nunito": "^5.2.7",
+    "marked": "^18.1.1"
+  }
+}
