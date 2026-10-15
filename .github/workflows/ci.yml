@@ -3,7 +3,9 @@ name: CI
 on:
   push:
     branches: [main, 'claude/**']
+    paths: ['games/**', '.github/workflows/ci.yml']
   pull_request:
+    paths: ['games/**', '.github/workflows/ci.yml']
   workflow_dispatch:
     inputs:
       ios:

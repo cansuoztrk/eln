@@ -1,12 +1,22 @@
-name: Website
+name: Website (manual)
 
-# Publishes site/public to GitHub Pages. Enable it once in
-# Settings › Pages › Build and deployment › Source: GitHub Actions.
+# Publishes site/public to GitHub Pages — MANUAL ONLY.
+#
+# ⚠️ This repository already serves another site through GitHub Pages. Running
+# this workflow (after switching Settings › Pages › Source to "GitHub Actions")
+# would REPLACE that site. Recommended instead: deploy site/public to
+# Cloudflare Pages or Netlify, or move site/ to its own repository
+# (e.g. tekirstudios/website) and run this workflow there.
+#
+# To run it anyway: Actions › Website (manual) › Run workflow, and type
+# `replace-pages-site` in the confirmation box.
 on:
-  push:
-    branches: [main]
-    paths: ['site/**', 'games/lokum-blast/legal/**', '.github/workflows/site.yml']
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type replace-pages-site to publish (this replaces the current GitHub Pages site of this repository)'
+        required: true
+        default: ''
 
 permissions:
   contents: read
@@ -19,6 +29,7 @@ concurrency:
 
 jobs:
   build:
+    if: inputs.confirm == 'replace-pages-site'
     runs-on: ubuntu-latest
     defaults:
       run:
