@@ -66,7 +66,7 @@ export class Session {
   private history: State[] = [];
   /** Moves bought or earned during this run. */
   extra = 0;
-  /** True once +moves or a paw was used (caps stars at 1 only for bought moves). */
+  /** True once extra moves were added (ad or coins): the level then ends with one star. */
   boosted = false;
   pawsUsed = 0;
   hintsUsed = 0;

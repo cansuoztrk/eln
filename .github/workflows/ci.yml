@@ -27,6 +27,7 @@ jobs:
         game:
           - { dir: lokum-blast, name: Lokum Blast }
           - { dir: simit-tycoon, name: Simit Tycoon }
+          - { dir: bookcat, name: Kitap Kedisi }
     defaults:
       run:
         working-directory: games/${{ matrix.game.dir }}
@@ -57,6 +58,7 @@ jobs:
         game:
           - { dir: lokum-blast, name: Lokum Blast }
           - { dir: simit-tycoon, name: Simit Tycoon }
+          - { dir: bookcat, name: Kitap Kedisi }
     defaults:
       run:
         working-directory: games/${{ matrix.game.dir }}
@@ -95,6 +97,7 @@ jobs:
         game:
           - { dir: lokum-blast, name: Lokum Blast }
           - { dir: simit-tycoon, name: Simit Tycoon }
+          - { dir: bookcat, name: Kitap Kedisi }
     defaults:
       run:
         working-directory: games/${{ matrix.game.dir }}

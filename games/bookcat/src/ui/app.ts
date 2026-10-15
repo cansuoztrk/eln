@@ -13,7 +13,7 @@ import { rescheduleNotifications } from '../services/notify';
 import { showCollection, showDaily, showLogin, showQuests, showSettings, showShop, maybeStarterOffer } from './dialogs';
 import { GameScreen } from './game';
 import { HomeScreen } from './home';
-import { closeTop } from './modal';
+import { closeAll, closeTop } from './modal';
 
 useTable(table as never);
 
@@ -99,6 +99,7 @@ export class App {
     return {
       store,
       app: this,
+      closeModals: closeAll,
       dialogs: {
         daily: () => showDaily(() => this.playSpec(dailySpec(todayKey(), currentLang()))),
         collection: showCollection,
@@ -111,7 +112,7 @@ export class App {
       /** Plays one move ('best' follows the solver, 'deck' only draws); 'end' when nothing is left to do. */
       step: (mode: 'best' | 'deck' = 'best') => {
         const s = this.game?.session;
-        if (!s || s.won || s.lost || document.querySelector('.modal-card')) return 'end';
+        if (!s || s.won || s.lost || document.querySelector('.modal-backdrop:not(.closing)')) return 'end';
         if (mode === 'deck') return s.deck() ? 'ok' : 'end';
         const m = hint(s.state) ?? legalMoves(s.state)[0];
         return m && s.move(m) ? 'ok' : 'end';

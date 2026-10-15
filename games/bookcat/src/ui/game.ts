@@ -252,7 +252,7 @@ export class GameScreen {
         const ok = await ads.rewarded('moves');
         if (ok) {
           this.moveAds++;
-          this.session.addMoves(EXTRA_MOVES, false);
+          this.session.addMoves(EXTRA_MOVES, true);
           audio.booster();
           finish(true);
         } else {

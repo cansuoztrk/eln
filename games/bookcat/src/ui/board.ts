@@ -432,7 +432,7 @@ function fitText(text: string, kind: Card['kind']): string {
   const words = text.split(/\s+/);
   const longest = Math.max(...words.map((w) => [...w].length));
   const total = [...text].length;
-  const em = kind === 'cat' ? 0.68 : 0.6;
+  const em = kind === 'cat' ? 0.7 : 0.66;
   const room = kind === 'cat' ? 0.84 : 0.9;
   // Long compounds (German!) stop shrinking at a readable floor and hyphenate instead.
   const floor = kind === 'cat' ? 0.115 : 0.128;

@@ -1,4 +1,4 @@
-import { num, t } from '../i18n';
+import { currentLang, num, t } from '../i18n';
 import { chapterInfo, CHAPTERS } from '../meta/chapters';
 import { dailyDone, dailyStreak, questsAttention } from '../meta/daily';
 import { store } from '../meta/state';
@@ -15,7 +15,7 @@ export interface HomeCallbacks {
 }
 
 /** Shopfront of Tekir's bookshop: awning, window shelves of book spines, Tekir at the door. */
-function shopfrontSVG(): string {
+function shopfrontSVG(sign: string): string {
   const spines = ['#8a2f2a', '#2f6150', '#2b4a7a', '#b0801f', '#62407a', '#2a7176', '#a8582e', '#e7bd5b'];
   const shelf = (y: number, seed: number) => {
     let x = 34;
@@ -36,7 +36,7 @@ function shopfrontSVG(): string {
   return `<svg class="shopfront" viewBox="0 0 260 230" aria-hidden="true">
 <rect x="6" y="40" width="248" height="190" rx="6" fill="#4a2f19"/>
 <rect x="14" y="20" width="232" height="34" rx="6" fill="#2b1a0d"/>
-<text x="130" y="44" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="19" fill="#e7bd5b" letter-spacing="1.5">SAHAF · KİTAP KEDİSİ</text>
+<text x="130" y="44" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="19" fill="#e7bd5b" letter-spacing="1.5" textLength="${Math.min(220, sign.length * 12)}" lengthAdjust="spacingAndGlyphs">${sign}</text>
 ${awning}
 <rect x="24" y="78" width="182" height="140" rx="4" fill="#1f130c"/>
 <rect x="28" y="82" width="174" height="132" rx="3" fill="#2b1a0d"/>
@@ -86,7 +86,7 @@ export class HomeScreen {
         h('h1', {}, t('app.name')),
         h('p', {}, t('app.sub')),
       ),
-      h('div', { class: 'storefront' }, h('div', { html: shopfrontSVG() }), h('div', { class: 'home-cat', html: tekirSVG(116, 'idle') })),
+      h('div', { class: 'storefront' }, h('div', { html: shopfrontSVG(`SAHAF · ${t('app.name').toLocaleUpperCase(currentLang())}`) }), h('div', { class: 'home-cat', html: tekirSVG(116, 'idle') })),
       h(
         'div',
         { class: 'play-card' },
