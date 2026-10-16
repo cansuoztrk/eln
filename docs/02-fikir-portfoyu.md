@@ -20,7 +20,7 @@ Mobil pazarda tek bir hit’e bel bağlamak yerine **portföy stratejisi** öner
 | 9 | **Masal AI** | Labs | Kişiye özel uyku masalı | Abonelik | ★★★★ | ★★★ | ★★★ | 4–6 hf |
 | 10 | **Düğüm** | Games | İp çözme bulmacası | Reklam + IAP | ★★★ | ★★★★ | ★★★★ | 3 hf |
 | 11 | **Tavla & Okey Kulübü** | Games | Çok oyunculu masa oyunları | IAP (çip) + reklam | ★★★★★ | ★ | ★★★ | 4–6 ay |
-| 12 | **Lale: Odak Bahçesi** | Labs | Odaklanma zamanlayıcısı | Tek seferlik + abonelik | ★★★ | ★★★★★ | ★★★ | 2–3 hf |
+| 12 | **Lale: YKS Sayaç & Ders Takibi** *(yapıldı, Tekir Labs’in ilk uygulaması)* | Labs | Odaklanma zamanlayıcısı | Tek seferlik + abonelik | ★★★ | ★★★★★ | ★★★ | 2–3 hf |
 
 \*Tek geliştirici + Claude ile tahmini süre.
 
@@ -98,7 +98,7 @@ Mobil pazarda tek bir hit’e bel bağlamak yerine **portföy stratejisi** öner
 - **Kanca:** Arkadaşlarınla ya da dünyayla tavla, okey, 101 ve batak. Kahvehane estetiği var, Tekir krupiye.
 - **Neden:** Türkiye’nin en çok gelir getiren yerli oyun türlerinden biri. Ancak gerçek zamanlı sunucu, hile önleme ve moderasyon gerektiriyor. Bu yüzden en son, stüdyo büyüyünce yapılacak.
 
-## 12. Lale: Odak Bahçesi
+## 12. Lale: YKS Sayaç & Ders Takibi *(yapıldı: `apps/lale`, `docs/15`–`docs/17`)*
 
 - **Kanca:** Odaklandıkça lale bahçen büyüyor, telefonu açarsan lale soluyor. Arkadaşlarla ortak bahçe kurulabiliyor.
 - **Para:** Tek seferlik satın alma veya premium abonelik. En hızlı üretilecek ürün. İyi bir “ikinci ürün” denemesi olur.

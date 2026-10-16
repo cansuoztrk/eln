@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Lale</string>
+    <string name="title_activity_main">Lale</string>
+    <string name="package_name">com.tekirstudios.lale</string>
+    <string name="custom_url_scheme">com.tekirstudios.lale</string>
+    <string name="widget_name">Exam countdown</string>
+    <string name="widget_days">days left</string>
+    <string name="widget_empty">Add your exam date in Lale</string>
+</resources>

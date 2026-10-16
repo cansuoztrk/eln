@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lale</string>
+    <string name="title_activity_main">Lale</string>
+    <string name="widget_name">Sınav geri sayımı</string>
+    <string name="widget_days">gün kaldı</string>
+    <string name="widget_empty">Sınav tarihini Lale’de ekle</string>
+</resources>

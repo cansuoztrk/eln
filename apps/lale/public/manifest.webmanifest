@@ -1,0 +1,16 @@
+{
+  "name": "Lale: YKS Sayaç & Ders Takibi",
+  "short_name": "Lale",
+  "description": "Odaklandıkça İstanbul laleleri açan pomodoro bahçesi; YKS geri sayımı, soru ve deneme neti takibi. Reklamsız, hesapsız.",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbf6ee",
+  "theme_color": "#fff8f0",
+  "icons": [
+    { "src": "icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" }
+  ]
+}

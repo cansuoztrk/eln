@@ -52,7 +52,7 @@ ${link('#oyunlar', t('Oyunlar', 'Games'), 'games')}
 ${link('lokum-blast/', 'Lokum Blast', 'lokum')}
 ${link('simit-tycoon/', 'Simit Tycoon', 'simit')}
 ${link('kitap-kedisi/', t('Kitap Kedisi', 'Bookcat'), 'kitap')}
-${link('#labs', 'Tekir Labs', 'labs')}
+${link('lale/', 'Lale', 'lale')}
 ${link('basin/', t('Basın', 'Press'), 'press')}
 ${link('destek/', t('Destek', 'Support'), 'support')}
 </nav>
@@ -190,9 +190,10 @@ ${badges}
 <div class="band-head">
 <p class="eyebrow">Tekir Labs</p>
 <h2>${t('Hayatı kolaylaştıran akıllı uygulamalar', 'Smart apps that make life a little easier')}</h2>
-<p class="lead">${t('Yapay zekâyı günlük hayatın küçük işlerine taşıyoruz. Şu an atölyede olanlar:', 'We bring AI to the small jobs of everyday life. Currently in the workshop:')}</p>
+<p class="lead">${t('Günlük hayatın küçük işlerini kolaylaştıran, verine saygılı uygulamalar. İlki Lale, ardından atölyedekiler:', 'Privacy-respecting apps for the small jobs of everyday life. Lale comes first, then what’s in the workshop:')}</p>
 </div>
 <div class="grid">
+<a class="card" href="lale/" style="text-decoration:none;color:inherit"><img src="assets/img/lale-icon-180.png" alt="" width="64" height="64" style="width:64px;border-radius:16px"><span class="tag">${t('Yakında', 'Coming soon')}</span><h3>Lale: YKS Sayaç &amp; Ders Takibi</h3><p class="muted">${t('Odaklandıkça İstanbul laleleri açan pomodoro bahçesi; YKS geri sayımı, soru ve deneme neti takibi, sınıfça haftalık sıralama. Reklamsız, hesapsız.', 'A pomodoro garden where Istanbul tulips bloom as you focus, with an exam countdown, score tracking and a weekly class leaderboard. No ads, no account.')}</p></a>
 <article class="card"><div class="ico" aria-hidden="true">🥙</div><span class="tag soon">${t('Atölyede', 'In the workshop')}</span><h3>Lokma</h3><p class="muted">${t('Yemeğinin fotoğrafını çek, kalori ve makrolar anında hesaplansın. Türk mutfağını gerçekten tanıyan kalori sayacı.', 'Snap your meal and get calories and macros instantly — a calorie tracker that actually knows Turkish food.')}</p></article>
 <article class="card"><div class="ico" aria-hidden="true">🌬️</div><span class="tag soon">${t('Atölyede', 'In the workshop')}</span><h3>Nefes</h3><p class="muted">${t('Sigarayı ya da vape’i bırakmak için kişisel koç: sayaç, sağlık zaman çizelgesi ve kriz anında nefes egzersizleri.', 'A personal coach for quitting smoking or vaping: counters, a health timeline and breathing exercises for cravings.')}</p></article>
 </div>
@@ -388,6 +389,65 @@ page({
 </section>`,
 });
 
+// ───────────── Lale (Tekir Labs) ─────────────
+const laleFeatures = [
+  ['🌷', t('Odaklan, lalen açsın', 'Focus and a tulip blooms'), t('Pomodoro, zamanlayıcı ya da kronometre. Ne kadar uzun odaklanırsan o kadar nadir lale: 32 çeşit, İstanbul’un 7 lale bahçesi.', 'Pomodoro, timer or stopwatch. The longer you focus, the rarer the tulip: 32 varieties across 7 Istanbul gardens.')],
+  ['🎯', t('Netin anında hesaplansın', 'Your score, instantly'), t('Doğru, yanlış, boş gir; YKS, LGS, KPSS, ALES, DGS, YDS ve MSÜ kurallarıyla net hesaplansın. TYT ve AYT deneme grafiği.', 'Enter right, wrong and blank answers and get your score with real exam rules, plus a mock-exam trend chart.')],
+  ['⏳', t('Sınava geri sayım', 'Exam countdown'), t('YKS 2027’ye kaç gün kaldı? Ana ekran widget’ı, günlük hedef, çalışma serisi ve kaçırılan günü kurtaran lale soğanı.', 'Days left to your exam on a home-screen widget, with daily goals, a study streak and tulip bulbs that save a missed day.')],
+  ['🤝', t('Sınıfça haftalık sıralama', 'A weekly class leaderboard'), t('Haftalık çalışma kodunu paylaş, arkadaşlarınla yarış. Hesap yok, sunucu yok, sohbet yok, her zaman ücretsiz.', 'Share your weekly study code and compete with friends. No accounts, no server, no chat, always free.')],
+  ['🔒', t('Verin sende kalır', 'Your data stays with you'), t('Reklam yok, hesap yok, analitik yok. Tüm kayıtların sadece telefonunda; istersen yedeğini al.', 'No ads, no account, no analytics. Everything stays on your phone, and you can back it up any time.')],
+  ['👨‍👩‍👧', t('Veliler için', 'For parents'), t('YKS 2027 Sezon Kartı tek seferlik, sınavdan sonra kendiliğinden biter. CSV rapor ve Aile Paylaşımı.', 'The Season Pass is a one-time payment that simply ends after the exam. CSV reports and Family Sharing.')],
+];
+const LALE_SHOTS = ['01-focus', '02-session', '03-garden', '04-track', '05-stats', '06-friends'];
+page({
+  path: 'lale/',
+  title: 'Lale: YKS Sayaç & Ders Takibi · Tekir Labs',
+  description: 'Lale: odaklandıkça İstanbul laleleri açan pomodoro bahçesi; YKS geri sayımı, soru ve deneme neti takibi. Reklamsız, hesapsız. A study timer and focus garden.',
+  current: 'lale',
+  image: '/assets/img/lale-feature.jpg',
+  body: (rel) => `
+<section class="hero">
+<div class="lights" aria-hidden="true"></div>
+<div class="wrap">
+<div>
+<img src="${rel}assets/img/lale-icon-512.png" alt="" width="104" height="104" style="width:104px;border-radius:26px;box-shadow:0 12px 30px #0008;margin-bottom:18px">
+<p class="eyebrow">Tekir Labs · ${t('Yakında', 'Coming soon')}</p>
+<h1>Lale</h1>
+<p class="lead">${t('YKS sayaç ve ders takibi. Odaklandıkça İstanbul laleleri açar, netlerin büyür. Reklamsız, hesapsız, verin sende.', 'A study timer and focus garden: Istanbul tulips bloom as you focus and your scores grow. No ads, no account, your data stays yours.')}</p>
+<div class="hero-cta">${badges}</div>
+</div>
+<div class="hero-art"><img src="${rel}assets/img/lale/shots/tr/01-focus.jpg" lang="tr" alt="Lale" style="border-radius:28px;max-width:300px;margin:auto" width="540" height="1080"><img src="${rel}assets/img/lale/shots/en/01-focus.jpg" lang="en" alt="Lale" style="border-radius:28px;max-width:300px;margin:auto" width="540" height="1080"></div>
+</div>
+</section>
+
+<section class="band">
+<div class="wrap">
+<div class="band-head"><p class="eyebrow">${t('Ekran görüntüleri', 'Screenshots')}</p><h2>${t('Bir seans, bir lale, bir net daha', 'One more session, one more tulip, one more point')}</h2></div>
+<div class="shots" lang="tr">${LALE_SHOTS.map((s) => `<img src="${rel}assets/img/lale/shots/tr/${s}.jpg" alt="" loading="lazy" width="540" height="1080">`).join('')}</div>
+<div class="shots" lang="en">${LALE_SHOTS.map((s) => `<img src="${rel}assets/img/lale/shots/en/${s}.jpg" alt="" loading="lazy" width="540" height="1080">`).join('')}</div>
+</div>
+</section>
+
+<section class="band alt">
+<div class="wrap">
+<div class="grid">${laleFeatures.map(([ico, h3, p]) => `<article class="card"><div class="ico" aria-hidden="true">${ico}</div><h3>${h3}</h3><p class="muted">${p}</p></article>`).join('')}</div>
+</div>
+</section>
+
+<section class="band">
+<div class="wrap">
+<div class="band-head"><p class="eyebrow">${t('Sık sorulanlar', 'FAQ')}</p><h2>${t('Merak edilenler', 'Questions')}</h2></div>
+<div class="faq">
+<details><summary>${t('Lale ücretsiz mi?', 'Is Lale free?')}</summary><div>${t('Evet. Zamanlayıcı, bahçe, sayaç, soru ve deneme takibi, seri ve arkadaşlar her zaman ücretsiz ve reklamsız. İsteğe bağlı Lale Bahçıvan; nadir laleler, özel bahçeler, tüm ortam sesleri ve derin istatistikler ekler.', 'Yes. The timer, garden, countdown, score tracking, streak and friends are always free and ad-free. Optional Lale Gardener adds rare tulips, special gardens, every ambient sound and deeper stats.')}</div></details>
+<details><summary>${t('Sınav tarihleri doğru mu?', 'Are the exam dates right?')}</summary><div>${t('2027 ve 2028 tarihleri tahminidir ve uygulamada “tahmini” olarak işaretlenir. ÖSYM/MEB takvimi açıklanınca güncelleriz; tarihi Ayarlar’dan kendin de değiştirebilirsin.', 'Built-in 2027 and 2028 dates are estimates and marked as such. We update them when the official calendar is published, and you can set your own date in Settings.')}</div></details>
+<details><summary>${t('Arkadaş sıralaması nasıl çalışıyor?', 'How does the friends leaderboard work?')}</summary><div>${t('Her hafta Lale sana bir çalışma kodu verir. Kodu WhatsApp’tan paylaşırsın, arkadaşların yapıştırır, sıralamada yan yana görünürsünüz. Kod yalnızca takma adını ve haftalık toplamlarını içerir; hiçbir sunucuya gönderilmez.', 'Each week Lale gives you a study code. Share it by message, your friends paste it, and you appear side by side. The code only holds your nickname and weekly totals, and it is never sent to a server.')}</div></details>
+<details><summary>${t('Lale ÖSYM ile bağlantılı mı?', 'Is Lale affiliated with ÖSYM?')}</summary><div>${t('Hayır. Lale; ÖSYM, MEB veya YÖK ile bağlantılı değildir.', 'No. Lale is not affiliated with ÖSYM, MEB, YÖK or any exam authority.')}</div></details>
+</div>
+<p style="margin-top:24px" class="muted"><a href="gizlilik/">Gizlilik Politikası</a> · <a href="privacy/">Privacy Policy</a> · <a href="kosullar/">Kullanım Koşulları</a> · <a href="terms/">Terms of Use</a></p>
+</div>
+</section>`,
+});
+
 // ───────────── support ─────────────
 page({
   path: 'destek/',
@@ -445,7 +505,7 @@ page({
 
 // ───────────── legal (from markdown) ─────────────
 function legal(game, path, file, lang, title, section) {
-  let md = readFileSync(join(here, '..', 'games', game, 'legal', file), 'utf8');
+  let md = readFileSync(join(here, '..', game.includes('/') ? game : join('games', game), 'legal', file), 'utf8');
   if (section) {
     const parts = md.split(/^## /m);
     const intro = parts[0];
@@ -461,11 +521,12 @@ function legal(game, path, file, lang, title, section) {
     body: () => `<article class="wrap"><div class="prose">${html}</div></article>`,
   });
 }
-// [web slug, games/<folder>, display name]
+// [web slug, games/<folder> (or a repo path such as apps/lale), display name]
 const GAMES = [
   ['lokum-blast', 'lokum-blast', 'Lokum Blast'],
   ['simit-tycoon', 'simit-tycoon', 'Simit Tycoon'],
   ['kitap-kedisi', 'bookcat', 'Kitap Kedisi'],
+  ['lale', 'apps/lale', 'Lale'],
 ];
 for (const [slug, dir, name] of GAMES) {
   legal(dir, `${slug}/gizlilik/`, 'gizlilik-politikasi.md', 'tr', `Gizlilik Politikası · ${name}`);
@@ -497,7 +558,7 @@ page({
 cpSync(join(here, 'assets'), join(out, 'assets'), { recursive: true });
 writeFileSync(join(out, '.nojekyll'), '');
 writeFileSync(join(out, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${SITE}/sitemap.xml\n`);
-const urls = ['', 'lokum-blast/', 'simit-tycoon/', 'kitap-kedisi/', 'destek/', 'basin/', 'yasal/', ...GAMES.flatMap(([slug]) => ['gizlilik/', 'privacy/', 'kosullar/', 'terms/'].map((p) => `${slug}/${p}`))];
+const urls = ['', 'lokum-blast/', 'simit-tycoon/', 'kitap-kedisi/', 'lale/', 'destek/', 'basin/', 'yasal/', ...GAMES.flatMap(([slug]) => ['gizlilik/', 'privacy/', 'kosullar/', 'terms/'].map((p) => `${slug}/${p}`))];
 writeFileSync(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${SITE}/${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 // AdMob requires app-ads.txt at the root of the developer website. Replace the publisher id.
 writeFileSync(join(out, 'app-ads.txt'), `# Replace pub-0000000000000000 with your AdMob publisher ID (AdMob › Apps › app-ads.txt).\ngoogle.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0\n`);

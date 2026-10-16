@@ -23,6 +23,23 @@ Karaköy iskelesinde tek bir simit arabasıyla başlayıp sevimli kedi müdürle
 
 > **Neden Orbita değil?** Portföyde 2. sıradaki Orbita (gezegen birleştirme) için pazar araştırması, aynı dairesel mekaniğe sahip oyunların zaten var olduğunu ve zayıf kaldığını gösterdi. Kedi temalı idle yemek oyunları ise kanıtlanmış bir pazar (Cat Snack Bar, Eatventure) ve İstanbul temalı bir örneği yok. Ayrıntı: [`docs/08`](docs/08-simit-tycoon-oyun-tasarimi.md).
 
+## Tekir Labs’in ilk uygulaması: Lale: YKS Sayaç & Ders Takibi 🌷
+
+Odaklandıkça İstanbul laleleri açan bir pomodoro bahçesi, gerçek net formülleriyle soru ve deneme takibi, YKS geri sayımı (Android widget’ı dahil) ve hesapsız haftalık sınıf sıralaması.
+- **Gizlilik:** Reklam yok, hesap yok, analitik yok. Veri cihazda kalır.
+- **Lale Bahçıvan fiyatları:**
+
+  | Ürün | Fiyat | Not |
+  |---|---|---|
+  | YKS/LGS 2027 Sezon Kartı | **₺249,99** | Tek seferlik, yenilenmez |
+  | Yıllık | **₺349,99** | 7 gün deneme |
+  | Aylık | **₺59,99** | |
+  | Ömür boyu | **₺699,99** | |
+
+- Kod: [`apps/lale/`](apps/lale/) · Karar: [`docs/15`](docs/15-tekir-labs-ilk-uygulama-karari.md) · Ürün ve ekonomi: [`docs/16`](docs/16-lale-urun-tasarimi-ve-ekonomi.md) · Mağaza metinleri: [`docs/17`](docs/17-lale-magaza-metinleri.md)
+
+![Lale](apps/lale/store/output/play/feature-graphic-tr.png)
+
 ## Üçüncü ürün: Kitap Kedisi: Kelime Solitaire 📚🐈
 
 Klasik solitaire’in kart dizme keyfini kelime çağrışımıyla birleştiren, hızla büyüyen yeni bir tür (*Solitaire Associations Journey* Türkiye Kelime listesinde 2. sırada, ama rakibin bir numaralı şikâyeti aşırı reklam). Tekir’in sahafında kelimeleri kategorilerine göre raflara diziyorsun. **Her bölüm bir çözücü botla üretilip kalibre edildi, yani reklamsız kazanılabilir.** Ara reklam yalnızca kazanılan bölümden sonra, 12. bölümden itibaren. 129 kategori × 4 dil, 300+ bölüm, Günün Rafı ve Türkiye’ye özel fiyatlar.
@@ -51,6 +68,9 @@ Klasik solitaire’in kart dizme keyfini kelime çağrışımıyla birleştiren,
 | [`docs/12-kitap-kedisi-oyun-tasarimi.md`](docs/12-kitap-kedisi-oyun-tasarimi.md) | Kitap Kedisi tasarım belgesi: kurallar, “her bölüm çözülebilir” üretimi, içerik kuralları, meta |
 | [`docs/13-kitap-kedisi-ekonomi-ve-fiyatlandirma.md`](docs/13-kitap-kedisi-ekonomi-ve-fiyatlandirma.md) | **Kitap Kedisi ürünleri, USD ve 🇹🇷 TL fiyatları**, altın dengesi, adil reklam kuralları |
 | [`docs/14-kitap-kedisi-magaza-metinleri.md`](docs/14-kitap-kedisi-magaza-metinleri.md) | Kitap Kedisi mağaza metinleri (TR/EN + DE/ES), anahtar kelimeler, ekran görüntüsü başlıkları |
+| [`docs/15-tekir-labs-ilk-uygulama-karari.md`](docs/15-tekir-labs-ilk-uygulama-karari.md) | Tekir Labs’in ilk uygulaması: Lale ve Nefes karşılaştırması, riskler, başarı ölçütü, kaynaklar |
+| [`docs/16-lale-urun-tasarimi-ve-ekonomi.md`](docs/16-lale-urun-tasarimi-ve-ekonomi.md) | **Lale ürün tasarımı**, bahçe ekonomisi, seri, çalışma kodu, **Bahçıvan ürünleri ve 🇹🇷 TL fiyatları**, gizlilik, yol haritası |
+| [`docs/17-lale-magaza-metinleri.md`](docs/17-lale-magaza-metinleri.md) | Lale mağaza metinleri (TR/EN/DE/ES), anahtar kelimeler, ekran görüntüsü başlıkları, inceleme notları |
 | [`brand/`](brand/) | Logolar ve maskot (SVG + PNG) |
 | [`games/lokum-blast/`](games/lokum-blast/) | Oyunun kaynak kodu, iOS ve Android projeleri, testler |
 | [`games/lokum-blast/store/output/`](games/lokum-blast/store/output/) | **Mağaza görselleri**: ikon, splash, iPhone/iPad/Android ekran görüntüleri (TR + EN), Play öne çıkan grafiği |
@@ -59,6 +79,8 @@ Klasik solitaire’in kart dizme keyfini kelime çağrışımıyla birleştiren,
 | [`games/simit-tycoon/store/output/`](games/simit-tycoon/store/output/) | Simit Tycoon mağaza görselleri (ikon, splash, logo, ekran görüntüleri TR + EN, öne çıkan grafik) |
 | [`games/bookcat/`](games/bookcat/) | Kitap Kedisi kaynak kodu, çözücü ve bölüm kalibrasyonu, 129 kategori × 4 dil, iOS ve Android projeleri, testler, e2e |
 | [`games/bookcat/store/output/`](games/bookcat/store/output/) | Kitap Kedisi mağaza görselleri (ikon, splash, logo, ekran görüntüleri TR + EN, öne çıkan grafikler) |
+| [`apps/lale/`](apps/lale/) | Lale kaynak kodu, iOS ve Android projeleri (ana ekran widget’ı dahil), testler, görsel tur |
+| [`apps/lale/store/output/`](apps/lale/store/output/) | Lale mağaza görselleri (ikon, splash, logo, ekran görüntüleri TR + EN, öne çıkan grafikler) |
 | [`apps/lokma/`](apps/lokma/) | Lokma’nın test edilmiş temel kodu (ertelendi) |
 | [`site/`](site/) | Tekir Studios web sitesi (statik, iki dilli) |
 

@@ -3,9 +3,9 @@ name: CI
 on:
   push:
     branches: [main, 'claude/**']
-    paths: ['games/**', '.github/workflows/ci.yml']
+    paths: ['games/**', 'apps/lale/**', '.github/workflows/ci.yml']
   pull_request:
-    paths: ['games/**', '.github/workflows/ci.yml']
+    paths: ['games/**', 'apps/lale/**', '.github/workflows/ci.yml']
   workflow_dispatch:
     inputs:
       ios:
@@ -25,19 +25,20 @@ jobs:
       fail-fast: false
       matrix:
         game:
-          - { dir: lokum-blast, name: Lokum Blast }
-          - { dir: simit-tycoon, name: Simit Tycoon }
-          - { dir: bookcat, name: Kitap Kedisi }
+          - { dir: lokum-blast, path: games/lokum-blast, name: Lokum Blast }
+          - { dir: simit-tycoon, path: games/simit-tycoon, name: Simit Tycoon }
+          - { dir: bookcat, path: games/bookcat, name: Kitap Kedisi }
+          - { dir: lale, path: apps/lale, name: Lale }
     defaults:
       run:
-        working-directory: games/${{ matrix.game.dir }}
+        working-directory: ${{ matrix.game.path }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: games/${{ matrix.game.dir }}/package-lock.json
+          cache-dependency-path: ${{ matrix.game.path }}/package-lock.json
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
@@ -45,7 +46,7 @@ jobs:
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.game.dir }}-web
-          path: games/${{ matrix.game.dir }}/dist
+          path: ${{ matrix.game.path }}/dist
           retention-days: 14
 
   android:
@@ -56,19 +57,20 @@ jobs:
       fail-fast: false
       matrix:
         game:
-          - { dir: lokum-blast, name: Lokum Blast }
-          - { dir: simit-tycoon, name: Simit Tycoon }
-          - { dir: bookcat, name: Kitap Kedisi }
+          - { dir: lokum-blast, path: games/lokum-blast, name: Lokum Blast }
+          - { dir: simit-tycoon, path: games/simit-tycoon, name: Simit Tycoon }
+          - { dir: bookcat, path: games/bookcat, name: Kitap Kedisi }
+          - { dir: lale, path: apps/lale, name: Lale }
     defaults:
       run:
-        working-directory: games/${{ matrix.game.dir }}
+        working-directory: ${{ matrix.game.path }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: games/${{ matrix.game.dir }}/package-lock.json
+          cache-dependency-path: ${{ matrix.game.path }}/package-lock.json
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -78,12 +80,12 @@ jobs:
       - run: npm run build
       - run: npx cap sync android
       - name: Assemble debug APK
-        working-directory: games/${{ matrix.game.dir }}/android
+        working-directory: ${{ matrix.game.path }}/android
         run: ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.game.dir }}-debug-apk
-          path: games/${{ matrix.game.dir }}/android/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ matrix.game.path }}/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
 
   ios:
@@ -95,19 +97,20 @@ jobs:
       fail-fast: false
       matrix:
         game:
-          - { dir: lokum-blast, name: Lokum Blast }
-          - { dir: simit-tycoon, name: Simit Tycoon }
-          - { dir: bookcat, name: Kitap Kedisi }
+          - { dir: lokum-blast, path: games/lokum-blast, name: Lokum Blast }
+          - { dir: simit-tycoon, path: games/simit-tycoon, name: Simit Tycoon }
+          - { dir: bookcat, path: games/bookcat, name: Kitap Kedisi }
+          - { dir: lale, path: apps/lale, name: Lale }
     defaults:
       run:
-        working-directory: games/${{ matrix.game.dir }}
+        working-directory: ${{ matrix.game.path }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: games/${{ matrix.game.dir }}/package-lock.json
+          cache-dependency-path: ${{ matrix.game.path }}/package-lock.json
       - run: npm ci
       - run: npm run build
       - run: npx cap sync ios
