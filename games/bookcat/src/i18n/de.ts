@@ -125,6 +125,8 @@ const de: Record<Key, string> = {
   'shop.restored': 'Käufe wiederhergestellt',
   'shop.thanks': 'Danke! Kauf abgeschlossen.',
   'shop.failed': 'Der Kauf konnte nicht abgeschlossen werden.',
+  'shop.pending': 'Deine Zahlung wird noch geprüft. Nach der Freigabe wird der Kauf automatisch zugestellt.',
+  'shop.unavailable': 'Der Shop ist gerade nicht erreichbar. Bitte versuche es später noch einmal.',
   'shop.demoQ': 'Im Demomodus wird der Kauf nur simuliert, es wird nichts berechnet. Fortfahren?',
   'shop.popular': 'Beliebt',
   'shop.best': 'Bester Wert',

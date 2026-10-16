@@ -33,12 +33,17 @@ export const LOGIN_REWARDS: readonly Grant[] = [
   { coins: 300, boosters: { hint: 2, paw: 1 } },
 ];
 
-/** Calendar day index (0..6) claimable today, or -1 if already claimed. */
+/**
+ * Calendar day index (0..6) claimable today, or -1 if already claimed. A date
+ * before the last claim (time-zone change, clock set back) is not a new day.
+ */
 export function loginClaimable(today = todayKey()): number {
   const { last, day } = store.data.login;
   if (last === today) return -1;
-  if (!last || dayDiff(last, today) > 1) return 0;
-  return (day + 1) % 7;
+  if (!last) return 0;
+  const diff = dayDiff(last, today);
+  if (diff <= 0) return -1;
+  return diff > 1 ? 0 : (day + 1) % 7;
 }
 
 export function claimLogin(today = todayKey()): Grant | null {
@@ -61,9 +66,14 @@ export function dailyDone(today = todayKey()): boolean {
   return store.data.daily.last === today;
 }
 
-/** Records a Daily Shelf win; returns the coins earned (base + streak bonus). */
+/**
+ * Records a Daily Shelf win for the puzzle of `today` (its date, not the date
+ * of the win); returns the coins earned (base + streak bonus). Only a puzzle
+ * newer than the last one recorded pays, so setting the clock back pays nothing.
+ */
 export function recordDaily(stars: number, moves: number, today = todayKey()): number {
-  if (dailyDone(today)) return 0;
+  const last = store.data.daily.last;
+  if (last && dayDiff(last, today) <= 0) return 0;
   let coins = DAILY_REWARD;
   store.update((d) => {
     const consecutive = d.daily.last && dayDiff(d.daily.last, today) === 1;

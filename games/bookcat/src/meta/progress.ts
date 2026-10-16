@@ -1,4 +1,4 @@
-import { CHAPTER_REWARD, chapterOf, endsChapter } from './chapters';
+import { CHAPTER_REWARD, chapterOf, CHAPTERS, endsChapter } from './chapters';
 import { recordDaily } from './daily';
 import { winCoins } from './economy';
 import { store } from './state';
@@ -19,10 +19,12 @@ export interface WinOutcome {
 
 export function recordWin(opts: { key: string; level: number; daily: boolean; stars: 1 | 2 | 3; movesLeft: number; movesUsed: number; kind: 'normal' | 'hard' | 'boss' }): WinOutcome {
   if (opts.daily) {
-    const coins = recordDaily(opts.stars, opts.movesUsed);
+    // Recorded under the puzzle's date ('D2026-10-15'), not the date of the
+    // win: a puzzle started before midnight keeps the streak and leaves today's open.
+    const coins = recordDaily(opts.stars, opts.movesUsed, opts.key.slice(1));
     store.update((d) => {
       d.stats.wins++;
-      d.run = null;
+      if (d.runs.daily?.key === opts.key) d.runs.daily = null;
     });
     return { coins, stars: opts.stars, firstClear: coins > 0, book: null, bookCoins: 0 };
   }
@@ -40,10 +42,11 @@ export function recordWin(opts: { key: string; level: number; daily: boolean; st
       d.totalStars += opts.stars - prev;
     }
     if (opts.level >= d.level) d.level = opts.level + 1;
-    d.run = null;
+    if (d.runs.journey?.key === opts.key) d.runs.journey = null;
     if (firstClear && endsChapter(opts.level)) {
       const idx = chapterOf(opts.level);
-      if (!d.books.includes(idx)) {
+      // One rare book per chapter; past the last chapter the names cycle but there is no new book.
+      if (idx < CHAPTERS.length && !d.books.includes(idx)) {
         d.books.push(idx);
         book = idx;
         bookCoins = CHAPTER_REWARD;

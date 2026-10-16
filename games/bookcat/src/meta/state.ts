@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { CHAPTERS } from './chapters';
 
 /**
  * Persistent player profile. Saved shortly after every change and when the
@@ -11,6 +12,8 @@ export const BOOSTERS: readonly BoosterId[] = ['hint', 'paw'];
 /** Minimal snapshot of an unfinished level so the player can resume. */
 export interface SavedRun {
   key: string;
+  /** Fingerprint of the level layout (see runSig); '' for saves made before it existed. */
+  sig: string;
   columns: { down: number[]; up: number[] }[];
   stock: number[];
   waste: number[];
@@ -21,7 +24,15 @@ export interface SavedRun {
   recycles: number;
   extra: number;
   boosted: boolean;
+  /** Rewarded videos and coin purchases of +10 moves in this run (per-level cap and price steps). */
+  moveAds: number;
+  moveBuys: number;
+  /** Shelving progress already counted for quests and stats, so undo + redo never counts twice. */
+  credited?: { words: number; cats: number[] };
 }
+
+/** Journey and Daily Shelf keep separate runs, so playing one never wipes the other. */
+export type RunSlot = 'journey' | 'daily';
 
 export interface QuestState {
   id: string;
@@ -44,7 +55,7 @@ export interface SaveData {
   starterOfferUntil: number;
   /** Rare books collected (one per finished chapter). */
   books: number[];
-  run: SavedRun | null;
+  runs: Record<RunSlot, SavedRun | null>;
   settings: { sound: boolean; music: boolean; haptics: boolean; lang: string | null; notifications: boolean; bigText: boolean };
   login: { last: string; streak: number; day: number };
   daily: { last: string; streak: number; best: number; results: Record<string, { stars: number; moves: number }> };
@@ -67,11 +78,18 @@ export interface SaveData {
   tutorial: { done: boolean; tips: string[] };
   ads: { lastInterstitial: number; sinceInterstitial: number };
   review: { lastAsk: number; asks: number };
+  /**
+   * Store transactions already granted (ledger), so a purchase is delivered
+   * exactly once even if the app dies mid-purchase or the payment clears
+   * later. Transactions older than `since` belong to an earlier install (or
+   * to a save from before the ledger) and are never granted again.
+   */
+  iap: { since: number; granted: string[] };
 }
 
 export function defaultSave(now = Date.now()): SaveData {
   return {
-    v: 1,
+    v: 2,
     coins: 200,
     level: 1,
     levelStars: {},
@@ -81,7 +99,7 @@ export function defaultSave(now = Date.now()): SaveData {
     owned: [],
     starterOfferUntil: 0,
     books: [],
-    run: null,
+    runs: { journey: null, daily: null },
     settings: { sound: true, music: true, haptics: true, lang: null, notifications: true, bigText: false },
     login: { last: '', streak: 0, day: 0 },
     daily: { last: '', streak: 0, best: 0, results: {} },
@@ -94,6 +112,7 @@ export function defaultSave(now = Date.now()): SaveData {
     tutorial: { done: false, tips: [] },
     ads: { lastInterstitial: 0, sinceInterstitial: 0 },
     review: { lastAsk: 0, asks: 0 },
+    iap: { since: now, granted: [] },
   };
 }
 
@@ -111,22 +130,101 @@ export function merge<T>(base: T, saved: unknown): T {
 }
 
 const finite = (x: unknown, fallback = 0) => (typeof x === 'number' && Number.isFinite(x) ? x : fallback);
+const count = (x: unknown) => Math.max(0, Math.floor(finite(x)));
+const isObj = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x);
+const isInt = (x: unknown): x is number => Number.isInteger(x) && (x as number) >= 0;
+const intList = (x: unknown): x is number[] => Array.isArray(x) && x.every(isInt);
 
-/** Repairs anything a corrupted save could break. */
-export function sanitize(d: SaveData): SaveData {
-  d.coins = Math.max(0, Math.floor(finite(d.coins)));
+/**
+ * Puts the defaults back wherever a save holds null or a value of the wrong
+ * type (a corrupt or hand-edited save must never throw), keeping every valid
+ * field and every extra key. Nullable defaults (runs, settings.lang) are
+ * checked by sanitize itself.
+ */
+function repair(def: unknown, val: unknown): unknown {
+  if (def === null) return val;
+  if (Array.isArray(def)) return Array.isArray(val) ? val : def;
+  if (isObj(def)) {
+    if (!isObj(val)) return def;
+    const out: Record<string, unknown> = { ...val };
+    for (const [k, dv] of Object.entries(def)) out[k] = repair(dv, out[k]);
+    return out;
+  }
+  if (typeof def === 'number') return typeof val === 'number' && Number.isFinite(val) ? val : def;
+  return typeof val === typeof def ? val : def;
+}
+
+/** Shape check of a saved run; whether it fits its level is checked when the level opens (runFits). */
+function cleanRun(r: unknown, prefix: 'L' | 'D'): SavedRun | null {
+  if (!isObj(r) || typeof r.key !== 'string' || !r.key.startsWith(prefix)) return null;
+  const cols = r.columns;
+  if (!Array.isArray(cols) || !cols.every((c) => isObj(c) && intList(c.down) && intList(c.up))) return null;
+  if (!intList(r.stock) || !intList(r.waste) || !intList(r.done)) return null;
+  const slotOk = (x: unknown) => x === null || (isObj(x) && isInt(x.cat) && isInt(x.count) && (x.top === null || isInt(x.top)));
+  if (!Array.isArray(r.slots) || !r.slots.every(slotOk)) return null;
+  if (![r.movesLeft, r.movesUsed, r.recycles].every(isInt)) return null;
+  const credited = isObj(r.credited) && isInt(r.credited.words) && intList(r.credited.cats) ? { words: r.credited.words, cats: r.credited.cats } : undefined;
+  return {
+    key: r.key,
+    sig: typeof r.sig === 'string' ? r.sig : '',
+    columns: cols as SavedRun['columns'],
+    stock: r.stock,
+    waste: r.waste,
+    slots: r.slots as SavedRun['slots'],
+    done: r.done,
+    movesLeft: r.movesLeft as number,
+    movesUsed: r.movesUsed as number,
+    recycles: r.recycles as number,
+    extra: count(r.extra),
+    boosted: r.boosted === true,
+    moveAds: count(r.moveAds),
+    moveBuys: count(r.moveBuys),
+    ...(credited ? { credited } : {}),
+  };
+}
+
+/**
+ * Repairs anything a corrupted save could break and migrates older formats:
+ *  - v1 kept one `run` for both modes: it moves to runs.journey (L…) or
+ *    runs.daily (D…), without a layout signature (checked when it is resumed)
+ *    and with no +moves bought or watched yet;
+ *  - saves without the purchase ledger get one starting now (see SaveData.iap).
+ */
+export function sanitize(input: SaveData): SaveData {
+  const def = defaultSave();
+  if (!isObj(input)) return def;
+  const legacy = input as unknown as Record<string, unknown>;
+  const d = repair(def, input) as SaveData;
+  d.coins = count(d.coins);
   d.level = Math.max(1, Math.floor(finite(d.level, 1)));
-  for (const b of ['hint', 'paw'] as const) d.boosters[b] = Math.max(0, Math.floor(finite(d.boosters[b])));
-  if (!d.levelStars || typeof d.levelStars !== 'object' || Array.isArray(d.levelStars)) d.levelStars = {};
+  for (const b of BOOSTERS) d.boosters[b] = count(d.boosters[b]);
   for (const [k, v] of Object.entries(d.levelStars)) {
     const s = Math.floor(finite(v));
     if (s < 1 || s > 3) delete d.levelStars[k];
     else d.levelStars[k] = s;
   }
   d.totalStars = Object.values(d.levelStars).reduce((a, b) => a + b, 0);
-  d.books = Array.isArray(d.books) ? [...new Set(d.books.filter((b) => Number.isInteger(b) && b >= 0))] : [];
-  if (d.run && (typeof d.run.key !== 'string' || !Array.isArray(d.run.columns))) d.run = null;
-  if (!d.daily.results || typeof d.daily.results !== 'object') d.daily.results = {};
+  d.books = [...new Set(d.books.filter((b) => isInt(b) && b < CHAPTERS.length))];
+  d.owned = [...new Set(d.owned.filter((x) => typeof x === 'string'))];
+  if (typeof d.settings.lang !== 'string') d.settings.lang = null;
+  d.login.day = isInt(d.login.day) && d.login.day < 7 ? d.login.day : 0;
+  d.login.streak = count(d.login.streak);
+  for (const [k, v] of Object.entries(d.daily.results)) {
+    if (!isObj(v) || !Number.isFinite(v.stars) || !Number.isFinite(v.moves)) delete d.daily.results[k];
+  }
+  const questOk = (q: unknown) => isObj(q) && typeof q.id === 'string' && [q.target, q.progress, q.reward].every((x) => Number.isFinite(x)) && typeof q.claimed === 'boolean';
+  if (!d.quests.list.every(questOk)) d.quests = def.quests;
+  d.tutorial.tips = d.tutorial.tips.filter((x) => typeof x === 'string');
+  // Runs: v1 had a single slot shared by journey and daily.
+  const old = legacy.run;
+  if (isObj(old) && typeof old.key === 'string') {
+    if (old.key.startsWith('L') && !d.runs.journey) d.runs.journey = old as unknown as SavedRun;
+    else if (old.key.startsWith('D') && !d.runs.daily) d.runs.daily = old as unknown as SavedRun;
+  }
+  delete (d as unknown as Record<string, unknown>).run;
+  d.runs = { journey: cleanRun(d.runs.journey, 'L'), daily: cleanRun(d.runs.daily, 'D') };
+  d.iap.granted = [...new Set(d.iap.granted.filter((x) => typeof x === 'string' && x.length > 0))];
+  d.v = def.v;
   return d;
 }
 
@@ -153,7 +251,9 @@ class Store {
       try {
         this.data = sanitize(merge(defaultSave(), JSON.parse(raw)));
       } catch {
+        // Beyond repair: keep the raw text for support before the next save replaces it.
         this.data = defaultSave();
+        await this.write(`${KEY}.bad`, raw);
       }
     }
   }
@@ -184,13 +284,16 @@ class Store {
       clearTimeout(this.saveTimer);
       this.saveTimer = null;
     }
-    const raw = JSON.stringify(this.data);
+    await this.write(KEY, JSON.stringify(this.data));
+  }
+
+  private async write(key: string, raw: string): Promise<void> {
     try {
       if (Capacitor.isNativePlatform()) {
         const { Preferences } = await import('@capacitor/preferences');
-        await Preferences.set({ key: KEY, value: raw });
+        await Preferences.set({ key, value: raw });
       } else {
-        localStorage.setItem(KEY, raw);
+        localStorage.setItem(key, raw);
       }
     } catch {
       // Storage can be unavailable (private mode); the game keeps working in memory.
@@ -206,8 +309,10 @@ class Store {
     for (const fn of [...this.listeners]) fn();
   }
 
+  /** "Reset progress": starts over but keeps what was paid for, the settings and the purchase ledger. */
   async reset(): Promise<void> {
-    this.data = defaultSave();
+    const old = this.data;
+    this.data = { ...defaultSave(), removeAds: old.removeAds, owned: [...old.owned], settings: { ...old.settings }, iap: { since: old.iap.since, granted: [...old.iap.granted] } };
     await this.flush();
     this.emit();
   }

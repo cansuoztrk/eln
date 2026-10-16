@@ -7,8 +7,8 @@ import { addCoins, DAILY_REWARD, MAX_REWARDED_COINS_PER_DAY, REWARDED_COINS } fr
 import { store } from '../meta/state';
 import { ads } from '../services/ads';
 import { audio } from '../services/audio';
-import { iap } from '../services/iap';
-import { cancelNotifications, requestNotifications } from '../services/notify';
+import { iap, type PurchaseResult } from '../services/iap';
+import { cancelNotifications, requestNotifications, rescheduleNotifications } from '../services/notify';
 import { bookCover, coinIcon, ICONS, tekirSVG } from './art';
 import { h } from './dom';
 import { confirmDialog, modal, toast } from './modal';
@@ -48,7 +48,7 @@ export function showDaily(play: () => void): void {
 // ───────────── collection ─────────────
 
 export function showCollection(): void {
-  const owned = new Set(store.data.books);
+  const owned = new Set(store.data.books.filter((i) => i < CHAPTERS.length));
   const lang = currentLang();
   const shelf = h('div', { class: 'book-shelf' });
   CHAPTERS.forEach((ch, i) => {
@@ -120,16 +120,24 @@ export function showQuests(): void {
 
 // ───────────── shop ─────────────
 
+/** Feedback for a finished purchase attempt; true when it was completed. */
+function purchaseFeedback(r: PurchaseResult): boolean {
+  if (r === 'ok') {
+    audio.purchase();
+    toast(t('shop.thanks'), 'good');
+  } else if (r === 'pending') toast(t('shop.pending'));
+  else if (r === 'unavailable') toast(t('shop.unavailable'), 'bad');
+  else if (r === 'failed') toast(t('shop.failed'), 'bad');
+  return r === 'ok';
+}
+
 function productRow(p: Product, refresh: () => void): HTMLElement {
   const owned = p.once && iap.owned(p.id);
   const btn = h('button', { class: 'btn small btn-buy', disabled: owned }, owned ? t('shop.owned') : iap.price(p.id)) as HTMLButtonElement;
   btn.onclick = async () => {
+    if (btn.disabled) return;
     btn.disabled = true;
-    const ok = await iap.purchase(p.id);
-    if (ok) {
-      audio.purchase();
-      toast(t('shop.thanks'), 'good');
-    }
+    purchaseFeedback(await iap.purchase(p.id));
     btn.disabled = false;
     refresh();
   };
@@ -151,6 +159,7 @@ export function showShop(): void {
     const left = Math.max(0, MAX_REWARDED_COINS_PER_DAY - used);
     const freeBtn = h('button', { class: 'btn btn-video small', disabled: left <= 0, html: `${ICONS.video}<span>+${REWARDED_COINS}</span>` }) as HTMLButtonElement;
     freeBtn.onclick = async () => {
+      if (freeBtn.disabled) return;
       freeBtn.disabled = true;
       if (await ads.rewarded('coins')) {
         addCoins(REWARDED_COINS);
@@ -165,8 +174,10 @@ export function showShop(): void {
     body.replaceChildren(
       h('div', { class: 'coins-line big', html: `${coinIcon(30)}<b>${num(store.data.coins)}</b>` }),
       h('div', { class: 'product free' }, h('div', { class: 'pinfo' }, h('b', {}, t('shop.free')), h('small', {}, `${t('shop.freeAd', { n: REWARDED_COINS })} · ${t('shop.freeLeft', { n: left })}`)), freeBtn),
+      ...(iap.unavailable ? [h('p', { class: 'modal-text' }, t('shop.unavailable'))] : []),
       h('h3', {}, t('shop.bundles')),
-      ...PRODUCTS.filter((p) => p.type === 'non_consumable' || p.id.startsWith('bundle') || p.id === 'starter_pack').filter((p) => p.id !== 'starter_pack' || !iap.owned(p.id)).map((p) => productRow(p, render)),
+      // The starter pack is only on sale during its real 72-hour window.
+      ...PRODUCTS.filter((p) => p.type === 'non_consumable' || p.id.startsWith('bundle') || p.id === 'starter_pack').filter((p) => p.id !== 'starter_pack' || starterOfferActive()).map((p) => productRow(p, render)),
       h('h3', {}, t('shop.coins')),
       ...PRODUCTS.filter((p) => p.id.startsWith('coins_')).map((p) => productRow(p, render)),
       h('button', {
@@ -183,6 +194,12 @@ export function showShop(): void {
   modal(body, { title: t('shop.title'), className: 'wide' });
 }
 
+/** The one-time starter pack is on sale: from level 8, within its 72-hour window, not bought yet. */
+export function starterOfferActive(now = Date.now()): boolean {
+  const d = store.data;
+  return !iap.owned('starter_pack') && d.level >= 8 && d.starterOfferUntil > now;
+}
+
 /** One-time starter offer, shown from the 8th level on for 72 hours. */
 export function maybeStarterOffer(): void {
   const d = store.data;
@@ -193,26 +210,18 @@ export function maybeStarterOffer(): void {
       x.starterOfferUntil = now + 72 * 3_600_000;
     });
   }
-  if (store.data.starterOfferUntil < now || d.stats.sessions % 2 !== 0) return;
+  if (!starterOfferActive(now) || d.stats.sessions % 2 !== 0) return;
   const p = PRODUCTS.find((x) => x.id === 'starter_pack')!;
+  const buy = h('button', { class: 'btn btn-wide' }, iap.price(p.id)) as HTMLButtonElement;
+  buy.onclick = async () => {
+    if (buy.disabled) return;
+    buy.disabled = true;
+    const ok = purchaseFeedback(await iap.purchase(p.id));
+    buy.disabled = false;
+    if (ok) m.close();
+  };
   const m = modal(
-    h(
-      'div',
-      { class: 'modal-body' },
-      h('div', { class: 'mascot', html: tekirSVG(110, 'happy') }),
-      h('p', { class: 'modal-text' }, t('starter.body')),
-      grantChips(p.grant),
-      h('button', {
-        class: 'btn btn-wide',
-        onclick: async () => {
-          if (await iap.purchase(p.id)) {
-            audio.purchase();
-            toast(t('shop.thanks'), 'good');
-            m.close();
-          }
-        },
-      }, iap.price(p.id)),
-    ),
+    h('div', { class: 'modal-body' }, h('div', { class: 'mascot', html: tekirSVG(110, 'happy') }), h('p', { class: 'modal-text' }, t('starter.body')), grantChips(p.grant), buy),
     { title: t('starter.title') },
   );
 }
@@ -233,6 +242,8 @@ export function showLogin(claim: () => Grant | null, after: () => void): void {
       ),
     );
   });
+  // Not dismissable (backdrop, Back): the only way out is claiming, so the gift is never lost for the day.
+  let claimed = false;
   const m = modal(
     h(
       'div',
@@ -241,13 +252,14 @@ export function showLogin(claim: () => Grant | null, after: () => void): void {
       h('button', {
         class: 'btn btn-green btn-wide',
         onclick: () => {
-          const g = claim();
-          if (g) audio.coin();
+          if (claimed) return;
+          claimed = true;
+          if (claim()) audio.coin();
           m.close();
         },
       }, t('login.claim')),
     ),
-    { title: t('login.title'), onClose: () => after() },
+    { title: t('login.title'), dismissable: false, onClose: () => after() },
   );
 }
 
@@ -278,9 +290,9 @@ export function showSettings(onLang: () => void): void {
         h('button', {
           class: `chip ${currentLang() === l.id ? 'on' : ''}`,
           onclick: () => {
+            // Runs survive a language change: cards are the same, only their words are relabelled.
             store.update((x) => {
               x.settings.lang = l.id;
-              x.run = null;
             });
             setLang(l.id);
             m.close();
@@ -313,8 +325,11 @@ export function showSettings(onLang: () => void): void {
       store.update((x) => {
         x.settings.notifications = v;
       });
-      if (v) void requestNotifications();
-      else void cancelNotifications();
+      if (v) {
+        void requestNotifications().then((ok) => {
+          if (ok) void rescheduleNotifications();
+        });
+      } else void cancelNotifications();
     }),
     toggle(ICONS.text, t('settings.bigText'), () => store.data.settings.bigText, (v) => store.update((x) => {
       x.settings.bigText = v;

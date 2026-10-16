@@ -76,7 +76,7 @@ export class Board {
     this.el.addEventListener('pointerdown', (e) => this.onDown(e));
     window.addEventListener('pointermove', this.onMoveBound);
     window.addEventListener('pointerup', this.onUpBound);
-    window.addEventListener('pointercancel', this.onUpBound);
+    window.addEventListener('pointercancel', this.onCancelBound);
     this.resizeObs = new ResizeObserver(() => this.render(false));
     // Label heights depend on the web fonts; re-measure once they are in.
     void document.fonts?.ready.then(() => {
@@ -89,7 +89,7 @@ export class Board {
   destroy(): void {
     window.removeEventListener('pointermove', this.onMoveBound);
     window.removeEventListener('pointerup', this.onUpBound);
-    window.removeEventListener('pointercancel', this.onUpBound);
+    window.removeEventListener('pointercancel', this.onCancelBound);
     this.resizeObs.disconnect();
   }
 
@@ -122,6 +122,9 @@ export class Board {
     const cw = Math.min(96, byWidth, Math.floor(H / 5.4 / 1.36));
     const ch = Math.round(cw * 1.36);
     const rowW = (n: number) => n * cw + (n - 1) * gap;
+    // Deck, then the waste fan (covered cards peek out by 0.44 cw) starting one gap to its right.
+    const fan = Math.round(cw * 0.44);
+    const stockX = (W - (cw * 2 + gap + fan)) / 2;
     const slotStart = (W - rowW(s.slots.length)) / 2;
     const slotY = 24;
     const colStart = (W - rowW(s.columns.length)) / 2;
@@ -134,8 +137,8 @@ export class Board {
       colX: s.columns.map((_, i) => colStart + i * (cw + gap)),
       colY,
       colBottom: stockY - 12,
-      stockX: (W - (cw * 2 + gap * 3)) / 2,
-      wasteX: (W - (cw * 2 + gap * 3)) / 2 + cw + gap * 3,
+      stockX,
+      wasteX: stockX + cw + gap + fan,
       stockY,
     };
   }
@@ -364,6 +367,14 @@ export class Board {
 
   private onMoveBound = (e: PointerEvent) => this.onPointerMove(e);
   private onUpBound = (e: PointerEvent) => this.onPointerUp(e);
+  /** A cancelled touch (incoming call, system gesture) never plays a card: the drag is simply dropped. */
+  private onCancelBound = (e: PointerEvent) => {
+    const d = this.drag;
+    if (!d || e.pointerId !== d.pointer) return;
+    this.drag = null;
+    for (const id of d.ids) this.cards.get(id)!.classList.remove('dragging');
+    this.render();
+  };
 
   private onPointerMove(e: PointerEvent): void {
     const d = this.drag;
@@ -399,9 +410,11 @@ export class Board {
       }
     } else {
       const dst = this.targetAt(e.clientX, e.clientY);
-      if (dst) result = this.session.drop(d.src, dst);
+      // Putting the card back on its own column is how a drag is cancelled: no error buzz.
+      const home = !!dst && dst.to === 'col' && d.src.from === 'col' && dst.col === d.src.col;
+      if (dst && !home) result = this.session.drop(d.src, dst);
       if (!result) {
-        if (dst) this.cb.onInvalid?.(d.ids);
+        if (dst && !home) this.cb.onInvalid?.(d.ids);
         this.render();
       }
     }

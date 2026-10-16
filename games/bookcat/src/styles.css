@@ -652,6 +652,10 @@ svg {
 .modal-backdrop.closing {
   animation: fadeOut 0.18s ease-in forwards;
 }
+/* A closing dialog still swallows taps (no click-through to the board) but its buttons no longer react. */
+.modal-backdrop.closing .modal-card {
+  pointer-events: none;
+}
 @keyframes fadeIn {
   from {
     opacity: 0;

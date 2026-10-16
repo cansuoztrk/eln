@@ -124,6 +124,8 @@ const tr = {
   'shop.restored': 'Satın alımlar geri yüklendi',
   'shop.thanks': 'Teşekkürler! Satın alım tamamlandı.',
   'shop.failed': 'Satın alım tamamlanamadı.',
+  'shop.pending': 'Ödeme onay bekliyor. Onaylanınca ürünün otomatik olarak teslim edilecek.',
+  'shop.unavailable': 'Mağazaya şu anda ulaşılamıyor. Lütfen daha sonra tekrar dene.',
   'shop.demoQ': 'Demo modunda satın alım simüle edilir, ücret alınmaz. Devam edilsin mi?',
   'shop.popular': 'Popüler',
   'shop.best': 'En avantajlı',

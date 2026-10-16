@@ -1,15 +1,16 @@
-import type { Card, Move } from '../core/rules';
+import type { Card, Move, State } from '../core/rules';
 import { remainingCards } from '../core/rules';
 import { hint } from '../core/solver';
 import { Session, type LevelSpec } from '../game/session';
 import { cap, num, t } from '../i18n';
 import { chapterInfo, CHAPTERS } from '../meta/chapters';
-import { questEvent, shareStars, todayKey } from '../meta/daily';
-import { BOOSTER_PRICE, buyBooster, coins, EXTRA_MOVES, EXTRA_MOVES_PRICE, MAX_MOVE_ADS_PER_LEVEL, spendCoins, useBooster } from '../meta/economy';
+import { questEvent, shareStars } from '../meta/daily';
+import { addBooster, BOOSTER_PRICE, buyBooster, coins, EXTRA_MOVES, EXTRA_MOVES_PRICE, MAX_MOVE_ADS_PER_LEVEL, spendCoins, useBooster } from '../meta/economy';
 import { recordLoss, recordWin, type WinOutcome } from '../meta/progress';
-import { store, type BoosterId } from '../meta/state';
+import { store, type BoosterId, type RunSlot } from '../meta/state';
 import { ads } from '../services/ads';
 import { audio } from '../services/audio';
+import { askNotificationsOnce } from '../services/notify';
 import { haptic, track } from '../services/platform';
 import { maybeAskReview } from '../services/review';
 import { bookCover, coinIcon, ICONS, starIcon, tekirSVG } from './art';
@@ -31,18 +32,41 @@ export class GameScreen {
   private board: Board;
   private movesEl: HTMLElement;
   private boosterEls = new Map<string, HTMLButtonElement>();
-  private moveAds = 0;
-  private moveBuys = 0;
+  private readonly slot: RunSlot;
   private tutStep = 0;
+  /** Tutorial step whose bubble the player closed with "Got it" (it returns at the next step). */
+  private tutHidden = 0;
   private tutEl: HTMLElement | null = null;
+  private tutTimer = 0;
+  /** The run is over (won, retried or given up): nothing more is saved for it. */
   private ended = false;
+  /** The screen was left: pending timers and dialogs must not act any more. */
+  private dead = false;
+  private timers = new Set<number>();
+  private loseTimer = 0;
+  private loseOpen = false;
+  /** A +moves offer is on screen (from the booster bar or the lose dialog). */
+  private offerOpen = false;
+  /** A booster action is waiting for its buy prompt. */
+  private busy = false;
+  /** The state the last paid hint was shown for, so a double tap does not pay twice. */
+  private hintFor: State | null = null;
+  private lastHint: Move | null = null;
+  private unsubStore: () => void;
 
   constructor(
     private spec: LevelSpec,
     private cb: GameCallbacks,
   ) {
-    const saved = store.data.run && store.data.run.key === spec.key ? store.data.run : null;
-    this.session = new Session(spec, saved);
+    this.slot = spec.daily ? 'daily' : 'journey';
+    const saved = store.data.runs[this.slot];
+    this.session = new Session(spec, saved?.key === spec.key ? saved : null);
+    // A run that no longer fits the level (retuned by an update, corrupt) is dropped.
+    if (saved?.key === spec.key && !this.session.resumed) {
+      store.quiet((d) => {
+        d.runs[this.slot] = null;
+      });
+    }
     this.board = new Board(this.session, {
       label: (card) => this.label(card),
       onDeck: () => this.deck(),
@@ -53,7 +77,7 @@ export class GameScreen {
     });
     const info = spec.daily ? null : chapterInfo(spec.n);
     const kind = spec.def.kind;
-    const sub = spec.daily ? todayKey() : `${info!.chapter.name}${kind === 'boss' ? ` · ${t('hud.boss')}` : kind === 'hard' ? ` · ${t('hud.hard')}` : ''}`;
+    const sub = spec.daily ? this.puzzleDate : `${info!.chapter.name}${kind === 'boss' ? ` · ${t('hud.boss')}` : kind === 'hard' ? ` · ${t('hud.hard')}` : ''}`;
     this.movesEl = h('div', { class: 'pill moves' });
     const hud = h(
       'header',
@@ -79,40 +103,65 @@ export class GameScreen {
         else if (e.move.dst.to === 'slot') {
           const slot = e.result.state.slots[e.move.dst.slot];
           const opened = !!slot && slot.count === 0 && !e.result.completed.length;
-          if (e.result.completed.length) this.onComplete(e.move.dst.slot);
+          if (e.result.completed.length) this.celebrate(e.move.dst.slot);
           else if (opened) audio.place();
           else if (slot) audio.shelve(slot.count / this.session.state.sizes[slot.cat]);
-          if (!opened) {
-            const n = e.move.src.from === 'waste' ? 1 : e.move.src.count;
-            questEvent({ type: 'shelve', n });
-            store.quiet((d) => {
-              d.stats.shelved += n;
-            });
-          }
         } else audio.place();
         if (e.result.revealed.length) setTimeout(() => audio.flip(), 120);
         void haptic('light');
+        this.credit(true);
         store.quiet((d) => {
           d.stats.moves++;
         });
       }
-      if (e.type === 'paw' && e.result.completed.length) this.onComplete(e.slot);
+      if (e.type === 'paw') {
+        if (e.result.completed.length) this.celebrate(e.slot);
+        // Words fetched by the paw are not "shelved by the player"; a finished shelf still counts.
+        this.credit(false);
+      }
       this.refresh();
       this.persist();
-      if (e.type === 'win') setTimeout(() => this.win(), 700);
-      if (e.type === 'lose') setTimeout(() => this.lose(), 450);
+      if (e.type === 'win') this.onWin(700);
+      if (e.type === 'lose') {
+        clearTimeout(this.loseTimer);
+        this.loseTimer = this.later(() => this.lose(), 450);
+      }
     });
-    store.subscribe(() => this.updateBoosters());
+    this.unsubStore = store.subscribe(() => this.updateBoosters());
     requestAnimationFrame(() => {
+      if (this.dead) return;
       this.board.render(false);
       this.refresh();
       if (spec.n === 1 && !spec.daily && !store.data.tutorial.done) this.tutorial();
+      // A run saved in a finished state (older versions saved won runs; a lost
+      // run is saved at 0 moves) goes straight to its dialog instead of a dead board.
+      if (this.session.won) this.onWin(0);
+      else if (this.session.lost) this.lose();
     });
   }
 
   destroy(): void {
+    this.dead = true;
+    for (const id of this.timers) clearTimeout(id);
+    this.timers.clear();
+    clearTimeout(this.tutTimer);
+    this.unsubStore();
     this.board.destroy();
     this.tutEl?.remove();
+  }
+
+  /** setTimeout that is cancelled when the screen goes away. */
+  private later(fn: () => void, ms: number): number {
+    const id = window.setTimeout(() => {
+      this.timers.delete(id);
+      if (!this.dead) fn();
+    }, ms);
+    this.timers.add(id);
+    return id;
+  }
+
+  private get puzzleDate(): string {
+    return this.spec.key.slice(1);
   }
 
   private label(card: Card): string {
@@ -120,11 +169,29 @@ export class GameScreen {
     return card.kind === 'cat' ? c.name : cap(c.words[card.word]);
   }
 
+  /** Saves the run for resuming; a finished (won) run is never saved. */
   private persist(): void {
-    if (this.ended) return;
+    if (this.ended || this.session.won) return;
     store.quiet((d) => {
-      d.run = this.session.snapshot();
+      d.runs[this.slot] = this.session.snapshot();
     });
+  }
+
+  /** Counts new shelving progress for quests and stats (never twice for undo + redo). */
+  private credit(words: boolean): void {
+    const c = this.session.creditProgress();
+    if (words && c.words > 0) {
+      questEvent({ type: 'shelve', n: c.words });
+      store.quiet((d) => {
+        d.stats.shelved += c.words;
+      });
+    }
+    for (let i = 0; i < c.cats.length; i++) questEvent({ type: 'category' });
+    if (c.cats.length) {
+      store.quiet((d) => {
+        d.stats.categories += c.cats.length;
+      });
+    }
   }
 
   private refresh(): void {
@@ -153,10 +220,14 @@ export class GameScreen {
       const n = d.boosters[id];
       set(id, n > 0 ? String(n) : String(BOOSTER_PRICE[id]), n <= 0, this.session.won);
     }
-    set('moves', String(EXTRA_MOVES_PRICE[Math.min(this.moveBuys, EXTRA_MOVES_PRICE.length - 1)]), true, this.session.won);
+    set('moves', String(this.movesPrice), true, this.session.won);
   }
 
   // ───────────── actions ─────────────
+
+  private get movesPrice(): number {
+    return EXTRA_MOVES_PRICE[Math.min(this.session.moveBuys, EXTRA_MOVES_PRICE.length - 1)];
+  }
 
   private deck(): void {
     if (this.session.state.movesLeft <= 0) return void this.lose();
@@ -164,8 +235,16 @@ export class GameScreen {
   }
 
   private undo(): void {
-    if (this.session.undo()) {
+    const undone = this.session.undo();
+    if (undone) {
       audio.whoosh();
+      if (undone === 'paw') {
+        // The paid Paw comes back with its undo.
+        addBooster('paw', 1);
+        store.update((d) => {
+          d.stats.pawsUsed = Math.max(0, d.stats.pawsUsed - 1);
+        });
+      }
       if (!store.data.tutorial.tips.includes('undo')) {
         toast(t('booster.undoNote'));
         store.update((d) => {
@@ -191,84 +270,119 @@ export class GameScreen {
   }
 
   private async hint(): Promise<void> {
-    if (this.session.won) return;
-    if (!(await this.ensureBooster('hint'))) return;
-    const m = this.session.hint();
-    if (!m) return void toast(t('booster.noHint'));
-    useBooster('hint');
-    questEvent({ type: 'hint' });
-    audio.booster();
-    this.board.showHint(m as Move);
+    if (this.session.won || this.busy) return;
+    // Same board as the last paid hint (double tap): show it again for free.
+    if (this.hintFor === this.session.state && this.lastHint) return void this.board.showHint(this.lastHint);
+    this.busy = true;
+    try {
+      if (!(await this.ensureBooster('hint')) || this.dead || this.session.won) return;
+      const m = this.session.hint();
+      if (!m) return void toast(t('booster.noHint'));
+      useBooster('hint');
+      questEvent({ type: 'hint' });
+      audio.booster();
+      this.hintFor = this.session.state;
+      this.lastHint = m;
+      this.board.showHint(m as Move);
+    } finally {
+      this.busy = false;
+    }
   }
 
   private async paw(): Promise<void> {
-    if (this.session.won) return;
+    if (this.session.won || this.busy) return;
     if (!this.session.state.slots.some(Boolean)) return void toast(t('booster.noPaw'));
-    if (!(await this.ensureBooster('paw'))) return;
-    const r = this.session.paw();
-    if (!r) return void toast(t('booster.noPaw'));
-    useBooster('paw');
-    audio.booster();
-    toast(t('booster.pawDone'), 'good');
+    this.busy = true;
+    try {
+      if (!(await this.ensureBooster('paw')) || this.dead || this.session.won) return;
+      const r = this.session.paw();
+      if (!r) return void toast(t('booster.noPaw'));
+      useBooster('paw');
+      audio.booster();
+      toast(t('booster.pawDone'), 'good');
+    } finally {
+      this.busy = false;
+    }
   }
 
-  private onComplete(slot: number): void {
+  /** Sound, haptics and sparkle for a finished shelf (quests are counted by credit()). */
+  private celebrate(slot: number): void {
     audio.complete();
     void haptic('success');
     this.board.sparkle(slot);
-    questEvent({ type: 'category' });
-    store.quiet((d) => {
-      d.stats.categories++;
-    });
   }
 
   private async quit(): Promise<void> {
     if (this.session.won) return this.cb.exit();
+    // A pending "out of moves" dialog waits for the answer instead of opening over it.
+    clearTimeout(this.loseTimer);
     const ok = await confirmDialog(t('quit.title'), t('quit.body'), t('quit.yes'), t('common.cancel'));
+    if (this.dead) return;
     if (ok) {
       this.persist();
       void store.flush();
       this.cb.exit();
-    }
+    } else this.lose();
   }
 
   // ───────────── moves offer / lose ─────────────
 
   /** +10 moves for a rewarded video (3 per level) or for coins (escalating). Resolves true if moves were added. */
   private async offerMoves(fromLose: boolean): Promise<boolean> {
-    return new Promise((resolve) => {
+    if (this.dead || this.ended || this.offerOpen || this.session.won) return false;
+    this.offerOpen = true;
+    /** The dialog was closed while its video was still playing: the video's outcome decides what follows. */
+    let closedPending = false;
+    const added = await new Promise<boolean>((resolve) => {
       let done = false;
-      const price = EXTRA_MOVES_PRICE[Math.min(this.moveBuys, EXTRA_MOVES_PRICE.length - 1)];
+      let pending = false;
+      const price = this.movesPrice;
       const left = remainingCards(this.session.state) + this.session.state.slots.filter(Boolean).length;
       const finish = (v: boolean) => {
+        if (done) return;
         done = true;
         m.close();
         resolve(v);
       };
+      const buttons: HTMLButtonElement[] = [];
+      const adsLeft = () => this.session.moveAds < MAX_MOVE_ADS_PER_LEVEL;
+      /** While a video is loading or playing nothing else in the dialog can be pressed. */
+      const setPending = (v: boolean) => {
+        pending = v;
+        for (const b of buttons) b.disabled = v;
+        if (!v) {
+          adBtn.disabled = !adsLeft();
+          coinBtn.disabled = coins() < price;
+        }
+      };
       const adBtn = h('button', { class: 'btn btn-video btn-wide', html: `${ICONS.video}<span>${t('lose.ad', { n: EXTRA_MOVES })}</span>` }) as HTMLButtonElement;
-      adBtn.disabled = this.moveAds >= MAX_MOVE_ADS_PER_LEVEL;
+      adBtn.disabled = !adsLeft();
       adBtn.onclick = async () => {
-        adBtn.disabled = true;
+        if (done || pending || !adsLeft()) return;
+        setPending(true);
         const ok = await ads.rewarded('moves');
-        if (ok) {
-          this.moveAds++;
+        if (this.dead) return;
+        // A video watched to the end always pays, even if the dialog was closed meanwhile.
+        if (ok && !this.ended && !this.session.won) {
+          this.session.moveAds++;
           this.session.addMoves(EXTRA_MOVES, true);
           audio.booster();
-          finish(true);
-        } else {
-          adBtn.disabled = false;
-          toast(t('ad.unavailable'));
+          return finish(true);
         }
+        setPending(false);
+        if (!ok && !done) toast(t('ad.unavailable'));
+        if (closedPending) this.lose();
       };
       const coinBtn = h('button', { class: 'btn btn-wide', html: `${coinIcon(24)}<span>${t('lose.coins', { n: EXTRA_MOVES, price: num(price) })}</span>` }) as HTMLButtonElement;
       coinBtn.disabled = coins() < price;
       coinBtn.onclick = () => {
-        if (!spendCoins(price)) return;
-        this.moveBuys++;
+        if (done || pending || !spendCoins(price)) return;
+        this.session.moveBuys++;
         this.session.addMoves(EXTRA_MOVES, true);
         audio.coin();
         finish(true);
       };
+      buttons.push(adBtn, coinBtn);
       const body = h(
         'div',
         { class: 'modal-body' },
@@ -278,66 +392,91 @@ export class GameScreen {
         h('div', { class: 'modal-actions col' }, adBtn, coinBtn),
       );
       if (fromLose) {
-        body.append(
-          h(
-            'div',
-            { class: 'modal-actions' },
-            h('button', { class: 'btn btn-wood small', html: `${ICONS.restart}<span>${t('lose.retry')}</span>`, onclick: () => { finish(false); this.retry(); } }),
-            h('button', { class: 'btn btn-ghost small', onclick: () => { finish(false); this.giveUp(); } }, t('lose.quit')),
-          ),
-          h('p', { class: 'tip' }, t('lose.tip')),
-        );
+        const retry = h('button', { class: 'btn btn-wood small', html: `${ICONS.restart}<span>${t('lose.retry')}</span>`, onclick: () => {
+          if (done || pending) return;
+          finish(false);
+          this.retry();
+        } }) as HTMLButtonElement;
+        const quit = h('button', { class: 'btn btn-ghost small', onclick: () => {
+          if (done || pending) return;
+          finish(false);
+          this.giveUp();
+        } }, t('lose.quit')) as HTMLButtonElement;
+        buttons.push(retry, quit);
+        body.append(h('div', { class: 'modal-actions' }, retry, quit), h('p', { class: 'tip' }, t('lose.tip')));
       }
       const m = modal(body, {
         title: fromLose ? t('lose.title') : t('booster.moves'),
         dismissable: !fromLose,
         onClose: () => {
-          if (!done) resolve(false);
+          if (!done) {
+            done = true;
+            closedPending = pending;
+            resolve(false);
+          }
         },
       });
     });
+    this.offerOpen = false;
+    // Closed the booster offer without moves at 0 moves left: the level is lost.
+    if (!added && !fromLose && !closedPending) this.lose();
+    return added;
   }
 
   private lose(): void {
-    if (this.ended || this.session.won || this.session.state.movesLeft > 0) return;
+    if (this.dead || this.ended || this.loseOpen || this.offerOpen || this.session.won || this.session.state.movesLeft > 0) return;
+    clearTimeout(this.loseTimer);
+    this.loseOpen = true;
     audio.lose();
     void haptic('warning');
     track('level_fail', { key: this.spec.key });
-    void this.offerMoves(true);
+    void this.offerMoves(true).then(() => {
+      this.loseOpen = false;
+    });
   }
 
   private retry(): void {
-    recordLoss();
-    store.update((d) => {
-      d.run = null;
-    });
-    this.ended = true;
+    this.endRun();
     this.cb.restart(this.spec);
   }
 
   private giveUp(): void {
+    this.endRun();
+    this.cb.exit();
+  }
+
+  private endRun(): void {
+    if (this.ended) return;
+    this.ended = true;
     recordLoss();
     store.update((d) => {
-      d.run = null;
+      if (d.runs[this.slot]?.key === this.spec.key) d.runs[this.slot] = null;
     });
-    this.ended = true;
-    this.cb.exit();
   }
 
   // ───────────── win ─────────────
 
-  private win(): void {
+  /**
+   * Records the win at once (so leaving or a killed app cannot lose it, and
+   * the finished run is never resumed) and shows the dialog after `delay` ms,
+   * once the last card has landed.
+   */
+  private onWin(delay: number): void {
     if (this.ended) return;
     this.ended = true;
+    clearTimeout(this.loseTimer);
     const s = this.session.state;
     const stars = this.session.stars();
     const outcome = recordWin({ key: this.spec.key, level: this.spec.n, daily: this.spec.daily, stars, movesLeft: s.movesLeft, movesUsed: s.movesUsed, kind: this.spec.def.kind });
     questEvent({ type: 'win', stars });
     track('level_win', { key: this.spec.key, stars, moves: s.movesUsed });
-    audio.win();
-    void haptic('success');
-    this.showWin(outcome);
-    if (stars === 3) void maybeAskReview('win3');
+    void store.flush();
+    this.later(() => {
+      audio.win();
+      void haptic('success');
+      this.showWin(outcome);
+      if (stars === 3) void maybeAskReview('win3');
+    }, delay);
   }
 
   private showWin(o: WinOutcome): void {
@@ -348,29 +487,45 @@ export class GameScreen {
       starRow.append(el);
     }
     const coinsEl = h('b', {}, `+${num(o.coins)}`);
+    let leaving = false;
+    let pending = false;
     const doubleBtn = h('button', { class: 'btn btn-video btn-wide', html: `${ICONS.video}<span>${t('win.double')}</span>` }) as HTMLButtonElement;
+    const actions = h('div', { class: 'modal-actions col' });
+    const setPending = (v: boolean) => {
+      pending = v;
+      for (const b of actions.querySelectorAll('button')) b.disabled = v;
+    };
     doubleBtn.onclick = async () => {
-      doubleBtn.disabled = true;
-      if (await ads.rewarded('double')) {
+      if (leaving || pending) return;
+      setPending(true);
+      const ok = await ads.rewarded('double');
+      setPending(false);
+      if (ok) {
         store.update((d) => {
           d.coins += o.coins;
         });
         coinsEl.textContent = `+${num(o.coins * 2)}`;
         audio.coin();
         doubleBtn.remove();
-      } else doubleBtn.disabled = false;
+      } else toast(t('ad.unavailable'));
     };
-    const actions = h('div', { class: 'modal-actions col' });
+    /** One way out per dialog: a double tap must not run afterWin twice. */
+    const go = (next: boolean) => {
+      if (leaving || pending) return;
+      leaving = true;
+      m.close();
+      void this.afterWin(o, next);
+    };
     if (o.coins > 0) actions.append(doubleBtn);
     if (this.spec.daily) {
       actions.append(
         h('button', { class: 'btn btn-green btn-wide', html: `${ICONS.share}<span>${t('daily.share')}</span>`, onclick: () => void this.shareDaily(o.stars) }),
-        h('button', { class: 'btn btn-wood btn-wide', onclick: () => { m.close(); this.cb.exit(); } }, t('win.home')),
+        h('button', { class: 'btn btn-wood btn-wide', onclick: () => go(false) }, t('win.home')),
       );
     } else {
       actions.append(
-        h('button', { class: 'btn btn-green btn-wide', html: `${ICONS.play}<span>${t('win.next')}</span>`, onclick: () => { m.close(); void this.afterWin(o, true); } }),
-        h('button', { class: 'btn btn-ghost small', onclick: () => { m.close(); void this.afterWin(o, false); } }, t('win.home')),
+        h('button', { class: 'btn btn-green btn-wide', html: `${ICONS.play}<span>${t('win.next')}</span>`, onclick: () => go(true) }),
+        h('button', { class: 'btn btn-ghost small', onclick: () => go(false) }, t('win.home')),
       );
     }
     const body = h(
@@ -387,8 +542,13 @@ export class GameScreen {
 
   private async afterWin(o: WinOutcome, next: boolean): Promise<void> {
     if (o.book !== null) await this.showBook(o.book, o.bookCoins);
+    if (this.dead) return;
     await ads.maybeInterstitial('level_end');
-    if (next) this.cb.next(this.spec.n + 1);
+    if (this.dead) return;
+    // Notification permission is asked once, at the happy moment after the first journey win.
+    if (!this.spec.daily) await askNotificationsOnce();
+    if (this.dead) return;
+    if (next && !this.spec.daily) this.cb.next(this.spec.n + 1);
     else this.cb.exit();
   }
 
@@ -415,7 +575,7 @@ export class GameScreen {
   }
 
   private async shareDaily(stars: number): Promise<void> {
-    const text = t('daily.shareText', { date: todayKey(), stars: shareStars(stars), moves: this.session.state.movesUsed, streak: store.data.daily.streak });
+    const text = t('daily.shareText', { date: this.puzzleDate, stars: shareStars(stars), moves: this.session.state.movesUsed, streak: store.data.daily.streak });
     try {
       const { Share } = await import('@capacitor/share');
       if ((await Share.canShare()).value) {
@@ -437,13 +597,22 @@ export class GameScreen {
 
   private tutorial(): void {
     this.tutStep = 1;
-    this.tutEl = h('div', { class: 'tut' }, h('div', { class: 'tut-cat', html: tekirSVG(64, 'idle') }), h('p', {}), h('button', { class: 'btn small', onclick: () => this.skipTutorial() }, t('tut.ok')));
+    this.tutEl = h('div', { class: 'tut' }, h('div', { class: 'tut-cat', html: tekirSVG(64, 'idle') }), h('p', {}), h('button', { class: 'btn small', onclick: () => this.closeTutorialStep() }, t('tut.ok')));
     this.el.append(this.tutEl);
     this.updateTutorial();
   }
 
+  /** "Got it" hides the current tip only; the next step shows again. After the last step it ends the tutorial. */
+  private closeTutorialStep(): void {
+    if (this.tutStep >= 4) return this.skipTutorial();
+    this.tutHidden = this.tutStep;
+    clearTimeout(this.tutTimer);
+    if (this.tutEl) this.tutEl.hidden = true;
+  }
+
   private skipTutorial(): void {
     this.tutStep = 0;
+    clearTimeout(this.tutTimer);
     this.tutEl?.remove();
     this.tutEl = null;
     store.update((d) => {
@@ -458,9 +627,18 @@ export class GameScreen {
     else if (this.tutStep === 1 && s.slots.some(Boolean)) this.tutStep = 2;
     else if (this.tutStep === 2 && s.slots.some((x) => x && x.count > 0)) this.tutStep = 3;
     if (this.session.won) return this.skipTutorial();
+    clearTimeout(this.tutTimer);
+    this.tutEl.hidden = this.tutStep === this.tutHidden;
+    if (this.tutEl.hidden) return;
     (this.tutEl.querySelector('p') as HTMLElement).textContent = t(`tut.${this.tutStep}` as 'tut.1');
-    // Point at the move the step talks about (free: does not count as a hint used).
-    const m = this.tutStep < 4 ? hint(s) : null;
-    if (m) window.setTimeout(() => this.tutStep && this.board.showHint(m), 450);
+    // Point at the move the step talks about (free: does not count as a hint used),
+    // worked out for the board as it is when the pulse starts.
+    if (this.tutStep < 4) {
+      this.tutTimer = this.later(() => {
+        if (!this.tutStep || this.tutEl?.hidden) return;
+        const m = hint(this.session.state);
+        if (m) this.board.showHint(m);
+      }, 450);
+    }
   }
 }

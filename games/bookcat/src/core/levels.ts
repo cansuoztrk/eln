@@ -45,6 +45,18 @@ export function levelDef(n: number): LevelDef {
   return calibrate(n, { runs: 12 });
 }
 
+/**
+ * Number of categories of level n without calibrating it (calibration runs
+ * the solver, ~0.1 s per level beyond the table). Beyond the table the band
+ * fixes the count for every attempt k, so the first layout already tells.
+ */
+export function categoryCount(n: number): number {
+  const row = table?.[n - 1];
+  if (row) return row[0].length;
+  const b = band(n);
+  return b.cats[0] === b.cats[1] ? layoutFor(n).sizes.length : levelDef(n).sizes.length;
+}
+
 export function toRow(l: LevelDef): Tuned {
   return [l.sizes, l.columns, l.slots, l.depth, l.seed, l.moves, l.par];
 }

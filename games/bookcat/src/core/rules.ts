@@ -128,9 +128,9 @@ export function canMove(state: State, src: Source, dst: Target, rules: Rules = D
   const col = state.columns[dst.col];
   if (!col) return false;
   if (!col.up.length && !col.down.length) {
-    if (head.kind === 'cat') return rules.catToEmptyColumn && ids.length === 1;
-    // Moving a whole column's only run onto another empty column is pointless.
+    // Moving a whole column's only run (a lone category card included) onto another empty column is pointless.
     if (src.from === 'col' && src.count === state.columns[src.col].up.length && !state.columns[src.col].down.length) return false;
+    if (head.kind === 'cat') return rules.catToEmptyColumn && ids.length === 1;
     return true;
   }
   const top = state.cards[col.up[col.up.length - 1]];

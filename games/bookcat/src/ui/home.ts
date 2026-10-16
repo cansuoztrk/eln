@@ -70,7 +70,7 @@ export class HomeScreen {
     const info = chapterInfo(level);
     const streak = dailyStreak();
     const attn = questsAttention();
-    const resume = d.run?.key === `L${level}`;
+    const resume = d.runs.journey?.key === `L${level}`;
     const progress = h('div', { class: 'chapter-bar' }, h('i', { style: `width:${(info.done / info.total) * 100}%` }));
     this.el.replaceChildren(
       h(
@@ -97,7 +97,7 @@ export class HomeScreen {
         'nav',
         { class: 'home-grid' },
         this.tile(ICONS.calendar, t('home.daily'), dailyDone() ? t('home.dailyDone') : '', () => this.cb.daily(), !dailyDone()),
-        this.tile(ICONS.books, t('home.collection'), `${d.books.length}/${CHAPTERS.length}`, () => this.cb.collection(), false),
+        this.tile(ICONS.books, t('home.collection'), `${d.books.filter((i) => i < CHAPTERS.length).length}/${CHAPTERS.length}`, () => this.cb.collection(), false),
         this.tile(ICONS.trophy, t('home.quests'), '', () => this.cb.quests(), attn > 0, attn),
         this.tile(ICONS.shop, t('home.shop'), '', () => this.cb.shop(), false),
       ),

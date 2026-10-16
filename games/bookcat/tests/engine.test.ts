@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { cardCount, deal, type Layout } from '../src/core/deal';
-import { apply, canMove, isWon, legalMoves, topRunLength, type State } from '../src/core/rules';
+import { apply, autoTarget, canMove, isWon, legalMoves, topRunLength, type State } from '../src/core/rules';
 import { greedyPlay, solve } from '../src/core/solver';
 
 const small: Layout = { sizes: [3, 3], columns: 3, slots: 2, depth: [0, 1, 2], seed: 7 };
@@ -49,6 +49,20 @@ describe('rules', () => {
     expect(canMove(s, { from: 'col', col: 1, count: 1 }, { to: 'col', col: 0 })).toBe(false);
     expect(canMove(s, { from: 'col', col: 0, count: 1 }, { to: 'col', col: 2 })).toBe(true);
     expect(canMove(s, { from: 'col', col: 1, count: 1 }, { to: 'col', col: 2 })).toBe(true);
+  });
+
+  it('never moves a lone card (category card included) from one empty column to another', () => {
+    const s = position();
+    // Column 1 holds only the category card 0 once its face-down card is gone.
+    s.columns = [{ down: [], up: [1, 2] }, { down: [], up: [0] }, { down: [], up: [] }];
+    s.slots = [{ cat: 1, count: 0, top: null }]; // the only shelf is taken
+    const lone = { from: 'col', col: 1, count: 1 } as const;
+    expect(canMove(s, lone, { to: 'col', col: 2 })).toBe(false);
+    expect(autoTarget(s, lone)).toBeNull();
+    expect(legalMoves(s).some((m) => m.type === 'move' && m.src.from === 'col' && m.src.col === 1 && m.dst.to === 'col')).toBe(false);
+    // With a face-down card under it the move uncovers that card, so it stays legal.
+    s.columns[1] = { down: [3], up: [0] };
+    expect(canMove(s, lone, { to: 'col', col: 2 })).toBe(true);
   });
 
   it('draws and recycles the stock', () => {

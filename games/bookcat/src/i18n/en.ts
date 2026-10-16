@@ -125,6 +125,8 @@ const en: Record<Key, string> = {
   'shop.restored': 'Purchases restored',
   'shop.thanks': 'Thank you! Purchase complete.',
   'shop.failed': 'The purchase couldn’t be completed.',
+  'shop.pending': 'Your payment is pending. It will be delivered automatically once it’s approved.',
+  'shop.unavailable': 'The store isn’t available right now. Please try again later.',
   'shop.demoQ': 'In demo mode the purchase is simulated and nothing is charged. Continue?',
   'shop.popular': 'Popular',
   'shop.best': 'Best value',

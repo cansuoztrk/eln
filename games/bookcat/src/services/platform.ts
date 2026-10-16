@@ -17,7 +17,8 @@ export async function haptic(kind: HapticKind): Promise<void> {
       else if (kind === 'warning') await Haptics.notification({ type: NotificationType.Warning });
       else if (kind === 'select') await Haptics.selectionChanged();
       else await Haptics.impact({ style: kind === 'heavy' ? ImpactStyle.Heavy : kind === 'medium' ? ImpactStyle.Medium : ImpactStyle.Light });
-    } else if ('vibrate' in navigator) {
+    } else if ('vibrate' in navigator && (navigator.userActivation?.hasBeenActive ?? true)) {
+      // Browsers refuse (and log) vibration before the first user gesture, e.g. a lose dialog on a resumed run.
       const ms = { light: 8, select: 5, medium: 16, heavy: 30, success: [10, 40, 20], warning: [30, 50, 30] }[kind];
       navigator.vibrate(ms as number | number[]);
     }

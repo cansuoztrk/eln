@@ -10,6 +10,7 @@ interface Open {
 }
 
 const stack: Open[] = [];
+const BACKDROP_GRACE_MS = 350;
 
 function root(): HTMLElement {
   return document.getElementById('modals')!;
@@ -43,8 +44,18 @@ export function modal(content: Node, opts: ModalOptions = {}): { el: HTMLElement
     setTimeout(() => backdrop.remove(), 180);
     opts.onClose?.();
   };
+  // Dismiss only on a full press (down and up) on the backdrop, and not in the
+  // first moments: the second tap of the double tap that opened this dialog
+  // must not close it straight away.
+  const openedAt = performance.now();
+  let downOnBackdrop = false;
   backdrop.addEventListener('pointerdown', (e) => {
-    if (e.target === backdrop && dismissable) {
+    downOnBackdrop = e.target === backdrop && performance.now() - openedAt > BACKDROP_GRACE_MS;
+  });
+  backdrop.addEventListener('click', (e) => {
+    const ok = downOnBackdrop && e.target === backdrop;
+    downOnBackdrop = false;
+    if (ok && dismissable && !closed) {
       audio.tap();
       close();
     }
@@ -95,6 +106,7 @@ export function confirmDialog(title: string, body: string, ok: string, cancel: s
       { title, onClose: () => !answered && resolve(false) },
     );
     function done(v: boolean) {
+      if (answered) return;
       answered = true;
       audio.tap();
       m.close();

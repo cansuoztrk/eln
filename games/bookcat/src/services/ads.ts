@@ -18,11 +18,18 @@ import { isNative, platform, track } from './platform';
 export type RewardPlacement = 'moves' | 'double' | 'hint' | 'coins';
 export type InterstitialTrigger = 'level_end';
 
+/** Upper bound on a full-screen ad, so a lost dismiss event can never freeze the game. */
+const AD_TIMEOUT_MS = 5 * 60_000;
+
 class AdService {
   private initialized = false;
   private initPromise: Promise<void> | null = null;
   private rewardedReady = false;
   private interstitialReady = false;
+  private rewardedLoading: Promise<void> | null = null;
+  private interstitialLoading: Promise<void> | null = null;
+  /** The interstitial being shown: a second call waits for it instead of showing another. */
+  private showing: Promise<void> | null = null;
 
   private get units() {
     return platform === 'ios' ? CONFIG.admob.ios : CONFIG.admob.android;
@@ -57,58 +64,107 @@ class AdService {
     return this.initPromise;
   }
 
-  private async preloadRewarded(): Promise<void> {
-    if (!isNative || !this.initialized) return;
-    try {
-      const { AdMob } = await import('@capacitor-community/admob');
-      await AdMob.prepareRewardVideoAd({ adId: this.units.rewarded, isTesting: CONFIG.admob.testing });
-      this.rewardedReady = true;
-    } catch {
-      this.rewardedReady = false;
-    }
+  private preloadRewarded(): Promise<void> {
+    if (!isNative || !this.initialized || this.rewardedReady) return Promise.resolve();
+    this.rewardedLoading ??= (async () => {
+      try {
+        const { AdMob } = await import('@capacitor-community/admob');
+        await AdMob.prepareRewardVideoAd({ adId: this.units.rewarded, isTesting: CONFIG.admob.testing });
+        this.rewardedReady = true;
+      } catch {
+        this.rewardedReady = false;
+      } finally {
+        this.rewardedLoading = null;
+      }
+    })();
+    return this.rewardedLoading;
   }
 
-  private async preloadInterstitial(): Promise<void> {
-    if (!isNative || !this.initialized) return;
-    try {
-      const { AdMob } = await import('@capacitor-community/admob');
-      await AdMob.prepareInterstitial({ adId: this.units.interstitial, isTesting: CONFIG.admob.testing });
-      this.interstitialReady = true;
-    } catch {
-      this.interstitialReady = false;
-    }
+  private preloadInterstitial(): Promise<void> {
+    if (!isNative || !this.initialized || this.interstitialReady) return Promise.resolve();
+    this.interstitialLoading ??= (async () => {
+      try {
+        const { AdMob } = await import('@capacitor-community/admob');
+        await AdMob.prepareInterstitial({ adId: this.units.interstitial, isTesting: CONFIG.admob.testing });
+        this.interstitialReady = true;
+      } catch {
+        this.interstitialReady = false;
+      } finally {
+        this.interstitialLoading = null;
+      }
+    })();
+    return this.interstitialLoading;
   }
 
-  /** Shows a rewarded video. Resolves true only if the reward was earned. */
+  /**
+   * Shows a rewarded video. Resolves true only if the reward was earned, and
+   * only once the ad is closed. Never loads on demand: a video that pops up
+   * seconds later would land mid-level or after the player moved on, so
+   * without a preloaded ad it resolves false at once (callers say "no video
+   * right now") and loads one for the next try.
+   */
   async rewarded(placement: RewardPlacement): Promise<boolean> {
     track('ad_rewarded_request', { placement });
     await this.init();
+    if (isNative && !this.rewardedReady) {
+      void this.preloadRewarded();
+      return false;
+    }
     let earned = false;
     audio.setSuspended(true);
     try {
-      if (!isNative) {
-        earned = await webMockAd(true);
-      } else {
-        if (!this.rewardedReady) await this.preloadRewarded();
-        if (!this.rewardedReady) return false;
-        const { AdMob } = await import('@capacitor-community/admob');
-        this.rewardedReady = false;
-        const reward = await AdMob.showRewardVideoAd();
-        earned = !!reward;
-        void this.preloadRewarded();
-      }
+      earned = isNative ? await this.showRewardedNative() : await webMockAd(true);
     } catch {
       earned = false;
     } finally {
       audio.setSuspended(false);
+      if (isNative) void this.preloadRewarded();
     }
     if (earned) {
       store.update((d) => {
         d.stats.adsWatched++;
+        // A rewarded video counts as a full-screen ad for the interstitial gap.
+        d.ads.lastInterstitial = Math.max(d.ads.lastInterstitial, Date.now());
       });
       track('ad_rewarded_earned', { placement });
     }
     return earned;
+  }
+
+  /**
+   * In plugin 8.x showRewardVideoAd() resolves only when the reward is
+   * earned and never settles when the ad is closed early or fails to show,
+   * so the outcome is read from the Rewarded / Dismissed / FailedToShow events.
+   */
+  private async showRewardedNative(): Promise<boolean> {
+    const { AdMob, RewardAdPluginEvents } = await import('@capacitor-community/admob');
+    this.rewardedReady = false;
+    let got = false;
+    let end: (v: boolean) => void = () => undefined;
+    const closed = new Promise<boolean>((resolve) => {
+      end = resolve;
+    });
+    const handles = await Promise.all([
+      AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
+        got = true;
+      }),
+      // The reward callback can trail the dismissal by a moment on some devices.
+      AdMob.addListener(RewardAdPluginEvents.Dismissed, () => setTimeout(() => end(got), got ? 0 : 500)),
+      AdMob.addListener(RewardAdPluginEvents.FailedToShow, () => end(false)),
+    ]);
+    const guard = setTimeout(() => end(got), AD_TIMEOUT_MS);
+    AdMob.showRewardVideoAd().then(
+      () => {
+        got = true;
+      },
+      () => end(got),
+    );
+    try {
+      return await closed;
+    } finally {
+      clearTimeout(guard);
+      for (const hnd of handles) void hnd.remove().catch(() => undefined);
+    }
   }
 
   interstitialEligible(_trigger: InterstitialTrigger): boolean {
@@ -120,36 +176,65 @@ class AdService {
     return d.ads.sinceInterstitial + 1 >= cfg.everyNLevels;
   }
 
-  /** Call at natural breaks. Applies pacing rules and may show an interstitial. */
-  async maybeInterstitial(trigger: InterstitialTrigger): Promise<void> {
+  /** Call at natural breaks. Applies pacing rules and may show an interstitial; resolves once it is closed. */
+  maybeInterstitial(trigger: InterstitialTrigger): Promise<void> {
+    if (this.showing) return this.showing;
     if (!this.interstitialEligible(trigger)) {
       store.update((d) => {
         d.ads.sinceInterstitial++;
       });
+      return Promise.resolve();
+    }
+    this.showing = this.showInterstitial(trigger).finally(() => {
+      this.showing = null;
+    });
+    return this.showing;
+  }
+
+  private async showInterstitial(trigger: InterstitialTrigger): Promise<void> {
+    await this.init();
+    if (isNative && !this.interstitialReady) {
+      // Not loaded: skip this break rather than make the player wait for a load.
+      void this.preloadInterstitial();
       return;
     }
-    await this.init();
     audio.setSuspended(true);
     try {
-      if (!isNative) {
-        await webMockAd(false);
-      } else {
-        if (!this.interstitialReady) await this.preloadInterstitial();
-        if (!this.interstitialReady) return;
-        const { AdMob } = await import('@capacitor-community/admob');
-        this.interstitialReady = false;
-        await AdMob.showInterstitial();
-        void this.preloadInterstitial();
+      const shown = isNative ? await this.showInterstitialNative() : await webMockAd(false);
+      if (shown) {
+        store.update((d) => {
+          d.ads.lastInterstitial = Date.now();
+          d.ads.sinceInterstitial = 0;
+        });
+        track('ad_interstitial_shown', { trigger });
       }
-      store.update((d) => {
-        d.ads.lastInterstitial = Date.now();
-        d.ads.sinceInterstitial = 0;
-      });
-      track('ad_interstitial_shown', { trigger });
     } catch {
       /* no fill — fine */
     } finally {
       audio.setSuspended(false);
+      if (isNative) void this.preloadInterstitial();
+    }
+  }
+
+  /** showInterstitial() resolves when the ad appears; wait for Dismissed (or FailedToShow) instead. */
+  private async showInterstitialNative(): Promise<boolean> {
+    const { AdMob, InterstitialAdPluginEvents } = await import('@capacitor-community/admob');
+    this.interstitialReady = false;
+    let end: (v: boolean) => void = () => undefined;
+    const closed = new Promise<boolean>((resolve) => {
+      end = resolve;
+    });
+    const handles = await Promise.all([
+      AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => end(true)),
+      AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => end(false)),
+    ]);
+    const guard = setTimeout(() => end(true), AD_TIMEOUT_MS);
+    AdMob.showInterstitial().catch(() => end(false));
+    try {
+      return await closed;
+    } finally {
+      clearTimeout(guard);
+      for (const hnd of handles) void hnd.remove().catch(() => undefined);
     }
   }
 

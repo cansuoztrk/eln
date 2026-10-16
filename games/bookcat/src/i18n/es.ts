@@ -125,6 +125,8 @@ const es: Record<Key, string> = {
   'shop.restored': 'Compras restauradas',
   'shop.thanks': '¡Gracias! Compra completada.',
   'shop.failed': 'No se pudo completar la compra.',
+  'shop.pending': 'Tu pago está pendiente. Se entregará automáticamente cuando se apruebe.',
+  'shop.unavailable': 'La tienda no está disponible ahora mismo. Inténtalo de nuevo más tarde.',
   'shop.demoQ': 'En modo demo la compra es simulada y no se cobra nada. ¿Continuar?',
   'shop.popular': 'Popular',
   'shop.best': 'Mejor valor',

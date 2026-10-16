@@ -575,6 +575,9 @@
   box-shadow: 0 0 0 3px var(--gold), 0 10px 24px #000a;
   animation: popIn 0.3s cubic-bezier(0.2, 1.5, 0.4, 1);
 }
+.tut[hidden] {
+  display: none;
+}
 .tut p {
   flex: 1;
   margin: 0;

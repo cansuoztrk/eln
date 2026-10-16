@@ -1,5 +1,5 @@
 import { t } from '../i18n';
-import { todayKey } from '../meta/daily';
+import { dailyStreak, todayKey } from '../meta/daily';
 import { store } from '../meta/state';
 import { isNative } from './platform';
 
@@ -7,7 +7,8 @@ import { isNative } from './platform';
  * Local re-engagement notifications (no server needed). Rescheduled every
  * time the app goes to background, so they always reflect the current state.
  *   1  Daily Shelf ready (tomorrow 09:30), or today 19:00 if it is still open
- *   2  streak reminder (tomorrow 19:30, only with a streak of 2+)
+ *   2  streak reminder (only with a live streak of 2+): today 20:30 while
+ *      today's shelf is still open, otherwise tomorrow 19:30
  *   3  win-back after 3 days
  *   4  win-back after 7 days
  */
@@ -39,6 +40,21 @@ export async function requestNotifications(): Promise<boolean> {
   }
 }
 
+/**
+ * Asks for the notification permission once (after the first journey win)
+ * if reminders are switched on, and schedules them when it is granted.
+ * Resolves after the player answered, so the next level is not dealt behind
+ * the system prompt.
+ */
+export async function askNotificationsOnce(): Promise<void> {
+  const d = store.data;
+  if (!isNative || !d.settings.notifications || d.tutorial.tips.includes('notif')) return;
+  store.update((x) => {
+    x.tutorial.tips.push('notif');
+  });
+  if (await requestNotifications()) await rescheduleNotifications();
+}
+
 function atLocal(daysAhead: number, hour: number, minute = 0): Date {
   const d = new Date();
   d.setDate(d.getDate() + daysAhead);
@@ -60,7 +76,12 @@ export async function rescheduleNotifications(): Promise<void> {
     // Reminders do not need exact alarms; exact ones would open the Android
     // "Alarms & reminders" settings screen.
     list.push(!doneToday && evening.getTime() > Date.now() + 30 * 60_000 ? n(1, t('notif.daily.title'), t('notif.daily.body'), evening) : n(1, t('notif.daily.title'), t('notif.daily.body'), atLocal(1, 9, 30)));
-    if (d.daily.streak >= 2) list.push(n(2, t('notif.streak.title', { n: d.daily.streak }), t('notif.streak.body'), atLocal(1, 19, 30)));
+    // Only a streak that is still alive, and before it breaks: tonight if today's shelf is open.
+    const streak = dailyStreak();
+    if (streak >= 2) {
+      const at = doneToday ? atLocal(1, 19, 30) : atLocal(0, 20, 30);
+      if (at.getTime() > Date.now() + 30 * 60_000) list.push(n(2, t('notif.streak.title', { n: streak }), t('notif.streak.body'), at));
+    }
     list.push(n(3, t('notif.miss.title'), t('notif.miss.body'), atLocal(3, 19, 30)));
     list.push(n(4, t('notif.miss.title'), t('notif.miss.body'), atLocal(7, 19, 30)));
     await ln.schedule({ notifications: list });

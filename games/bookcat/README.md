@@ -52,7 +52,7 @@ URL parametreleri: `?level=45` bölümü doğrudan açar, `?daily` Günün Rafı
 
 ## Yayın öncesi değiştirilecekler
 
-1. `src/config.ts`: AdMob ara reklam ve ödüllü reklam birimi kimlikleri, `testing: false`, RevenueCat anahtarları
+1. `src/config.ts`: AdMob ara reklam ve ödüllü reklam birimi kimlikleri, `testing: false`, RevenueCat anahtarları (anahtarlar `REPLACE_ME` kalırsa yerel sürümde mağaza “kullanılamıyor” görünür; demo satın alma yalnızca web ve geliştirme sürümlerinde çalışır)
 2. `ios/App/App/Info.plist` → `GADApplicationIdentifier`
 3. `android/app/src/main/AndroidManifest.xml` → `com.google.android.gms.ads.APPLICATION_ID`
 4. App Store Connect ve Play Console’da `src/meta/catalog.ts` içindeki 10 ürünü aynı kimliklerle oluştur, Türkiye fiyatlarını elle gir (bkz. `docs/13`)
