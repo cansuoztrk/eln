@@ -1,0 +1,1049 @@
+// FırsatRadar veri modeli
+//
+// Tasarım ilkeleri
+// - Tüm para tutarları "minor unit" (kuruş/cent) cinsinden Int olarak saklanır. Kayan nokta
+//   hatası ve Decimal serileştirme sorunları yaşanmaz. Para birimi her kayıtta ayrıca tutulur.
+// - Tüm zaman damgaları UTC'dir (timestamptz). Arayüz Europe/Istanbul olarak gösterir.
+// - E-ticaret (Product/Offer/PriceSnapshot) ve uçuş (FlightRoute/FlightOffer) verileri ayrı
+//   modellerdedir; ortak olan yalnızca DataSource, IngestionJob ve ClickEvent altyapısıdır.
+// - Fiyat geçmişi (PriceSnapshot) yalnızca fiyat/stok/kargo değiştiğinde veya son kayıttan bu
+//   yana "heartbeat" süresi (varsayılan 20 saat) geçtiğinde yazılır. Böylece veri boşlukları
+//   tespit edilebilir ve tablo gereksiz büyümez.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── Kullanıcılar ve oturumlar ─────────────────────────────
+
+enum Role {
+  USER
+  EDITOR
+  ADMIN
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique // her zaman küçük harfe normalize edilir
+  passwordHash        String
+  name                String?
+  role                Role      @default(USER)
+  emailVerifiedAt     DateTime?
+  kvkkAcceptedAt      DateTime // aydınlatma metni onayı (zorunlu)
+  emailAlertsEnabled  Boolean   @default(true) // fiyat alarmı e-postaları
+  digestOptIn         Boolean   @default(false) // haftalık özet (açık rıza ile)
+  digestOptInAt       DateTime?
+  unsubscribeToken    String    @unique @default(cuid())
+  lastLoginAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  sessions        Session[]
+  tokens          UserToken[]
+  favorites       UserFavorite[]
+  savedSearches   SavedSearch[]
+  favoriteRoutes  FavoriteRoute[]
+  interests       UserInterest[]
+  recentlyViewed  RecentlyViewed[]
+  priceAlerts     PriceAlert[]
+  flightAlerts    FlightAlert[]
+  notifications   Notification[]
+  auditLogs       AdminAuditLog[]
+  editorialAuthored EditorialContent[]
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique // ham token yalnızca çerezde bulunur; DB'de SHA-256 özeti tutulur
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+  lastSeenAt DateTime @default(now())
+  userAgent  String?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+enum UserTokenType {
+  RESET_PASSWORD
+  VERIFY_EMAIL
+}
+
+model UserToken {
+  id        String        @id @default(cuid())
+  type      UserTokenType
+  tokenHash String        @unique
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime      @default(now())
+
+  @@index([userId, type])
+}
+
+// ───────────────────────────── Katalog ─────────────────────────────
+
+model Category {
+  id             String     @id @default(cuid())
+  slug           String     @unique
+  name           String
+  description    String?
+  parentId       String?
+  parent         Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children       Category[] @relation("CategoryTree")
+  sortOrder      Int        @default(0)
+  icon           String? // tasarım sistemindeki kategori ikon anahtarı
+  keywords       String[] // otomatik sınıflandırma için normalize anahtar kelimeler
+  isActive       Boolean    @default(true)
+  // Kategoriye özel filtre/karşılaştırma ölçütleri: [{ key, label, type: "enum"|"number"|"boolean", unit?, options? }]
+  filterSchema   Json?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  products  Product[]
+  interests UserInterest[]
+  mappings  CategoryMapping[]
+
+  @@index([parentId, sortOrder])
+}
+
+// Kaynağın kategori yolunu ("Bilgisayar > Çevre Birimleri > Mouse") platform kategorisine eşler.
+model CategoryMapping {
+  id            String   @id @default(cuid())
+  dataSourceKey String? // null = tüm kaynaklar
+  pattern       String // normalize edilmiş alt dize
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  priority      Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@unique([dataSourceKey, pattern])
+}
+
+model Brand {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  aliases   String[] // normalize edilmiş alternatif yazımlar (ör. "logi" → Logitech)
+  createdAt DateTime  @default(now())
+  products  Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  brandId     String?
+  brand       Brand?   @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  modelNumber String? // üretici model ailesi (ör. "G502 X")
+  // Varyant sözcükleri (renk, bağlantı, kapasite) çıkarılmış normalize başlık. Aynı marka + aynı
+  // familyKey = aynı model ailesi → farklı nitelikler ayrı VARYANT olur.
+  familyKey   String?
+  description String?
+  imageUrl    String?
+  specs       Json     @default("{}") // { "Bağlantı": "Kablosuz", "DPI": "25600" }
+  tags        String[]
+  // Arama için normalize edilmiş metin (Türkçe karakterler katlanmış, küçük harf). pg_trgm ile indekslenir.
+  searchText  String   @default("")
+  isActive    Boolean  @default(true)
+  // Bütün tekliflerin özetinden türetilen önbellek alanları (scores.recompute görevi günceller)
+  bestOfferId         String?
+  bestTotalMinor      Int?
+  bestCurrency        String?
+  offerCount          Int      @default(0) // güncel (ACTIVE) teklif sayısı
+  retailerCount       Int      @default(0)
+  dealScore           Float?
+  verifiedDiscountPct Float? // doğrulanmış referansa göre indirim (liste fiyatı DEĞİL)
+  recentDropPct       Float? // son 7 günde fiyat düşüşü
+  popularity          Int      @default(0) // son 7 gün tıklama + favori (sıralama için, kalite ölçütü değil)
+  hasVerifiedCoupon   Boolean  @default(false)
+  inStock             Boolean  @default(false)
+  lastVerifiedAt      DateTime? // en güncel başarılı fiyat kontrolü
+  isTestData          Boolean  @default(false) // yalnızca test kaynaklarından teklif içeriyorsa
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  variants        ProductVariant[]
+  offers          Offer[]
+  favorites       UserFavorite[]
+  recentlyViewed  RecentlyViewed[]
+  priceAlerts     PriceAlert[]
+  matchCandidates MatchCandidate[]
+  editorialItems  EditorialItem[]
+  sponsored       SponsoredPlacement[]
+
+  @@index([categoryId, isActive])
+  @@index([brandId, familyKey])
+  @@index([dealScore])
+  @@index([bestTotalMinor])
+  @@index([verifiedDiscountPct])
+  @@index([recentDropPct])
+  @@index([searchText(ops: raw("gin_trgm_ops"))], type: Gin, map: "Product_searchText_trgm_idx")
+}
+
+model ProductVariant {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Normalize varyant anahtarı: "color=siyah|connectivity=kablosuz". Aynı üründe benzersizdir.
+  variantKey   String
+  label        String // kullanıcıya gösterilen: "Kablosuz · Siyah"
+  gtin         String?  @unique // GTIN-14'e normalize edilmiş
+  mpn          String? // üretici parça numarası (normalize)
+  attributes   Json     @default("{}")
+  imageUrl     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  offers      Offer[]
+  priceAlerts PriceAlert[]
+
+  @@unique([productId, variantKey])
+  @@index([mpn])
+}
+
+model Retailer {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  websiteUrl      String
+  logoText        String? // logo yoksa kullanılacak kısa ad
+  brandColor      String?
+  isActive        Boolean  @default(true)
+  // Satış ortaklığı: yalnızca resmî programdan onay alındığında etkinleştirilir.
+  affiliateEnabled Boolean @default(false)
+  affiliateProgram String? // ör. "Amazon Ortaklık Programı"
+  // Gizli olmayan yönlendirme ayarı, ör. { "type": "query", "param": "tag", "value": "ornek-21" }
+  affiliateConfig  Json?
+  shippingNote     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  offers      Offer[]
+  coupons     Coupon[]
+  promotions  Promotion[]
+  dataSources DataSource[]
+}
+
+enum StockStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  PREORDER
+  UNKNOWN
+}
+
+enum OfferStatus {
+  ACTIVE // son kontrol tazelik penceresi içinde ve başarılı
+  REVALIDATING // son kontrol başarısız; son başarılı veri korunuyor, fiyat yeniden doğrulanıyor
+  STALE // tazelik penceresi aşıldı; aktif fırsat olarak gösterilmez
+  OUT_OF_STOCK
+  EXPIRED // kaynakta artık bulunmuyor
+  DISABLED // yönetici tarafından devre dışı
+}
+
+enum MatchMethod {
+  GTIN
+  BRAND_MPN
+  SOURCE_ID
+  TITLE_SIMILARITY
+  NEW_PRODUCT
+  MANUAL
+}
+
+model Offer {
+  id                String       @id @default(cuid())
+  productId         String
+  product           Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId         String
+  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  retailerId        String
+  retailer          Retailer     @relation(fields: [retailerId], references: [id])
+  dataSourceId      String
+  dataSource        DataSource   @relation(fields: [dataSourceId], references: [id])
+  externalId        String // kaynaktaki benzersiz kimlik (ASIN, SKU, ürün id)
+  url               String // kaynağın verdiği ürün adresi
+  title             String // kaynaktaki başlık
+  imageUrl          String?
+  sellerName        String?
+  currency          String       @default("TRY")
+  priceMinor        Int
+  listPriceMinor    Int? // kaynağın bildirdiği liste/eski fiyat
+  shippingMinor     Int? // null = kargo bilgisi bilinmiyor
+  totalMinor        Int? // price + shipping (kargo biliniyorsa)
+  stockStatus       StockStatus  @default(UNKNOWN)
+  status            OfferStatus  @default(ACTIVE)
+  rating            Float?
+  ratingCount       Int?
+  promotionText     String? // kaynağın verdiği ham kampanya metni
+  isSponsored       Boolean      @default(false)
+  flaggedSuspicious Boolean      @default(false)
+  suspiciousAuto    Boolean      @default(false) // otomatik işaret: aynı fiyat tekrar doğrulanınca kalkar; yönetici işareti kalkmaz
+  suspiciousReason  String?
+  disabledByAdmin   Boolean      @default(false)
+  disabledReason    String?
+  matchMethod       MatchMethod
+  matchConfidence   Float
+  contentHash       String? // fiyat dışı alan değişikliklerini algılamak için
+  firstSeenAt       DateTime     @default(now())
+  lastCheckedAt     DateTime // son kontrol denemesi
+  lastSuccessAt     DateTime // son başarılı doğrulama
+  lastPriceChangeAt DateTime?
+  lastSnapshotAt    DateTime?
+  previousPriceMinor Int? // bir önceki doğrulanmış (farklı) fiyat
+  // Fırsat motoru çıktıları (açıklanabilir)
+  dealScore         Float?
+  dealScoreBreakdown Json?
+  dealLabels        String[]
+  verifiedDiscountPct Float?
+  recentDropPct     Float?
+  metrics           Json? // { low30, low90, low180, median30, coverageDays, ... }
+  scoredAt          DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  snapshots      PriceSnapshot[]
+  promotions     Promotion[]
+  clicks         ClickEvent[]
+  matchCandidates MatchCandidate[]
+  editorialItems EditorialItem[]
+  sponsored      SponsoredPlacement[]
+
+  @@unique([dataSourceId, externalId])
+  @@index([productId, status])
+  @@index([retailerId, status])
+  @@index([status, dealScore])
+  @@index([lastSuccessAt])
+}
+
+model PriceSnapshot {
+  id             BigInt      @id @default(autoincrement())
+  offerId        String
+  offer          Offer       @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  priceMinor     Int
+  listPriceMinor Int?
+  shippingMinor  Int?
+  currency       String
+  stockStatus    StockStatus
+  checkedAt      DateTime
+  dataSourceId   String
+  jobId          String?
+
+  @@unique([offerId, checkedAt])
+  @@index([offerId, checkedAt(sort: Desc)])
+}
+
+enum MatchReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Başlık benzerliğine dayalı belirsiz eşleşmeler otomatik birleştirilmez; burada incelemeye düşer.
+model MatchCandidate {
+  id                 String            @id @default(cuid())
+  offerId            String
+  offer              Offer             @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  candidateProductId String
+  candidateProduct   Product           @relation(fields: [candidateProductId], references: [id], onDelete: Cascade)
+  confidence         Float
+  signals            Json // { titleSimilarity, brandMatch, modelTokens, conflicts: [...] }
+  status             MatchReviewStatus @default(PENDING)
+  reviewedById       String?
+  reviewedAt         DateTime?
+  createdAt          DateTime          @default(now())
+
+  @@unique([offerId, candidateProductId])
+  @@index([status, confidence])
+}
+
+// ───────────────────────────── Kupon ve kampanyalar ─────────────────────────────
+
+enum ConditionType {
+  PUBLIC // herkese açık
+  MEMBERSHIP // üyelik/abonelik gerektirir
+  PAYMENT_METHOD // belirli ödeme yöntemi
+  MIN_BASKET // minimum sepet tutarı
+  COUPON_CODE // kupon kodu ile
+  CASHBACK // sonradan kazanılan avantaj
+}
+
+enum DiscountType {
+  PERCENT
+  AMOUNT
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  VERIFIED
+  FAILED
+  EXPIRED
+}
+
+model Coupon {
+  id                 String             @id @default(cuid())
+  retailerId         String
+  retailer           Retailer           @relation(fields: [retailerId], references: [id])
+  code               String?
+  title              String
+  description        String?
+  conditionType      ConditionType
+  discountType       DiscountType?
+  discountValue      Int? // PERCENT için yüzde ×100 (1250 = %12,5); AMOUNT için minor unit
+  maxDiscountMinor   Int?
+  minBasketMinor     Int?
+  currency           String             @default("TRY")
+  validFrom          DateTime?
+  validUntil         DateTime?
+  categorySlugs      String[] // boş = tüm kategoriler
+  restrictions       String?
+  stackable          Boolean? // null = birleştirilebilirlik doğrulanmadı
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  verifiedAt         DateTime?
+  lastCheckedAt      DateTime?
+  dataSourceId       String?
+  dataSource         DataSource?        @relation(fields: [dataSourceId], references: [id])
+  sourceUrl          String?
+  isActive           Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  clicks             ClickEvent[]
+
+  @@index([retailerId, isActive])
+  @@index([validUntil])
+}
+
+model Promotion {
+  id            String        @id @default(cuid())
+  retailerId    String
+  retailer      Retailer      @relation(fields: [retailerId], references: [id])
+  offerId       String?
+  offer         Offer?        @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  title         String
+  conditionType ConditionType
+  discountType  DiscountType?
+  discountValue Int?
+  startsAt      DateTime?
+  endsAt        DateTime? // yalnızca kaynak gerçekten bildiriyorsa
+  sourceText    String?
+  dataSourceId  String?
+  lastCheckedAt DateTime?
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+
+  @@index([offerId])
+  @@index([retailerId, isActive])
+}
+
+// ───────────────────────────── Veri kaynakları ve otomasyon ─────────────────────────────
+
+enum DataSourceKind {
+  RETAIL
+  FLIGHT
+  COUPON
+}
+
+enum IntegrationStatus {
+  CONNECTED // kimlik bilgileri mevcut, son çalışma başarılı
+  AWAITING_INTEGRATION // resmî/izinli erişim yolu henüz yok veya sözleşme gerekli
+  AWAITING_CREDENTIALS // adaptör hazır, API anahtarı/onay bekleniyor
+  DEGRADED // son çalışmalar hatalı, son başarılı veri korunuyor
+  DISABLED
+  TEST_ONLY // yalnızca test/fixture verisi üretir; canlı veri değildir
+}
+
+model DataSource {
+  id                     String            @id @default(cuid())
+  key                    String            @unique // ör. "amazon-tr", "feed-ornek-magaza", "travelpayouts"
+  name                   String
+  kind                   DataSourceKind
+  adapter                String // adaptör kayıt anahtarı (src/server/integrations/registry.ts)
+  status                 IntegrationStatus
+  isTestData             Boolean           @default(false)
+  isEnabled              Boolean           @default(true)
+  retailerId             String?
+  retailer               Retailer?         @relation(fields: [retailerId], references: [id])
+  // Gizli OLMAYAN ayarlar. Gizli değerler ortam değişkenindedir; burada yalnızca değişken adları tutulur.
+  config                 Json              @default("{}")
+  refreshIntervalMinutes Int               @default(60) // fiyat/teklif kontrolü
+  fullSyncIntervalMinutes Int              @default(1440) // kapsamlı senkron
+  freshnessWindowMinutes Int               @default(360) // bu süreden eski veri "aktif" gösterilmez
+  rateLimitPerMinute     Int               @default(30)
+  dailyQuota             Int? // sağlayıcı kotası (biliniyorsa)
+  quotaWarnPercent       Int               @default(80)
+  maxConsecutiveFailures Int               @default(5) // aşılırsa kaynak DEGRADED olur ve geri çekilir
+  consecutiveFailures    Int               @default(0)
+  lastRunAt              DateTime?
+  lastSuccessAt          DateTime?
+  lastErrorAt            DateTime?
+  lastError              String?
+  lastItemsSeen          Int?
+  lastItemsUpdated       Int?
+  docsUrl                String?
+  notes                  String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  offers       Offer[]
+  coupons      Coupon[]
+  jobs         IngestionJob[]
+  logs         IngestionLog[]
+  apiUsage     ApiUsage[]
+  schedules    JobSchedule[]
+  flightOffers FlightOffer[]
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED // tüm denemeler tükendi
+  CANCELLED
+}
+
+enum JobTrigger {
+  SCHEDULE
+  MANUAL
+  CRON_HTTP
+  RETRY
+  EVENT
+}
+
+model JobSchedule {
+  id              String      @id @default(cuid())
+  key             String      @unique // ör. "retail.refresh:amazon-tr"
+  type            String // görev tipi (src/server/jobs/registry.ts)
+  description     String
+  dataSourceId    String?
+  dataSource      DataSource? @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+  intervalMinutes Int
+  isEnabled       Boolean     @default(true)
+  payload         Json        @default("{}")
+  lastEnqueuedAt  DateTime?
+  nextRunAt       DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model IngestionJob {
+  id                String      @id @default(cuid())
+  type              String
+  dataSourceId      String?
+  dataSource        DataSource? @relation(fields: [dataSourceId], references: [id], onDelete: SetNull)
+  status            JobStatus   @default(QUEUED)
+  trigger           JobTrigger  @default(SCHEDULE)
+  triggeredById     String?
+  priority          Int         @default(0)
+  payload           Json        @default("{}")
+  // Aynı zaman penceresi için ikinci bir iş oluşturulmasını engeller (ör. "retail.refresh:amazon-tr:2026-10-23T13")
+  dedupeKey         String?     @unique
+  attempt           Int         @default(0)
+  maxAttempts       Int         @default(3)
+  runAt             DateTime    @default(now())
+  startedAt         DateTime?
+  finishedAt        DateTime?
+  durationMs        Int?
+  lockedBy          String?
+  heartbeatAt       DateTime?
+  stats             Json?
+  error             String?
+  retryOfId         String?
+  createdAt         DateTime    @default(now())
+
+  logs IngestionLog[]
+
+  @@index([status, runAt, priority])
+  @@index([type, createdAt(sort: Desc)])
+  @@index([dataSourceId, createdAt(sort: Desc)])
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+}
+
+model IngestionLog {
+  id           BigInt        @id @default(autoincrement())
+  jobId        String?
+  job          IngestionJob? @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  dataSourceId String?
+  dataSource   DataSource?   @relation(fields: [dataSourceId], references: [id], onDelete: SetNull)
+  level        LogLevel
+  message      String
+  context      Json?
+  createdAt    DateTime      @default(now())
+
+  @@index([jobId, createdAt])
+  @@index([level, createdAt(sort: Desc)])
+  @@index([dataSourceId, createdAt(sort: Desc)])
+}
+
+model ApiUsage {
+  id           String     @id @default(cuid())
+  dataSourceId String
+  dataSource   DataSource @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+  day          DateTime   @db.Date
+  requests     Int        @default(0)
+  errors       Int        @default(0)
+  rateLimited  Int        @default(0)
+
+  @@unique([dataSourceId, day])
+}
+
+// ───────────────────────────── Uçuşlar ─────────────────────────────
+// Uçuş sağlayıcıları DataSource (kind = FLIGHT) olarak tutulur; ayrı bir FlightProvider tablosu
+// yerine aynı izleme, kota ve görev altyapısı kullanılır.
+
+model Airport {
+  iata        String  @id
+  name        String
+  city        String
+  cityCode    String?
+  country     String
+  countryCode String
+  isTurkey    Boolean @default(false)
+  popularity  Int     @default(0)
+  searchText  String  @default("")
+}
+
+model Airline {
+  iata String @id
+  name String
+}
+
+enum CabinClass {
+  ECONOMY
+  PREMIUM_ECONOMY
+  BUSINESS
+  FIRST
+}
+
+enum FlightPriceKind {
+  LIVE_QUOTE // canlı aramadan dönen teklif (sağlayıcı fiyatı)
+  CACHED_INDICATIVE // önbellekten gelen gösterge fiyat (ör. son 48 saatte bulunmuş)
+}
+
+model FlightRoute {
+  id              String   @id @default(cuid())
+  origin          String // IATA (şehir veya havalimanı)
+  destination     String
+  label           String?
+  tags            String[] // "istanbul-cikisli", "yurt-disi", "hafta-sonu", "direkt" ...
+  isInternational Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  lookaheadDays   Int      @default(90)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  offers    FlightOffer[]
+  snapshots FlightPriceSnapshot[]
+
+  @@unique([origin, destination])
+}
+
+model FlightOffer {
+  id                  String          @id @default(cuid())
+  dataSourceId        String
+  dataSource          DataSource      @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+  routeId             String?
+  route               FlightRoute?    @relation(fields: [routeId], references: [id], onDelete: SetNull)
+  externalKey         String // sağlayıcı verisinden türetilen deterministik anahtar
+  origin              String
+  destination         String
+  originAirport       String
+  destinationAirport  String
+  departAt            DateTime
+  returnAt            DateTime?
+  oneWay              Boolean
+  airlineCode         String?
+  flightNumber        String?
+  stops               Int
+  returnStops         Int?
+  durationMinutes     Int?
+  durationOutMinutes  Int?
+  durationBackMinutes Int?
+  cabin               CabinClass      @default(ECONOMY)
+  passengers          Int             @default(1)
+  currency            String
+  priceMinor          Int
+  priceKind           FlightPriceKind
+  priceIncludesTaxes  Boolean? // null = sağlayıcı belirtmiyor
+  baggageIncluded     Boolean? // null = bilinmiyor
+  baggageInfo         String?
+  fareConditions      String?
+  deepLink            String? // bazı sağlayıcılar (ör. Duffel) tüketici rezervasyon bağlantısı vermez
+  isAffiliateLink     Boolean         @default(false)
+  searchKey           String? // canlı arama önbelleği anahtarı
+  foundAt             DateTime? // sağlayıcının fiyatı bulduğu an (önbellek kaynaklarında)
+  checkedAt           DateTime // bizim çektiğimiz an
+  expiresAt           DateTime
+  isActive            Boolean         @default(true)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  clicks              ClickEvent[]
+
+  @@unique([dataSourceId, externalKey])
+  @@index([routeId, departAt])
+  @@index([origin, destination, departAt])
+  @@index([isActive, priceMinor])
+  @@index([searchKey, checkedAt])
+}
+
+model FlightPriceSnapshot {
+  id           BigInt      @id @default(autoincrement())
+  routeId      String
+  route        FlightRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  departDate   DateTime    @db.Date
+  oneWay       Boolean
+  minPriceMinor Int
+  currency     String
+  checkedAt    DateTime
+  dataSourceId String
+
+  @@unique([routeId, departDate, oneWay, checkedAt])
+  @@index([routeId, checkedAt(sort: Desc)])
+}
+
+// ───────────────────────────── Kişiselleştirme ─────────────────────────────
+
+model UserFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+enum SearchKind {
+  PRODUCT
+  FLIGHT
+}
+
+model SavedSearch {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      SearchKind
+  name      String
+  query     String // URL sorgu dizesi (paylaşılabilir filtre durumu)
+  createdAt DateTime   @default(now())
+
+  @@index([userId])
+}
+
+model FavoriteRoute {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  origin      String
+  destination String
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, origin, destination])
+}
+
+model UserInterest {
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([userId, categoryId])
+}
+
+model RecentlyViewed {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  viewedAt  DateTime @default(now())
+
+  @@id([userId, productId])
+  @@index([userId, viewedAt(sort: Desc)])
+}
+
+enum AlertState {
+  ARMED // hedef bekleniyor
+  TRIGGERED // bildirim gönderildi; fiyat histerezis eşiğinin üstüne çıkınca yeniden ARMED olur
+}
+
+model PriceAlert {
+  id                 String          @id @default(cuid())
+  userId             String
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId          String
+  product            Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId          String?
+  variant            ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  targetMinor        Int
+  currency           String          @default("TRY")
+  includeShipping    Boolean         @default(true)
+  retailerIds        String[] // boş = tüm mağazalar
+  isActive           Boolean         @default(true) // false = duraklatıldı
+  state              AlertState      @default(ARMED)
+  triggerCount       Int             @default(0)
+  lastTriggeredAt    DateTime?
+  lastTriggeredMinor Int?
+  lastEvaluatedAt    DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@index([productId, isActive])
+  @@index([userId])
+}
+
+model FlightAlert {
+  id                 String     @id @default(cuid())
+  userId             String
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  origin             String
+  destination        String
+  departFrom         DateTime   @db.Date
+  departTo           DateTime   @db.Date
+  oneWay             Boolean    @default(true)
+  directOnly         Boolean    @default(false)
+  targetMinor        Int
+  currency           String     @default("TRY")
+  isActive           Boolean    @default(true)
+  state              AlertState @default(ARMED)
+  triggerCount       Int        @default(0)
+  lastTriggeredAt    DateTime?
+  lastTriggeredMinor Int?
+  lastEvaluatedAt    DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([origin, destination, isActive])
+  @@index([userId])
+}
+
+enum NotificationType {
+  PRICE_ALERT
+  FLIGHT_ALERT
+  DIGEST
+  SYSTEM
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  link      String?
+  data      Json?
+  // Aynı olay için ikinci bildirimi engeller (ör. "price-alert:<alertId>:<triggerCount>")
+  dedupeKey String           @unique
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  emails EmailOutbox[]
+
+  @@index([userId, readAt, createdAt(sort: Desc)])
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  SKIPPED // e-posta sağlayıcısı yapılandırılmamış veya kullanıcı tercihi kapalı
+}
+
+model EmailOutbox {
+  id             String        @id @default(cuid())
+  toEmail        String
+  subject        String
+  html           String
+  text           String
+  kind           String
+  status         EmailStatus   @default(PENDING)
+  attempts       Int           @default(0)
+  lastError      String?
+  notificationId String?
+  notification   Notification? @relation(fields: [notificationId], references: [id], onDelete: SetNull)
+  dedupeKey      String?       @unique
+  scheduledAt    DateTime      @default(now())
+  sentAt         DateTime?
+  createdAt      DateTime      @default(now())
+
+  @@index([status, scheduledAt])
+}
+
+// ───────────────────────────── Editoryal ve ticari ─────────────────────────────
+
+enum EditorialType {
+  DAILY_PICKS
+  WEEKLY_PICKS
+  GUIDE
+  COMPARISON
+  FLIGHT_TIPS
+  CAMPAIGN_NOTE
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model EditorialContent {
+  id             String          @id @default(cuid())
+  slug           String          @unique
+  type           EditorialType
+  title          String
+  summary        String
+  body           String          @default("") // sınırlı Markdown (sunucuda güvenli biçimde işlenir)
+  status         ContentStatus   @default(DRAFT)
+  publishedAt    DateTime?
+  authorId       String?
+  author         User?           @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  items          EditorialItem[]
+
+  @@index([type, status, publishedAt(sort: Desc)])
+}
+
+model EditorialItem {
+  id          String           @id @default(cuid())
+  contentId   String
+  content     EditorialContent @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  offerId     String?
+  offer       Offer?           @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  routeOrigin String?
+  routeDestination String?
+  note        String?
+  sortOrder   Int              @default(0)
+}
+
+// Sponsorlu yerleşimler doğal sıralamadan tamamen ayrıdır; fırsat puanını etkilemez.
+model SponsoredPlacement {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  offerId     String?
+  offer       Offer?   @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  sponsorName String
+  slot        String   @default("home") // "home", "category:<slug>"
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([slot, isActive, startsAt, endsAt])
+}
+
+enum ClickTarget {
+  OFFER
+  FLIGHT
+  COUPON
+}
+
+model ClickEvent {
+  id            BigInt       @id @default(autoincrement())
+  target        ClickTarget
+  offerId       String?
+  offer         Offer?       @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  flightOfferId String?
+  flightOffer   FlightOffer? @relation(fields: [flightOfferId], references: [id], onDelete: SetNull)
+  couponId      String?
+  coupon        Coupon?      @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  productId     String?
+  retailerId    String?
+  categoryId    String?
+  isSponsored   Boolean      @default(false)
+  isAffiliate   Boolean      @default(false)
+  // Günlük dönen tuz ile özetlenmiş anonim ziyaretçi kimliği; IP adresi saklanmaz.
+  visitorHash   String?
+  placement     String? // "product-offers", "deal-card", "home-hero" ...
+  createdAt     DateTime     @default(now())
+
+  @@index([createdAt])
+  @@index([productId, createdAt])
+  @@index([categoryId, createdAt])
+  @@index([retailerId, createdAt])
+}
+
+model PopularSearch {
+  query        String   @id // normalize edilmiş sorgu (kişisel veri içermez)
+  count        Int      @default(1)
+  lastSearchAt DateTime @default(now())
+
+  @@index([count(sort: Desc)])
+}
+
+model ScoringConfig {
+  id          String   @id @default(cuid())
+  version     Int      @unique
+  weights     Json
+  thresholds  Json
+  isActive    Boolean  @default(false)
+  note        String?
+  createdById String?
+  createdAt   DateTime @default(now())
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String // "offer.disable", "product.update", "source.rerun" ...
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt(sort: Desc)])
+}
+
+enum ReportType {
+  WEEKLY_QUALITY
+  CATEGORY_TRENDS
+  FRESHNESS
+}
+
+model Report {
+  id          String     @id @default(cuid())
+  type        ReportType
+  periodStart DateTime
+  periodEnd   DateTime
+  data        Json
+  createdAt   DateTime   @default(now())
+
+  @@unique([type, periodStart])
+}
+
+model Setting {
+  key         String   @id
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}
