@@ -22,7 +22,7 @@ export default function KvkkPage() {
       <h2>Aktarım</h2>
       <p>Veriler; barındırma, veritabanı ve e-posta gönderim hizmet sağlayıcılarıyla, yalnızca hizmetin sunulması için gerekli ölçüde paylaşılır. [Sağlayıcıların listesi ve yurt dışı aktarım durumu yayın öncesinde netleştirilmelidir.]</p>
       <h2>Saklama süresi</h2>
-      <p>Hesap verileri hesap silinene kadar; oturum kayıtları en fazla 30 gün; anonim tıklama özetleri istatistik amacıyla sınırlı süre saklanır.</p>
+      <p>Hesap verileri hesap silinene kadar; oturum kayıtları en fazla 30 gün; gönderilen e-postaların kuyruk kayıtları 60 gün; anonim tıklama kayıtları (IP adresi içermez, günlük değişen özetle) 13 ay saklanır ve ardından otomatik silinir. Hesabınızı sildiğinizde e-posta kuyruğundaki kayıtlarınız da hemen silinir.</p>
       <h2>Haklarınız (KVKK m.11)</h2>
       <p>Verilerinize erişme, düzeltme, silme ve itiraz haklarına sahipsiniz. Hesap ayarlarından verilerinizin bir kopyasını indirebilir ve hesabınızı tamamen silebilirsiniz.</p>
     </>

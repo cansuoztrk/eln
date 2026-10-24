@@ -82,7 +82,8 @@ export async function deleteAccount(_: FormState, fd: FormData): Promise<FormSta
   if (!full || !(await verifyPassword(String(fd.get("password") ?? ""), full.passwordHash))) return { error: "Parola hatalı." };
   if (fd.get("confirm") !== "SİL") return { error: "Onay için büyük harflerle SİL yazın." };
   // İlişkili tüm kişisel veriler (oturum, favori, alarm, bildirim...) cascade ile silinir.
-  await db.user.delete({ where: { id: u.id } });
+  // E-posta kuyruğu kullanıcıya bağlı olmadığı için adrese göre ayrıca silinir.
+  await db.$transaction([db.emailOutbox.deleteMany({ where: { toEmail: full.email } }), db.user.delete({ where: { id: u.id } })]);
   await destroySession();
   redirect("/?hesap=silindi");
 }

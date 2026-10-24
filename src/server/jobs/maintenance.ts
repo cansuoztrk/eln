@@ -13,7 +13,7 @@ import type { JobContext } from "./context";
 
 export async function runDailyMaintenance(db: Db, ctx: JobContext) {
   const now = ctx.now;
-  const [coupons, promos, sessions, tokens, flights, oldFlights, logs, outbox] = await Promise.all([
+  const [coupons, promos, sessions, tokens, flights, oldFlights, logs, outbox, clicks] = await Promise.all([
     db.coupon.updateMany({ where: { isActive: true, validUntil: { lt: now } }, data: { isActive: false, verificationStatus: "EXPIRED" } }),
     db.promotion.updateMany({ where: { isActive: true, endsAt: { lt: now } }, data: { isActive: false } }),
     db.session.deleteMany({ where: { expiresAt: { lt: now } } }),
@@ -21,7 +21,9 @@ export async function runDailyMaintenance(db: Db, ctx: JobContext) {
     db.flightOffer.updateMany({ where: { isActive: true, OR: [{ expiresAt: { lt: now } }, { departAt: { lt: now } }] }, data: { isActive: false } }),
     db.flightOffer.deleteMany({ where: { departAt: { lt: new Date(now.getTime() - 30 * DAY) } } }),
     db.ingestionLog.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 90 * DAY) } } }),
-    db.emailOutbox.deleteMany({ where: { status: { in: ["SENT", "SKIPPED"] }, createdAt: { lt: new Date(now.getTime() - 60 * DAY) } } }),
+    db.emailOutbox.deleteMany({ where: { status: { in: ["SENT", "SKIPPED", "FAILED"] }, createdAt: { lt: new Date(now.getTime() - 60 * DAY) } } }),
+    // Anonim tıklama kayıtları 13 ay saklanır (yıllık karşılaştırma için), sonra silinir.
+    db.clickEvent.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 395 * DAY) } } }),
   ]);
   // Eski görev kayıtları (başarılı olanlar 30 gün, başarısızlar 90 gün saklanır)
   const jobs = await db.ingestionJob.deleteMany({
@@ -41,6 +43,7 @@ export async function runDailyMaintenance(db: Db, ctx: JobContext) {
     flightOffersDeleted: oldFlights.count,
     logsPurged: logs.count,
     emailsPurged: outbox.count,
+    clicksPurged: clicks.count,
     jobsPurged: jobs.count,
   };
   ctx.log("INFO", "Günlük bakım tamamlandı", stats);

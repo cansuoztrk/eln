@@ -129,3 +129,19 @@ describe("uçuş verisi", () => {
     expect(await db.notification.count({ where: { userId: user.id, type: "FLIGHT_ALERT" } })).toBe(1);
   });
 });
+
+describe("saklama süreleri", () => {
+  it("günlük bakım 13 aydan eski anonim tıklamaları ve 60 günden eski e-posta kuyruğunu siler", async () => {
+    const db = await getDb();
+    const { runDailyMaintenance } = await import("../../src/server/jobs/maintenance");
+    const now = new Date();
+    const old = new Date(now.getTime() - 400 * 86400000);
+    await db.clickEvent.createMany({ data: [{ target: "OFFER", createdAt: old }, { target: "OFFER", createdAt: now }] });
+    await db.emailOutbox.create({ data: { toEmail: "eski@test.local", subject: "x", html: "x", text: "x", kind: "TEST", status: "SENT", createdAt: new Date(now.getTime() - 61 * 86400000) } });
+    const stats = await runDailyMaintenance(db, silentCtx(now));
+    expect(stats.clicksPurged).toBeGreaterThanOrEqual(1);
+    expect(await db.clickEvent.count({ where: { createdAt: { lt: new Date(now.getTime() - 395 * 86400000) } } })).toBe(0);
+    expect(await db.clickEvent.count({ where: { createdAt: { gte: new Date(now.getTime() - 60_000) } } })).toBeGreaterThanOrEqual(1);
+    expect(await db.emailOutbox.count({ where: { toEmail: "eski@test.local" } })).toBe(0);
+  });
+});

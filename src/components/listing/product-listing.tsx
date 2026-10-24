@@ -108,8 +108,18 @@ export async function ProductListing({
             <Pagination page={result.page} pageCount={result.pageCount} hrefFor={(p) => qs({ sayfa: p > 1 ? String(p) : null })} />
           </>
         ) : (
-          <EmptyState icon="search" title="Bu filtrelerle eşleşen güncel teklif yok">
-            {emptyHint ?? "Filtreleri gevşetmeyi veya farklı bir arama yapmayı deneyin. Yalnızca son kontrolde doğrulanmış teklifler listelenir."}
+          <EmptyState icon="search" title={count || f.q ? "Bu filtrelerle eşleşen güncel teklif yok" : "Henüz doğrulanmış güncel teklif yok"}>
+            {emptyHint ??
+              (count || f.q ? (
+                "Filtreleri gevşetmeyi veya farklı bir arama yapmayı deneyin. Yalnızca son kontrolde doğrulanmış teklifler listelenir."
+              ) : (
+                <>
+                  Teklifler yalnızca bağlı veri kaynaklarından gelir; tahmini veya örnek fiyat gösterilmez.{" "}
+                  <Link href="/veri-kaynaklari" className="text-brand-ink underline">
+                    Veri kaynaklarının durumu
+                  </Link>
+                </>
+              ))}
           </EmptyState>
         )}
       </div>

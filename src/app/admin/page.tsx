@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AdminPage, MiniBars, Panel, Stat, StatusBadge, Table, Td } from "@/components/admin/ui";
 import { Freshness } from "@/components/price/freshness";
+import { configWarnings } from "@/config/env";
 import { DAY } from "@/lib/time";
 import { formatShortDate } from "@/lib/time";
 import { db } from "@/server/db";
@@ -45,9 +46,20 @@ export default async function AdminDashboard() {
     db.retailer.findMany({ where: { id: { in: topRetailers.map((t) => t.retailerId!) } }, select: { id: true, name: true } }),
   ]);
   const usageBy = new Map(usage.map((u) => [u.dataSourceId, u._sum]));
+  const warnings = configWarnings();
 
   return (
     <AdminPage title="Kontrol merkezi" description="Otomatik çalışan platformun durumu. Manuel müdahale yalnızca istisnalar içindir: başarısız görevler, şüpheli fiyatlar ve eşleştirme incelemeleri.">
+      {warnings.length ? (
+        <div role="status" className="rounded-lg border border-warn/40 bg-warn-soft px-4 py-3 text-[13px] text-warn-ink">
+          <p className="mb-1 font-semibold">Yapılandırma uyarıları</p>
+          <ul className="list-disc space-y-0.5 pl-5">
+            {warnings.map((w) => (
+              <li key={w}>{w}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
         <Stat label="Toplam ürün" value={products.toLocaleString("tr-TR")} href="/admin/urunler" />
         <Stat label="Aktif teklif" value={activeOffers.toLocaleString("tr-TR")} />

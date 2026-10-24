@@ -10,6 +10,8 @@ export async function GET() {
     const lastJob = await db.ingestionJob.findFirst({ where: { status: { in: ["SUCCEEDED", "RUNNING"] } }, orderBy: { createdAt: "desc" }, select: { createdAt: true } });
     return NextResponse.json({ ok: true, db: "ok", lastJobAt: lastJob?.createdAt ?? null });
   } catch (err) {
-    return NextResponse.json({ ok: false, db: "unreachable", error: (err as Error).message.slice(0, 200) }, { status: 503 });
+    // Ayrıntı yalnızca sunucu günlüğüne yazılır (bağlantı bilgisi dışarı sızmasın)
+    console.error("[health] veritabanı erişilemiyor:", (err as Error).message);
+    return NextResponse.json({ ok: false, db: "unreachable" }, { status: 503 });
   }
 }

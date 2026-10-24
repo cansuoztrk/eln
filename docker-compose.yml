@@ -1,0 +1,60 @@
+# Yerel/tek sunucu kurulumu: PostgreSQL + şema göçü + web + worker.
+#   cp .env.example .env   # değerleri doldurun
+#   docker compose up -d --build
+# Gerçek entegrasyon anahtarları yalnızca .env dosyasında (depoya eklenmez) tutulur.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-firsat}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasında tanımlanmalı}
+      POSTGRES_DB: ${POSTGRES_DB:-firsatradar}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    build: .
+    image: ${APP_IMAGE:-firsatradar:local}
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-firsat}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-firsatradar}?schema=public
+    command: ["sh", "-c", "npx prisma migrate deploy && npx tsx prisma/seed.ts"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  web:
+    image: ${APP_IMAGE:-firsatradar:local}
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-firsat}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-firsatradar}?schema=public
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  worker:
+    image: ${APP_IMAGE:-firsatradar:local}
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-firsat}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-firsatradar}?schema=public
+    command: ["npx", "tsx", "src/worker/index.ts"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      disable: true
+    stop_grace_period: 60s
+    restart: unless-stopped
+
+volumes:
+  pgdata:

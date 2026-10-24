@@ -1,40 +1,18 @@
 import "server-only";
-import { z } from "zod";
 
 /**
- * Sunucu tarafı ortam değişkenleri. Gizli değerler yalnızca burada okunur; istemci paketine
- * girmez ("server-only"). Eksik isteğe bağlı entegrasyonlar uygulamayı durdurmaz, ilgili veri
- * kaynağı "AWAITING_CREDENTIALS" durumunda kalır.
+ * Eksik veya zayıf yapılandırmalar. Yönetim panelinde gösterilir; değişken değerleri asla
+ * gösterilmez, yalnızca adları. Eksik isteğe bağlı entegrasyonlar uygulamayı durdurmaz; ilgili
+ * veri kaynağı "kimlik bilgisi bekliyor" durumunda kalır (bkz. Veri kaynakları sayfası).
  */
-const schema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  DATABASE_URL: z.string().min(1),
-  SESSION_SECRET: z.string().min(32).optional(),
-  CRON_SECRET: z.string().min(16).optional(),
-  ANALYTICS_SALT: z.string().min(16).optional(),
-  SHOW_TEST_DATA: z.enum(["true", "false"]).optional(),
-
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().optional(),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  SMTP_SECURE: z.enum(["true", "false"]).optional(),
-  EMAIL_FROM: z.string().optional(),
-});
-
-export type ServerEnv = z.infer<typeof schema>;
-
-let cached: ServerEnv | null = null;
-
-export function env(): ServerEnv {
-  if (!cached) {
-    const parsed = schema.safeParse(process.env);
-    if (!parsed.success) {
-      throw new Error(`Geçersiz ortam değişkenleri: ${parsed.error.message}`);
-    }
-    cached = parsed.data;
-  }
-  return cached;
+export function configWarnings(): string[] {
+  const e = process.env;
+  const prod = e.NODE_ENV === "production";
+  const out: string[] = [];
+  if (!e.ANALYTICS_SALT || e.ANALYTICS_SALT.length < 16) out.push("ANALYTICS_SALT tanımlı değil veya 16 karakterden kısa: anonim tıklama özetleri varsayılan tuzla üretiliyor.");
+  if (!e.SMTP_HOST) out.push("SMTP_HOST tanımlı değil: e-posta bildirimleri gönderilmiyor (site içi bildirimler çalışır).");
+  if (e.CRON_SECRET && e.CRON_SECRET.length < 16) out.push("CRON_SECRET 16 karakterden kısa: /api/cron/tick uç noktası istekleri reddediyor.");
+  if (prod && (!e.NEXT_PUBLIC_SITE_URL || e.NEXT_PUBLIC_SITE_URL.includes("localhost"))) out.push("NEXT_PUBLIC_SITE_URL üretim adresine ayarlanmamış: canonical, sitemap ve e-posta bağlantıları yanlış olur.");
+  if (prod && e.SHOW_TEST_DATA === "true") out.push("SHOW_TEST_DATA=true: üretimde test verisi ziyaretçilere gösteriliyor (etiketli olsa da).");
+  return out;
 }
-
-export { includeTestData as showTestData } from "@/server/visibility";
