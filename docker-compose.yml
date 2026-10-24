@@ -6,9 +6,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-firsat}
+      POSTGRES_USER: ${POSTGRES_USER:-fiyatiz}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD .env dosyasında tanımlanmalı}
-      POSTGRES_DB: ${POSTGRES_DB:-firsatradar}
+      POSTGRES_DB: ${POSTGRES_DB:-fiyatiz}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -20,10 +20,10 @@ services:
 
   migrate:
     build: .
-    image: ${APP_IMAGE:-firsatradar:local}
+    image: ${APP_IMAGE:-fiyatiz:local}
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-firsat}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-firsatradar}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fiyatiz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-fiyatiz}?schema=public
     command: ["sh", "-c", "npx prisma migrate deploy && npx tsx prisma/seed.ts"]
     depends_on:
       db:
@@ -31,10 +31,10 @@ services:
     restart: "no"
 
   web:
-    image: ${APP_IMAGE:-firsatradar:local}
+    image: ${APP_IMAGE:-fiyatiz:local}
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-firsat}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-firsatradar}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fiyatiz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-fiyatiz}?schema=public
     ports:
       - "${WEB_PORT:-3000}:3000"
     depends_on:
@@ -43,10 +43,10 @@ services:
     restart: unless-stopped
 
   worker:
-    image: ${APP_IMAGE:-firsatradar:local}
+    image: ${APP_IMAGE:-fiyatiz:local}
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-firsat}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-firsatradar}?schema=public
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fiyatiz}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-fiyatiz}?schema=public
     command: ["npx", "tsx", "src/worker/index.ts"]
     depends_on:
       migrate:

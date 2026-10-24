@@ -1,7 +1,10 @@
-# FırsatRadar
+# Fiyatiz
 
 Türkiye için otomatik çalışan bir fiyat karşılaştırma, fırsat ve uygun uçak bileti platformu.
-"FırsatRadar" geçici çalışma adıdır (bkz. [docs/BRAND.md](docs/BRAND.md)).
+Marka adı ve alan adı durumu: [docs/BRAND.md](docs/BRAND.md).
+
+> **Yayına almak için:** [docs/YAYINA-ALMA-REHBERI.md](docs/YAYINA-ALMA-REHBERI.md). Teknik bilgi
+> gerektirmeyen, adım adım rehber.
 
 Farkı:
 
@@ -81,6 +84,7 @@ docker compose up -d --build
 
 | Belge | İçerik |
 |---|---|
+| [docs/YAYINA-ALMA-REHBERI.md](docs/YAYINA-ALMA-REHBERI.md) | Adım adım yayına alma: marka, alan adı, Neon + Vercel, veri kaynakları, e-posta, yasal metinler, kontrol listesi |
 | [docs/STATUS.md](docs/STATUS.md) | Gerçek veri ile test verisi ayrımı, eksikler, gerekli hesaplar, sonraki adımlar |
 | [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md) | Kaynaklar, entegrasyon gereksinimleri, doğrulanmış ve doğrulanmamış maliyetler |
 | [docs/PRICING.md](docs/PRICING.md) | Fiyat geçmişi, doğrulanmış indirim formülü, fırsat puanı, etiket koşulları, alarmlar, eşleştirme |

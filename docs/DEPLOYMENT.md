@@ -80,7 +80,7 @@ docker compose exec web npx tsx scripts/create-admin.ts siz@ornek.com "GüçlüB
 Docker Hub hız sınırına takılırsanız:
 
 ```bash
-docker build --build-arg NODE_IMAGE=mirror.gcr.io/library/node:22.22-bookworm-slim -t firsatradar:local .
+docker build --build-arg NODE_IMAGE=mirror.gcr.io/library/node:22.22-bookworm-slim -t fiyatiz:local .
 ```
 
 TLS denetimli kurumsal proxy arkasında derliyorsanız CA paketini secret olarak verin:
@@ -116,11 +116,21 @@ Vercel'de sürekli çalışan worker yoktur. Bu kurulumda görevler `/api/cron/t
 
   Kaynak: [Vercel cron limitleri](https://vercel.com/docs/cron-jobs/usage-and-pricing),
   [Vercel fiyatlandırma](https://vercel.com/pricing).
-- **Pro planında** `vercel.json` örneği (her 5 dakikada bir):
-
-  ```json
-  { "crons": [{ "path": "/api/cron/tick", "schedule": "*/5 * * * *" }] }
-  ```
+- Depodaki [`vercel.json`](../vercel.json) hazırdır. Pro plan gerektirir; Hobby'de 5 dakikalık
+  cron dağıtımı reddedilir. Dosyanın yaptıkları:
+  - **Derleme:** `npm run vercel-build` = göçler + temel veri (idempotent) + `next build`. Terminal
+    gerekmez.
+  - **Bölge:** fonksiyonlar `fra1` (Frankfurt) bölgesinde çalışır; veritabanını da Frankfurt'ta
+    açın.
+  - **Cron:** `/api/cron/tick` her 5 dakikada bir çağrılır.
+- **İlk yönetici:** `ADMIN_EMAIL` ve `ADMIN_PASSWORD` ortam değişkenlerini tanımlayıp dağıtın.
+  Hesap oluştuktan sonra `ADMIN_PASSWORD`'ü silin. Var olan hesaplara dokunulmaz.
+- **Neon gibi havuzlu bağlantı veren veritabanlarında:**
+  - `DATABASE_URL` = havuzlu adres (`-pooler` içeren);
+  - `DIRECT_DATABASE_URL` = doğrudan adres (göçler için);
+  - `DATABASE_POOL_MAX=3` (sunucusuz ortamda örnek başına az bağlantı).
+- `NEXT_PUBLIC_*` değişkenleri derleme sırasında sayfalara gömülür. Değiştirdiğinizde yeniden
+  dağıtın.
 
   `CRON_SECRET` ortam değişkeni tanımlandığında Vercel isteğe `Authorization: Bearer <CRON_SECRET>`
   ekler; uç nokta bunu sabit zamanlı karşılaştırmayla doğrular.

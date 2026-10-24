@@ -2,7 +2,7 @@ import { brand } from "@/config/brand";
 import { cn } from "@/lib/cn";
 
 /**
- * FırsatRadar logosu: radar halkaları + taramanın yakaladığı "fiyat düşüşü" çizgisi ve sinyal noktası.
+ * Logo işareti: radar halkaları + taramanın yakaladığı fiyat izi (düşüş çizgisi) ve sinyal noktası.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
@@ -20,7 +20,8 @@ export function LogoMark({ className }: { className?: string }) {
 
 export function Logo({ className, compact = false }: { className?: string; compact?: boolean }) {
   const name = brand.name;
-  const split = name.match(/^(.*?)(Radar)$/);
+  const accent = brand.accent;
+  const split = accent && name.length > accent.length && name.endsWith(accent) ? [name, name.slice(0, -accent.length), accent] : null;
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <LogoMark />

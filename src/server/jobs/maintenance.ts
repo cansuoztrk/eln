@@ -5,7 +5,7 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { DAY, isoWeekKey } from "@/lib/time";
 import { formatMoney } from "@/lib/money";
-import { siteUrl } from "@/config/brand";
+import { brand, siteUrl } from "@/config/brand";
 import type { Db } from "../db";
 import { createNotification } from "../notifications/service";
 import { includeTestData } from "../visibility";
@@ -147,7 +147,7 @@ export async function runWeeklyDigest(db: Db, ctx: JobContext) {
       body: `Fiyat geçmişine göre gerçekten avantajlı görünen ${products.length} ürün:\n${lines.join("\n")}\n\nFiyatlar son kontrol anına aittir ve değişebilir.\nAbonelikten çıkmak için: ${siteUrl(`/abonelik-iptal?token=${u.unsubscribeToken}`)}`,
       link: "/firsatlar?sirala=avantaj",
       dedupeKey: `digest:${u.id}:${week}`,
-      email: { to: u.email, subject: `FırsatRadar haftalık özet · ${week}` },
+      email: { to: u.email, subject: `${brand.name} haftalık özet · ${week}` },
     });
     if (created) sent++;
   }

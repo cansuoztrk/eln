@@ -54,7 +54,7 @@ Yönetici testi yalnızca `E2E_ADMIN_EMAIL` ve `E2E_ADMIN_PASSWORD` tanımlıysa
 | `matching.test.ts` | Varyant nitelikleri (renk/kapasite/bağlantı), model kodu çıkarımı (ölçü birimleri model kodu değildir), Türkçe varyant sözcükleri, aday güven puanı (farklı dil, model çelişkisi, farklı marka), kategori sınıflandırma sırası |
 | `adapters.test.ts` | Amazon (OffersV2 eşleme; teklifsiz ürünün hata olması), Travelpayouts (gösterge fiyat) ve Duffel (vergi dâhil canlı teklif) sahte yanıtlarla; HTTP istemcisi (429'da `Retry-After`, 401'in yeniden denenmemesi, yanıt boyutu sınırı); dış yönlendirme (satış ortaklığı parametresi, `javascript:` reddi); doğal dil araması ayrıştırma |
 
-### Entegrasyon testleri (`tests/integration`, 2 dosya, 18 test — gerçek PostgreSQL)
+### Entegrasyon testleri (`tests/integration`, 2 dosya, 19 test — gerçek PostgreSQL)
 
 - **Ingestion uçtan uca:** yerel HTTP sunucusundan sunulan Google Merchant feed'i.
   - Kayıt oluşturma, kategori sınıflandırma, en iyi teklif seçimi.
@@ -83,6 +83,8 @@ Yönetici testi yalnızca `E2E_ADMIN_EMAIL` ve `E2E_ADMIN_PASSWORD` tanımlıysa
   - anahtarı olmayan kaynakların başarısız değil "atlandı" sayılması.
 - **Uçuşlar:** test sağlayıcısıyla rota fiyatlarının ve snapshot'ların yazılması, uçuş alarmının
   tetiklenmesi.
+- **İlk yönetici:** ortam değişkeninden yalnızca hesap yoksa oluşturulması; var olan hesabın
+  parolasının değişmemesi; aynı e-postalı normal hesabın yönetici yapılmaması.
 - **Saklama süreleri:** günlük bakımın 13 aydan eski anonim tıklamaları ve 60 günden eski e-posta
   kuyruğu kayıtlarını silmesi.
 
@@ -106,7 +108,7 @@ Yönetici testi yalnızca `E2E_ADMIN_EMAIL` ve `E2E_ADMIN_PASSWORD` tanımlıysa
 | Paket | Sonuç |
 |---|---|
 | Birim | 65 / 65 geçti |
-| Entegrasyon | 18 / 18 geçti |
+| Entegrasyon | 19 / 19 geçti |
 | Uçtan uca (üretim derlemesine karşı) | 14 / 14 geçti (yönetici testi dâhil; kimlik bilgileri komut satırında verildi) |
 | `tsc --noEmit` | hata yok |
 | `eslint .` | hata ve uyarı yok |

@@ -84,8 +84,9 @@ Bunlar sizin açmanız veya onaylamanız gereken şeylerdir. Ben hiçbir hesap a
 
 ## Önerilen sonraki adımlar (öncelik sırasıyla)
 
-1. **Marka ve alan adı kararı:** [BRAND.md](BRAND.md). Ardından `NEXT_PUBLIC_BRAND_NAME` ve
-   `NEXT_PUBLIC_SITE_URL`.
+1. **Marka:** ad **Fiyatiz** olarak belirlendi (koddaki varsayılan). `fiyatiz.com` başkasına
+   kayıtlı. TÜRKPATENT araştırması yapın ve `.com.tr` alın ([BRAND.md](BRAND.md)). Adım adım
+   yapılacaklar: [YAYINA-ALMA-REHBERI.md](YAYINA-ALMA-REHBERI.md).
 2. **Travelpayouts hesabı aç** (ücretsiz). Uçuş modülü ilk gerçek veriyle çalışan bölüm olur.
 3. **Bir mağazadan resmî ürün feed'i al:** doğrudan mağazadan veya bir satış ortaklığı ağından.
    Panelden ekle ve gerçek fiyat geçmişi birikmeye başlasın. Doğrulanmış indirim için 30 günlük

@@ -4,7 +4,7 @@
  */
 
 import type { Prisma } from "@/generated/prisma/client";
-import { siteUrl } from "@/config/brand";
+import { brand, siteUrl } from "@/config/brand";
 import { escapeHtml } from "@/lib/text";
 import type { Db } from "../db";
 
@@ -61,7 +61,7 @@ export function renderEmail(title: string, body: string, link?: string, footer?:
   return `<!doctype html><html lang="tr"><body style="margin:0;background:#f4f5f7;font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#14171c">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border:1px solid #e3e6eb;border-radius:12px" cellpadding="0" cellspacing="0">
-<tr><td style="padding:28px 28px 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#3f5bd8;font-weight:700">FırsatRadar</td></tr>
+<tr><td style="padding:28px 28px 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#3f5bd8;font-weight:700">${escapeHtml(brand.name)}</td></tr>
 <tr><td style="padding:0 28px;font-size:20px;font-weight:700;line-height:1.3">${escapeHtml(title)}</td></tr>
 <tr><td style="padding:12px 28px 4px;font-size:15px;line-height:1.6;color:#3b414b">${escapeHtml(body).replace(/\n/g, "<br>")}</td></tr>
 ${url ? `<tr><td style="padding:20px 28px"><a href="${escapeHtml(url)}" style="display:inline-block;background:#3f5bd8;color:#fff;text-decoration:none;padding:11px 18px;border-radius:8px;font-weight:600;font-size:14px">Ayrıntıları gör</a></td></tr>` : ""}

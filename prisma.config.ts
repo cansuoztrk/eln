@@ -8,6 +8,8 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: env("DATABASE_URL"),
+    // Göçler için havuzsuz (doğrudan) bağlantı tercih edilir; yönetilen veritabanlarında
+    // DATABASE_URL havuzlu adres olabilir (ör. Neon "-pooler"). Tanımlı değilse DATABASE_URL.
+    url: process.env.DIRECT_DATABASE_URL ? process.env.DIRECT_DATABASE_URL : env("DATABASE_URL"),
   },
 });

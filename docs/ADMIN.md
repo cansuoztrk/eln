@@ -21,11 +21,17 @@ yönetmek içindir:
 | `EDITOR` | Kontrol merkezi, ürünler, teklifler, eşleştirme, kuponlar, editoryal içerik, raporlar |
 | `ADMIN` | Editör yetkilerine ek olarak: veri kaynakları, görevler/zamanlama, puanlama, kategoriler, uçuş rotaları, sponsorlu yerleşimler, mağazalar/satış ortaklığı, kullanıcılar, denetim kaydı |
 
-İlk yönetici komut satırından oluşturulur:
+İlk yönetici iki yoldan biriyle oluşturulur:
 
-```bash
-npm run admin:create -- siz@ornek.com "GüçlüBirParola123"
-```
+- **Terminalsiz (Vercel, Docker):** `ADMIN_EMAIL` ve `ADMIN_PASSWORD` ortam değişkenlerini
+  tanımlayıp dağıtın.
+  - Temel veri yüklemesi hesabı oluşturur; var olan hesaplara dokunmaz.
+  - Hesap oluştuktan sonra `ADMIN_PASSWORD`'ü silin.
+- **Komut satırından:**
+
+  ```bash
+  npm run admin:create -- siz@ornek.com "GüçlüBirParola123"
+  ```
 
 Sonraki rol değişiklikleri **Kullanıcılar** sayfasından yapılır.
 

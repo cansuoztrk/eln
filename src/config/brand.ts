@@ -1,11 +1,12 @@
 /**
- * Marka yapılandırması. "FırsatRadar" geçici çalışma adıdır; marka kesinleştiğinde yalnızca bu
- * dosya ve ortam değişkenleri güncellenir. Alan adı/marka müsaitliği doğrulanmadan
- * kullanılmamalıdır (bkz. docs/BRAND.md).
+ * Marka yapılandırması. Ad ortam değişkeniyle değiştirilebilir; logo, sayfa başlıkları,
+ * e-postalar ve paylaşım görseli bu değeri kullanır. Marka tescili ve alan adı durumu için
+ * bkz. docs/BRAND.md.
  */
 export const brand = {
-  name: process.env.NEXT_PUBLIC_BRAND_NAME || "FırsatRadar",
-  shortName: process.env.NEXT_PUBLIC_BRAND_SHORT || "Radar",
+  name: process.env.NEXT_PUBLIC_BRAND_NAME || "Fiyatiz",
+  /** Logoda vurgu rengiyle yazılan son ek ("Fiyat" + "iz"); adın sonunda değilse vurgu yapılmaz. */
+  accent: process.env.NEXT_PUBLIC_BRAND_ACCENT ?? "iz",
   tagline: "İyi fiyatı arama. Gerçekten avantajlı olanı gör.",
   description:
     "Mağazalar arası fiyat karşılaştırması, doğrulanmış fiyat geçmişi ve uygun uçak bileti keşfi. Hangi fırsatın gerçekten avantajlı olduğunu verilerle gösterir.",

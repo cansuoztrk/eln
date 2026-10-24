@@ -1,36 +1,38 @@
 # Marka adı
 
-"FırsatRadar" geçici çalışma adıdır. Ad tek bir yerden değişir: `NEXT_PUBLIC_BRAND_NAME`
-ortam değişkeni (`src/config/brand.ts`). Logo, sayfa başlıkları, e-postalar ve OG görseli bu
+**Seçilen ad: Fiyatiz** ("fiyat" + "iz": fiyatın izini sürmek). Logo işaretindeki fiyat izi
+çizgisi adla örtüşür; logoda "iz" vurgu rengiyle yazılır.
+
+Ad tek bir yerden değişir:
+
+- `NEXT_PUBLIC_BRAND_NAME`: marka adı.
+- `NEXT_PUBLIC_BRAND_ACCENT`: logoda vurgulanan son ek (varsayılan `iz`).
+
+Kodda karşılığı: `src/config/brand.ts`. Logo, sayfa başlıkları, e-postalar ve paylaşım görseli bu
 değeri kullanır.
 
-**Hiçbir adın alan adı veya marka tescili açısından uygun olduğu varsayılmadı ve kontrol
-edilmedi.** Karar vermeden önce şunları kontrol edin:
+## Alan adı durumu (24.10.2026 kontrolü)
 
-1. TÜRKPATENT marka araştırması (özellikle 35. ve 42. sınıflar).
-2. `.com` ve `.com.tr` alan adı uygunluğu.
-3. Sosyal medya kullanıcı adları.
-4. Pazardaki karşılaştırma siteleriyle karışma riski (ör. Akakçe, Cimri, Epey).
+| Alan adı | Durum |
+|---|---|
+| fiyatiz.com | **Kayıtlı.** 15.12.2025'te Atak Domain üzerinden kaydedilmiş; bitiş 15.12.2026; şu an yanıt veren bir site yok (RDAP sorgusu) |
+| fiyatiz.net, fiyatiz.app, fiyatiz.co, fiyatiz.io | Kayıt bulunamadı (satın alana kadar garanti değil) |
+| fiyatiz.com.tr | Bu ortamdan sorgulanamadı. Alan adı firmasında kontrol edin |
 
-## Değerlendirme ölçütleri
+`.com.tr`, 14.09.2022'den beri belge istenmeden ve "ilk başvuran alır" esasıyla BTK'nın yetkili
+kayıt kuruluşlarından alınabiliyor.
 
-- **Söylenişi kolay:** telefonda söylendiğinde yazımı tahmin edilebilir olmalı.
-- **Alan adında Türkçe karakter sorunu yok:** "ı, ş, ğ" içeren adlar alan adında ASCII'ye döner;
-  örneğin FırsatRadar → `firsatradar`. Bu, sözlü aktarımda karışıklık yaratır.
-- **Konumlandırmayı taşımalı:** "en ucuz" değil, **doğrulanmış/gerçek** avantaj.
-- **Kategoriye kilitlememeli:** hem ürün hem uçuş için çalışmalı.
+**Risk:** `fiyatiz.com`'un yakın zamanda başkası tarafından alınmış olması, aynı adla bir girişim
+olabileceğini düşündürür. Para harcamadan önce **TÜRKPATENT marka araştırması** yapın (35, 42 ve
+39. sınıflar) ve gerekirse bir marka vekiline danışın. Adımlar:
+[YAYINA-ALMA-REHBERI.md](YAYINA-ALMA-REHBERI.md#aşama-1--marka-ve-alan-adı).
 
-## Öneriler
+## Ad değişirse yedek öneriler
 
-| Ad | Anlam / gerekçe | Artı | Risk |
-|---|---|---|---|
-| **Fiyatiz** | fiyat + iz: fiyatın izini sürmek; fiyat geçmişine vurgu | Kısa, ASCII, ürünün ayırt edici özelliğini anlatıyor | "Fiyatız" (biz fiyatız) diye okunabilir |
-| **Netkıyas** | net fiyat + kıyas | Kargo dâhil "net" toplamı çağrıştırıyor | Alan adında `netkiyas`; "ı" sorunu |
-| **Dipfiyat** | "dip fiyat" yerleşik deyim | Herkesin anladığı bir ifade | Jenerik; tescil ve ayırt edicilik zor olabilir |
-| **Sapta** | saptamak: tespit etmek | Kısa, radar fikriyle uyumlu, ASCII | Anlamı ilk bakışta fiyatı anlatmıyor; marka yatırımı gerekir |
-| **Gerçekfiyat** | doğrulanmış fiyat iddiası | Konumlandırmayı doğrudan söylüyor | Uzun; "gerçek" iddiası hukuki/itibar beklentisi yaratır |
-| **FırsatRadar** (mevcut) | radar = otomatik tarama | Görsel kimlikle (radar) uyumlu | "Fırsat" kelimesi kategoride çok yaygın; alan adında `firsatradar` |
+| Ad | Not |
+|---|---|
+| Sapta | "saptamak"; kısa, ASCII, radar fikriyle uyumlu. Anlamı fiyatı doğrudan anlatmıyor |
+| Netkıyas | Kargo dâhil "net" toplamı çağrıştırır. Alan adında `netkiyas` (Türkçe karakter sorunu) |
+| Dipfiyat | Herkesin anladığı deyim, ama jenerik; tescil zor olabilir |
 
-**Öneri:** Tescil ve alan adı kontrolü olumluysa **Fiyatiz** veya **Sapta**. İkisi de kısa ve
-ASCII; Fiyatiz ürünün farkını (fiyat geçmişi) adın içinde taşıyor. Mevcut radar görsel dili ikisiyle
-de uyumludur.
+Hiçbir adın tescil veya alan adı açısından uygun olduğu varsayılmadı.

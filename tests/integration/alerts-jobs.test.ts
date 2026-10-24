@@ -145,3 +145,24 @@ describe("saklama süreleri", () => {
     expect(await db.emailOutbox.count({ where: { toEmail: "eski@test.local" } })).toBe(0);
   });
 });
+
+describe("ilk yönetici (ortam değişkeninden)", () => {
+  it("hesap yoksa oluşturur, varsa dokunmaz, normal hesabı yönetici yapmaz", async () => {
+    const db = await getDb();
+    const { ensureBootstrapAdmin } = await import("../../src/server/auth/bootstrap");
+    const { verifyPassword } = await import("../../src/server/auth/password");
+    const email = `kurucu-${Date.now()}@test.local`;
+    expect(await ensureBootstrapAdmin(db, undefined, undefined)).toBe("skipped");
+    await expect(ensureBootstrapAdmin(db, email, "kisa")).rejects.toThrow(/ADMIN_PASSWORD/);
+    expect(await ensureBootstrapAdmin(db, ` ${email.toUpperCase()} `, "IlkYonetici2026")).toBe("created");
+    const admin = await db.user.findUniqueOrThrow({ where: { email } });
+    expect(admin.role).toBe("ADMIN");
+    // İkinci dağıtım: farklı parola verilse bile mevcut hesap değişmez
+    expect(await ensureBootstrapAdmin(db, email, "BaskaParola2026")).toBe("exists");
+    expect(await verifyPassword("IlkYonetici2026", (await db.user.findUniqueOrThrow({ where: { email } })).passwordHash)).toBe(true);
+    // Aynı e-postayla önceden açılmış normal hesap yönetici yapılmaz
+    const other = await db.user.create({ data: { email: `normal-${Date.now()}@test.local`, passwordHash: "x", kvkkAcceptedAt: new Date() } });
+    expect(await ensureBootstrapAdmin(db, other.email, "IlkYonetici2026")).toBe("conflict");
+    expect((await db.user.findUniqueOrThrow({ where: { id: other.id } })).role).toBe("USER");
+  });
+});

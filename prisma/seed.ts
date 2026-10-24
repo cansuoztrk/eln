@@ -5,11 +5,15 @@
  * FİYAT VERİSİ İÇERMEZ. Gerçek fiyatlar yalnızca yapılandırılmış veri kaynaklarından gelir.
  * Yerel geliştirme için kurgusal test verisi: `npm run db:seed:demo`
  *
- * Tekrar çalıştırılabilir (idempotent): mevcut kayıtları korur, eksikleri ekler.
+ * Tekrar çalıştırılabilir (idempotent): mevcut kayıtları korur, eksikleri ekler. Her dağıtımda
+ * çalıştırılabilir; yönetim panelinde yapılan kategori düzenlemelerini ezmez.
+ *
+ * ADMIN_EMAIL ve ADMIN_PASSWORD tanımlıysa ve bu e-postayla hesap yoksa ilk yönetici oluşturulur.
  */
 import "dotenv/config";
 import type { Prisma } from "../src/generated/prisma/client";
 import { normalizeText } from "../src/lib/text";
+import { ensureBootstrapAdmin } from "../src/server/auth/bootstrap";
 import { db } from "../src/server/db";
 import { ensureSchedules } from "../src/server/jobs/scheduler";
 import { DEFAULT_SCORING } from "../src/server/pricing/config";
@@ -22,7 +26,7 @@ async function seedCategories() {
     const p = await db.category.upsert({
       where: { slug: parent.slug },
       create: { slug: parent.slug, name: parent.name, icon: parent.icon, description: parent.description, sortOrder: order++, keywords: [] },
-      update: { name: parent.name, icon: parent.icon, description: parent.description },
+      update: {},
     });
     let childOrder = 0;
     for (const c of parent.children ?? []) {
@@ -38,7 +42,7 @@ async function seedCategories() {
           filterSchema: (c.filters ?? []) as unknown as Prisma.InputJsonValue,
           description: c.description,
         },
-        update: { parentId: p.id, icon: c.icon },
+        update: {},
       });
     }
   }
@@ -187,6 +191,14 @@ async function main() {
   await seedScoring();
   await ensureSchedules(db);
   console.log("Temel veriler hazır: kategoriler, mağazalar, veri kaynakları, havalimanları, rotalar, zamanlamalar.");
+  const admin = await ensureBootstrapAdmin(db, process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD);
+  const adminMessages = {
+    created: "İlk yönetici hesabı oluşturuldu. Güvenlik için ADMIN_PASSWORD ortam değişkenini şimdi silebilirsiniz.",
+    exists: "Yönetici hesabı zaten var; değiştirilmedi.",
+    conflict: "UYARI: ADMIN_EMAIL ile açılmış normal bir hesap var; otomatik olarak yönetici yapılmadı.",
+    skipped: null,
+  } as const;
+  if (adminMessages[admin]) console.log(adminMessages[admin]);
 }
 
 main()

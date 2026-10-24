@@ -1,4 +1,4 @@
-// FırsatRadar veri modeli
+// Fiyatiz veri modeli
 //
 // Tasarım ilkeleri
 // - Tüm para tutarları "minor unit" (kuruş/cent) cinsinden Int olarak saklanır. Kayan nokta

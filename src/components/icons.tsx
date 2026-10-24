@@ -1,5 +1,5 @@
 /**
- * FırsatRadar ikon seti — özgün, 24×24 ızgarada 1,7 px çizgi kalınlığı, yuvarlak uçlar.
+ * İkon seti — özgün, 24×24 ızgarada 1,7 px çizgi kalınlığı, yuvarlak uçlar.
  * Arayüz ve kategori ikonları aynı geometrik dili paylaşır (yumuşak dikdörtgenler, tek vurgu noktası).
  */
 import type { SVGProps } from "react";
