@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { dayKeyFromToday } from "@/lib/time";
 import { Icon } from "../icons";
 import { SearchBox } from "../layout/search-box";
 import { AirportInput } from "../flights/airport-input";
@@ -9,7 +10,7 @@ import { AirportInput } from "../flights/airport-input";
 /** Kahraman alanı araması: ürün veya uçuş. Uçuş sekmesi uçuş arama sayfasına yönlendirir. */
 export function HeroSearch({ popular }: { popular: string[] }) {
   const [tab, setTab] = useState<"product" | "flight">("product");
-  const today = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const defDepart = dayKeyFromToday(7);
   return (
     <div>
       <div role="tablist" aria-label="Arama türü" className="mb-3 inline-flex rounded-lg border border-line bg-surface-2 p-1">
@@ -50,7 +51,7 @@ export function HeroSearch({ popular }: { popular: string[] }) {
           <AirportInput name="to" label="Nereye" defaultValue="" />
           <label className="flex flex-col rounded-md px-2.5 py-1.5 hover:bg-surface-2">
             <span className="text-[11px] text-ink-3">Gidiş</span>
-            <input type="date" name="depart" defaultValue={today} min={new Date().toISOString().slice(0, 10)} required className="bg-transparent text-[14px] outline-none" />
+            <input type="date" name="depart" defaultValue={defDepart} min={dayKeyFromToday(0)} required className="bg-transparent text-[14px] outline-none" />
           </label>
           <button type="submit" className="h-12 rounded-md bg-brand px-5 text-[14px] font-semibold text-on-brand hover:bg-brand-ink">
             Uçuş ara

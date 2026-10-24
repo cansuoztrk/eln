@@ -109,6 +109,16 @@ export function isoWeekKey(d: Date): string {
   return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
+/** Şu andan `days` gün önceki an (sorgu pencereleri için). */
+export function daysAgo(days: number, now: number = Date.now()): Date {
+  return new Date(now - days * DAY);
+}
+
+/** Türkiye saatine göre bugünden `offsetDays` gün sonrasının takvim günü (form varsayılanları için). */
+export function dayKeyFromToday(offsetDays = 0, now: number = Date.now()): string {
+  return localDayKey(new Date(now + offsetDays * DAY));
+}
+
 export function addDays(d: Date, days: number): Date {
   return new Date(d.getTime() + days * DAY);
 }

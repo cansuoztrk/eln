@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useStoredValue, writeStoredValue } from "@/lib/use-stored-value";
 import { Icon } from "../icons";
 
 type Mode = "system" | "light" | "dark";
@@ -8,19 +8,10 @@ const KEY = "fr:theme";
 
 /** Tema: sistem → açık → koyu. İlk boyamadan önce <head> içindeki betik uygular (yanıp sönme olmaz). */
 export function ThemeToggle() {
-  const [mode, setMode] = useState<Mode>("system");
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(KEY);
-      if (saved === "light" || saved === "dark") setMode(saved);
-    } catch {}
-  }, []);
+  const saved = useStoredValue(KEY);
+  const mode: Mode = saved === "light" || saved === "dark" ? saved : "system";
   function apply(next: Mode) {
-    setMode(next);
-    try {
-      if (next === "system") localStorage.removeItem(KEY);
-      else localStorage.setItem(KEY, next);
-    } catch {}
+    writeStoredValue(KEY, next === "system" ? null : next);
     if (next === "system") delete document.documentElement.dataset.theme;
     else document.documentElement.dataset.theme = next;
   }

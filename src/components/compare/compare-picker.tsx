@@ -9,11 +9,9 @@ export function ComparePicker({ current }: { current: string[] }) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [items, setItems] = useState<{ slug: string; title: string }[]>([]);
+  const active = q.trim().length >= 2;
   useEffect(() => {
-    if (q.trim().length < 2) {
-      setItems([]);
-      return;
-    }
+    if (!active) return;
     const ctrl = new AbortController();
     const t = setTimeout(() => {
       fetch(`/api/search/suggest?q=${encodeURIComponent(q)}`, { signal: ctrl.signal })
@@ -25,7 +23,7 @@ export function ComparePicker({ current }: { current: string[] }) {
       clearTimeout(t);
       ctrl.abort();
     };
-  }, [q]);
+  }, [q, active]);
   if (current.length >= 4) return <p className="text-[13px] text-ink-3">En fazla 4 ürün karşılaştırılabilir.</p>;
   return (
     <div className="relative max-w-md">
@@ -33,7 +31,7 @@ export function ComparePicker({ current }: { current: string[] }) {
         <Icon name="search" className="size-4 text-ink-3" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Karşılaştırmaya ürün ekle…" className="h-full flex-1 bg-transparent text-[14px] outline-none" aria-label="Karşılaştırmaya ürün ekle" />
       </label>
-      {items.length ? (
+      {active && items.length ? (
         <ul className="absolute inset-x-0 top-full z-30 mt-1 rounded-lg border border-line bg-surface p-1 shadow-pop">
           {items
             .filter((i) => !current.includes(i.slug))

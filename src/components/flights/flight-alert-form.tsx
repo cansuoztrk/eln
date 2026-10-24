@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { createFlightAlert, type FlightFormState } from "@/app/actions/flights";
+import { dayKeyFromToday } from "@/lib/time";
 
 export function FlightAlertForm({ origin, destination, suggestedMinor, loggedIn }: { origin: string; destination: string; suggestedMinor: number | null; loggedIn: boolean }) {
   const [state, action, pending] = useActionState<FlightFormState, FormData>(createFlightAlert, {});
-  const from = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
-  const to = new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10);
+  const from = dayKeyFromToday(7);
+  const to = dayKeyFromToday(60);
   if (!loggedIn)
     return (
       <p className="text-[13.5px] text-ink-2">

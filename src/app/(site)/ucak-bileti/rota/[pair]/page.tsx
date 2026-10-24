@@ -26,6 +26,17 @@ export async function generateMetadata(props: PageProps<"/ucak-bileti/rota/[pair
   return { title: `${a?.city ?? p.origin} – ${b?.city ?? p.destination} uçak bileti fiyatları`, alternates: { canonical: `/ucak-bileti/rota/${p.origin}-${p.destination}` } };
 }
 
+/** Son 90 günün günlük en düşük gösterge fiyatı serisi; kaydı olmayan gün boş (null) kalır. */
+function routeHistorySeries(history: { day: Date; minor: number }[], now = Date.now()) {
+  if (history.length < 2) return [];
+  const byDay = new Map(history.map((h) => [h.day.toISOString().slice(0, 10), h.minor]));
+  const points = Array.from({ length: 90 }, (_, i) => {
+    const t = now - (89 - i) * DAY;
+    return { t, v: byDay.get(new Date(t).toISOString().slice(0, 10)) ?? null };
+  });
+  return [{ key: "route", label: "Önümüzdeki uçuşların en düşük gösterge fiyatı", slot: 0, points }];
+}
+
 export default async function RoutePage(props: PageProps<"/ucak-bileti/rota/[pair]">) {
   const p = parse((await props.params).pair);
   if (!p) notFound();
@@ -33,15 +44,7 @@ export default async function RoutePage(props: PageProps<"/ucak-bileti/rota/[pai
   const days = detail.calendar.map((c) => ({ day: new Date(c.day.getTime() - c.day.getTimezoneOffset() * 60000).toISOString().slice(0, 10), minor: c.minor, currency: c.currency, stops: c.stops }));
   const isTest = detail.calendar.some((c) => c.isTestData);
   const cheapest = days.length ? days.reduce((m, d) => (d.minor < m.minor ? d : m)) : null;
-  const now = Date.now();
-  const historySeries = detail.history.length >= 2
-    ? [{ key: "route", label: "Önümüzdeki uçuşların en düşük gösterge fiyatı", slot: 0, points: Array.from({ length: 90 }, (_, i) => {
-        const t = now - (89 - i) * DAY;
-        const dayKey = new Date(t).toISOString().slice(0, 10);
-        const hit = detail.history.find((h) => h.day.toISOString().slice(0, 10) === dayKey);
-        return { t, v: hit ? hit.minor : null };
-      }) }]
-    : [];
+  const historySeries = routeHistorySeries(detail.history);
 
   return (
     <>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { dayKeyFromToday } from "@/lib/time";
 import { Icon } from "../icons";
 import { AirportInput } from "./airport-input";
 
@@ -12,8 +13,8 @@ export function FlightSearchForm({ d = {}, compact = false }: { d?: FlightFormDe
   const [roundTrip, setRoundTrip] = useState(Boolean(d.return));
   const [key, setKey] = useState(0);
   const [vals, setVals] = useState({ from: d.from ?? "IST", to: d.to ?? "" });
-  const today = new Date().toISOString().slice(0, 10);
-  const defDepart = d.depart ?? new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
+  const today = dayKeyFromToday(0);
+  const defDepart = d.depart ?? dayKeyFromToday(14);
   return (
     <form action="/ucak-bileti/ara" method="get" className={cn("rounded-xl border border-line bg-surface p-3 shadow-card", compact ? "" : "md:p-4")}>
       <div className="mb-3 flex flex-wrap items-center gap-2 text-[13px]">

@@ -22,7 +22,7 @@ export default async function AdminSources() {
       description="Her entegrasyonun bağlantı durumu, son çalışması, hatası ve kota kullanımı. Gizli anahtarlar yalnızca ortam değişkenlerinde tutulur; burada değişken adları görünür."
       actions={
         <Link href="/admin/kaynaklar/yeni" className="inline-flex h-9 items-center rounded-md bg-brand px-3.5 text-[13px] font-semibold text-on-brand">
-          Ürün feed'i ekle
+          Ürün feed&apos;i ekle
         </Link>
       }
     >

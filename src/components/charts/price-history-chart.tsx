@@ -171,7 +171,7 @@ export function PriceHistoryChart({ series, currency, firstTrackedAt }: { series
               {paths.map((d, si) => (
                 <path key={view[si].key} d={d} fill="none" stroke={SERIES_VARS[view[si].slot % 4]} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
               ))}
-              {view.map((s, si) => {
+              {view.map((s) => {
                 const lastIdx = s.points.map((p, i) => (p.v === null ? -1 : i)).filter((i) => i >= 0).pop();
                 if (lastIdx === undefined) return null;
                 return <circle key={`end-${s.key}`} cx={x(lastIdx)} cy={y(s.points[lastIdx].v!)} r={4} fill={SERIES_VARS[s.slot % 4]} stroke="var(--surface)" strokeWidth={2} />;

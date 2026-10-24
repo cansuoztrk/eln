@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>Örnek Mağaza (test feed'i)</title>
+    <item>
+      <g:id>SKU-100</g:id>
+      <g:title>Örnekmarka Z5 Kablosuz Oyuncu Faresi Siyah</g:title>
+      <g:link>https://ornek-magaza.test/urun/sku-100</g:link>
+      <g:image_link>https://cdn.ornek-magaza.test/sku-100.jpg</g:image_link>
+      <g:price>1499.90 TRY</g:price>
+      <g:sale_price>1199.90 TRY</g:sale_price>
+      <g:availability>in stock</g:availability>
+      <g:condition>new</g:condition>
+      <g:brand>Örnekmarka</g:brand>
+      <g:gtin>4006381333931</g:gtin>
+      <g:mpn>Z5-WL-BK</g:mpn>
+      <g:product_type>Bilgisayar &gt; Çevre Birimleri &gt; Oyuncu Faresi</g:product_type>
+      <g:shipping><g:country>TR</g:country><g:price>0 TRY</g:price></g:shipping>
+      <g:product_detail><g:attribute_name>DPI</g:attribute_name><g:attribute_value>26000</g:attribute_value></g:product_detail>
+    </item>
+    <item>
+      <g:id>SKU-200</g:id>
+      <g:title>Örnekmarka 27 inç 165 Hz Monitör</g:title>
+      <g:link>https://ornek-magaza.test/urun/sku-200</g:link>
+      <g:price>8999,00 TRY</g:price>
+      <g:availability>out of stock</g:availability>
+      <g:brand>Örnekmarka</g:brand>
+      <g:product_type>Bilgisayar &gt; Monitör</g:product_type>
+    </item>
+    <item>
+      <g:id>SKU-300</g:id>
+      <g:title>İkinci el ürün</g:title>
+      <g:link>https://ornek-magaza.test/urun/sku-300</g:link>
+      <g:price>100 TRY</g:price>
+      <g:condition>used</g:condition>
+    </item>
+    <item>
+      <g:id>SKU-400</g:id>
+      <g:title>Fiyatsız ürün</g:title>
+      <g:link>https://ornek-magaza.test/urun/sku-400</g:link>
+    </item>
+    <item>
+      <g:id>SKU-500</g:id>
+      <g:title>Güvensiz bağlantı</g:title>
+      <g:link>javascript:alert(1)</g:link>
+      <g:price>100 TRY</g:price>
+    </item>
+  </channel>
+</rss>

@@ -4,7 +4,7 @@ import { Icon } from "@/components/icons";
 import { ProductGrid } from "@/components/product/product-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader, SectionHeader } from "@/components/ui/section";
-import { DAY } from "@/lib/time";
+import { daysAgo } from "@/lib/time";
 import { getCurrentUser } from "@/server/auth/session";
 import { productCardsByIds, productCardsWhere } from "@/server/catalog/queries";
 import { getFavoriteIds } from "@/server/catalog/user";
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PopularPage() {
-  const since = new Date(Date.now() - 7 * DAY);
+  const since = daysAgo(7);
   const [user, popular, tracked, categoryClicks] = await Promise.all([
     getCurrentUser(),
     productCardsWhere({ bestOfferId: { not: null }, popularity: { gt: 0 } }, [{ popularity: "desc" }], 12),

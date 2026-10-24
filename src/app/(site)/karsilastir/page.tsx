@@ -79,12 +79,12 @@ export default async function ComparePage(props: PageProps<"/karsilastir">) {
                   </tr>
                 </thead>
                 <tbody>
-                  <Row label="En iyi teklif (kargo dâhil)" cells={ordered.map((p) => (p.bestTotalMinor ? <strong className="font-display text-[17px] tabular">{formatMoney(p.bestTotalMinor, p.bestCurrency ?? "TRY")}</strong> : "Güncel teklif yok"))} />
+                  <Row label="En iyi teklif (kargo dâhil)" cells={ordered.map((p) => (p.bestTotalMinor ? <strong key={p.id} className="font-display text-[17px] tabular">{formatMoney(p.bestTotalMinor, p.bestCurrency ?? "TRY")}</strong> : "Güncel teklif yok"))} />
                   <Row label="Mağaza sayısı" cells={ordered.map((p) => `${p.retailerCount}`)} />
-                  <Row label="Fırsat puanı" cells={ordered.map((p) => <SignalMeter score={p.dealScore} />)} />
+                  <Row label="Fırsat puanı" cells={ordered.map((p) => <SignalMeter key={p.id} score={p.dealScore} />)} />
                   <Row
                     label="Doğrulanmış indirim"
-                    cells={ordered.map((p) => (p.verifiedDiscountPct ? <span className="font-semibold text-good-ink">{formatPercent(p.verifiedDiscountPct, 1)}</span> : "—"))}
+                    cells={ordered.map((p) => (p.verifiedDiscountPct ? <span key={p.id} className="font-semibold text-good-ink">{formatPercent(p.verifiedDiscountPct, 1)}</span> : "—"))}
                   />
                   <Row
                     label="90 günlük en düşük"
@@ -94,7 +94,7 @@ export default async function ComparePage(props: PageProps<"/karsilastir">) {
                       return m?.d90.sufficient ? formatMoney(m.d90.lowMinor, best!.currency) : "Yetersiz geçmiş";
                     })}
                   />
-                  <Row label="Son kontrol" cells={ordered.map((p) => <Freshness at={p.lastVerifiedAt} compact />)} />
+                  <Row label="Son kontrol" cells={ordered.map((p) => <Freshness key={p.id} at={p.lastVerifiedAt} compact />)} />
                   <Row label="Marka" cells={ordered.map((p) => p.brand?.name ?? "—")} />
                   {specKeys.map((k) => (
                     <Row key={k} label={k} cells={ordered.map((p) => ((p.specs ?? {}) as Record<string, string>)[k] ?? "—")} />

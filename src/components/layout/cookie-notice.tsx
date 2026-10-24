@@ -1,17 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useStoredValue, writeStoredValue } from "@/lib/use-stored-value";
 
 /** Bilgilendirme: yalnızca zorunlu çerez kullanılır (onay gerektiren çerez yok). */
 export function CookieNotice() {
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    try {
-      setShow(localStorage.getItem("fr:cookie-notice") !== "1");
-    } catch {}
-  }, []);
-  if (!show) return null;
+  const seen = useStoredValue("fr:cookie-notice");
+  // Sunucuda ve hidrasyonda (undefined) gösterilmez; tarayıcıda yalnızca daha önce kapatılmadıysa
+  if (seen === undefined || seen === "1") return null;
   return (
     <div role="region" aria-label="Çerez bilgilendirmesi" className="fixed inset-x-3 bottom-[72px] z-40 mx-auto max-w-xl rounded-lg border border-line bg-surface p-3.5 text-[12.5px] text-ink-2 shadow-pop lg:bottom-4">
       <p>
@@ -23,10 +19,7 @@ export function CookieNotice() {
       <button
         type="button"
         onClick={() => {
-          try {
-            localStorage.setItem("fr:cookie-notice", "1");
-          } catch {}
-          setShow(false);
+          writeStoredValue("fr:cookie-notice", "1");
         }}
         className="mt-2 h-8 rounded-md bg-ink px-3 text-[12.5px] font-semibold text-bg"
       >

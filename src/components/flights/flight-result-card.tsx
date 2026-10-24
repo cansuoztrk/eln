@@ -67,7 +67,7 @@ function Leg({ from, to, at, minutes, stops, label }: { from: string; to: string
 
 export function FlightResultCard({ f }: { f: FlightCardData }) {
   return (
-    <article className="card grid gap-4 p-4 md:grid-cols-[1fr_210px] md:p-5">
+    <article data-testid="flight-result" className="card grid gap-4 p-4 md:grid-cols-[1fr_210px] md:p-5">
       <div className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center gap-2 text-[12.5px]">
           <span className="grid size-7 place-items-center rounded-md bg-surface-2 font-mono text-[11px] font-bold text-ink-2">{f.airlineCode ?? "?"}</span>

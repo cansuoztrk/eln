@@ -41,19 +41,19 @@ export function SearchBox({ popular = [], size = "md", autoFocus = false, placeh
   const [q, setQ] = useState(defaultValue);
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<Suggest | null>(null);
+  const suggest = q.trim().length >= 2 ? data : null;
   const [recent, setRecent] = useState<string[]>([]);
   const [active, setActive] = useState(-1);
   const listId = useId();
+  function openBox() {
+    setRecent(readRecent());
+    setOpen(true);
+  }
   const boxRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => setRecent(readRecent()), [open]);
 
   useEffect(() => {
     const term = q.trim();
-    if (term.length < 2) {
-      setData(null);
-      return;
-    }
+    if (term.length < 2) return;
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
       try {
@@ -82,9 +82,9 @@ export function SearchBox({ popular = [], size = "md", autoFocus = false, placeh
       popular.slice(0, 6).forEach((p) => out.push({ key: `p:${p}`, label: p, href: `/ara?q=${encodeURIComponent(p)}`, icon: "trendDown", kind: "Popüler aramalar" }));
       return out;
     }
-    data?.categories.forEach((c) => out.push({ key: `c:${c.slug}`, label: c.name, href: `/kategori/${c.slug}`, icon: c.icon ?? "grid", kind: "Kategoriler" }));
-    data?.brands.forEach((b) => out.push({ key: `b:${b.slug}`, label: b.name, href: `/firsatlar?marka=${b.slug}`, icon: "tag", kind: "Markalar" }));
-    data?.products.forEach((p) =>
+    suggest?.categories.forEach((c) => out.push({ key: `c:${c.slug}`, label: c.name, href: `/kategori/${c.slug}`, icon: c.icon ?? "grid", kind: "Kategoriler" }));
+    suggest?.brands.forEach((b) => out.push({ key: `b:${b.slug}`, label: b.name, href: `/firsatlar?marka=${b.slug}`, icon: "tag", kind: "Markalar" }));
+    suggest?.products.forEach((p) =>
       out.push({
         key: `u:${p.slug}`,
         label: p.title,
@@ -95,7 +95,7 @@ export function SearchBox({ popular = [], size = "md", autoFocus = false, placeh
       }),
     );
     return out;
-  }, [q, data, recent, popular]);
+  }, [q, suggest, recent, popular]);
 
   function submit(term: string) {
     const t = term.trim();
@@ -108,7 +108,7 @@ export function SearchBox({ popular = [], size = "md", autoFocus = false, placeh
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setOpen(true);
+      openBox();
       setActive((a) => Math.min(items.length - 1, a + 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
@@ -149,10 +149,10 @@ export function SearchBox({ popular = [], size = "md", autoFocus = false, placeh
           autoFocus={autoFocus}
           onChange={(e) => {
             setQ(e.target.value);
-            setOpen(true);
+            openBox();
             setActive(-1);
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => openBox()}
           onKeyDown={onKeyDown}
           placeholder={placeholder ?? "Ürün, marka, model kodu ara…"}
           className={cn("h-full min-w-0 flex-1 bg-transparent outline-none placeholder:text-ink-3", size === "lg" ? "text-[16px]" : "text-[14px]")}

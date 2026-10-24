@@ -1,7 +1,7 @@
 import { updateRetailerAffiliate } from "@/app/admin/actions";
 import { AdminPage, Field, Panel } from "@/components/admin/ui";
 import { ActionForm } from "@/components/forms/action-form";
-import { DAY } from "@/lib/time";
+import { daysAgo } from "@/lib/time";
 import { requireStaff } from "@/server/auth/guards";
 import { db } from "@/server/db";
 
@@ -11,7 +11,7 @@ export default async function AdminRetailers() {
   await requireStaff("ADMIN");
   const [retailers, clicks] = await Promise.all([
     db.retailer.findMany({ orderBy: { name: "asc" }, include: { _count: { select: { offers: true } } } }),
-    db.clickEvent.groupBy({ by: ["retailerId", "isAffiliate"], where: { createdAt: { gte: new Date(Date.now() - 30 * DAY) } }, _count: true }),
+    db.clickEvent.groupBy({ by: ["retailerId", "isAffiliate"], where: { createdAt: { gte: daysAgo(30) } }, _count: true }),
   ]);
   return (
     <AdminPage title="Mağazalar ve satış ortaklığı" description="Satış ortaklığı yalnızca resmî programdan onay alındıktan sonra etkinleştirilmelidir. Komisyon parametresi yalnızca bağlantıda başka bir ortaklık parametresi yoksa eklenir; kaynağın kendi ortaklık bağlantısı (ör. Amazon Creators API) değiştirilmez.">

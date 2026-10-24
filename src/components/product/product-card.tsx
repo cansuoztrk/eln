@@ -54,7 +54,9 @@ export function ProductCard({ p, loggedIn, favorited = false, priority = false, 
         {best ? (
           <>
             <div className="mt-2.5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <Price minor={best.totalMinor ?? best.priceMinor} currency={best.currency} className="text-[21px] leading-none" />
+              <span data-testid="card-price">
+                <Price minor={best.totalMinor ?? best.priceMinor} currency={best.currency} className="text-[21px] leading-none" />
+              </span>
               {p.discount ? (
                 <span className="inline-flex items-center gap-0.5 rounded-sm bg-good-soft px-1.5 py-0.5 text-[12px] font-semibold text-good-ink tabular" title={`Doğrulanmış indirim: ${p.discount.caption}`}>
                   <Icon name="arrowDown" className="size-3" />

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { runSourceNow, testSource, updateSource } from "@/app/admin/actions";
 import { AdminPage, Field, MiniBars, Panel, StatusBadge, SubmitButton, Table, Td } from "@/components/admin/ui";
 import { ActionForm } from "@/components/forms/action-form";
-import { DAY, formatDateTime, formatShortDate } from "@/lib/time";
+import { daysAgo, formatDateTime, formatShortDate } from "@/lib/time";
 import { requireStaff } from "@/server/auth/guards";
 import { db } from "@/server/db";
 import { getFlightAdapter, getRetailAdapter } from "@/server/integrations/registry";
@@ -23,7 +23,7 @@ export default async function AdminSource(props: PageProps<"/admin/kaynaklar/[id
   const [jobs, logs, usage] = await Promise.all([
     db.ingestionJob.findMany({ where: { dataSourceId: s.id }, orderBy: { createdAt: "desc" }, take: 15 }),
     db.ingestionLog.findMany({ where: { dataSourceId: s.id, level: { in: ["WARN", "ERROR"] } }, orderBy: { createdAt: "desc" }, take: 20 }),
-    db.apiUsage.findMany({ where: { dataSourceId: s.id, day: { gte: new Date(Date.now() - 14 * DAY) } }, orderBy: { day: "asc" } }),
+    db.apiUsage.findMany({ where: { dataSourceId: s.id, day: { gte: daysAgo(14) } }, orderBy: { day: "asc" } }),
   ]);
   return (
     <AdminPage
