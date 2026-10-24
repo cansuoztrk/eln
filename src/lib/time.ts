@@ -70,6 +70,16 @@ export function formatRelative(d: Date | string | number, now: Date = new Date()
   return formatDate(d);
 }
 
+/** Kısa göreli zaman: "15 dk önce", "3 sa önce", "2 gün önce". */
+export function formatRelativeShort(d: Date | string | number, now: Date = new Date()): string {
+  const diff = Math.max(0, now.getTime() - toDate(d).getTime());
+  if (diff < MINUTE) return "az önce";
+  if (diff < HOUR) return `${Math.round(diff / MINUTE)} dk önce`;
+  if (diff < DAY) return `${Math.round(diff / HOUR)} sa önce`;
+  if (diff < 30 * DAY) return `${Math.round(diff / DAY)} gün önce`;
+  return formatShortDate(d);
+}
+
 export function formatDuration(minutes: number | null | undefined): string {
   if (minutes === null || minutes === undefined) return "—";
   const h = Math.floor(minutes / 60);

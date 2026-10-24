@@ -44,24 +44,8 @@ export type CompetitorOffer = {
   currency: string;
 };
 
-export type DealLabelKey =
-  | "VERIFIED_RECENTLY"
-  | "HISTORICALLY_GOOD"
-  | "BEST_ACROSS_STORES"
-  | "LOWEST_30D"
-  | "COUPON_BETTER"
-  | "WATCH_CLOSELY"
-  | "REVALIDATING";
-
-export const DEAL_LABELS: Record<DealLabelKey, { text: string; tone: "brand" | "positive" | "neutral" | "warning" }> = {
-  VERIFIED_RECENTLY: { text: "Son fiyat kontrolünde doğrulandı", tone: "neutral" },
-  HISTORICALLY_GOOD: { text: "Fiyat geçmişine göre avantajlı", tone: "positive" },
-  BEST_ACROSS_STORES: { text: "Mağazalar arasında en uygun teklif", tone: "brand" },
-  LOWEST_30D: { text: "Geçmiş 30 günün en düşük fiyatı", tone: "positive" },
-  COUPON_BETTER: { text: "Kuponla daha uygun", tone: "brand" },
-  WATCH_CLOSELY: { text: "Fiyatı yakından takip et", tone: "neutral" },
-  REVALIDATING: { text: "Fiyat bilgisi yeniden kontrol ediliyor", tone: "warning" },
-};
+export { DEAL_LABELS, type DealLabelKey } from "@/lib/deal-labels";
+import type { DealLabelKey } from "@/lib/deal-labels";
 
 type WindowMetric = {
   coverageDays: number;
