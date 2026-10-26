@@ -74,7 +74,7 @@ export interface Agent {
   queueAt: number;
 }
 
-export const GRID = { size: 640, cells: 80 };
+export const GRID = { size: 520, cells: 72 };
 
 export class CrowdSim {
   nodes: Node[] = [];

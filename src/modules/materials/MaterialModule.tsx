@@ -7,6 +7,8 @@ import { MATERIAL_TARGET_LABEL } from '@/core/model/labels';
 import { worldApi, type CameraPose } from '@/world/worldApi';
 import { Icon, Note, Section, Segmented } from '@/ui/primitives';
 
+const SHORT: Record<MaterialTarget, string> = { facade: 'Cephe', roof: 'Çatı', structure: 'Taşıyıcı', plinth: 'Kaide' };
+
 const VIEWS: Record<MaterialTarget, CameraPose> = {
   facade: { pos: [120, 30, 210], target: [0, 22, 80] },
   roof: { pos: [170, 140, 200], target: [0, 40, 0] },
@@ -54,7 +56,7 @@ export default function MaterialModule() {
   return (
     <div>
       <Section title="Bileşen" kicker="Material Lab">
-        <Segmented label="Bileşen" value={target} onChange={setTarget} options={MATERIAL_TARGETS.map((t) => ({ value: t, label: MATERIAL_TARGET_LABEL[t].split(' ')[0] }))} />
+        <Segmented label="Bileşen" value={target} onChange={setTarget} options={MATERIAL_TARGETS.map((t) => ({ value: t, label: SHORT[t] }))} />
         <p className="text-[12px] muted mt-2">{MATERIAL_TARGET_LABEL[target]} — modeldeki ilgili parça anında değişir.</p>
       </Section>
 

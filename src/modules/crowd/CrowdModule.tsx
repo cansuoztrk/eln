@@ -303,7 +303,9 @@ export default function CrowdModule() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="card card-tight text-center">
-      <div className="text-[18px] font-semibold tabular-nums display">{value}</div>
+      <div className="text-[18px] font-semibold tabular-nums display" data-stat={label}>
+        {value}
+      </div>
       <div className="text-[10.5px] muted uppercase tracking-wide">{label}</div>
     </div>
   );

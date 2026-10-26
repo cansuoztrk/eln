@@ -6,7 +6,7 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Stars } from '@react-three/drei';
+import { Environment as EnvironmentMap, Lightformer, Stars } from '@react-three/drei';
 import { useEffectiveDesign } from '@/core/store/effective';
 import { useView } from '@/core/store/viewStore';
 import { NIGHT_COLORS } from '@/core/model/labels';
@@ -234,12 +234,37 @@ export function SceneLights() {
   );
 }
 
+/**
+ * Image-based lighting rendered once from a few in-scene light panels
+ * (no HDR download): gives metal and glass materials something to reflect.
+ */
+function Reflections() {
+  const env = useView((s) => s.env);
+  const pal = useEnvPalette();
+  const primary = useEffectiveDesign().palette.primary;
+  const day = env === 'day';
+  return (
+    <EnvironmentMap key={`${env}-${pal.horizon}-${primary}`} frames={1} resolution={128} environmentIntensity={day ? 1 : env === 'dusk' ? 0.7 : 0.55}>
+      <color attach="background" args={[day ? '#9fb7cf' : pal.sky]} />
+      {/* sky dome glow */}
+      <Lightformer form="rect" intensity={day ? 2.2 : 0.5} color={day ? '#ffffff' : pal.horizon} position={[0, 12, 0]} rotation-x={Math.PI / 2} scale={[30, 30, 1]} />
+      {/* horizon city glow ring */}
+      <Lightformer form="ring" intensity={day ? 0.6 : 1.6} color={day ? '#e8eef5' : '#ffcf8a'} position={[0, 1, 0]} rotation-x={Math.PI / 2} scale={18} />
+      {/* stadium floodlight bounce */}
+      <Lightformer form="rect" intensity={day ? 0.4 : 1.4} color="#fff1dc" position={[0, 6, -10]} scale={[16, 4, 1]} />
+      <Lightformer form="rect" intensity={day ? 0.3 : 0.9} color={primary} position={[10, 3, 6]} rotation-y={-Math.PI / 2} scale={[10, 3, 1]} />
+      <Lightformer form="rect" intensity={day ? 0.3 : 0.8} color="#f2b631" position={[-10, 3, 6]} rotation-y={Math.PI / 2} scale={[10, 3, 1]} />
+    </EnvironmentMap>
+  );
+}
+
 export function Environment() {
   const env = useView((s) => s.env);
   const reduced = useView((s) => s.reducedMotion);
   return (
     <group>
       <FogSync />
+      <Reflections />
       <Sky />
       {env !== 'day' && <Stars radius={3000} depth={600} count={2500} factor={18} saturation={0} fade speed={reduced ? 0 : 0.3} />}
       <City />

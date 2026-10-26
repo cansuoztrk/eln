@@ -1,7 +1,7 @@
 /**
  * The persistent 3D world. Mounted once and shared by every module.
  */
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import { useView } from '@/core/store/viewStore';
@@ -21,6 +21,7 @@ export default function StadiumCanvas() {
   const q = QUALITY_SETTINGS[quality];
   const [dpr, setDpr] = useState(q.dpr[1]);
   const [lost, setLost] = useState(false);
+  const down = useRef({ x: 0, y: 0 });
 
   useEffect(() => setDpr(QUALITY_SETTINGS[quality].dpr[1]), [quality]);
 
@@ -31,6 +32,11 @@ export default function StadiumCanvas() {
         dpr={dpr}
         gl={{ antialias: q.antialias, powerPreference: 'high-performance', alpha: false, stencil: false }}
         camera={{ fov: 48, near: 0.3, far: 9000, position: HOME_POSE.pos }}
+        onPointerDown={(e) => (down.current = { x: e.clientX, y: e.clientY })}
+        onPointerMissed={(e) => {
+          // a click on empty space (not the end of a drag) clears the Object Inspector
+          if (Math.hypot(e.clientX - down.current.x, e.clientY - down.current.y) < 5) set({ selected: null });
+        }}
         onCreated={({ gl }) => {
           gl.localClippingEnabled = true;
           const canvas = gl.domElement;

@@ -1,12 +1,18 @@
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useEffectiveDesign } from '@/core/store/effective';
-import { useView } from '@/core/store/viewStore';
 import { useClipping } from './clipping';
 import { LayerGroup, Selectable } from './LayerGroup';
-import { PROFILE, perimeterAt, roofY } from './geometry';
-import { applyInstances, radialMatrix } from './radial';
+import { PROFILE, ringSamples, roofY, sweepProfile } from './geometry';
 import { ZONE_BY_ID } from '@/core/district';
+import { solarTexture } from '../textures';
+
+/** Panel bands (d ranges) on the roof: existing installation (representative placement). */
+const BANDS: [number, number][] = [
+  [15, 25],
+  [27, 37],
+  [39, 50],
+];
 
 /**
  * Solar layer. The existing rooftop installation is a verified fact
@@ -15,42 +21,37 @@ import { ZONE_BY_ID } from '@/core/district';
  */
 export function Solar() {
   const design = useEffectiveDesign();
-  const quality = useView((s) => s.quality);
   const clipping = useClipping();
   const panelMat = useMemo(() => {
-    const m = new THREE.MeshStandardMaterial({ color: '#1b2a4a', metalness: 0.6, roughness: 0.25, emissive: '#0d1a33', emissiveIntensity: 0.3 });
+    const t = solarTexture().clone();
+    t.needsUpdate = true;
+    const m = new THREE.MeshStandardMaterial({ map: t, metalness: 0.55, roughness: 0.28, emissive: '#0d1a33', emissiveIntensity: 0.35, side: THREE.DoubleSide });
     m.userData.baseEmissive = m.emissive.clone();
-    m.userData.baseEmissiveIntensity = 0.3;
+    m.userData.baseEmissiveIntensity = 0.35;
     return m;
   }, []);
   panelMat.clippingPlanes = clipping;
   const frameMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#8d939c', metalness: 0.7, roughness: 0.4 }), []);
+  const canopyPanel = useMemo(() => {
+    const t = solarTexture().clone();
+    t.needsUpdate = true;
+    t.repeat.set(6, 4);
+    return new THREE.MeshStandardMaterial({ map: t, metalness: 0.55, roughness: 0.3 });
+  }, []);
 
-  const roofRef = useRef<THREE.InstancedMesh>(null);
-  const roofCount = useMemo(() => {
-    const rows = quality === 'low' ? 5 : 8;
-    let n = 0;
-    for (let r = 0; r < rows; r++) {
-      const d = 16 + (r * 34) / rows;
-      n += Math.floor((perimeterAt(d) * 0.82) / 7);
-    }
-    return n;
-  }, [quality]);
-
-  useLayoutEffect(() => {
-    const mats: THREE.Matrix4[] = [];
-    const rows = quality === 'low' ? 5 : 8;
-    for (let r = 0; r < rows; r++) {
-      const d = 16 + (r * 34) / rows;
-      const n = Math.floor((perimeterAt(d) * 0.82) / 7);
-      const slope = Math.atan2(roofY(d + 1) - roofY(d - 1), 2);
-      for (let i = 0; i < n; i++) {
-        const s = (i + 0.5 + (r % 2) * 0.5) / n;
-        mats.push(radialMatrix(s, d, roofY(d) + PROFILE.roofThickness + 0.3, new THREE.Vector3(1, 1, 1), -slope - 0.08));
-      }
-    }
-    applyInstances(roofRef.current, mats);
-  }, [roofCount, quality]);
+  // continuous panel arrays following the roof slope; u tiles by arc length
+  const bands = useMemo(
+    () =>
+      BANDS.map(([d0, d1]) => {
+        const prof = [0, 0.5, 1].map((f) => {
+          const d = d0 + (d1 - d0) * f;
+          return { d, y: roofY(d) + PROFILE.roofThickness + 0.35 };
+        });
+        return sweepProfile(prof, { samples: ringSamples(16, 18), tile: 3.2 });
+      }),
+    [],
+  );
+  useEffect(() => () => bands.forEach((b) => b.dispose()), [bands]);
 
   const extended = design.green.solar === 'extended';
   const park = ZONE_BY_ID.parking;
@@ -58,15 +59,15 @@ export function Solar() {
   return (
     <LayerGroup id="solar">
       <Selectable id="solarRoof">
-        <instancedMesh ref={roofRef} args={[undefined, undefined, roofCount]} material={panelMat}>
-          <boxGeometry args={[6.2, 0.12, 3.6]} />
-        </instancedMesh>
+        {bands.map((g, i) => (
+          <mesh key={i} geometry={g} material={panelMat} />
+        ))}
       </Selectable>
       {extended && (
         <Selectable id="solarCanopies">
           {Array.from({ length: 4 }, (_, i) => (
             <group key={i} position={[park.x - 45 + i * 30, 0, park.z]}>
-              <mesh position={[0, 4.2, 0]} rotation-x={-0.12} material={panelMat}>
+              <mesh position={[0, 4.2, 0]} rotation-x={-0.12} material={canopyPanel}>
                 <boxGeometry args={[26, 0.25, 40]} />
               </mesh>
               {[-10, 10].map((x) => (
@@ -78,7 +79,7 @@ export function Solar() {
           ))}
           {[-40, 40].map((x) => (
             <group key={x} position={[plaza.x + x, 0, plaza.z + 18]}>
-              <mesh position={[0, 6, 0]} rotation-z={0.08} material={panelMat}>
+              <mesh position={[0, 6, 0]} rotation-z={0.08} material={canopyPanel}>
                 <boxGeometry args={[30, 0.25, 12]} />
               </mesh>
               <mesh position={[0, 3, 0]} material={frameMat}>

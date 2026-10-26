@@ -102,7 +102,7 @@ export function Structure() {
     const slope = Math.atan2(yFn(outer) - yFn(inner), len);
     for (let i = 0; i < count; i++) {
       const s = i / count;
-      trusses.push(radialMatrix(s, midD, yFn(midD) + PROFILE.roofThickness + 1.6, new THREE.Vector3(1, 1, len), -slope));
+      trusses.push(radialMatrix(s, midD, yFn(midD) + PROFILE.roofThickness + 0.7, new THREE.Vector3(1, 1, len), -slope));
     }
     applyInstances(trussRef.current, trusses);
     const cols: THREE.Matrix4[] = [];
@@ -120,7 +120,7 @@ export function Structure() {
   return (
     <LayerGroup id="structure">
       <instancedMesh ref={trussRef} args={[undefined, undefined, 64]} material={mat}>
-        <boxGeometry args={[0.45, 3.2, 1]} />
+        <boxGeometry args={[0.35, 1.4, 1]} />
       </instancedMesh>
       <instancedMesh ref={colRef} args={[undefined, undefined, 48]} material={mat}>
         <cylinderGeometry args={[0.7, 0.9, roofY(PROFILE.facadeD - 1.8), 10]} />

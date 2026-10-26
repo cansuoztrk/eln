@@ -78,8 +78,8 @@ export default function CityModule() {
                   onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), select(zz.id))}
                 >
                   <rect x={zz.x - zz.w / 2} y={zz.z - zz.d / 2} width={zz.w} height={zz.d} rx="6" fill={zz.color} fillOpacity={on ? 0.28 : 0.06} stroke={zz.color} strokeWidth={zone === zz.id ? 3 : 1.2} strokeDasharray={on ? undefined : '4 3'} />
-                  <text x={zz.x} y={zz.z + 3} textAnchor="middle" fontSize="9" fontWeight="700" fill={on ? '#f3efe6' : '#7c838f'}>
-                    {zz.name.split(' (')[0]}
+                  <text x={zz.x} y={zz.z + 4} textAnchor="middle" fontSize="14" fontWeight="700" fill={on ? '#f3efe6' : '#7c838f'}>
+                    {zz.short}
                   </text>
                 </g>
               );

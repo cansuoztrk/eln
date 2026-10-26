@@ -24,6 +24,7 @@ export const MODULE_COMPONENTS: Partial<Record<ModuleId, ReturnType<typeof L>>> 
   seats: L(() => import('@/modules/seats/SeatModule')),
   journey: L(() => import('@/modules/journey/JourneyModule')),
   archive: L(() => import('@/modules/archive/ArchiveModule')),
+  gallery: L(() => import('@/modules/gallery/GalleryModule')),
   share: L(() => import('@/modules/share/ShareModule')),
   about: L(() => import('@/modules/about/AboutModule')),
 };

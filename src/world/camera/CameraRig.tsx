@@ -268,7 +268,8 @@ export function CameraRig() {
 
   // keyboard (only when the 3D view has focus)
   useEffect(() => {
-    const el = gl.domElement.parentElement?.parentElement ?? gl.domElement;
+    // the focusable wrapper (#world-canvas) owns keyboard input for the 3D view
+    const el = document.getElementById('world-canvas') ?? gl.domElement;
     const st = state.current;
     const down = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
@@ -299,7 +300,8 @@ export function CameraRig() {
   useFrame((_, dtRaw) => {
     const c = ref.current;
     if (!c) return;
-    const dt = Math.min(0.05, dtRaw);
+    // clamp large frame gaps, but keep walking speed usable on low-fps devices
+    const dt = Math.min(0.1, dtRaw);
     const st = state.current;
     const v = useView.getState();
 

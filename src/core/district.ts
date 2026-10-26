@@ -21,6 +21,8 @@ export type ZoneId =
 export interface Zone {
   id: ZoneId;
   name: string;
+  /** short map label */
+  short: string;
   /** centre x,z */
   x: number;
   z: number;
@@ -37,6 +39,7 @@ export interface Zone {
 export const ZONES: Zone[] = [
   {
     id: 'fanPlaza',
+    short: 'Meydan',
     name: 'Taraftar meydanı',
     x: 0,
     z: 168,
@@ -50,6 +53,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'entryPlaza',
+    short: 'Giriş',
     name: 'Dış giriş meydanı',
     x: 0,
     z: 118,
@@ -63,6 +67,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'social',
+    short: 'Sosyal',
     name: 'Sosyal yaşam alanı',
     x: -165,
     z: 105,
@@ -76,6 +81,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'museum',
+    short: 'Müze',
     name: 'Kulüp müzesi ve deneyim alanı',
     x: 158,
     z: 118,
@@ -89,6 +95,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'eventLawn',
+    short: 'Etkinlik',
     name: 'Etkinlik çimi',
     x: -178,
     z: -60,
@@ -102,6 +109,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'greenPark',
+    short: 'Yeşil alan',
     name: 'Dinlenme ve yeşil alan',
     x: 175,
     z: -40,
@@ -115,6 +123,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'transitHub',
+    short: 'Ulaşım',
     name: 'Toplu taşıma bağlantısı (şematik)',
     x: 128,
     z: -170,
@@ -129,6 +138,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'dropoff',
+    short: 'Servis',
     name: 'Servis ve indirme-bindirme',
     x: -100,
     z: -168,
@@ -142,6 +152,7 @@ export const ZONES: Zone[] = [
   },
   {
     id: 'parking',
+    short: 'Otopark',
     name: 'Otopark (şematik)',
     x: 0,
     z: -200,

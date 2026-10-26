@@ -13,15 +13,19 @@ export function CameraDock() {
   const poi = useView((s) => s.poi);
   const env = useView((s) => s.env);
   const view2D = useView((s) => s.view2D);
+  const mobile = useView((s) => s.mobile);
+  const panelOpen = useView((s) => s.panelOpen);
   const set = useView((s) => s.set);
   if (view2D) return null;
   const idx = POIS.findIndex((p) => p.id === poi);
+  // on phones the dock sits just above the bottom sheet
+  const style = mobile ? { bottom: panelOpen ? 'calc(56vh + 10px)' : '70px' } : undefined;
   const go = (d: number) => {
     const next = POIS[(Math.max(0, idx) + d + POIS.length) % POIS.length];
     worldApi.flyToPoi(next.id);
   };
   return (
-    <div className="no-print camera-dock fixed z-20 left-3 md:left-[calc(var(--rail-w)+20px)] bottom-3 flex flex-wrap items-center gap-1.5 glass rounded-2xl p-1.5 max-w-[calc(100vw-24px)]">
+    <div style={style} className="no-print camera-dock fixed z-20 left-3 md:left-[calc(var(--rail-w)+20px)] bottom-3 flex flex-wrap items-center gap-1.5 glass rounded-2xl p-1.5 max-w-[calc(100vw-24px)]">
       <Segmented
         label="Kamera modu"
         value={mode === 'seat' ? 'walkthrough' : mode}

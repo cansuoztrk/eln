@@ -208,3 +208,33 @@ export function pavingTexture(tint: string) {
     return t;
   });
 }
+
+/** Photovoltaic array texture: dark cells with a light frame grid (tiles along the ring). */
+export function solarTexture() {
+  return cached('solar', () => {
+    const { c, ctx } = canvas(128, 128);
+    ctx.fillStyle = '#0f1c36';
+    ctx.fillRect(0, 0, 128, 128);
+    for (let y = 0; y < 4; y++)
+      for (let x = 0; x < 2; x++) {
+        const g = ctx.createLinearGradient(x * 64, y * 32, x * 64 + 64, y * 32 + 32);
+        g.addColorStop(0, '#1b3466');
+        g.addColorStop(1, '#0c1730');
+        ctx.fillStyle = g;
+        ctx.fillRect(x * 64 + 2, y * 32 + 2, 60, 28);
+      }
+    ctx.strokeStyle = 'rgba(160,180,210,0.35)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 8; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, i * 16);
+      ctx.lineTo(128, i * 16);
+      ctx.stroke();
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.anisotropy = 4;
+    return t;
+  });
+}
