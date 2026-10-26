@@ -105,7 +105,8 @@ Varsayılan AI Architect tarayıcıda çalışan, **açıkça etiketlenmiş kura
 ```bash
 cd server
 npm install
-ANTHROPIC_API_KEY=sk-ant-... npm start        # http://localhost:8787/api/architect
+cp .env.example .env          # ANTHROPIC_API_KEY'i yalnızca sunucudaki .env dosyasına yazın
+npm start                     # http://localhost:8787/api/architect
 ```
 
 Ardından uygulamayı uç noktayla derleyin:

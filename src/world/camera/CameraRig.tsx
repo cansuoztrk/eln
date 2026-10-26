@@ -10,7 +10,7 @@ import { CameraControls } from '@react-three/drei';
 import CameraControlsImpl from 'camera-controls';
 import { useView, type CameraMode } from '@/core/store/viewStore';
 import { HOME_POSE, INTRO_START, POIS, POI_BY_ID, type PoiZone } from './pois';
-import { fadeOverlay, worldApi, type CameraPose, type Vec3 } from '../worldApi';
+import { fadeOverlay, flushPendingCamera, worldApi, type CameraPose, type Vec3 } from '../worldApi';
 import { runtime } from '../runtime';
 import { requestFrameCapture } from '../Renderer';
 import { layerRegistry } from '../stadium/registry';
@@ -59,6 +59,8 @@ function configure(c: CameraControlsImpl, mode: CameraMode) {
     c.setBoundary(undefined);
   }
 }
+
+let rigOwner: object | null = null;
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
@@ -234,8 +236,13 @@ export function CameraRig() {
     };
 
     worldApi.ready = true;
+    const owner = {};
+    rigOwner = owner;
+    // a module opened by deep link may have asked for a view before the world existed
+    if (!useView.getState().introPlaying) setTimeout(flushPendingCamera, 0);
     return () => {
-      worldApi.ready = false;
+      // a previous 3D view may unmount after a new one mounted (2D ↔ 3D switch)
+      if (rigOwner === owner) worldApi.ready = false;
     };
   }, [camera, set]);
 

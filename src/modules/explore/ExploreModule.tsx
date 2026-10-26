@@ -14,8 +14,7 @@ export default function ExploreModule() {
   useEffect(() => {
     const target = route.params.get('poi');
     if (!target || !POI_BY_ID[target]) return;
-    const t = setTimeout(() => worldApi.flyToPoi(target), worldApi.ready ? 50 : 900);
-    return () => clearTimeout(t);
+    worldApi.flyToPoi(target);
   }, [route.params]);
 
   const current = poi ? POI_BY_ID[poi] : null;

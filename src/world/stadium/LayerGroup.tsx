@@ -60,9 +60,10 @@ export function LayerGroup({ id, children, selectId, radialExplode }: { id: Laye
   useHighlight(ref, highlighted);
 
   useEffect(() => {
-    layerRegistry.set(id, ref.current);
+    const obj = ref.current;
+    layerRegistry.set(id, obj);
     return () => {
-      layerRegistry.delete(id);
+      if (layerRegistry.get(id) === obj) layerRegistry.delete(id);
     };
   }, [id]);
 

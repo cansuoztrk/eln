@@ -33,7 +33,7 @@ export default function MatchdayModule() {
 
   useEffect(() => {
     const m = route.params.get('mode') as AtmosphereId | null;
-    if (m && ORDER.includes(m)) setTimeout(() => applyAtmosphere(m), worldApi.ready ? 0 : 900);
+    if (m && ORDER.includes(m)) applyAtmosphere(m);
   }, [route.params]);
 
   useEffect(() => {

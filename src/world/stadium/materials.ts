@@ -42,18 +42,3 @@ export function useConceptMaterial(id: MaterialId, repeat: [number, number] = [4
   mat.clippingPlanes = clipping;
   return mat;
 }
-
-/** Plain material helper with clipping. */
-export function useBasicStandard(params: THREE.MeshStandardMaterialParameters, deps: unknown[] = []) {
-  const clipping = useClipping();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const mat = useMemo(() => {
-    const m = new THREE.MeshStandardMaterial(params);
-    m.userData.baseEmissive = m.emissive.clone();
-    m.userData.baseEmissiveIntensity = m.emissiveIntensity;
-    return m;
-  }, deps);
-  useEffect(() => () => mat.dispose(), [mat]);
-  mat.clippingPlanes = clipping;
-  return mat;
-}

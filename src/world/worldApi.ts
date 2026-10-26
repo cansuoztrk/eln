@@ -39,10 +39,23 @@ export interface WorldApi {
   layerObject: (id: LayerId) => THREE.Object3D | null;
 }
 
+/** Last camera request made before the 3D world was ready; replayed once it mounts. */
+let pendingCamera: (() => void) | null = null;
+
+export function flushPendingCamera() {
+  const fn = pendingCamera;
+  pendingCamera = null;
+  fn?.();
+}
+
 export const worldApi: WorldApi = {
   ready: false,
-  flyToPoi: () => {},
-  flyTo: () => {},
+  flyToPoi: (id, opts) => {
+    pendingCamera = () => worldApi.flyToPoi(id, { ...opts, instant: true });
+  },
+  flyTo: (pose, opts) => {
+    pendingCamera = () => worldApi.flyTo(pose, { ...opts, instant: true });
+  },
   resetView: () => {},
   fitLayer: () => {},
   saveView: () => {},
@@ -51,13 +64,6 @@ export const worldApi: WorldApi = {
   capture: async () => null,
   layerObject: () => null,
 };
-
-/** Capture a series of images sequentially (each may use its own preview/pose). */
-export async function captureSeries(list: CaptureOptions[]): Promise<(string | null)[]> {
-  const out: (string | null)[] = [];
-  for (const opts of list) out.push(await worldApi.capture(opts));
-  return out;
-}
 
 /* Fade overlay used for safe teleport transitions (no flying through walls). */
 export function fadeOverlay(on: boolean, ms = 260): Promise<void> {

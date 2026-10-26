@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Optional server-side proxy for the AI Architect. Keeps the Anthropic API key on the server.",
   "scripts": {
-    "start": "node architect-proxy.mjs"
+    "start": "node --env-file-if-exists=.env architect-proxy.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0"

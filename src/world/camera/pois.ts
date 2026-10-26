@@ -4,7 +4,7 @@
  * and a walk radius: keyboard movement is clamped inside that radius at a
  * fixed eye height, so the visitor cannot walk into walls or fall.
  */
-import { INNER, LOWER_TOP_Y, PROFILE, bowlPoint, lowerRowD, lowerRowY } from '../stadium/geometry';
+import { INNER, PROFILE, bowlPoint, lowerRowD, lowerRowY } from '../stadium/geometry';
 import type { Vec3 } from '../worldApi';
 
 export type PoiZone = 'outside' | 'interior' | 'bowl' | 'aerial';
@@ -138,6 +138,4 @@ export const POI_BY_ID = Object.fromEntries(POIS.map((p) => [p.id, p])) as Recor
 
 export const HOME_POSE = { pos: [250, 135, 330] as Vec3, target: [0, 12, 0] as Vec3 };
 export const INTRO_START = { pos: [900, 260, 1500] as Vec3, target: [0, 40, 0] as Vec3 };
-export const AERIAL_POSE = { pos: [0, 520, 40] as Vec3, target: [0, 0, 0] as Vec3 };
 
-export const LOWER_TOP = LOWER_TOP_Y;

@@ -21,8 +21,7 @@ export default function PresentationMode() {
     const cfg = slide.config?.(design) ?? null;
     setPreview(cfg, `Sunum: ${slide.title}`);
     set({ section: slide.section ?? 'off', exploded: false, env: slide.env ?? 'night', selected: null, highlight: [] });
-    const t = setTimeout(() => worldApi.flyTo(slide.pose, { mode: 'explorer' }), worldApi.ready ? 0 : 900);
-    return () => clearTimeout(t);
+    worldApi.flyTo(slide.pose, { mode: 'explorer' });
   }, [slide, design, set, setPreview]);
 
   // restore on exit
