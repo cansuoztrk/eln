@@ -23,13 +23,13 @@ export function requestFrameCapture(width: number, height: number, mime = 'image
   return new Promise((resolve) => {
     if (pending) pending.resolve(null);
     pending = { width, height, mime, quality, resolve };
-    // safety timeout (e.g. render loop paused)
+    // safety timeout (e.g. render loop paused); generous because slow devices can take seconds per frame
     setTimeout(() => {
       if (pending && pending.resolve === resolve) {
         pending = null;
         resolve(null);
       }
-    }, 4000);
+    }, 20000);
   });
 }
 
@@ -59,6 +59,15 @@ export function Renderer({ bloom }: { bloom: boolean }) {
     return () => composer?.dispose();
   }, [composer, size.width, size.height]);
 
+  // the world is going away (2D view, context loss): do not leave a capture waiting
+  useEffect(
+    () => () => {
+      pending?.resolve(null);
+      pending = null;
+    },
+    [],
+  );
+
   const drawn = useRef(0);
   useFrame((_, dt) => {
     // hidden behind a full-screen overlay: keep the last frame (captures still render)
@@ -68,8 +77,10 @@ export function Renderer({ bloom }: { bloom: boolean }) {
       if (composer) composer.render(dt);
       else gl.render(scene, camera);
     };
-    render();
-    if (pending) {
+    // a capture frame draws at the export size and then restores, so the normal draw would be wasted
+    if (!pending) {
+      render();
+    } else {
       const req = pending;
       pending = null;
       try {

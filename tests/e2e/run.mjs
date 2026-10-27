@@ -5,7 +5,9 @@
  *
  * Starts `vite preview`, drives the real UI and asserts the resulting
  * application state through the test hook exposed with `?e2e=1`.
- * Set E2E_URL to test an already running server instead.
+ * Set E2E_URL to test an already running server instead, E2E_ONLY to a
+ * regular expression to run only the matching tests, and E2E_TIMEOUT_SCALE
+ * (default 3) to stretch every timeout on slow software rendering.
  */
 import { spawn } from 'node:child_process';
 import { mkdirSync, existsSync } from 'node:fs';
@@ -16,6 +18,9 @@ const PORT = 4317;
 const BASE = process.env.E2E_URL ?? `http://localhost:${PORT}/`;
 const OUT = new URL('./output/', import.meta.url).pathname;
 const ONLY = process.env.E2E_ONLY ? new RegExp(process.env.E2E_ONLY, 'i') : null;
+/** timeout multiplier: headless Chromium draws WebGL on the CPU (SwiftShader), which can take seconds per frame */
+const SCALE = Number(process.env.E2E_TIMEOUT_SCALE ?? 3);
+const T = (ms) => ms * SCALE;
 mkdirSync(OUT, { recursive: true });
 
 if (!process.env.E2E_URL && !existsSync(new URL('../../dist/index.html', import.meta.url))) {
@@ -48,6 +53,7 @@ async function newPage({ viewport = { width: 1440, height: 900 }, prefs = { intr
   const context = await browser.newContext({ viewport, hasTouch, acceptDownloads: true, permissions: ['clipboard-read', 'clipboard-write'] });
   contexts.add(context);
   context.on('close', () => contexts.delete(context));
+  context.setDefaultTimeout(T(30000));
   await context.addInitScript(
     ({ prefs, clearStorage }) => {
       try {
@@ -68,7 +74,7 @@ async function newPage({ viewport = { width: 1440, height: 900 }, prefs = { intr
     if (m.type() === 'error') pageErrors.push(m.text());
   });
   await page.goto(`${BASE}?e2e=1${hash}`);
-  await page.waitForFunction(() => window.__aslan, null, { timeout: 30000 });
+  await page.waitForFunction(() => window.__aslan, null, { timeout: T(30000) });
   return page;
 }
 
@@ -103,7 +109,7 @@ const go = async (page, hash) => {
   await page.waitForTimeout(400);
 };
 async function until(page, fn, arg, timeout = 15000) {
-  await page.waitForFunction(fn, arg, { timeout, polling: 200 });
+  await page.waitForFunction(fn, arg, { timeout: T(timeout), polling: 200 });
 }
 const worldReady = (page) => until(page, () => window.__aslan.worldApi.ready, null, 40000);
 const btn = (page, name, exact = false) => page.getByRole('button', { name, exact }).first();
@@ -156,7 +162,8 @@ await test('camera dock: next/previous point, keyboard N and reset view', async 
   await page.locator('#world-canvas').focus();
   await page.keyboard.press('n');
   await until(page, () => window.__aslan.useView.getState().poi === 'entry-plaza', null);
-  await page.waitForTimeout(1000); // let the fade transition to the point finish
+  // walk from a settled pose: snap to the point instead of waiting out the camera transition
+  await page.evaluate(() => window.__aslan.worldApi.flyToPoi('entry-plaza', { instant: true }));
   const before = await page.evaluate(() => window.__aslan.worldApi.getPose().pos);
   // hold W until the walker moves: each frame walks 3.2 m/s × min(dt, 0.1 s), so a fixed hold fails on very slow software GL
   await page.keyboard.down('w');
@@ -274,8 +281,8 @@ await test('material lab: materials apply to the model; A/B comparison renders t
   await btn(page, 'A’yı göster').click();
   assert((await view(page)).hasPreview, 'A preview missing');
   await btn(page, 'Yan yana görsel').click();
-  await page.locator('#panel img[alt^="Alternatif A"]').waitFor({ timeout: 60000 });
-  await page.locator('#panel img[alt^="Alternatif B"]').waitFor({ timeout: 60000 });
+  await page.locator('#panel img[alt^="Alternatif A"]').waitFor({ timeout: T(60000) });
+  await page.locator('#panel img[alt^="Alternatif B"]').waitFor({ timeout: T(60000) });
   await page.getByRole('button', { name: 'Tasarıma dön' }).click();
 });
 
@@ -316,8 +323,8 @@ await test('what-if: question presets and side-by-side comparison', async () => 
   await page.locator('#panel').getByRole('button', { name: '3D’de göster' }).nth(1).click();
   assert((await view(page)).hasPreview, 'scenario preview missing');
   await btn(page, 'Yan yana karşılaştır').click();
-  await page.locator('#panel img[alt^="Senaryo A"]').waitFor({ timeout: 60000 });
-  await page.locator('#panel img[alt^="Senaryo B"]').waitFor({ timeout: 60000 });
+  await page.locator('#panel img[alt^="Senaryo A"]').waitFor({ timeout: T(60000) });
+  await page.locator('#panel img[alt^="Senaryo B"]').waitFor({ timeout: T(60000) });
   await page.getByRole('button', { name: 'Tasarıma dön' }).click();
 });
 
@@ -344,8 +351,8 @@ await test('seat experience: pick two seats, camera moves, comparison renders', 
   await page.getByRole('button', { name: /Üst Doğu · Blok U07 — koltuk B/ }).click();
   await page.locator('#panel table').getByText('C-değeri (yaklaşık)').waitFor();
   await btn(page, 'İki görüşü yan yana göster').click();
-  await page.locator('#panel img[alt="Koltuk A görüşü"]').waitFor({ timeout: 60000 });
-  await page.locator('#panel img[alt="Koltuk B görüşü"]').waitFor({ timeout: 60000 });
+  await page.locator('#panel img[alt="Koltuk A görüşü"]').waitFor({ timeout: T(60000) });
+  await page.locator('#panel img[alt="Koltuk B görüşü"]').waitFor({ timeout: T(60000) });
 });
 
 await test('crowd flow: simulation runs, gate closure and strategy change reset it', async () => {
@@ -449,7 +456,7 @@ await test('design archive: save, version, restore, compare and delete', async (
   await page.locator('#panel').getByText('Sürüm karşılaştırması').waitFor();
   await btn(page, 'Yeni sürüm').first().click();
   await btn(page, 'Sürümler').first().click();
-  await page.locator('#panel').getByText('v2').first().waitFor({ timeout: 30000 });
+  await page.locator('#panel').getByText('v2').first().waitFor({ timeout: T(30000) });
   await page.locator('#panel').getByRole('button', { name: 'Aç', exact: true }).last().click();
   assert((await design(page)).dna === 'classic' || (await design(page)).dna !== 'green', 'restore failed');
   await page.locator('#panel').getByRole('button', { name: /kaydını sil$/ }).first().click();
@@ -466,7 +473,7 @@ await test('share & export: JSON/summary downloads, image render, link round-tri
   await btn(page, 'Tasarım özeti (.md)').click();
   assert(/\.md$/.test((await dl).suggestedFilename()), 'no md');
   await btn(page, /1920×1080 görsel/).click();
-  await page.locator('#panel img[alt="Mevcut tasarımın 3D konsept görseli"]').waitFor({ timeout: 60000 });
+  await page.locator('#panel img[alt="Mevcut tasarımın 3D konsept görseli"]').waitFor({ timeout: T(60000) });
   dl = page.waitForEvent('download');
   await btn(page, 'PNG indir').click();
   assert(/\.png$/.test((await dl).suggestedFilename()), 'no png');
@@ -477,7 +484,7 @@ await test('share & export: JSON/summary downloads, image render, link round-tri
   try {
     const other = await newPage({ hash: '' });
     await other.goto(link);
-    await other.getByRole('dialog').getByRole('button', { name: 'Tasarımı yükle' }).click({ timeout: 30000 });
+    await other.getByRole('dialog').getByRole('button', { name: 'Tasarımı yükle' }).click({ timeout: T(30000) });
     const loaded = await design(other);
     assert(canonical(loaded) === canonical(shared), 'shared design differs');
     await other.goto(`${BASE}?e2e=1#/design?d=@@broken`);
@@ -491,7 +498,7 @@ await test('share & export: JSON/summary downloads, image render, link round-tri
 await test('gallery: renders concept images and the lightbox opens and closes', async () => {
   await go(page, '#/gallery');
   await btn(page, 'Galeriyi oluştur').click();
-  await page.locator('#panel').getByRole('button', { name: 'Gece silueti görselini büyüt' }).click({ timeout: 120000 });
+  await page.locator('#panel').getByRole('button', { name: 'Gece silueti görselini büyüt' }).click({ timeout: T(120000) });
   await page.getByRole('dialog', { name: /Galeri/ }).waitFor();
   await page.keyboard.press('ArrowRight');
   await page.getByRole('dialog', { name: /Alacakaranlık/ }).waitFor();
@@ -514,7 +521,7 @@ await test('presentation mode: slides advance with keys, apply their state, and 
 await test('project report: renders 3D visuals and downloads HTML', async () => {
   await go(page, '#/report');
   await btn(page, '3D görselleri oluştur').click();
-  await page.locator('.report-doc img').nth(5).waitFor({ timeout: 120000 });
+  await page.locator('.report-doc img').nth(5).waitFor({ timeout: T(120000) });
   const dl = page.waitForEvent('download');
   await btn(page, 'HTML indir').click();
   assert(/\.html$/.test((await dl).suggestedFilename()), 'no html');

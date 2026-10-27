@@ -33,6 +33,7 @@ export default function GalleryModule() {
   const view2D = useView((s) => s.view2D);
   const [images, setImages] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const ready = SHOTS.filter((s) => images[s.id]);
@@ -41,11 +42,13 @@ export default function GalleryModule() {
     setBusy(true);
     const prev = useView.getState().env;
     const out: Record<string, string> = {};
+    setDone(0);
     for (const s of SHOTS) {
       set({ env: s.env ?? 'night', section: s.section ?? 'off' });
       const preview = s.show ? applyPatch(design, { show: { ...SHOW_BY_ID['golden-halo'].look, active: true, preset: 'golden-halo' } }) : undefined;
       const url = await worldApi.capture({ ...s.opts, preview, width: 1280, height: 720 });
       if (url) out[s.id] = url;
+      setDone((n) => n + 1);
     }
     set({ env: prev, section: 'off' });
     setImages(out);
@@ -71,7 +74,7 @@ export default function GalleryModule() {
       <Section title="Konsept görsel galerisi" kicker="Gallery" badges={<Badge kind="concept">Önerilen tasarım görselleri</Badge>}>
         <p className="text-[12.5px] muted mb-2.5">Görseller mevcut tasarımınızdan, aynı 3D model üzerinde sabit bakış noktalarıyla oluşturulur.</p>
         <button type="button" className="btn btn-primary w-full" onClick={generate} disabled={busy || view2D}>
-          <Icon name="Camera" size={15} /> {busy ? 'Görseller oluşturuluyor…' : ready.length ? 'Galeriyi yenile' : 'Galeriyi oluştur'}
+          <Icon name="Camera" size={15} /> {busy ? `Görseller oluşturuluyor… ${done}/${SHOTS.length}` : ready.length ? 'Galeriyi yenile' : 'Galeriyi oluştur'}
         </button>
         {view2D && <p className="text-[11.5px] muted mt-1">Galeri 3D görünüm gerektirir.</p>}
       </Section>

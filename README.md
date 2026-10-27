@@ -184,6 +184,8 @@ Temel kararlar:
 | `npm test` | 34 birim testi: doğrulama ve paylaşım kodlaması, kilitler ve yamalar, çakışma kuralları, Time Machine aşamaları, fotosensitivite sınırı, AI Architect yorumlayıcısı (brief'teki 7 örnek dahil), sunucu şeması ↔ veri modeli uyumu, kalabalık simülasyonu, geometri, koltuk ölçüleri |
 | `npm run test:e2e` | Gerçek arayüzde Playwright testleri: 5 CTA, 10 gezinti noktası, klavye ve yürüme sınırı, katmanlar/patlatma/odak/kesit, Inspector, DNA + onay + kilit + çakışma önerisi, geri al/yinele, Material Lab A/B görseli, ışık gösterisi oynatma, Time Machine, What-If görselleri, atmosfer ve ses, koltuk karşılaştırması, kalabalık simülasyonu, Stadium OS, Green Engine, Stadium City, Economy, Roadmap, Fan Journey indirme, AI Architect + geri alma, arşiv (kaydet/sürüm/aç/karşılaştır/sil), paylaşım bağlantısı gidiş-dönüş, bozuk bağlantı hatası, JSON/MD/PNG indirme, galeri lightbox, sunum, rapor görselleri + HTML, 2D görünüm, azaltılmış hareket, ilk ziyaret açılışı, mobil menü ve alt sayfa |
 
+E2E ortam değişkenleri: `E2E_URL` (çalışan bir sunucuyu test eder), `E2E_ONLY` (yalnızca adı bu düzenli ifadeyle eşleşen testler), `E2E_TIMEOUT_SCALE` (varsayılan 3; başsız Chromium WebGL'i CPU'da (SwiftShader) çizdiği ve bir kare saniyeler sürebildiği için tüm zaman aşımlarını çarpar).
+
 Son çalıştırma sonuçları için bkz. [Test sonuçları](#son-test-sonuçları).
 
 ### Test edilmemiş veya sınırlı test edilmiş özellikler
