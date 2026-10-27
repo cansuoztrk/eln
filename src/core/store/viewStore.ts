@@ -49,6 +49,8 @@ interface ViewState extends Prefs {
   crowdIn3D: boolean;
   introPlaying: boolean;
   capturing: boolean;
+  /** number of open full-screen overlays hiding the 3D world (it stops drawing while > 0) */
+  worldCovered: number;
   panelOpen: boolean;
   toasts: Toast[];
   announcement: string;
@@ -94,6 +96,7 @@ export const useView = create<ViewState>()((set, get) => ({
   crowdIn3D: false,
   introPlaying: false,
   capturing: false,
+  worldCovered: 0,
   panelOpen: true,
   toasts: [],
   announcement: '',

@@ -3,10 +3,11 @@
  * WYSIWYG image capture at an arbitrary resolution (used by exports,
  * comparisons, the archive thumbnails and the report).
  */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { BloomEffect, EffectComposer, EffectPass, RenderPass, ToneMappingEffect, ToneMappingMode } from 'postprocessing';
+import { useView } from '@/core/store/viewStore';
 
 interface CaptureRequest {
   width: number;
@@ -58,7 +59,11 @@ export function Renderer({ bloom }: { bloom: boolean }) {
     return () => composer?.dispose();
   }, [composer, size.width, size.height]);
 
+  const drawn = useRef(0);
   useFrame((_, dt) => {
+    // hidden behind a full-screen overlay: keep the last frame (captures still render)
+    if (!pending && drawn.current > 2 && useView.getState().worldCovered > 0) return;
+    drawn.current++;
     const render = () => {
       if (composer) composer.render(dt);
       else gl.render(scene, camera);

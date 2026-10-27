@@ -6,6 +6,7 @@ import { decodeDesign } from '@/core/model/sanitize';
 import type { DesignConfig } from '@/core/model/design';
 import { TopBar } from '@/shell/TopBar';
 import { MobileMenu, ModuleRail } from '@/shell/Nav';
+import { useCoverWorld } from '@/shell/useCoverWorld';
 import { Hero } from '@/shell/Hero';
 import { ModulePanel } from '@/shell/ModulePanel';
 import { CameraDock, CaptureOverlay, Inspector, LiveRegion, PreviewBanner, Toasts } from '@/shell/Overlays';
@@ -22,6 +23,7 @@ function SharedDesignDialog({ config, warnings, onClose }: { config: DesignConfi
   const current = useDesign((s) => s.design);
   const save = useArchive((s) => s.save);
   const toast = useView((s) => s.toast);
+  useCoverWorld(true);
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="share-title" className="fixed inset-0 z-[80] bg-ink/70 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="glass rounded-2xl p-5 max-w-md w-full">

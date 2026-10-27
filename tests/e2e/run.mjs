@@ -41,9 +41,13 @@ const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=sw
 
 const results = [];
 const pageErrors = [];
+/** every open browser context; a test closes the ones it opened even when it fails */
+const contexts = new Set();
 
 async function newPage({ viewport = { width: 1440, height: 900 }, prefs = { introSeen: true, quality: 'low', qualityAuto: false }, hash = '#/', hasTouch = false, clearStorage = true } = {}) {
   const context = await browser.newContext({ viewport, hasTouch, acceptDownloads: true, permissions: ['clipboard-read', 'clipboard-write'] });
+  contexts.add(context);
+  context.on('close', () => contexts.delete(context));
   await context.addInitScript(
     ({ prefs, clearStorage }) => {
       try {
@@ -71,6 +75,7 @@ async function newPage({ viewport = { width: 1440, height: 900 }, prefs = { intr
 async function test(name, fn) {
   if (ONLY && !ONLY.test(name)) return;
   const t0 = Date.now();
+  const before = new Set(contexts);
   try {
     await fn();
     results.push({ name, ok: true, ms: Date.now() - t0 });
@@ -78,6 +83,9 @@ async function test(name, fn) {
   } catch (e) {
     results.push({ name, ok: false, ms: Date.now() - t0, error: e.message });
     console.log(`  ✘ ${name}\n      ${e.message.split('\n')[0]}`);
+  } finally {
+    // a page left open by a failed test keeps rendering and slows every later test
+    for (const c of contexts) if (!before.has(c)) await c.close().catch(() => {});
   }
 }
 
@@ -138,6 +146,9 @@ await test('walkthrough: every walkthrough point can be visited from the list', 
 });
 
 await test('camera dock: next/previous point, keyboard N and reset view', async () => {
+  await go(page, '#/explore');
+  await page.evaluate(() => window.__aslan.worldApi.flyToPoi('museum', { instant: true }));
+  await until(page, () => window.__aslan.useView.getState().poi === 'museum', null);
   await page.getByRole('button', { name: 'Sonraki gezinti noktası' }).click();
   await until(page, () => window.__aslan.useView.getState().poi === 'entry-plaza', null);
   await page.getByRole('button', { name: 'Önceki gezinti noktası' }).click();
@@ -145,12 +156,18 @@ await test('camera dock: next/previous point, keyboard N and reset view', async 
   await page.locator('#world-canvas').focus();
   await page.keyboard.press('n');
   await until(page, () => window.__aslan.useView.getState().poi === 'entry-plaza', null);
+  await page.waitForTimeout(1000); // let the fade transition to the point finish
   const before = await page.evaluate(() => window.__aslan.worldApi.getPose().pos);
+  // hold W until the walker moves: each frame walks 3.2 m/s × min(dt, 0.1 s), so a fixed hold fails on very slow software GL
   await page.keyboard.down('w');
-  await page.waitForTimeout(1500);
-  await page.keyboard.up('w');
+  try {
+    await until(page, (b) => { const p = window.__aslan.worldApi.getPose().pos; return Math.hypot(p[0] - b[0], p[2] - b[2]) > 0.3; }, before, 20000);
+  } catch {
+    throw new Error('W key did not move the walker');
+  } finally {
+    await page.keyboard.up('w');
+  }
   const after = await page.evaluate(() => window.__aslan.worldApi.getPose().pos);
-  assert(Math.hypot(after[0] - before[0], after[2] - before[2]) > 0.3, 'W key did not move the walker');
   assert(Math.abs(after[1] - before[1]) < 0.01, 'walker left the eye height');
   await page.getByRole('button', { name: 'Başlangıç görünümüne dön' }).click();
   await until(page, () => window.__aslan.useView.getState().cameraMode === 'explorer', null);
@@ -270,9 +287,10 @@ await test('light show: preset applies, sequence preview plays, speed is capped'
   await btn(page, 'Sahne ekle').click();
   assert((await design(page)).show.sequence.length === 4, 'scene not added');
   await btn(page, 'Önizlemeyi oynat').click();
-  await page.waitForTimeout(2500);
-  const width = await page.locator('[role=progressbar] > div').evaluate((el) => parseFloat(el.style.width));
-  assert(width > 0, 'progress did not advance');
+  // show time advances per rendered frame, so poll instead of waiting a fixed time on slow software GL
+  await until(page, () => parseFloat(document.querySelector('[role=progressbar] > div').style.width) > 0, null, 30000).catch(() => {
+    throw new Error('progress did not advance');
+  });
   await btn(page, 'Durdur', true).click();
   const hz = await page.locator('#panel').getByText(/Şu anki geçiş frekansı/).textContent();
   assert(parseFloat(hz.match(/([\d.]+) Hz/)[1]) <= 1.2, 'frequency above cap');
@@ -333,9 +351,9 @@ await test('seat experience: pick two seats, camera moves, comparison renders', 
 await test('crowd flow: simulation runs, gate closure and strategy change reset it', async () => {
   await go(page, '#/crowd');
   await btn(page, 'Başlat').click();
-  await page.waitForTimeout(3000);
-  const t = await page.locator('[data-stat="Simüle süre"]').textContent();
-  assert(t && t !== '0:00', `sim time did not advance (${t})`);
+  await until(page, () => (document.querySelector('[data-stat="Simüle süre"]')?.textContent ?? '0:00') !== '0:00', null, 30000).catch(async () => {
+    throw new Error(`sim time did not advance (${await page.locator('[data-stat="Simüle süre"]').textContent()})`);
+  });
   await btn(page, 'Kapı E', true).click();
   await btn(page, 'Dengeli').click();
   await page.locator('#panel').getByRole('switch', { name: 'Akışı 3D modelde göster' }).click();
@@ -402,6 +420,8 @@ await test('fan journey: personas, editing and markdown download', async () => {
 
 await test('AI architect: example prompts change the design, explain, and can be undone', async () => {
   await go(page, '#/architect');
+  // start from a roof light the "more minimal" request can actually change
+  await page.evaluate(() => window.__aslan.useDesign.getState().setKey('roof.light', 'halo-ring', 'e2e başlangıç'));
   const before = await design(page);
   await page.locator('#panel').getByRole('button', { name: 'Çatı ışıklarını daha minimal yap.' }).click();
   await page.locator('#panel').getByText('Değişen özellikler').first().waitFor();
@@ -452,14 +472,20 @@ await test('share & export: JSON/summary downloads, image render, link round-tri
   assert(/\.png$/.test((await dl).suggestedFilename()), 'no png');
   const link = await page.locator('#panel input[aria-label="Paylaşım bağlantısı"]').inputValue();
   const shared = await design(page);
-  const other = await newPage({ hash: '' });
-  await other.goto(link);
-  await other.getByRole('dialog').getByRole('button', { name: 'Tasarımı yükle' }).click({ timeout: 30000 });
-  const loaded = await design(other);
-  assert(canonical(loaded) === canonical(shared), 'shared design differs');
-  await other.goto(`${BASE}?e2e=1#/design?d=@@broken`);
-  await other.getByRole('alert').filter({ hasText: /Paylaşım bağlantısı okunamadı/ }).waitFor();
-  await other.context().close();
+  // the link opens in a second tab; browsers stop drawing background tabs, headless pages need it done by hand
+  await page.evaluate(() => window.__aslan.useView.setState({ worldCovered: 1 }));
+  try {
+    const other = await newPage({ hash: '' });
+    await other.goto(link);
+    await other.getByRole('dialog').getByRole('button', { name: 'Tasarımı yükle' }).click({ timeout: 30000 });
+    const loaded = await design(other);
+    assert(canonical(loaded) === canonical(shared), 'shared design differs');
+    await other.goto(`${BASE}?e2e=1#/design?d=@@broken`);
+    await other.getByRole('alert').filter({ hasText: /Paylaşım bağlantısı okunamadı/ }).waitFor();
+    await other.context().close();
+  } finally {
+    await page.evaluate(() => window.__aslan.useView.setState({ worldCovered: 0 }));
+  }
 });
 
 await test('gallery: renders concept images and the lightbox opens and closes', async () => {

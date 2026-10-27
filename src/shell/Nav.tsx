@@ -3,6 +3,7 @@ import { navigate } from '@/core/router';
 import { GROUPS, MODULES, type ModuleId } from '@/core/modules';
 import { useView } from '@/core/store/viewStore';
 import { Icon } from '@/ui/primitives';
+import { useCoverWorld } from './useCoverWorld';
 
 /** Desktop navigation rail grouped by the four core systems. */
 export function ModuleRail() {
@@ -45,6 +46,7 @@ function RailButton({ id, icon, title, subtitle, active }: { id: ModuleId; icon:
 export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   const module = useView((s) => s.module);
   const ref = useRef<HTMLDivElement>(null);
+  useCoverWorld(open);
   useEffect(() => {
     if (!open) return;
     ref.current?.querySelector<HTMLButtonElement>('button')?.focus();

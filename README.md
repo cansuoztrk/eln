@@ -169,6 +169,7 @@ Temel kararlar:
 - Modüller ve 3D dünya tembel yüklenir; ilk ekran 3D yüklenmeden görünür.
 - Cihaz sınıfına göre otomatik kalite (düşük/orta/yüksek): DPR, bloom, şehir/ağaç sayısı, örnekleme; `PerformanceMonitor` ile çalışma zamanında otomatik düşürme. Ayarlardan elle seçilebilir.
 - Instancing (cephe kanatları, kirişler, projektörler, kalabalık), tek tuval tabanlı LED dokusu, CanvasTexture koltuk boyama (yalnızca değiştiğinde veya ≤8 fps animasyonda).
+- 3D dünyayı tamamen örten katmanlar (mobil modül menüsü, paylaşılan tasarım iletişim kutusu) açıkken sahne yeni kare çizmez, son kareyi gösterir; görsel dışa aktarımlar yine çalışır.
 - WebGL bağlamı kaybı yakalanır; WebGL yoksa 2D plan.
 - **Azaltılmış hareket:** işletim sistemi ayarı + uygulama içi anahtar; anlık kamera geçişleri, sabit ışık, otomatik dönüş/konfeti kapalı.
 - Klavye: atla bağlantısı, odak halkaları, 3D görünümde ok tuşları/W-A-S-D/R/N/P/+/−, sunumda ←/→/Esc, lightbox'ta ←/→/Esc.
