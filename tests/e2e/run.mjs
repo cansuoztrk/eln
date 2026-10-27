@@ -192,6 +192,7 @@ await test('walkthrough: keyboard movement stays inside the walk radius', async 
 });
 
 await test('environment: night / dusk / day buttons', async () => {
+  await go(page, '#/explore'); // the time-of-day buttons live in the camera dock, shown with a module panel
   for (const [label, env] of [['Alacakaranlık', 'dusk'], ['Gündüz', 'day'], ['Gece', 'night']]) {
     await page.getByRole('button', { name: label, exact: true }).click();
     await until(page, (e) => window.__aslan.useView.getState().env === e, env);
@@ -225,6 +226,7 @@ await test('digital twin: layers, presets, exploded view, focus and section', as
 });
 
 await test('object inspector: clicking the model selects a component; close button works', async () => {
+  await go(page, '#/architecture');
   await page.evaluate(() => window.__aslan.worldApi.flyTo({ pos: [0, 330, 40], target: [0, 0, 0] }, { instant: true, mode: 'explorer' }));
   await page.waitForTimeout(1200);
   const box = await page.locator('#world-canvas canvas').boundingBox();
@@ -252,6 +254,7 @@ await test('DNA engine: presets apply, confirm dialog protects customisations, l
 });
 
 await test('DNA engine: conflict detection and one-click alternatives', async () => {
+  await go(page, '#/design');
   await page.locator('#panel').getByRole('combobox', { name: 'Görsel dil' }).selectOption('minimal');
   await page.locator('#panel').getByRole('combobox', { name: 'Dijital ekran düzeni' }).selectOption('media-facade');
   await page.getByText('Sade mimari dil ile yoğun ışık/ekran birbirini zayıflatıyor').waitFor();
@@ -261,6 +264,7 @@ await test('DNA engine: conflict detection and one-click alternatives', async ()
 });
 
 await test('top bar: undo / redo', async () => {
+  await go(page, '#/design');
   const before = (await design(page)).seats.choreography;
   const next = before === 'stars' ? 'wave' : 'stars';
   await page.locator('#panel').getByRole('combobox', { name: 'Tribün koreografisi' }).selectOption(next);
@@ -586,7 +590,11 @@ await browser.close();
 server?.kill();
 
 const failed = results.filter((r) => !r.ok);
-const uniqueErrors = [...new Set(pageErrors)].filter((e) => !/THREE\.Clock|GPU stall|WebGL: INVALID_|GL_INVALID|Download the React DevTools/.test(e));
+// software-GL driver noise and library deprecations are counted, not failed
+const KNOWN = /THREE\.Clock|GPU stall|WebGL: INVALID_|GL_INVALID|Download the React DevTools/;
+const uniqueErrors = [...new Set(pageErrors)].filter((e) => !KNOWN.test(e));
+const known = [...new Set(pageErrors)].filter((e) => KNOWN.test(e));
 console.log(`\n${results.length - failed.length}/${results.length} passed`);
 if (uniqueErrors.length) console.log(`Page errors (${uniqueErrors.length}):\n  ${uniqueErrors.slice(0, 10).join('\n  ')}`);
+console.log(`Known driver/library console errors ignored: ${known.length}${known.length ? `\n  ${known.slice(0, 5).join('\n  ')}` : ''}`);
 process.exit(failed.length || uniqueErrors.length ? 1 : 0);

@@ -20,6 +20,7 @@
 8. [Testler ve test durumu](#testler-ve-test-durumu)
 9. [Bilinen sınırlar ve sonraki adımlar](#bilinen-sınırlar-ve-sonraki-adımlar)
 10. [Kaynaklar](#kaynaklar)
+11. [Son test sonuçları](#son-test-sonuçları)
 
 ---
 
@@ -216,4 +217,24 @@ Kaynaklar arasındaki farklar (kapasite yılları, GES gücü, alan değerleri) 
 
 ## Son test sonuçları
 
-_Bu bölüm test çalıştırmasından sonra güncellenir._
+27 Ekim 2026, uygulama kodu `a45b4fc` commit'i:
+
+| Kontrol | Sonuç |
+|---|---|
+| `npm run build` (tsc + Vite) | Hatasız |
+| `npm test` | **34/34** birim testi geçti |
+| `npm run test:e2e` | **33/33** uçtan uca test geçti (yaklaşık 16 dakika), sayfa hatası 0 |
+| Konsol taraması (ana sayfa, mimari, ışık gösterisi, şampiyonluk atmosferi, şehir, paylaşım, görsel yakalama, patlatma + kesit) | Hata yok; tek uyarı R3F'nin kullandığı `THREE.Clock` için kütüphane kaynaklı kullanımdan kaldırma uyarısı |
+| Görsel kontrol (orta kalite, gece / alacakaranlık / gündüz) | Işık, gökyüzü ve ortam yansımaları beklendiği gibi, artefakt yok |
+
+Ortam: başsız Chromium (Playwright 1.63.0), yazılım tabanlı WebGL (SwiftShader), 4 çekirdekli bulut konteyneri, düşük kalite ayarı; masaüstü 1440×900, mobil 390×844 dokunmatik emülasyon. Bu ortamda kare hızı saniyede 1'in altına inebildiği için testler sabit süre yerine durum değişikliğini bekler. Her test `E2E_ONLY` ile tek başına da çalışır; tam koşudan sonra kendi sayfasına giden dört test (ortam, Inspector, DNA çakışması, geri al/yinele) ayrıca tek tek doğrulandı.
+
+Bu turda testlerin ortaya çıkardığı ve düzeltilen sorunlar:
+
+- Görsel yakalama bir sonraki kareyi yalnızca 4 sn bekliyordu; kareleri saniyeler süren cihazlarda dışa aktarım, arşiv küçük resmi ve galeri görselleri boş dönebiliyordu. Bekleme 20 sn'ye çıkarıldı; 3D dünya kapanırsa bekleyen yakalama hemen sonlanır.
+- 3D dünya hazır olmadan gelen kamera istekleri kayboluyordu; artık kuyruğa alınıp dünya hazır olunca uygulanıyor.
+- 2D'den 3D'ye dönüşte geç kapanan eski kamera bileşeni "dünya hazır" bayrağını sıfırlıyordu; sahiplik denetimi eklendi.
+- Tam ekran katmanlar (mobil menü, paylaşılan tasarım iletişim kutusu) açıkken sahne görünmediği hâlde çizilmeye devam ediyordu; artık duraklatılıyor.
+- Galeri, kaç görselin hazır olduğunu gösteriyor.
+
+Kapsam dışında kalanlar için bkz. [Test edilmemiş veya sınırlı test edilmiş özellikler](#test-edilmemiş-veya-sınırlı-test-edilmiş-özellikler).
