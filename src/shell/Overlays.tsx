@@ -25,9 +25,10 @@ export function CameraDock() {
     worldApi.flyToPoi(next.id);
   };
   return (
-    <div style={style} className="no-print camera-dock fixed z-20 left-3 md:left-[calc(var(--rail-w)+20px)] bottom-3 flex flex-wrap items-center gap-1.5 glass rounded-2xl p-1.5 max-w-[calc(100vw-24px)]">
+    <div style={style} className="no-print camera-dock fixed z-20 left-3 lg:left-[calc(var(--rail-w)+20px)] bottom-3 flex flex-wrap items-center gap-1.5 glass rounded-2xl p-1.5 max-w-[calc(100vw-24px)]">
       <Segmented
         label="Kamera modu"
+        iconOnly={mobile}
         value={mode === 'seat' ? 'walkthrough' : mode}
         onChange={(v) => {
           if (v === 'explorer') worldApi.resetView();
@@ -93,7 +94,7 @@ export function Inspector() {
   if (!selected) return null;
   const info = componentInfo(selected);
   return (
-    <aside aria-label="Object Inspector" className="no-print inspector fixed z-30 glass rounded-2xl p-4 shadow-2xl w-[320px] max-w-[calc(100vw-24px)] left-3 md:left-[calc(var(--rail-w)+20px)] top-[calc(var(--top-h)+8px)] max-h-[60vh] scroll-y">
+    <aside aria-label="Object Inspector" className="no-print inspector fixed z-30 glass rounded-2xl p-4 shadow-2xl w-[320px] max-w-[calc(100vw-24px)] left-3 lg:left-[calc(var(--rail-w)+20px)] top-[calc(var(--top-h)+8px)] max-h-[60vh] scroll-y">
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="kicker mb-1">Object Inspector</div>

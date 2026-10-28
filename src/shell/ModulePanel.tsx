@@ -65,7 +65,7 @@ export function ModulePanel({ module }: { module: ModuleId }) {
       aria-label={meta.title}
       className={`no-print module-panel fixed z-20 glass flex flex-col shadow-2xl
         inset-x-0 bottom-0 rounded-t-2xl ${open ? 'h-[56vh]' : 'h-[58px]'}
-        md:inset-x-auto md:right-3 md:top-[calc(var(--top-h)+8px)] md:bottom-3 md:h-auto md:w-[var(--panel-w)] md:rounded-2xl`}
+        lg:inset-x-auto lg:right-3 lg:top-[calc(var(--top-h)+8px)] lg:bottom-3 lg:h-auto lg:w-[var(--panel-w)] lg:rounded-2xl`}
     >
       <header className="flex items-center gap-3 px-4 pt-3 pb-2.5 border-b border-line">
         <Icon name={meta.icon} size={20} className="text-gold shrink-0" />
@@ -73,18 +73,18 @@ export function ModulePanel({ module }: { module: ModuleId }) {
           <h2 className="display text-[16px] font-semibold leading-tight truncate">{meta.title}</h2>
           <p className="text-[12px] muted truncate">{meta.subtitle}</p>
         </div>
-        <button type="button" className="btn btn-icon btn-sm md:hidden" onClick={() => set({ panelOpen: !open })} aria-expanded={open} aria-label={open ? 'Paneli küçült' : 'Paneli genişlet'}>
+        <button type="button" className="btn btn-icon btn-sm lg:hidden" onClick={() => set({ panelOpen: !open })} aria-expanded={open} aria-label={open ? 'Paneli küçült' : 'Paneli genişlet'}>
           <Icon name={open ? 'ChevronDown' : 'ChevronUp'} size={16} />
         </button>
       </header>
-      <div className={`flex-1 scroll-y px-4 pt-3 pb-6 ${open ? '' : 'hidden md:block'}`}>
+      <div className={`flex-1 scroll-y px-4 pt-3 pb-6 ${open ? '' : 'hidden lg:block'}`}>
         <ModuleBoundary id={module}>
           <Suspense fallback={<div className="muted text-[13px] py-6">Modül yükleniyor…</div>}>
             <Cmp />
           </Suspense>
         </ModuleBoundary>
       </div>
-      <footer className={`px-4 py-2 border-t border-line text-[11px] leading-snug text-faint ${open ? '' : 'hidden md:block'}`}>
+      <footer className={`px-4 py-2 border-t border-line text-[11px] leading-snug text-faint ${open ? '' : 'hidden lg:block'}`}>
         Konsept 3D model: yayımlanmış oranlara dayanır, gerçek stadyumun birebir ölçülü rölövesi değildir.{' '}
         {module !== 'about' && (
           <button type="button" className="underline hover:text-text" onClick={() => navigate('about')}>

@@ -49,9 +49,11 @@ export function Hero() {
   const set = useView((s) => s.set);
   if (introPlaying) return <IntroTitles onSkip={() => set({ introPlaying: false, introFlying: false, introSeen: true })} />;
   return (
-    <div className="no-print fixed inset-0 z-10 pointer-events-none flex flex-col justify-end md:justify-center">
+    <div className="no-print fixed inset-0 z-10 pointer-events-none flex flex-col justify-end lg:justify-center">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(7,8,12,0.78),transparent_62%)]" aria-hidden="true" />
-      <div className="relative px-5 md:px-[7vw] pb-8 md:pb-0 max-w-[1100px]">
+      {/* phones: the text sits low over the model, so shade the lower part for legibility */}
+      <div className="absolute inset-x-0 bottom-0 h-[78%] lg:hidden bg-gradient-to-t from-ink via-ink/85 to-transparent" aria-hidden="true" />
+      <div className="relative px-5 md:px-10 lg:px-[7vw] pb-8 lg:pb-0 max-w-[1100px]">
         <div className="kicker fade-up mb-3" style={{ animationDelay: '0.2s' }}>
           RAMS Park · Seyrantepe · İstanbul — bağımsız konsept platformu
         </div>
@@ -66,9 +68,15 @@ export function Hero() {
         <p className="fade-up mt-2 text-[14.5px] muted max-w-[560px] leading-relaxed" style={{ animationDelay: '1.1s' }}>
           <span className="text-text font-semibold">Bir Efsaneyi İzleme. Geleceğini Tasarla.</span> — Don’t Just Witness a Legend. Design Its Future.
         </p>
-        <div className="fade-up mt-7 flex flex-wrap gap-2.5 pointer-events-auto" style={{ animationDelay: '1.4s' }}>
+        <div className="fade-up mt-6 lg:mt-7 grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:gap-2.5 pointer-events-auto" style={{ animationDelay: '1.4s' }}>
           {CTAS.map((c, i) => (
-            <button key={c.label} type="button" onClick={c.go} className={`btn ${i === 0 ? 'btn-primary' : i === 1 ? 'btn-gold' : 'glass'} h-12 px-4 rounded-xl`} aria-label={`${c.label} — ${c.tr}`}>
+            <button
+              key={c.label}
+              type="button"
+              onClick={c.go}
+              className={`btn ${i === 0 ? 'btn-primary col-span-2' : i === 1 ? 'btn-gold' : 'glass'} min-h-12 h-auto py-2 lg:h-12 lg:py-0 px-3 lg:px-4 rounded-xl !justify-start lg:!justify-center`}
+              aria-label={`${c.label} — ${c.tr}`}
+            >
               <Icon name={c.icon} size={17} />
               <span className="text-left leading-tight">
                 <span className="block text-[12.5px] font-extrabold tracking-[0.06em]">{c.label}</span>

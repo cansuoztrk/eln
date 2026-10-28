@@ -83,6 +83,9 @@ export function Renderer({ bloom }: { bloom: boolean }) {
     } else {
       const req = pending;
       pending = null;
+      // exported images use the full frame, not the on-screen offset that dodges the panels
+      const view = camera.view?.enabled ? { ...camera.view } : null;
+      if (view) camera.clearViewOffset();
       try {
         const prev = gl.getSize(new THREE.Vector2());
         const prevDpr = gl.getPixelRatio();
@@ -98,10 +101,12 @@ export function Renderer({ bloom }: { bloom: boolean }) {
         gl.setSize(prev.x, prev.y, false);
         camera.aspect = prevAspect;
         camera.updateProjectionMatrix();
+        if (view) camera.setViewOffset(view.fullWidth, view.fullHeight, view.offsetX, view.offsetY, view.width, view.height);
         composer?.setSize(prev.x, prev.y);
         render();
         req.resolve(url);
       } catch {
+        if (view) camera.setViewOffset(view.fullWidth, view.fullHeight, view.offsetX, view.offsetY, view.width, view.height);
         req.resolve(null);
       }
     }

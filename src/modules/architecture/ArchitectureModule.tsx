@@ -113,24 +113,14 @@ export default function ArchitectureModule() {
         </div>
       </Section>
 
-      <Section
-        title="Katmanlar"
-        kicker="15 bağımsız katman"
-        actions={
-          <div className="flex gap-1">
-            {PRESETS.map((p) => (
-              <button
-                key={p.label}
-                type="button"
-                className="chip !min-h-[26px] !px-2 text-[11px]"
-                onClick={() => LAYER_IDS.forEach((id) => setLayer(id, p.layers.includes(id)))}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        }
-      >
+      <Section title="Katmanlar" kicker="15 bağımsız katman">
+        <div className="flex flex-wrap gap-1.5 mb-2" role="group" aria-label="Katman ön ayarları">
+          {PRESETS.map((p) => (
+            <button key={p.label} type="button" className="chip !min-h-[28px] !px-2.5 text-[11.5px]" onClick={() => LAYER_IDS.forEach((id) => setLayer(id, p.layers.includes(id)))}>
+              {p.label}
+            </button>
+          ))}
+        </div>
         <div className="divide-y divide-line">
           {LAYER_IDS.map((id) => (
             <div key={id} className="flex items-center gap-2">

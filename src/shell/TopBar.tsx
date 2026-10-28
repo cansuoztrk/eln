@@ -58,7 +58,7 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
   return (
     <header className="no-print fixed top-0 inset-x-0 z-30 h-[var(--top-h)] flex items-center gap-2 px-3 md:px-4 pointer-events-none">
       <div className="pointer-events-auto flex items-center gap-2 min-w-0">
-        <button type="button" className="btn btn-icon btn-ghost md:hidden glass" onClick={onMenu} aria-label="Modül menüsünü aç">
+        <button type="button" className="btn btn-icon btn-ghost lg:hidden glass" onClick={onMenu} aria-label="Modül menüsünü aç">
           <Icon name="Menu" />
         </button>
         <button type="button" onClick={() => navigate('home')} className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 hover:bg-white/5" aria-label="ASLAN 2035 OMEGA ana sayfa">
@@ -67,7 +67,7 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
             <ellipse cx="32" cy="34" rx="12" ry="7" fill="#d4213d" />
             <path d="M10 30 Q32 8 54 30" fill="none" stroke="#f2b631" strokeWidth="3" />
           </svg>
-          <span className="display font-bold tracking-tight text-[15px] whitespace-nowrap">
+          <span className="hidden min-[430px]:inline display font-bold tracking-tight text-[15px] whitespace-nowrap">
             ASLAN 2035 <span className="text-gold">Ω</span>
           </span>
         </button>

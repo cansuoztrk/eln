@@ -9,7 +9,7 @@ import { useCoverWorld } from './useCoverWorld';
 export function ModuleRail() {
   const module = useView((s) => s.module);
   return (
-    <nav aria-label="Modüller" className="no-print hidden md:flex fixed left-3 top-[calc(var(--top-h)+8px)] bottom-3 z-20 w-[var(--rail-w)] flex-col glass rounded-2xl py-2 scroll-y">
+    <nav aria-label="Modüller" className="no-print hidden lg:flex fixed left-3 top-[calc(var(--top-h)+8px)] bottom-3 z-20 w-[var(--rail-w)] flex-col glass rounded-2xl py-2 scroll-y">
       {GROUPS.map((g) => (
         <div key={g.id} className="flex flex-col items-center gap-0.5 pb-1.5 mb-1.5 border-b border-line last:border-0">
           <div className="text-[8.5px] font-extrabold tracking-[0.12em] uppercase text-faint text-center px-1 leading-tight mb-0.5" aria-hidden="true">

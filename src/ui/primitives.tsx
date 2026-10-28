@@ -129,7 +129,20 @@ export function LockButton({ locked, onClick, label }: { locked: boolean; onClic
   );
 }
 
-export function Segmented<T extends string>({ label, value, options, onChange }: { label?: string; value: T; options: { value: T; label: string; icon?: string }[]; onChange: (v: T) => void }) {
+export function Segmented<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  iconOnly = false,
+}: {
+  label?: string;
+  value: T;
+  options: { value: T; label: string; icon?: string }[];
+  onChange: (v: T) => void;
+  /** show only the icons (labels stay for screen readers) where space is tight */
+  iconOnly?: boolean;
+}) {
   return (
     <div role="group" aria-label={label} className="inline-flex p-1 rounded-xl bg-surface-2 border border-line gap-1 flex-wrap">
       {options.map((o) => (
@@ -138,10 +151,11 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
           type="button"
           aria-pressed={value === o.value}
           onClick={() => onChange(o.value)}
-          className={`h-8 px-3 rounded-lg text-[12.5px] font-semibold flex items-center gap-1.5 transition ${value === o.value ? 'bg-aslan text-white' : 'text-muted hover:text-text'}`}
+          title={iconOnly ? o.label : undefined}
+          className={`h-8 ${iconOnly && o.icon ? 'px-2.5' : 'px-3'} rounded-lg text-[12.5px] font-semibold flex items-center gap-1.5 transition ${value === o.value ? 'bg-aslan text-white' : 'text-muted hover:text-text'}`}
         >
           {o.icon && <Icon name={o.icon} size={14} />}
-          {o.label}
+          {iconOnly && o.icon ? <span className="sr-only">{o.label}</span> : o.label}
         </button>
       ))}
     </div>

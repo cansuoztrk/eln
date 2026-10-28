@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { clearParams, useRoute } from '@/core/router';
-import { useView } from '@/core/store/viewStore';
+import { COMPACT_LAYOUT, useView } from '@/core/store/viewStore';
 import { useDesign } from '@/core/store/designStore';
 import { decodeDesign } from '@/core/model/sanitize';
 import type { DesignConfig } from '@/core/model/design';
@@ -74,6 +74,14 @@ export default function App() {
   const module = route.module;
 
   // route → view state
+  // the compact layout follows the viewport (rotation, resizing) like the CSS breakpoint
+  useEffect(() => {
+    const mq = window.matchMedia(COMPACT_LAYOUT);
+    const sync = () => set({ mobile: mq.matches });
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, [set]);
+
   useEffect(() => {
     set({ module, selected: null });
   }, [module, set]);

@@ -5,6 +5,12 @@ import type { ModuleId } from '../modules';
 import { detectDevice, prefersReducedMotion, type Quality } from '../quality';
 import { readJSON, writeJSON } from '../storage';
 
+/**
+ * Compact layout for phones and portrait tablets (bottom sheet, module menu): below the CSS lg
+ * breakpoint, so it follows rotation and resizing exactly like the stylesheet.
+ */
+export const COMPACT_LAYOUT = '(max-width: 1023.98px)';
+
 export type CameraMode = 'explorer' | 'walkthrough' | 'seat';
 export type SectionMode = 'off' | 'long' | 'short';
 export type EnvMode = 'night' | 'dusk' | 'day';
@@ -26,6 +32,7 @@ interface Prefs {
 
 interface ViewState extends Prefs {
   module: ModuleId;
+  /** compact layout is active (see COMPACT_LAYOUT) */
   mobile: boolean;
   webgl: boolean;
   deviceReason: string;
@@ -74,7 +81,7 @@ let toastSeq = 1;
 
 export const useView = create<ViewState>()((set, get) => ({
   module: 'home',
-  mobile: device.mobile,
+  mobile: typeof window !== 'undefined' ? (window.matchMedia?.(COMPACT_LAYOUT).matches ?? false) : false,
   webgl: device.webgl,
   deviceReason: device.reason,
   quality: savedPrefs?.qualityAuto === false && savedPrefs.quality ? savedPrefs.quality : device.quality,

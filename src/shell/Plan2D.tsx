@@ -160,7 +160,7 @@ export default function Plan2D() {
           Şematik konsept planı — gerçek parsel, yol ağı veya ölçülmüş bir plan değildir. Kuzey yukarıda varsayılmıştır.
         </text>
       </svg>
-      <div className="absolute left-3 bottom-3 md:left-[calc(var(--rail-w)+20px)] glass rounded-xl p-2 text-[11px] max-w-[260px] no-print">
+      <div className="absolute left-3 bottom-3 lg:left-[calc(var(--rail-w)+20px)] glass rounded-xl p-2 text-[11px] max-w-[260px] no-print">
         <div className="font-semibold mb-1">2D görünüm</div>
         {webgl ? (
           <>
