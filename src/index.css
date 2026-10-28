@@ -83,21 +83,20 @@ body {
 /* ---------- glass surfaces ---------- */
 .glass {
   background: rgb(12 14 20 / 0.78);
+  /* written once, unprefixed: the CSS minifier adds the -webkit- copy for Safari itself and,
+     given both, kept only the prefixed one, which Chromium ignores */
   backdrop-filter: blur(14px) saturate(1.2);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid var(--color-line);
 }
 /* the blur re-filters the live 3D canvas every frame: skip it on low quality (phones, weak GPUs) */
 [data-quality='low'] .glass {
   background: rgb(12 14 20 / 0.93);
   backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 @media (prefers-reduced-transparency: reduce) {
   .glass {
     background: rgb(12 14 20 / 0.96);
     backdrop-filter: none;
-    -webkit-backdrop-filter: none;
   }
 }
 
