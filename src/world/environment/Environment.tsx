@@ -3,7 +3,7 @@
  * city lights, a strait with a suspension-bridge silhouette. Abstract and
  * procedural — not a geographic reconstruction.
  */
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Environment as EnvironmentMap, Lightformer, Stars } from '@react-three/drei';
@@ -28,6 +28,11 @@ function EnvDirector() {
   const night = useEffectiveDesign().palette.night;
   const target = useMemo(() => targetLook(env, night), [env, night]);
   const first = useRef(true);
+  useEffect(() => {
+    // the ?e2e=1 test hook reads the eased values to check that a switch is a transition
+    const hook = (window as unknown as { __aslan?: Record<string, unknown> }).__aslan;
+    if (hook) hook.look = look;
+  }, []);
   useFrame((_, dt) => {
     const v = useView.getState();
     const k = first.current || v.reducedMotion || v.capturing ? 1 : 1 - Math.exp(-Math.min(dt, 0.1) * 2.6);

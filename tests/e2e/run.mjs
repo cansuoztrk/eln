@@ -153,7 +153,7 @@ await test('walkthrough: every walkthrough point can be visited from the list', 
   await go(page, '#/explore');
   const names = ['Dış giriş meydanı', 'Ana giriş', 'İç dolaşım alanı', 'Tribün girişi', 'Koltuk sırası', 'Saha kenarı', 'Oyuncu tüneli', 'Çatıya bakan özel kamera', 'Taraftar meydanı', 'Müze ve deneyim alanı'];
   for (const n of names) {
-    await page.locator('#panel').getByRole('button', { name: new RegExp(`^\\d+\\s*${n}`) }).click();
+    await page.locator('#panel').getByRole('button', { name: new RegExp(`^\\d+\\.?\\s*${n}`) }).click();
     await page.waitForTimeout(700);
   }
   const v = await view(page);
@@ -206,6 +206,16 @@ await test('environment: night / dusk / day buttons', async () => {
     await page.getByRole('button', { name: label, exact: true }).click();
     await until(page, (e) => window.__aslan.useView.getState().env === e, env);
   }
+  // night → day is a transition: the sky light passes through in-between levels (night 0.42, day 1.4)
+  await until(page, () => window.__aslan.look.hemiIntensity < 0.45, null);
+  await page.getByRole('button', { name: 'Gündüz', exact: true }).click();
+  const levels = [];
+  for (let i = 0; i < 40 && !(levels.at(-1) > 1.39); i++) {
+    levels.push(await page.evaluate(() => window.__aslan.look.hemiIntensity));
+    await page.waitForTimeout(120);
+  }
+  assert(levels.some((v) => v > 0.5 && v < 1.3), `no in-between light level: ${levels.map((v) => v.toFixed(2)).join(' ')}`);
+  await page.getByRole('button', { name: 'Gece', exact: true }).click();
 });
 
 await test('digital twin: layers, presets, exploded view, focus and section', async () => {

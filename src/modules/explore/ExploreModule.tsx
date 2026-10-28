@@ -39,26 +39,32 @@ export default function ExploreModule() {
       </Section>
 
       <Section title="Gezinti noktaları" kicker="Walkthrough">
-        <ol className="grid grid-cols-1 gap-1.5">
-          {POIS.map((p, i) => (
-            <li key={p.id}>
-              <button
-                type="button"
-                aria-current={poi === p.id ? 'true' : undefined}
-                onClick={() => worldApi.flyToPoi(p.id)}
-                className={`w-full text-left rounded-xl border px-3 py-2.5 flex gap-3 items-start transition ${poi === p.id ? 'border-aslan bg-aslan/12' : 'border-line bg-surface-2 hover:border-white/20'}`}
-              >
-                <span className="w-6 h-6 shrink-0 rounded-full bg-surface-3 text-[11px] font-bold flex items-center justify-center">{i + 1}</span>
-                <span className="flex-1">
-                  <span className="text-[13.5px] font-semibold flex items-center gap-2">
-                    {p.name}
-                    {p.concept && <Badge kind="concept">İç mekân konsept</Badge>}
-                  </span>
-                  <span className="block text-[12px] muted leading-snug mt-0.5">{p.description}</span>
+        {/* the walk as a route: numbered stops on a line; only the current stop shows its description */}
+        <ol>
+          {POIS.map((p, i) => {
+            const here = poi === p.id;
+            return (
+              <li key={p.id} className="relative pl-9">
+                {i < POIS.length - 1 && <span aria-hidden="true" className="absolute left-[13px] top-8 -bottom-1 w-px bg-line" />}
+                <span
+                  aria-hidden="true"
+                  className={`absolute left-0 top-[5px] w-[27px] h-[27px] rounded-full border text-[11px] font-bold flex items-center justify-center ${here ? 'bg-aslan border-aslan text-white' : 'bg-surface-2 border-line'}`}
+                >
+                  {i + 1}
                 </span>
-              </button>
-            </li>
-          ))}
+                <button type="button" className="tree-item !items-start !py-2" aria-current={here ? 'true' : undefined} onClick={() => worldApi.flyToPoi(p.id)}>
+                  <span className="sr-only">{i + 1}. </span>
+                  <span className="flex-1">
+                    <span className="flex flex-wrap items-center gap-2">
+                      {p.name}
+                      {p.concept && <Badge kind="concept">İç mekân konsept</Badge>}
+                    </span>
+                    {here && <span className="block text-[12px] font-normal muted leading-snug mt-1">{p.description}</span>}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ol>
       </Section>
 
