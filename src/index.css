@@ -455,7 +455,8 @@ input[type='color'] {
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 0.92;
-  font-size: clamp(44px, 8.4vw, 118px);
+  /* follows the height too, so the title stays on screen on landscape phones */
+  font-size: clamp(36px, min(8.4vw, 13vh), 118px);
   text-shadow: 0 10px 60px rgb(0 0 0 / 0.6);
 }
 .hero-omega {

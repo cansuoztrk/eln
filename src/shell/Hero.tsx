@@ -49,11 +49,13 @@ export function Hero() {
   const set = useView((s) => s.set);
   if (introPlaying) return <IntroTitles onSkip={() => set({ introPlaying: false, introFlying: false, introSeen: true })} />;
   return (
-    <div className="no-print fixed inset-0 z-10 pointer-events-none flex flex-col justify-end lg:justify-center">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(7,8,12,0.78),transparent_62%)]" aria-hidden="true" />
-      {/* phones: the text sits low over the model, so shade the lower part for legibility */}
-      <div className="absolute inset-x-0 bottom-0 h-[78%] lg:hidden bg-gradient-to-t from-ink via-ink/85 to-transparent" aria-hidden="true" />
-      <div className="relative px-5 md:px-10 lg:px-[7vw] pb-8 lg:pb-0 max-w-[1100px]">
+    // scrolls instead of clipping when the text is taller than the screen (landscape phones);
+    // margin-top: auto keeps it low (centred on desktop) without pushing its top off-screen
+    <div className="no-print fixed inset-0 z-10 pointer-events-none flex flex-col overflow-y-auto pt-[calc(var(--top-h)+8px)]">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(7,8,12,0.78),transparent_62%)]" aria-hidden="true" />
+      {/* compact screens: the text sits low over the model, so shade the lower part for legibility */}
+      <div className="fixed inset-x-0 bottom-0 h-[78%] lg:hidden bg-gradient-to-t from-ink via-ink/85 to-transparent" aria-hidden="true" />
+      <div className="relative mt-auto lg:mb-auto px-5 md:px-10 lg:px-[7vw] pb-8 lg:pb-0 max-w-[1100px]">
         <div className="kicker fade-up mb-3" style={{ animationDelay: '0.2s' }}>
           RAMS Park · Seyrantepe · İstanbul — bağımsız konsept platformu
         </div>
