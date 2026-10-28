@@ -488,6 +488,8 @@ input[type='color'] {
   right: 0;
   height: 9vh;
   background: #000;
+}
+.intro-bar--run {
   animation: introBars 7.5s ease-in-out both;
 }
 .intro-bar--top {

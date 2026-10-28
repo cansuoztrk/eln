@@ -266,7 +266,7 @@ export function CameraRig() {
     const v = useView.getState();
     if (v.introPlaying && !v.reducedMotion) {
       c.setLookAt(...INTRO_START.pos, ...INTRO_START.target, false);
-      state.current.introStart = performance.now();
+      state.current.introStart = 0; // the clock starts with the first rendered frame
       runtime.reveal = 0;
     } else {
       c.setLookAt(...HOME_POSE.pos, ...HOME_POSE.target, false);
@@ -327,6 +327,11 @@ export function CameraRig() {
 
     // cinematic intro
     if (v.introPlaying) {
+      if (!st.introStart) {
+        // start the flight with the first frame the user actually sees, and the title sequence with it
+        st.introStart = performance.now();
+        set({ introFlying: true });
+      }
       const t = Math.min(1, (performance.now() - st.introStart) / 7500);
       const e = easeInOut(t);
       const from = new THREE.Vector3(...INTRO_START.pos);
@@ -338,7 +343,7 @@ export function CameraRig() {
       runtime.reveal = Math.min(1, Math.max(0, (t - 0.25) / 0.6));
       if (t >= 1) {
         runtime.reveal = 1;
-        set({ introPlaying: false, introSeen: true });
+        set({ introPlaying: false, introFlying: false, introSeen: true });
       }
       return;
     }

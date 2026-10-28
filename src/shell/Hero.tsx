@@ -11,26 +11,31 @@ const CTAS = [
 ] as const;
 
 /**
- * Opening title sequence over the first-visit camera flight. The CSS timing
- * matches the 7.5 s flight in the camera rig: place line, title, slogan,
- * then the letterbox bars retract and the home screen fades in.
+ * Opening title sequence over the first-visit camera flight. It mounts with
+ * the flight's first frame and its CSS timing matches the 7.5 s flight:
+ * place line, title, slogan, then the letterbox bars retract.
  */
 function IntroTitles({ onSkip }: { onSkip: () => void }) {
+  // bars hold still while the 3D world loads; titles and bar retraction start with the flight
+  const flying = useView((s) => s.introFlying);
   return (
     <div className="no-print fixed inset-0 z-10 pointer-events-none">
-      <div className="intro-bar intro-bar--top" aria-hidden="true" />
-      <div className="intro-bar intro-bar--bottom" aria-hidden="true" />
-      <div className="absolute inset-x-0 bottom-[19vh] px-6 text-center">
-        <p className="intro-line kicker" style={{ animationDelay: '0.5s' }}>
-          RAMS Park · Seyrantepe · İstanbul
-        </p>
-        <h1 className="intro-line intro-line--long hero-title mt-2" style={{ animationDelay: '2.3s' }}>
-          ASLAN 2035 <span className="hero-omega">OMEGA</span>
-        </h1>
-        <p className="intro-line display mt-3 text-[clamp(16px,2vw,24px)] text-text/90" style={{ animationDelay: '4.3s' }}>
-          Bir Efsaneyi İzleme. Geleceğini Tasarla.
-        </p>
-      </div>
+      <div className={`intro-bar intro-bar--top ${flying ? 'intro-bar--run' : ''}`} aria-hidden="true" />
+      <div className={`intro-bar intro-bar--bottom ${flying ? 'intro-bar--run' : ''}`} aria-hidden="true" />
+      <h1 className="sr-only">ASLAN 2035 OMEGA</h1>
+      {flying && (
+        <div className="absolute inset-x-0 bottom-[19vh] px-6 text-center" aria-hidden="true">
+          <p className="intro-line kicker" style={{ animationDelay: '0.5s' }}>
+            RAMS Park · Seyrantepe · İstanbul
+          </p>
+          <p className="intro-line intro-line--long hero-title mt-2" style={{ animationDelay: '2.3s' }}>
+            ASLAN 2035 <span className="hero-omega">OMEGA</span>
+          </p>
+          <p className="intro-line display mt-3 text-[clamp(16px,2vw,24px)] text-text/90" style={{ animationDelay: '4.3s' }}>
+            Bir Efsaneyi İzleme. Geleceğini Tasarla.
+          </p>
+        </div>
+      )}
       {/* focused on mount so keyboard users can skip at once */}
       <button type="button" autoFocus className="pointer-events-auto btn glass absolute right-4 bottom-4 md:right-8 md:bottom-8" onClick={onSkip}>
         <Icon name="SkipForward" size={16} /> Açılışı atla
@@ -42,7 +47,7 @@ function IntroTitles({ onSkip }: { onSkip: () => void }) {
 export function Hero() {
   const introPlaying = useView((s) => s.introPlaying);
   const set = useView((s) => s.set);
-  if (introPlaying) return <IntroTitles onSkip={() => set({ introPlaying: false, introSeen: true })} />;
+  if (introPlaying) return <IntroTitles onSkip={() => set({ introPlaying: false, introFlying: false, introSeen: true })} />;
   return (
     <div className="no-print fixed inset-0 z-10 pointer-events-none flex flex-col justify-end md:justify-center">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(7,8,12,0.78),transparent_62%)]" aria-hidden="true" />

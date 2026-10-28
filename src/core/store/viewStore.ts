@@ -50,6 +50,8 @@ interface ViewState extends Prefs {
   volume: number;
   crowdIn3D: boolean;
   introPlaying: boolean;
+  /** the intro camera flight has drawn its first frame (the title sequence starts with it) */
+  introFlying: boolean;
   capturing: boolean;
   /** number of open full-screen overlays hiding the 3D world (it stops drawing while > 0) */
   worldCovered: number;
@@ -98,6 +100,7 @@ export const useView = create<ViewState>()((set, get) => ({
   volume: 0.6,
   crowdIn3D: false,
   introPlaying: false,
+  introFlying: false,
   capturing: false,
   worldCovered: 0,
   panelOpen: true,
