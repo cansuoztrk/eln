@@ -1,7 +1,7 @@
 /**
  * Moves the picture's centre into the part of the screen the interface leaves
  * free: between the module rail and the side panel on wide screens, beside the
- * hero text on the desktop home screen and above it on phones. Eased, instant
+ * home text on landscape screens and above it on portrait ones. Eased, instant
  * with reduced motion; image captures render without it (see Renderer).
  */
 import { useRef } from 'react';
@@ -17,7 +17,7 @@ let panelWidth = 0;
 function target(width: number, height: number): [number, number] {
   const v = useView.getState();
   if (v.introPlaying || v.module === 'present' || v.module === 'report') return [0, 0];
-  if (v.module === 'home') return v.mobile ? [0, height * 0.18] : [-width * 0.1, 0];
+  if (v.module === 'home') return width >= height ? [-width * 0.1, 0] : [0, height * 0.26];
   if (v.mobile) return [0, 0]; // compact layout: the canvas already ends above the bottom sheet
   panelWidth ||= parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--panel-w')) || 420;
   return [(panelWidth + PANEL_MARGIN - RAIL) / 2, 0];
