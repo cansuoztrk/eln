@@ -9,7 +9,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
 import CameraControlsImpl from 'camera-controls';
 import { useView, type CameraMode } from '@/core/store/viewStore';
-import { HOME_POSE, INTRO_START, POIS, POI_BY_ID, type PoiZone } from './pois';
+import { INTRO_START, POIS, POI_BY_ID, homePose, type PoiZone } from './pois';
 import { fadeOverlay, flushPendingCamera, worldApi, type CameraPose, type Vec3 } from '../worldApi';
 import { runtime } from '../runtime';
 import { requestFrameCapture } from '../Renderer';
@@ -163,10 +163,10 @@ export function CameraRig() {
       set({ cameraMode: 'explorer', poi: null });
       if (fade)
         void fadeOverlay(true).then(() => {
-          apply(HOME_POSE, 'explorer', false);
+          apply(homePose(camera.aspect), 'explorer', false);
           void fadeOverlay(false);
         });
-      else apply(HOME_POSE, 'explorer', !useView.getState().reducedMotion);
+      else apply(homePose(camera.aspect), 'explorer', !useView.getState().reducedMotion);
     };
 
     worldApi.saveView = () => {
@@ -269,7 +269,8 @@ export function CameraRig() {
       state.current.introStart = 0; // the clock starts with the first rendered frame
       runtime.reveal = 0;
     } else {
-      c.setLookAt(...HOME_POSE.pos, ...HOME_POSE.target, false);
+      const home = homePose(camera.aspect);
+      c.setLookAt(...home.pos, ...home.target, false);
       runtime.reveal = 1;
       if (v.introPlaying) set({ introPlaying: false, introSeen: true });
     }
@@ -282,7 +283,8 @@ export function CameraRig() {
     if (!c || introPlaying) return;
     if (runtime.reveal < 1) {
       runtime.reveal = 1;
-      c.setLookAt(...HOME_POSE.pos, ...HOME_POSE.target, false);
+      const home = homePose(camera.aspect);
+      c.setLookAt(...home.pos, ...home.target, false);
     }
   }, [introPlaying]);
 
@@ -335,10 +337,11 @@ export function CameraRig() {
       const t = Math.min(1, (performance.now() - st.introStart) / 7500);
       const e = easeInOut(t);
       const from = new THREE.Vector3(...INTRO_START.pos);
-      const to = new THREE.Vector3(...HOME_POSE.pos);
+      const home = homePose(camera.aspect);
+      const to = new THREE.Vector3(...home.pos);
       const p = from.lerp(to, e);
       p.x += Math.sin(Math.PI * e) * -260;
-      const target = new THREE.Vector3(...INTRO_START.target).lerp(new THREE.Vector3(...HOME_POSE.target), e);
+      const target = new THREE.Vector3(...INTRO_START.target).lerp(new THREE.Vector3(...home.target), e);
       c.setLookAt(p.x, p.y, p.z, target.x, target.y, target.z, false);
       runtime.reveal = Math.min(1, Math.max(0, (t - 0.25) / 0.6));
       if (t >= 1) {

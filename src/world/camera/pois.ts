@@ -137,5 +137,17 @@ export const POIS: Poi[] = [
 export const POI_BY_ID = Object.fromEntries(POIS.map((p) => [p.id, p])) as Record<string, Poi>;
 
 export const HOME_POSE = { pos: [250, 135, 330] as Vec3, target: [0, 12, 0] as Vec3 };
+
+/**
+ * The home view for a canvas aspect ratio. The field of view is vertical, so a
+ * portrait phone sees a much narrower slice of the bowl: the camera moves back
+ * (up to 1.8×) until the stadium fits across. Wide screens keep HOME_POSE.
+ */
+export function homePose(aspect: number) {
+  const k = Math.min(1.8, Math.max(1, 0.67 / aspect));
+  const [px, py, pz] = HOME_POSE.pos;
+  const [tx, ty, tz] = HOME_POSE.target;
+  return { pos: [tx + (px - tx) * k, ty + (py - ty) * k, tz + (pz - tz) * k] as Vec3, target: HOME_POSE.target };
+}
 export const INTRO_START = { pos: [900, 260, 1500] as Vec3, target: [0, 40, 0] as Vec3 };
 
