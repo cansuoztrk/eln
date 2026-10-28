@@ -1,5 +1,6 @@
 import { Component, Suspense, lazy, type ComponentType, type ReactNode } from 'react';
 import { MODULE_BY_ID, type ModuleId } from '@/core/modules';
+import { navigate } from '@/core/router';
 import { useView } from '@/core/store/viewStore';
 import { Icon } from '@/ui/primitives';
 
@@ -83,6 +84,14 @@ export function ModulePanel({ module }: { module: ModuleId }) {
           </Suspense>
         </ModuleBoundary>
       </div>
+      <footer className={`px-4 py-2 border-t border-line text-[11px] leading-snug text-faint ${open ? '' : 'hidden md:block'}`}>
+        Konsept 3D model: yayımlanmış oranlara dayanır, gerçek stadyumun birebir ölçülü rölövesi değildir.{' '}
+        {module !== 'about' && (
+          <button type="button" className="underline hover:text-text" onClick={() => navigate('about')}>
+            Kaynaklar ve varsayımlar
+          </button>
+        )}
+      </footer>
     </aside>
   );
 }

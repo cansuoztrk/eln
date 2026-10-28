@@ -10,9 +10,39 @@ const CTAS = [
   { label: 'VIEW THE FUTURE', tr: 'Geleceği gör', icon: 'History', go: () => navigate('time', { phase: '4' }) },
 ] as const;
 
+/**
+ * Opening title sequence over the first-visit camera flight. The CSS timing
+ * matches the 7.5 s flight in the camera rig: place line, title, slogan,
+ * then the letterbox bars retract and the home screen fades in.
+ */
+function IntroTitles({ onSkip }: { onSkip: () => void }) {
+  return (
+    <div className="no-print fixed inset-0 z-10 pointer-events-none">
+      <div className="intro-bar intro-bar--top" aria-hidden="true" />
+      <div className="intro-bar intro-bar--bottom" aria-hidden="true" />
+      <div className="absolute inset-x-0 bottom-[19vh] px-6 text-center">
+        <p className="intro-line kicker" style={{ animationDelay: '0.5s' }}>
+          RAMS Park · Seyrantepe · İstanbul
+        </p>
+        <h1 className="intro-line intro-line--long hero-title mt-2" style={{ animationDelay: '2.3s' }}>
+          ASLAN 2035 <span className="hero-omega">OMEGA</span>
+        </h1>
+        <p className="intro-line display mt-3 text-[clamp(16px,2vw,24px)] text-text/90" style={{ animationDelay: '4.3s' }}>
+          Bir Efsaneyi İzleme. Geleceğini Tasarla.
+        </p>
+      </div>
+      {/* focused on mount so keyboard users can skip at once */}
+      <button type="button" autoFocus className="pointer-events-auto btn glass absolute right-4 bottom-4 md:right-8 md:bottom-8" onClick={onSkip}>
+        <Icon name="SkipForward" size={16} /> Açılışı atla
+      </button>
+    </div>
+  );
+}
+
 export function Hero() {
   const introPlaying = useView((s) => s.introPlaying);
   const set = useView((s) => s.set);
+  if (introPlaying) return <IntroTitles onSkip={() => set({ introPlaying: false, introSeen: true })} />;
   return (
     <div className="no-print fixed inset-0 z-10 pointer-events-none flex flex-col justify-end md:justify-center">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_60%,rgba(7,8,12,0.78),transparent_62%)]" aria-hidden="true" />
@@ -43,17 +73,12 @@ export function Hero() {
           ))}
         </div>
         <p className="fade-up mt-6 text-[11.5px] text-faint max-w-[620px] leading-relaxed pointer-events-auto" style={{ animationDelay: '1.6s' }}>
-          Bu platform Galatasaray SK tarafından onaylanmış resmî bir dönüşüm projesi değildir. Mevcut yapıya ilişkin doğrulanmış bilgiler, öneriler ve simülasyonlar etiketlerle ayrılır.{' '}
+          Bu platform Galatasaray SK tarafından onaylanmış resmî bir dönüşüm projesi değildir. 3D model yayımlanmış oranlara dayanan yaklaşık bir konsept modeldir; birebir ölçülü değildir. Doğrulanmış bilgiler, öneriler ve simülasyonlar etiketlerle ayrılır.{' '}
           <button type="button" className="underline hover:text-text" onClick={() => navigate('about')}>
             Kaynaklar ve varsayımlar
           </button>
         </p>
       </div>
-      {introPlaying && (
-        <button type="button" className="pointer-events-auto btn glass absolute right-4 bottom-4 md:right-8 md:bottom-8" onClick={() => set({ introPlaying: false, introSeen: true })}>
-          <Icon name="SkipForward" size={16} /> Açılışı atla
-        </button>
-      )}
     </div>
   );
 }

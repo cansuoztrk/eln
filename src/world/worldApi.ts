@@ -32,6 +32,8 @@ export interface WorldApi {
   flyTo: (pose: CameraPose, opts?: { instant?: boolean; mode?: CameraMode; fade?: boolean }) => void;
   resetView: () => void;
   fitLayer: (id: LayerId) => void;
+  /** Frames a layer or a selectable part; false when it is not in the scene or hidden. */
+  fitObject: (id: string) => boolean;
   saveView: () => void;
   restoreView: () => void;
   getPose: () => CameraPose | null;
@@ -58,6 +60,7 @@ export const worldApi: WorldApi = {
   },
   resetView: () => {},
   fitLayer: () => {},
+  fitObject: () => false,
   saveView: () => {},
   restoreView: () => {},
   getPose: () => null,

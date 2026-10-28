@@ -9,23 +9,35 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Environment as EnvironmentMap, Lightformer, Stars } from '@react-three/drei';
 import { useEffectiveDesign } from '@/core/store/effective';
 import { useView } from '@/core/store/viewStore';
-import { NIGHT_COLORS } from '@/core/model/labels';
 import { QUALITY_SETTINGS } from '@/core/quality';
 import { windowsTexture } from '../textures';
-
-const ENV_COLORS = {
-  dusk: { sky: '#1a2a4f', horizon: '#d9825b', fog: '#3b3348' },
-  day: { sky: '#6fa3d9', horizon: '#cfe0ef', fog: '#a9bccd' },
-};
+import { easeLook, envPalette, look, targetLook } from './look';
 
 function useEnvPalette() {
   const env = useView((s) => s.env);
   const night = useEffectiveDesign().palette.night;
-  return env === 'night' ? NIGHT_COLORS[night] : { ...ENV_COLORS[env], accent: '#ffffff' };
+  return envPalette(env, night);
+}
+
+/**
+ * Eases the time-of-day look toward the selected environment (about 1.5 s);
+ * instant on the first frame, with reduced motion and during image captures.
+ */
+function EnvDirector() {
+  const env = useView((s) => s.env);
+  const night = useEffectiveDesign().palette.night;
+  const target = useMemo(() => targetLook(env, night), [env, night]);
+  const first = useRef(true);
+  useFrame((_, dt) => {
+    const v = useView.getState();
+    const k = first.current || v.reducedMotion || v.capturing ? 1 : 1 - Math.exp(-Math.min(dt, 0.1) * 2.6);
+    first.current = false;
+    easeLook(target, k);
+  });
+  return null;
 }
 
 function Sky() {
-  const pal = useEnvPalette();
   const mat = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -41,8 +53,10 @@ function Sky() {
       }),
     [],
   );
-  mat.uniforms.uTop.value.set(pal.sky);
-  mat.uniforms.uHorizon.value.set(pal.horizon);
+  useFrame(() => {
+    mat.uniforms.uTop.value.copy(look.sky);
+    mat.uniforms.uHorizon.value.copy(look.horizon);
+  });
   return (
     <mesh material={mat} renderOrder={-10}>
       <sphereGeometry args={[4200, 32, 16]} />
@@ -51,13 +65,20 @@ function Sky() {
 }
 
 function FogSync() {
-  const pal = useEnvPalette();
-  const env = useView((s) => s.env);
   const scene = useThree((s) => s.scene);
   useLayoutEffect(() => {
-    scene.fog = new THREE.Fog(pal.fog, env === 'day' ? 900 : 650, env === 'day' ? 4200 : 3400);
-    scene.background = new THREE.Color(pal.sky);
-  }, [scene, pal.fog, pal.sky, env]);
+    scene.fog = new THREE.Fog(look.fog.clone(), look.fogNear, look.fogFar);
+    scene.background = look.sky.clone();
+  }, [scene]);
+  useFrame(() => {
+    const fog = scene.fog as THREE.Fog | null;
+    if (fog) {
+      fog.color.copy(look.fog);
+      fog.near = look.fogNear;
+      fog.far = look.fogFar;
+    }
+    if (scene.background instanceof THREE.Color) scene.background.copy(look.sky);
+  });
   return null;
 }
 
@@ -71,7 +92,6 @@ function seeded(seed: number) {
 
 function City() {
   const quality = useView((s) => s.quality);
-  const env = useView((s) => s.env);
   const count = QUALITY_SETTINGS[quality].cityCount;
   const ref = useRef<THREE.InstancedMesh>(null);
   const mat = useMemo(() => {
@@ -79,8 +99,8 @@ function City() {
     return new THREE.MeshStandardMaterial({ color: '#1a1d24', emissiveMap: t, emissive: '#ffffff', emissiveIntensity: 0.8, roughness: 0.85 });
   }, []);
   useFrame(() => {
-    mat.emissiveIntensity = env === 'day' ? 0.05 : env === 'dusk' ? 0.45 : 0.8;
-    mat.color.set(env === 'day' ? '#8c929c' : '#1a1d24');
+    mat.emissiveIntensity = look.cityGlow;
+    mat.color.copy(look.city);
   });
   useLayoutEffect(() => {
     const mesh = ref.current;
@@ -121,7 +141,14 @@ function City() {
 }
 
 function Hills() {
-  const env = useView((s) => s.env);
+  const ground = useMemo(() => new THREE.MeshStandardMaterial({ color: look.hills.clone(), roughness: 1 }), []);
+  const glowMat = useMemo(() => new THREE.PointsMaterial({ size: 2.4, sizeAttenuation: true, color: '#ffcf8a', transparent: true, opacity: 0.8, toneMapped: false }), []);
+  const glow = useRef<THREE.Points>(null);
+  useFrame(() => {
+    ground.color.copy(look.hills);
+    glowMat.opacity = 0.8 * look.lights;
+    if (glow.current) glow.current.visible = look.lights > 0.02;
+  });
   const geo = useMemo(() => {
     const g = new THREE.RingGeometry(1500, 3600, 96, 6);
     g.rotateX(-Math.PI / 2);
@@ -152,20 +179,21 @@ function Hills() {
   }, []);
   return (
     <group>
-      <mesh geometry={geo}>
-        <meshStandardMaterial color={env === 'day' ? '#4d5a46' : '#0b0d10'} roughness={1} />
-      </mesh>
-      {env !== 'day' && (
-        <points geometry={lights}>
-          <pointsMaterial size={2.4} sizeAttenuation color="#ffcf8a" transparent opacity={0.8} toneMapped={false} />
-        </points>
-      )}
+      <mesh geometry={geo} material={ground} />
+      <points ref={glow} geometry={lights} material={glowMat} />
     </group>
   );
 }
 
 function Strait() {
-  const env = useView((s) => s.env);
+  const water = useMemo(() => new THREE.MeshStandardMaterial({ color: look.water.clone(), metalness: 0.6, roughness: 0.15 }), []);
+  const towerMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#2a2f38', emissive: '#7aa2ff', emissiveIntensity: 0.4 }), []);
+  const deckMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#20242c', emissive: '#ffcf8a', emissiveIntensity: 0.35 }), []);
+  useFrame(() => {
+    water.color.copy(look.water);
+    towerMat.emissiveIntensity = 0.4 * look.lights;
+    deckMat.emissiveIntensity = 0.35 * look.lights;
+  });
   const cables = useMemo(() => {
     const pts: THREE.Vector3[] = [];
     const span = 1100;
@@ -183,22 +211,18 @@ function Strait() {
     l.position.z = z;
     return l;
   }), [cables, lineMat]);
-  const lit = env !== 'day';
   return (
     <group position={[2300, 0, 300]} rotation-y={Math.PI / 2.2}>
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0.5, 0]}>
+      <mesh rotation-x={-Math.PI / 2} position={[0, 0.5, 0]} material={water}>
         <planeGeometry args={[5200, 520]} />
-        <meshStandardMaterial color={env === 'day' ? '#2f5f7f' : '#05080e'} metalness={0.6} roughness={0.15} />
       </mesh>
       {[-550, 550].map((x) => (
-        <mesh key={x} position={[x, 85, 0]}>
+        <mesh key={x} position={[x, 85, 0]} material={towerMat}>
           <boxGeometry args={[10, 170, 14]} />
-          <meshStandardMaterial color="#2a2f38" emissive={lit ? '#7aa2ff' : '#000'} emissiveIntensity={0.4} />
         </mesh>
       ))}
-      <mesh position={[0, 64, 0]}>
+      <mesh position={[0, 64, 0]} material={deckMat}>
         <boxGeometry args={[1800, 4, 26]} />
-        <meshStandardMaterial color="#20242c" emissive={lit ? '#ffcf8a' : '#000'} emissiveIntensity={0.35} />
       </mesh>
       {lines.map((l, i) => (
         <primitive key={i} object={l} />
@@ -208,27 +232,28 @@ function Strait() {
 }
 
 export function SceneLights() {
-  const env = useView((s) => s.env);
-  const pal = useEnvPalette();
   const hemi = useRef<THREE.HemisphereLight>(null);
   const sun = useRef<THREE.DirectionalLight>(null);
+  const flood = useRef<THREE.PointLight>(null);
   useFrame(() => {
     if (hemi.current) {
-      hemi.current.color.set(env === 'day' ? '#dfeaff' : env === 'dusk' ? '#8fa0d0' : pal.accent);
-      hemi.current.groundColor.set(env === 'day' ? '#6d6455' : '#15161a');
-      hemi.current.intensity = env === 'day' ? 1.4 : env === 'dusk' ? 0.8 : 0.42;
+      hemi.current.color.copy(look.hemi);
+      hemi.current.groundColor.copy(look.ground);
+      hemi.current.intensity = look.hemiIntensity;
     }
     if (sun.current) {
-      sun.current.color.set(env === 'day' ? '#fff6e6' : env === 'dusk' ? '#ffb27a' : '#b9c8ff');
-      sun.current.intensity = env === 'day' ? 2.6 : env === 'dusk' ? 1.1 : 0.35;
+      sun.current.color.copy(look.sun);
+      sun.current.intensity = look.sunIntensity;
+      sun.current.position.copy(look.sunPos);
     }
+    if (flood.current) flood.current.intensity = look.flood;
   });
   return (
     <>
       <hemisphereLight ref={hemi} args={['#8fa0d0', '#15161a', 0.5]} />
-      <directionalLight ref={sun} position={env === 'dusk' ? [-600, 180, -300] : [300, 600, 200]} intensity={0.4} />
+      <directionalLight ref={sun} position={[300, 600, 200]} intensity={0.4} />
       {/* soft fill that represents the bowl being lit by its own floodlights */}
-      <pointLight position={[0, 70, 0]} intensity={env === 'day' ? 0 : 9000} distance={260} decay={1.6} color="#fff1dc" />
+      <pointLight ref={flood} position={[0, 70, 0]} intensity={9000} distance={260} decay={1.6} color="#fff1dc" />
       <ambientLight intensity={0.08} />
     </>
   );
@@ -258,15 +283,28 @@ function Reflections() {
   );
 }
 
-export function Environment() {
-  const env = useView((s) => s.env);
+function StarLayer() {
   const reduced = useView((s) => s.reducedMotion);
+  const ref = useRef<THREE.Group>(null);
+  // additive stars vanish against a brightening sky anyway; hide them halfway through the transition
+  useFrame(() => {
+    if (ref.current) ref.current.visible = look.lights > 0.5;
+  });
+  return (
+    <group ref={ref}>
+      <Stars radius={3000} depth={600} count={2500} factor={18} saturation={0} fade speed={reduced ? 0 : 0.3} />
+    </group>
+  );
+}
+
+export function Environment() {
   return (
     <group>
+      <EnvDirector />
       <FogSync />
       <Reflections />
       <Sky />
-      {env !== 'day' && <Stars radius={3000} depth={600} count={2500} factor={18} saturation={0} fade speed={reduced ? 0 : 0.3} />}
+      <StarLayer />
       <City />
       <Hills />
       <Strait />

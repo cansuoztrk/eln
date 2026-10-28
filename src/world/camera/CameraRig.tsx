@@ -13,7 +13,8 @@ import { HOME_POSE, INTRO_START, POIS, POI_BY_ID, type PoiZone } from './pois';
 import { fadeOverlay, flushPendingCamera, worldApi, type CameraPose, type Vec3 } from '../worldApi';
 import { runtime } from '../runtime';
 import { requestFrameCapture } from '../Renderer';
-import { layerRegistry } from '../stadium/registry';
+import { layerRegistry, partRegistry } from '../stadium/registry';
+import type { LayerId } from '@/core/layers';
 
 const ACTION = CameraControlsImpl.ACTION;
 const BOUNDS = new THREE.Box3(new THREE.Vector3(-900, 0, -900), new THREE.Vector3(900, 160, 900));
@@ -193,6 +194,18 @@ export function CameraRig() {
       const box = new THREE.Box3().setFromObject(obj);
       if (box.isEmpty()) return;
       void c.fitToBox(box, !useView.getState().reducedMotion, { paddingTop: 8, paddingBottom: 8, paddingLeft: 8, paddingRight: 8 });
+    };
+
+    worldApi.fitObject = (id) => {
+      const obj = layerRegistry.get(id as LayerId) ?? partRegistry.get(id);
+      if (!obj) return false;
+      for (let o: THREE.Object3D | null = obj; o; o = o.parent) if (!o.visible) return false;
+      const box = new THREE.Box3().setFromObject(obj);
+      if (box.isEmpty()) return false;
+      configure(c, 'explorer');
+      set({ cameraMode: 'explorer' });
+      void c.fitToBox(box, !useView.getState().reducedMotion, { paddingTop: 8, paddingBottom: 8, paddingLeft: 8, paddingRight: 8 });
+      return true;
     };
 
     worldApi.layerObject = (id) => layerRegistry.get(id) ?? null;

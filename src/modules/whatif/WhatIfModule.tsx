@@ -8,6 +8,7 @@ import { evaluateRules } from '@/core/model/rules';
 import { worldApi } from '@/world/worldApi';
 import { Badge, Icon, Note, Section } from '@/ui/primitives';
 import { LEVER_LABELS, LEVER_LIMITS, QUESTIONS, applyLevers, leversFromDesign, type Levers, type Question } from './scenarios';
+import { Needs3D } from '@/shell/Needs3D';
 
 const SLOT_NAMES = ['A', 'B', 'C'];
 
@@ -121,6 +122,7 @@ export default function WhatIfModule() {
         <button type="button" className="btn btn-primary w-full mt-3" onClick={compare} disabled={busy || view2D}>
           <Icon name="GitCompare" size={16} /> {busy ? 'Görseller oluşturuluyor…' : 'Yan yana karşılaştır'}
         </button>
+        <Needs3D what="Yan yana karşılaştırma" />
       </Section>
 
       {shots && (

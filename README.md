@@ -30,9 +30,9 @@ Stadyum tek bir bina olarak değil, birbirine bağlı alanlardan oluşan bir **d
 
 | Sistem | Modül | Öne çıkanlar |
 |---|---|---|
-| **Omega Experience** | Ana sayfa | Gece İstanbul atmosferinde atlanabilir sinematik açılış, ışığın kademeli belirmesi, fare parallax'ı, 5 çalışan CTA |
-| **Stadium World** | Walkable Stadium | Explorer (sınırlı orbit) ve Walkthrough (10 gezinti noktası, güvenli yürüme yarıçapı, kararma geçişleri, klavye) |
-| | Master Digital Twin | 15 bağımsız katman, Exploded Architecture (katman odaklama + geri dönüş), analitik **kavramsal kesit**, Object Inspector |
+| **Omega Experience** | Ana sayfa | İlk ziyarette atlanabilir sinematik açılış: 7,5 sn kamera uçuşu, sinema bantları ve uçuşla eşzamanlı başlık sekansı, ışığın kademeli belirmesi; ardından fare parallax'ı ve 5 çalışan CTA |
+| **Stadium World** | Walkable Stadium | Explorer (sınırlı orbit) ve Walkthrough (10 gezinti noktası, güvenli yürüme yarıçapı, kararma geçişleri, klavye); gece / alacakaranlık / gündüz arasında yaklaşık 1,5 sn'lik yumuşak geçiş |
+| | Master Digital Twin | 15 bağımsız katman, Exploded Architecture (katman odaklama + geri dönüş), analitik **kavramsal kesit**, Object Inspector; klavyeyle kullanılabilen **bölge ve bileşen gezgini** (kase, bina kabuğu, çevre — 15 katman + 23 parça), fare üzerinde durunca bileşen adı |
 | | Stadium City | Şematik master plan; alana tıklayınca kamera geçişi ve açıklama, kapalı alanları tasarıma ekleme |
 | **Design Engine** | Stadium DNA Engine | 5 DNA (Classic Evolution, Red & Gold Icon, Pure Architecture, Future Arena, Green Stadium), birleştirilebilir parametreler, **kilitler**, değişiklik onayı, **çakışma kuralları** ve tek tıkla alternatifler |
 | | Material Lab | 8 konsept malzeme × 4 bileşen; malzeme kartları; A/B canlı önizleme ve yan yana görsel |

@@ -72,6 +72,21 @@ export function CameraDock() {
 }
 
 /** Object Inspector card for the selected component. */
+/** Name of the model part under a resting mouse pointer (keyboard users get the component list instead). */
+export function HoverTip() {
+  const hover = useView((s) => s.hover);
+  const selected = useView((s) => s.selected);
+  if (!hover) return null;
+  const left = Math.max(8, Math.min(hover.x + 14, window.innerWidth - 240));
+  const top = Math.max(8, Math.min(hover.y + 18, window.innerHeight - 44));
+  return (
+    <div className="no-print fixed z-40 pointer-events-none glass rounded-lg px-2.5 py-1.5 text-[12px] shadow-xl max-w-[230px]" style={{ left, top }} aria-hidden="true">
+      <span className="font-semibold">{componentInfo(hover.id).name}</span>
+      <span className="muted"> · {selected === hover.id ? 'seçili' : 'tıklayın'}</span>
+    </div>
+  );
+}
+
 export function Inspector() {
   const selected = useView((s) => s.selected);
   const set = useView((s) => s.set);

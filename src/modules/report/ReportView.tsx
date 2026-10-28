@@ -12,6 +12,7 @@ import { Icon, downloadFile } from '@/ui/primitives';
 import { ROADMAP } from '@/modules/roadmap/RoadmapModule';
 import { QUESTIONS } from '@/modules/whatif/scenarios';
 import { preferenceRows } from '@/modules/share/summary';
+import { Needs3D } from '@/shell/Needs3D';
 
 const SHOTS: { id: string; caption: string; opts: CaptureOptions; section?: 'long' }[] = [
   { id: 'aerial', caption: 'Genel görünüm (gece)', opts: { pose: { pos: [300, 150, 340], target: [0, 15, 0] } } },
@@ -88,6 +89,11 @@ export default function ReportView() {
         <button type="button" className="btn btn-sm btn-ghost" onClick={() => navigate('home')}>
           <Icon name="X" size={14} /> Kapat
         </button>
+        {view2D && (
+          <div className="basis-full">
+            <Needs3D what="Rapordaki 3D görseller" />
+          </div>
+        )}
       </div>
       <article ref={docRef} className="max-w-[900px] mx-auto px-6 md:px-10 py-10 report-doc">
         <header className="print-section">

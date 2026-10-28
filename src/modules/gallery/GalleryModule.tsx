@@ -5,6 +5,7 @@ import { applyPatch } from '@/core/model/design';
 import { SHOW_BY_ID } from '@/core/model/lightshow';
 import { worldApi, type CaptureOptions } from '@/world/worldApi';
 import { Badge, Icon, Note, Section, dataUrlToBlob, downloadFile } from '@/ui/primitives';
+import { Needs3D } from '@/shell/Needs3D';
 
 interface Shot {
   id: string;
@@ -76,7 +77,7 @@ export default function GalleryModule() {
         <button type="button" className="btn btn-primary w-full" onClick={generate} disabled={busy || view2D}>
           <Icon name="Camera" size={15} /> {busy ? `Görseller oluşturuluyor… ${done}/${SHOTS.length}` : ready.length ? 'Galeriyi yenile' : 'Galeriyi oluştur'}
         </button>
-        {view2D && <p className="text-[11.5px] muted mt-1">Galeri 3D görünüm gerektirir.</p>}
+        <Needs3D what="Galeri" />
       </Section>
 
       {ready.length > 0 && (

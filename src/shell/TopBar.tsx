@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { navigate } from '@/core/router';
 import { useDesign } from '@/core/store/designStore';
 import { useView } from '@/core/store/viewStore';
@@ -22,7 +22,27 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
   const undo = useDesign((s) => s.undo);
   const redo = useDesign((s) => s.redo);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
   const title = module === 'home' ? '' : MODULE_BY_ID[module].title;
+
+  // the settings popover closes on Escape (focus returns to its button) and on a click outside it
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setSettingsOpen(false);
+      settingsRef.current?.querySelector<HTMLButtonElement>('button[aria-haspopup]')?.focus();
+    };
+    const onDown = (e: PointerEvent) => {
+      if (!settingsRef.current?.contains(e.target as Node)) setSettingsOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('pointerdown', onDown);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('pointerdown', onDown);
+    };
+  }, [settingsOpen]);
 
   const toggleSound = async () => {
     if (soundOn) {
@@ -84,7 +104,7 @@ export function TopBar({ onMenu }: { onMenu: () => void }) {
         <button type="button" className="btn btn-icon btn-sm btn-ghost" aria-pressed={soundOn} onClick={toggleSound} aria-label={soundOn ? 'Sesi kapat' : 'Sesi aç'} title={soundOn ? 'Sesi kapat' : 'Sesi aç (özgün sentezlenmiş ses)'}>
           <Icon name={soundOn ? 'Volume2' : 'VolumeX'} size={16} />
         </button>
-        <div className="relative">
+        <div className="relative" ref={settingsRef}>
           <button type="button" className="btn btn-icon btn-sm btn-ghost" aria-expanded={settingsOpen} aria-haspopup="dialog" onClick={() => setSettingsOpen((v) => !v)} aria-label="Görünüm ayarları">
             <Icon name="Settings" size={16} />
           </button>

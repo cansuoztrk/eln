@@ -87,6 +87,19 @@ body {
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border: 1px solid var(--color-line);
 }
+/* the blur re-filters the live 3D canvas every frame: skip it on low quality (phones, weak GPUs) */
+[data-quality='low'] .glass {
+  background: rgb(12 14 20 / 0.93);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: rgb(12 14 20 / 0.96);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
 
 .display {
   font-family: var(--font-display);
@@ -244,6 +257,38 @@ body {
 }
 .chip:hover {
   border-color: rgb(255 255 255 / 0.2);
+}
+
+/* clickable shapes of the 2D plan */
+.plan-part {
+  cursor: pointer;
+}
+.plan-part:hover {
+  filter: brightness(1.35);
+}
+
+/* a row in a list of selectable things (component browser): no card, a gold bar marks the selection */
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+  border-left: 2px solid transparent;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.tree-item:hover {
+  background: rgb(255 255 255 / 0.05);
+}
+.tree-item[aria-pressed='true'] {
+  border-left-color: var(--color-gold);
+  background: rgb(242 182 49 / 0.1);
 }
 
 .field-label {
@@ -434,6 +479,54 @@ input[type='color'] {
 }
 .reduce-motion .fade-up {
   animation: none;
+}
+
+/* ---------- opening title sequence (timed to the 7.5 s camera flight) ---------- */
+.intro-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 9vh;
+  background: #000;
+  animation: introBars 7.5s ease-in-out both;
+}
+.intro-bar--top {
+  top: 0;
+  transform-origin: top;
+}
+.intro-bar--bottom {
+  bottom: 0;
+  transform-origin: bottom;
+}
+@keyframes introBars {
+  0%,
+  82% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0);
+  }
+}
+.intro-line {
+  animation: introLine 3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.intro-line--long {
+  animation-duration: 4.4s;
+}
+@keyframes introLine {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  22%,
+  78% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .fade-up {

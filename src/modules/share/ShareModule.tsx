@@ -7,6 +7,7 @@ import { MAX_SHARE_LENGTH, encodeDesign, sanitizeDesign } from '@/core/model/san
 import { worldApi } from '@/world/worldApi';
 import { Badge, Icon, Note, Section, dataUrlToBlob, downloadFile } from '@/ui/primitives';
 import { designSummary, preferenceRows } from './summary';
+import { Needs3D } from '@/shell/Needs3D';
 
 async function copy(text: string) {
   try {
@@ -88,7 +89,7 @@ export default function ShareModule() {
         <button type="button" className="btn btn-primary" onClick={makeImage} disabled={busy || view2D}>
           <Icon name="Camera" size={15} /> {busy ? 'Oluşturuluyor…' : 'Mevcut görünümden 1920×1080 görsel oluştur'}
         </button>
-        {view2D && <p className="text-[11.5px] muted mt-1">Görsel oluşturmak için 3D görünüme geçin.</p>}
+        <Needs3D what="Görsel oluşturma" />
         {image && (
           <figure className="m-0 mt-2">
             <img src={image} alt="Mevcut tasarımın 3D konsept görseli" className="rounded-lg border border-line w-full" />

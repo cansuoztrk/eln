@@ -11,6 +11,7 @@ import { Environment, SceneLights } from './environment/Environment';
 import { CameraRig } from './camera/CameraRig';
 import { LightingDirector } from './LightingDirector';
 import { Renderer } from './Renderer';
+import { HoverProbe } from './HoverProbe';
 import { HOME_POSE } from './camera/pois';
 
 export default function StadiumCanvas() {
@@ -64,6 +65,7 @@ export default function StadiumCanvas() {
           <Stadium />
           <LightingDirector />
           <CameraRig />
+          <HoverProbe />
           <Renderer bloom={q.bloom} />
         </Suspense>
       </Canvas>

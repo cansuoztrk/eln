@@ -4,6 +4,7 @@ import { INNER, PITCH, PROFILE, innerPoint, upperRowD } from '@/world/stadium/ge
 import { worldApi } from '@/world/worldApi';
 import { Icon, Note, Section, Segmented, Slider } from '@/ui/primitives';
 import { BLOCKS_PER_TIER, LOOK_LABEL, blockName, seatGeometry, seatMetrics, seatPose, type LookTarget, type SeatPick, type Tier } from './seatMath';
+import { Needs3D } from '@/shell/Needs3D';
 
 const TIER_RANGE: Record<Tier, [number, number]> = {
   lower: [PROFILE.lowerStart, PROFILE.crossAisle[0]],
@@ -162,11 +163,7 @@ export default function SeatModule() {
           <span className="field-label">Bakış yönü</span>
           <Segmented label="Bakış yönü" value={look} onChange={setLook} options={(Object.keys(LOOK_LABEL) as LookTarget[]).map((k) => ({ value: k, label: LOOK_LABEL[k] }))} />
         </div>
-        {view2D && (
-          <div className="mt-2">
-            <Note kind="warn">Koltuk görüşü 3D görünüm gerektirir; 2D modda yalnızca plan ve yaklaşık ölçüler gösterilir.</Note>
-          </div>
-        )}
+        <Needs3D what="Koltuktan görüş" />
       </Section>
 
       <Section title="Görüş karşılaştırması" kicker="İki koltuk">

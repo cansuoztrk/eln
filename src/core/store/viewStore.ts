@@ -35,6 +35,8 @@ interface ViewState extends Prefs {
   exploded: boolean;
   section: SectionMode;
   selected: string | null;
+  /** selectable thing under a resting mouse pointer (viewport coordinates) */
+  hover: { id: string; x: number; y: number } | null;
   focusLayer: LayerId | null;
   highlight: LayerId[];
   /** Temporary configuration override rendered instead of the user's design. */
@@ -84,6 +86,7 @@ export const useView = create<ViewState>()((set, get) => ({
   exploded: false,
   section: 'off',
   selected: null,
+  hover: null,
   focusLayer: null,
   highlight: [],
   preview: null,

@@ -4,12 +4,12 @@ import { useView } from '@/core/store/viewStore';
 import { POIS, POI_BY_ID } from '@/world/camera/pois';
 import { worldApi } from '@/world/worldApi';
 import { Badge, Icon, Note, Section, Segmented } from '@/ui/primitives';
+import { Needs3D } from '@/shell/Needs3D';
 
 export default function ExploreModule() {
   const route = useRoute();
   const mode = useView((s) => s.cameraMode);
   const poi = useView((s) => s.poi);
-  const view2D = useView((s) => s.view2D);
 
   useEffect(() => {
     const target = route.params.get('poi');
@@ -35,7 +35,7 @@ export default function ExploreModule() {
             ? 'Fareyle sürükleyerek döndürün, tekerlekle yakınlaştırın, sağ tıkla kaydırın. Kamera zemin altına inemez ve sahne sınırları dışına çıkamaz.'
             : 'Sürükleyerek etrafa bakın. 3D görünüme odaklanıp W/A/S/D ile noktanın güvenli yürüme yarıçapı içinde hareket edin. İç ve dış mekân arasında geçişler kararma ile yapılır; kamera duvarlardan geçmez.'}
         </p>
-        {view2D && <Note kind="warn">Gezinti noktaları 3D görünüm gerektirir. Üst menüden 3D’ye geçebilirsiniz.</Note>}
+        <Needs3D what="Gezinti noktaları" />
       </Section>
 
       <Section title="Gezinti noktaları" kicker="Walkthrough">
@@ -76,7 +76,7 @@ export default function ExploreModule() {
       )}
 
       <Note>
-        İç mekân geometrisi gerçek planlara dayanmaz; dolaşım, tribün girişi ve tünel konsept seviyesinde oluşturulmuştur. Model, fiziksel yapının birebir kopyası değildir.
+        İç mekân geometrisi gerçek planlara dayanmaz; dolaşım, tribün girişi ve tünel konsept seviyesinde oluşturulmuştur.
       </Note>
     </div>
   );

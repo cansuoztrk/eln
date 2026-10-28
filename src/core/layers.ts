@@ -36,6 +36,32 @@ export const LAYER_LABEL: Record<LayerId, string> = {
   transit: 'Ulaşım ve giriş bölgeleri',
 };
 
+/** Selectable parts inside each layer; ids match the Object Inspector content. */
+export const LAYER_PARTS: Record<LayerId, string[]> = {
+  massing: [],
+  facade: [],
+  roof: ['halo'],
+  structure: ['compressionRing'],
+  lowerTier: [],
+  upperTier: [],
+  pitch: [],
+  screens: ['ledRibbon', 'endScreens', 'perimeterBoards', 'mediaFacade'],
+  lighting: ['lightRing', 'floodlights'],
+  concourse: ['skyboxes', 'kiosks', 'tunnel'],
+  surroundings: ['fanPlaza', 'social', 'museum', 'eventLawn', 'waste'],
+  landscape: ['greenPark', 'rainwater'],
+  solar: ['solarRoof', 'solarCanopies'],
+  access: ['accessRoutes'],
+  transit: ['gates', 'transitHub'],
+};
+
+/** Zones of the component browser: the bowl, the building envelope and the district around it. */
+export const LAYER_ZONES: { title: string; layers: LayerId[] }[] = [
+  { title: 'Kase', layers: ['pitch', 'lowerTier', 'upperTier', 'concourse', 'screens'] },
+  { title: 'Bina kabuğu', layers: ['massing', 'facade', 'roof', 'structure', 'lighting', 'solar'] },
+  { title: 'Çevre', layers: ['surroundings', 'landscape', 'access', 'transit'] },
+];
+
 /** Vertical offsets (m) used by the exploded architecture view. */
 export const EXPLODE_OFFSET: Record<LayerId, number> = {
   massing: 0,

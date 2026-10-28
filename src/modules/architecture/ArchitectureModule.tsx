@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { LAYER_IDS, LAYER_LABEL, type LayerId } from '@/core/layers';
+import { LAYER_IDS, LAYER_LABEL, LAYER_PARTS, LAYER_ZONES, type LayerId } from '@/core/layers';
 import { useView } from '@/core/store/viewStore';
+import { componentInfo } from '@/content/components';
 import { worldApi } from '@/world/worldApi';
 import { Icon, Note, Section, Segmented, Toggle } from '@/ui/primitives';
 
@@ -10,6 +11,30 @@ const PRESETS: { label: string; layers: LayerId[] }[] = [
   { label: 'Kabuk', layers: ['facade', 'roof', 'structure', 'massing', 'solar', 'lighting'] },
   { label: 'Çevre', layers: ['surroundings', 'landscape', 'access', 'transit', 'massing', 'facade', 'roof'] },
 ];
+
+/** Selects a layer or part from the list: highlight, Object Inspector and a camera that frames it. */
+function pick(id: string) {
+  const v = useView.getState();
+  const name = componentInfo(id).name;
+  v.set({ selected: id });
+  if (v.view2D) return v.announce(`${name} seçildi.`);
+  const framed = worldApi.fitObject(id);
+  v.announce(framed ? `${name} seçildi ve görünüme alındı.` : `${name} seçildi; mevcut görünümde modelde yer almıyor.`);
+}
+
+function PartButton({ id, part }: { id: string; part?: boolean }) {
+  const pressed = useView((s) => s.selected === id);
+  const name = componentInfo(id).name;
+  return part ? (
+    <button type="button" className="chip !min-h-[26px] !px-2.5 text-[11.5px]" aria-pressed={pressed} onClick={() => pick(id)}>
+      {name}
+    </button>
+  ) : (
+    <button type="button" className="tree-item" aria-pressed={pressed} onClick={() => pick(id)}>
+      {name}
+    </button>
+  );
+}
 
 export default function ArchitectureModule() {
   const layers = useView((s) => s.layers);
@@ -120,10 +145,31 @@ export default function ArchitectureModule() {
         </div>
       </Section>
 
-      <Section title="Object Inspector">
-        <p className="text-[12.5px] muted leading-relaxed">
-          3D modelde bir bileşene tıklayın: adı, amacı, tasarım seçenekleri ve teknik değerlendirme notları sol üstte açılır.
+      <Section title="Bölgeler ve bileşenler" kicker="Object Inspector">
+        <p className="text-[12.5px] muted leading-relaxed mb-2.5">
+          Bir bölge veya bileşen seçin: modelde vurgulanır, kamera ona odaklanır, adı, amacı ve teknik notları sol üstte açılır. 3D modele doğrudan tıklayarak da seçebilirsiniz.
         </p>
+        <div className="flex flex-col gap-3">
+          {LAYER_ZONES.map((zone) => (
+            <div key={zone.title} role="group" aria-label={zone.title}>
+              <div className="field-label !mb-1">{zone.title}</div>
+              <ul>
+                {zone.layers.map((layer) => (
+                  <li key={layer} className={layers[layer] ? '' : 'opacity-60'}>
+                    <PartButton id={layer} />
+                    {LAYER_PARTS[layer].length > 0 && (
+                      <div className="flex flex-wrap gap-1 pl-3 pt-0.5 pb-2">
+                        {LAYER_PARTS[layer].map((p) => (
+                          <PartButton key={p} id={p} part />
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </Section>
     </div>
   );

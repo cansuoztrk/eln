@@ -49,7 +49,7 @@ const pageErrors = [];
 /** every open browser context; a test closes the ones it opened even when it fails */
 const contexts = new Set();
 
-async function newPage({ viewport = { width: 1440, height: 900 }, prefs = { introSeen: true, quality: 'low', qualityAuto: false }, hash = '#/', hasTouch = false, clearStorage = true } = {}) {
+async function newPage({ viewport = { width: 1440, height: 900 }, prefs = { introSeen: true, quality: 'low', qualityAuto: false }, hash = '#/', hasTouch = false, clearStorage = true, noWebGL = false } = {}) {
   const context = await browser.newContext({ viewport, hasTouch, acceptDownloads: true, permissions: ['clipboard-read', 'clipboard-write'] });
   contexts.add(context);
   context.on('close', () => contexts.delete(context));
@@ -68,6 +68,15 @@ async function newPage({ viewport = { width: 1440, height: 900 }, prefs = { intr
     },
     { prefs, clearStorage },
   );
+  if (noWebGL) {
+    // a device without WebGL: every webgl/webgl2 context request fails
+    await context.addInitScript(() => {
+      const get = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (type, ...args) {
+        return /webgl/i.test(String(type)) ? null : get.call(this, type, ...args);
+      };
+    });
+  }
   const page = await context.newPage();
   page.on('pageerror', (e) => pageErrors.push(e.message));
   page.on('console', (m) => {
@@ -230,11 +239,29 @@ await test('object inspector: clicking the model selects a component; close butt
   await page.evaluate(() => window.__aslan.worldApi.flyTo({ pos: [0, 330, 40], target: [0, 0, 0] }, { instant: true, mode: 'explorer' }));
   await page.waitForTimeout(1200);
   const box = await page.locator('#world-canvas canvas').boundingBox();
-  await page.mouse.click(box.x + box.width / 2 - 200, box.y + box.height / 2);
+  const [x, y] = [box.x + box.width / 2 - 200, box.y + box.height / 2];
+  await page.mouse.move(x - 20, y);
+  await page.mouse.move(x, y, { steps: 2 });
+  await until(page, () => window.__aslan.useView.getState().hover !== null, null);
+  assert((await page.evaluate(() => document.querySelector('#world-canvas canvas').style.cursor)) === 'pointer', 'no pointer cursor over a part');
+  await page.mouse.click(x, y);
   await until(page, () => window.__aslan.useView.getState().selected !== null, null);
   await page.getByRole('complementary', { name: 'Object Inspector' }).waitFor();
   await page.getByRole('button', { name: "Inspector'ı kapat" }).click();
   assert((await view(page)).selected === null, 'inspector did not close');
+});
+
+await test('component browser: zones and parts select, frame and open the Inspector', async () => {
+  await go(page, '#/architecture');
+  const before = await page.evaluate(() => window.__aslan.worldApi.getPose().pos);
+  await page.locator('#panel').getByRole('button', { name: 'Çatı', exact: true }).click();
+  await until(page, () => window.__aslan.useView.getState().selected === 'roof', null);
+  await page.getByRole('complementary', { name: 'Object Inspector' }).waitFor();
+  assert((await page.locator('#panel').getByRole('button', { name: 'Çatı', exact: true }).getAttribute('aria-pressed')) === 'true', 'selection not marked in the list');
+  await until(page, (b) => { const p = window.__aslan.worldApi.getPose().pos; return Math.hypot(p[0] - b[0], p[1] - b[1], p[2] - b[2]) > 1; }, before);
+  await page.locator('#panel').getByRole('button', { name: 'Oyuncu tüneli', exact: true }).click();
+  await until(page, () => window.__aslan.useView.getState().selected === 'tunnel', null);
+  await page.getByRole('button', { name: "Inspector'ı kapat" }).click();
 });
 
 await test('DNA engine: presets apply, confirm dialog protects customisations, locks hold', async () => {
@@ -541,6 +568,11 @@ await test('2D plan view and reduced motion setting', async () => {
   await page.getByRole('button', { name: 'Görünüm ayarları' }).click();
   await btn(page, /Azaltılmış hareket/).click();
   assert((await view(page)).reducedMotion === true, 'reduced motion not enabled');
+  await page.keyboard.press('Escape');
+  await until(page, () => !document.querySelector('[role=dialog][aria-label="Görünüm ayarları"]'), null);
+  assert((await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))) === 'Görünüm ayarları', 'focus did not return to the settings button');
+  await page.getByRole('button', { name: 'Görünüm ayarları' }).click();
+  await btn(page, /Azaltılmış hareket/).click();
   await btn(page, 'Kapat', true).click();
 });
 
@@ -558,12 +590,36 @@ console.log('\nFirst visit');
 await test('first visit plays the cinematic intro, which can be skipped', async () => {
   const p = await newPage({ prefs: { quality: 'low', qualityAuto: false } });
   await until(p, () => window.__aslan.useView.getState().introPlaying === true, null, 30000);
+  await p.getByRole('heading', { name: /ASLAN 2035/ }).waitFor();
+  assert((await p.locator('header').count()) === 0, 'top bar visible during the intro');
+  assert((await p.evaluate(() => document.activeElement?.textContent?.trim())) === 'Açılışı atla', 'skip button not focused');
   await p.getByRole('button', { name: 'Açılışı atla' }).click();
   await until(p, () => window.__aslan.useView.getState().introPlaying === false, null);
   await p.reload();
   await p.waitForFunction(() => window.__aslan);
   await p.waitForTimeout(1500);
   assert(!(await p.evaluate(() => window.__aslan.useView.getState().introPlaying)), 'intro replayed after being seen');
+  await p.context().close();
+});
+
+/* ======================= Device without WebGL ======================= */
+console.log('\nNo WebGL');
+await test('no WebGL: 2D plan, honest notes for 3D-only features, design still works', async () => {
+  const p = await newPage({ hash: '#/explore', noWebGL: true });
+  await p.getByRole('img', { name: 'Stadyum ve çevresinin 2D konsept planı' }).waitFor();
+  const v = await p.evaluate(() => window.__aslan.useView.getState());
+  assert(v.webgl === false && v.view2D === true, 'did not fall back to 2D');
+  await p.locator('#panel').getByText(/WebGL gerektirir/).first().waitFor();
+  await p.getByRole('img', { name: 'Stadyum ve çevresinin 2D konsept planı' }).click(); // the pitch sits at the plan's centre
+  await until(p, () => window.__aslan.useView.getState().selected === 'pitch', null);
+  await p.getByRole('complementary', { name: 'Object Inspector' }).waitFor();
+  await p.locator('header').getByRole('button', { name: /3D/ }).click();
+  await until(p, () => window.__aslan.useView.getState().toasts.some((t) => /WebGL/.test(t.text)), null);
+  await go(p, '#/share');
+  assert(await p.getByRole('button', { name: /1920×1080/ }).isDisabled(), 'image export enabled without WebGL');
+  await go(p, '#/design');
+  await p.locator('#panel').getByRole('button', { name: /^Red & Gold Icon/ }).click();
+  assert((await design(p)).dna === 'redgold', 'design change failed without WebGL');
   await p.context().close();
 });
 

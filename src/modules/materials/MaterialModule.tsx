@@ -6,6 +6,7 @@ import { MATERIAL_BY_ID, materialsFor } from '@/core/model/materials';
 import { MATERIAL_TARGET_LABEL } from '@/core/model/labels';
 import { worldApi, type CameraPose } from '@/world/worldApi';
 import { Icon, Note, Section, Segmented } from '@/ui/primitives';
+import { Needs3D } from '@/shell/Needs3D';
 
 const SHORT: Record<MaterialTarget, string> = { facade: 'Cephe', roof: 'Çatı', structure: 'Taşıyıcı', plinth: 'Kaide' };
 
@@ -147,6 +148,7 @@ export default function MaterialModule() {
             <Icon name="Camera" size={14} /> Yan yana görsel
           </button>
         </div>
+        <Needs3D what="Yan yana görsel" />
         {shots && (
           <div className="grid grid-cols-2 gap-2 mt-3">
             {(['a', 'b'] as const).map((slot) => (

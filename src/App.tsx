@@ -9,7 +9,7 @@ import { MobileMenu, ModuleRail } from '@/shell/Nav';
 import { useCoverWorld } from '@/shell/useCoverWorld';
 import { Hero } from '@/shell/Hero';
 import { ModulePanel } from '@/shell/ModulePanel';
-import { CameraDock, CaptureOverlay, Inspector, LiveRegion, PreviewBanner, Toasts } from '@/shell/Overlays';
+import { CameraDock, CaptureOverlay, HoverTip, Inspector, LiveRegion, PreviewBanner, Toasts } from '@/shell/Overlays';
 import { audioEngine } from '@/modules/matchday/audio';
 import { useArchive } from '@/core/store/archiveStore';
 
@@ -64,6 +64,8 @@ export default function App() {
   const set = useView((s) => s.set);
   const view2D = useView((s) => s.view2D);
   const reduced = useView((s) => s.reducedMotion);
+  const quality = useView((s) => s.quality);
+  const introPlaying = useView((s) => s.introPlaying);
   const mobile = useView((s) => s.mobile);
   const panelOpen = useView((s) => s.panelOpen);
   const toast = useView((s) => s.toast);
@@ -110,7 +112,7 @@ export default function App() {
   const showPanel = module !== 'home' && !fullscreen;
 
   return (
-    <div className={reduced ? 'reduce-motion' : ''}>
+    <div className={reduced ? 'reduce-motion' : ''} data-quality={quality}>
       <a className="skip-link" href={showPanel ? '#panel' : '#main-cta'}>
         İçeriğe atla
       </a>
@@ -124,7 +126,7 @@ export default function App() {
         <Suspense fallback={<div className="world-message">{view2D ? '2D plan yükleniyor…' : '3D dünya yükleniyor…'}</div>}>{view2D ? <Plan2D /> : <StadiumCanvas />}</Suspense>
       </div>
       <div id="world-fade" aria-hidden="true" />
-      {!fullscreen && <TopBar onMenu={() => setMenuOpen(true)} />}
+      {!fullscreen && !introPlaying && <TopBar onMenu={() => setMenuOpen(true)} />}
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       {module === 'home' && (
         <div id="main-cta">
@@ -137,6 +139,7 @@ export default function App() {
           <ModulePanel module={module} />
           <CameraDock />
           <Inspector />
+          <HoverTip />
           <PreviewBanner />
         </>
       )}

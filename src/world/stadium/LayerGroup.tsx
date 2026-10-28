@@ -4,7 +4,7 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { EXPLODE_FACADE_SCALE, EXPLODE_OFFSET, type LayerId } from '@/core/layers';
 import { useView } from '@/core/store/viewStore';
 import { runtime } from '../runtime';
-import { layerRegistry } from './registry';
+import { layerRegistry, partRegistry } from './registry';
 
 const HIGHLIGHT = new THREE.Color('#ffd166');
 
@@ -107,6 +107,13 @@ export function Selectable({ id, children }: { id: string; children: ReactNode }
   const highlighted = useView((s) => s.selected === id);
   const onClick = useSelectHandler(id);
   useHighlight(ref, highlighted);
+  useEffect(() => {
+    const obj = ref.current;
+    partRegistry.set(id, obj);
+    return () => {
+      if (partRegistry.get(id) === obj) partRegistry.delete(id);
+    };
+  }, [id]);
   return (
     <group ref={ref} onClick={onClick} name={id}>
       {children}
