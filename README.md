@@ -20,7 +20,8 @@
 8. [Testler ve test durumu](#testler-ve-test-durumu)
 9. [Bilinen sınırlar ve sonraki adımlar](#bilinen-sınırlar-ve-sonraki-adımlar)
 10. [Kaynaklar](#kaynaklar)
-11. [Son test sonuçları](#son-test-sonuçları)
+11. [Aşama 1 — Temel ürün: durum raporu](#aşama-1--temel-ürün-durum-raporu)
+12. [Son test sonuçları](#son-test-sonuçları)
 
 ---
 
@@ -171,19 +172,23 @@ Temel kararlar:
 - Cihaz sınıfına göre otomatik kalite (düşük/orta/yüksek): DPR, bloom, şehir/ağaç sayısı, örnekleme; `PerformanceMonitor` ile çalışma zamanında otomatik düşürme. Ayarlardan elle seçilebilir.
 - Instancing (cephe kanatları, kirişler, projektörler, kalabalık), tek tuval tabanlı LED dokusu, CanvasTexture koltuk boyama (yalnızca değiştiğinde veya ≤8 fps animasyonda).
 - 3D dünyayı tamamen örten katmanlar (mobil modül menüsü, paylaşılan tasarım iletişim kutusu) açıkken sahne yeni kare çizmez, son kareyi gösterir; görsel dışa aktarımlar yine çalışır.
+- Cam paneller orta/yüksek kalitede arka planı bulanıklaştırır; bulanıklık canlı 3D tuvali her karede yeniden süzdüğü için düşük kalitede (telefonlar, zayıf GPU) ve "saydamlığı azalt" tercihinde kapalıdır.
+- Fare etiketi, imleç 180 ms hareketsiz kaldığında tek bir ışın atar; hareket, sürükleme ve dokunmatik sırasında ışın atılmaz (stadyum geometrisine her harekette ışın atmak milisaniyeler sürer).
+- 3D görüntünün merkezi arayüzün bıraktığı boş alana kaydırılır (`setViewOffset`); dışa aktarılan görseller tam kadrajdır.
 - WebGL bağlamı kaybı yakalanır; WebGL yoksa 2D plan.
 - **Azaltılmış hareket:** işletim sistemi ayarı + uygulama içi anahtar; anlık kamera geçişleri, sabit ışık, otomatik dönüş/konfeti kapalı.
 - Klavye: atla bağlantısı, odak halkaları, 3D görünümde ok tuşları/W-A-S-D/R/N/P/+/−, sunumda ←/→/Esc, lightbox'ta ←/→/Esc.
 - Ekran okuyucu: ARIA etiketleri, `aria-live` duyuruları (tasarım değişiklikleri, gösteri adımları), grafikler için tablo görünümü, renk tek başına bilgi taşımaz.
-- Mobil: alt sayfa paneli (küçült/genişlet), tam ekran modül menüsü, 3D görünüm panelin üstünde yeniden boyutlanır.
+- Kompakt düzen (telefon ve dikey tablet, 1024 px altı): alt sayfa paneli (küçült/genişlet), tam ekran modül menüsü, 3D görünüm panelin üstünde yeniden boyutlanır, kamera düğmeleri tek satır simge. Düzen CSS kırılma noktasıyla aynı medya sorgusunu izler; cihaz döndürülünce güncellenir.
+- Bölgeler fareye ek olarak klavyeyle de seçilebilir (Master Digital Twin → bölge ve bileşen gezgini).
 - Grafik paleti koyu yüzeye karşı renk körlüğü ve kontrast denetiminden geçirildi.
 
 ## Testler ve test durumu
 
 | Komut | Kapsam |
 |---|---|
-| `npm test` | 34 birim testi: doğrulama ve paylaşım kodlaması, kilitler ve yamalar, çakışma kuralları, Time Machine aşamaları, fotosensitivite sınırı, AI Architect yorumlayıcısı (brief'teki 7 örnek dahil), sunucu şeması ↔ veri modeli uyumu, kalabalık simülasyonu, geometri, koltuk ölçüleri |
-| `npm run test:e2e` | Gerçek arayüzde Playwright testleri: 5 CTA, 10 gezinti noktası, klavye ve yürüme sınırı, katmanlar/patlatma/odak/kesit, Inspector, DNA + onay + kilit + çakışma önerisi, geri al/yinele, Material Lab A/B görseli, ışık gösterisi oynatma, Time Machine, What-If görselleri, atmosfer ve ses, koltuk karşılaştırması, kalabalık simülasyonu, Stadium OS, Green Engine, Stadium City, Economy, Roadmap, Fan Journey indirme, AI Architect + geri alma, arşiv (kaydet/sürüm/aç/karşılaştır/sil), paylaşım bağlantısı gidiş-dönüş, bozuk bağlantı hatası, JSON/MD/PNG indirme, galeri lightbox, sunum, rapor görselleri + HTML, 2D görünüm, azaltılmış hareket, ilk ziyaret açılışı, mobil menü ve alt sayfa |
+| `npm test` | 37 birim testi: doğrulama ve paylaşım kodlaması, kilitler ve yamalar, çakışma kuralları, Time Machine aşamaları, fotosensitivite sınırı, AI Architect yorumlayıcısı (brief'teki 7 örnek dahil), sunucu şeması ↔ veri modeli uyumu, kalabalık simülasyonu, geometri, koltuk ölçüleri, bölge gezgini listesi ↔ 3D sahnedeki seçilebilir parçalar uyumu |
+| `npm run test:e2e` | Gerçek arayüzde Playwright testleri: 5 CTA, 10 gezinti noktası, klavye ve yürüme sınırı, katmanlar/patlatma/odak/kesit, Inspector, DNA + onay + kilit + çakışma önerisi, geri al/yinele, Material Lab A/B görseli, ışık gösterisi oynatma, Time Machine, What-If görselleri, atmosfer ve ses, koltuk karşılaştırması, kalabalık simülasyonu, Stadium OS, Green Engine, Stadium City, Economy, Roadmap, Fan Journey indirme, AI Architect + geri alma, arşiv (kaydet/sürüm/aç/karşılaştır/sil), paylaşım bağlantısı gidiş-dönüş, bozuk bağlantı hatası, JSON/MD/PNG indirme, galeri lightbox, sunum, rapor görselleri + HTML, 2D görünüm, azaltılmış hareket, ayarlar panelinin Escape ile kapanıp odağı geri vermesi, gece→gündüz geçişinin ara ışık seviyelerinden geçmesi, bölge gezgini (seçim, kamera odağı, Inspector), fare etiketi ve imleç, ilk ziyaret açılışı (başlık sekansı, gizli üst çubuk, odaktaki atla düğmesi), WebGL'siz cihaz (2D plan, plan üzerinde seçim, açıklamalı devre dışı özellikler), mobil menü ve alt sayfa |
 
 E2E ortam değişkenleri: `E2E_URL` (çalışan bir sunucuyu test eder), `E2E_ONLY` (yalnızca adı bu düzenli ifadeyle eşleşen testler), `E2E_TIMEOUT_SCALE` (varsayılan 3; başsız Chromium WebGL'i CPU'da (SwiftShader) çizdiği ve bir kare saniyeler sürebildiği için tüm zaman aşımlarını çarpar).
 
@@ -215,26 +220,45 @@ Son çalıştırma sonuçları için bkz. [Test sonuçları](#son-test-sonuçlar
 
 Kaynaklar arasındaki farklar (kapasite yılları, GES gücü, alan değerleri) uygulamada açıkça gösterilir.
 
+## Aşama 1 — Temel ürün: durum raporu
+
+Bu aşamada yeni modül eklenmedi. Var olan temel katman, "önce kaliteli ve gerçekten çalışan temel" ilkesine göre baştan sona incelendi: tasarım sistemi, navigasyon, sinematik açılış, 3D stadyum, kamera, gece-gündüz, seçilebilir bölgeler, 2D alternatif ve masaüstü/mobil düzen. Eksikler giderildi ve her adım tarayıcıda doğrulandı. Çalışan kod incelenmeden silinmedi; her değişiklik ayrı commit'te gerekçesiyle kayıtlı.
+
+### Gerçekten uygulananlar
+
+| Madde | Durum |
+|---|---|
+| 1. Dosya, teknoloji ve bağımlılık incelemesi | `npm ls` temiz; `npm audit` uygulamada ve sunucuda 0 açık; derleme uyarısız. Tek konsol uyarısı, en güncel R3F sürümünün (9.8.2) kendi içinde kullandığı `THREE.Clock`. Kod yaklaşık 14 bin satır ve katmanlı: veri modeli ve depolar (`core`), 3D dünya (`world`), kabuk (`shell`), arayüz bileşenleri (`ui`), modüller. |
+| 2. Mimari ve geliştirme sırası | Tek `DesignConfig` veri modeli ve tek 3D dünya; modüller bunların üzerine kurulu. Sıra: temel (bu aşama) → modüllerin aynı ölçütlerle tek tek derinleştirilmesi. |
+| 3. Tasarım sistemi ve navigasyon | Düzen kırılma noktası birleştirildi: 1024 px altında (telefon ve dikey tablet) alt panel ve modül menüsü, üstünde yan panel ve ray. JavaScript aynı medya sorgusunu izler, cihaz döndürülünce güncellenir. 3D görüntünün merkezi arayüzün bıraktığı boş alana kaydırılır. Cam panellerde bulanıklık, CSS küçültücüsünün `backdrop-filter`'ı silmesi yüzünden hiç çalışmıyordu; düzeltildi. Gezinti noktaları kart yığını yerine rota listesi. Model doğruluğu uyarısı tek bir panel dipnotuna toplandı. Ayarlar paneli Escape ve dış tıklamayla kapanır, odak geri döner. |
+| 4. Sinematik açılış | 7,5 sn kamera uçuşu üzerinde sinema bantları ve üç aşamalı başlık sekansı (konum, başlık, slogan). Sekans uçuşun ilk karesiyle başlar; 3D dünya yavaş yüklense de senkron kalır. Sekans boyunca üst çubuk gizli, "Açılışı atla" odakta. Başlık boyutu ekran yüksekliğine de bağlı. Ana görünüm ekranın en-boy oranına göre çerçevelenir. |
+| 5. Gerçek 3D geometriyle stadyum | Prosedürel geometri: 15 bağımsız katman, 23 seçilebilir parça. Yayımlanmış oranlara dayanır, **ölçülü bir rölöve değildir**; bu, her modül panelinin dipnotunda ve ana sayfada yazılıdır. |
+| 6. Kamera, gece-gündüz, seçilebilir bölgeler | Explorer/Walkthrough kamera ve klavye kontrolleri. Gece, alacakaranlık ve gündüz arasında yaklaşık 1,5 sn'lik yumuşak geçiş (gökyüzü, sis, ışıklar, şehir, su, yıldızlar); azaltılmış harekette ve görsel yakalamada anlık. Klavyeyle kullanılabilen bölge ve bileşen gezgini: seçim, modelde vurgu, kamera odağı, Object Inspector. Fare durunca altındaki parçanın adı gösterilir; bu, hareket başına değil durunca tek bir ışınla yapılır. |
+| 7. 3D yüklenemeyen cihazlar | WebGL yoksa uygulama 2D planla açılır. Plan öğeleri tıklanınca Inspector açılır, seçim çerçevelenir. 3D gerektiren yedi özellik nedenini söyler: "3D görünüme geç" sunar ya da cihazda WebGL olmadığını belirtir. |
+| 8. Masaüstü ve mobil ekranlar | Sekiz ekran boyutunda görsel kontrol: 1440×900, 1280×720, 1024×768, 768×1024, 820×1180, 390×844, 360×740, 844×390. Bulunup düzeltilenler: dikey tablette yan panel ile mobil tuvalin çakışması, telefonda logonun düğmelerin altında kalması, iki satıra taşan kamera düğmeleri, yatay telefonda başlığın ekran dışına itilmesi. |
+| 9. Çalıştırma, hata giderme, test | Ayrıntılar aşağıda. |
+
+### Henüz yapılmayanlar ve bilinen sınırlar
+
+- 3D model ölçülü değildir; gerçek rölöve veya BIM verisi yoktur. İç mekânlar konsept seviyesindedir.
+- Gerçek GPU'lu bilgisayarlarda ve gerçek telefonlarda performans ölçülmedi; bütün testler yazılım tabanlı WebGL ile yapıldı.
+- Ekran okuyucuyla (NVDA, VoiceOver) gerçek kullanıcı testi yapılmadı. Safari ve Firefox denenmedi.
+- Fare etiketi yalnızca fareyle çalışır; dokunmatikte bölgeler bölge gezgininden seçilir.
+- Yatay telefonda 3D alanı küçük kalır, çünkü alt panel ekranın yarısını kaplar.
+- Sonraki aşamalar: mimari tasarım motoru, ışık laboratuvarı, maç günü simülatörü, akıllı stadyum sistemleri ve diğer modüller bu temel üzerinde, aynı ölçütlerle tek tek derinleştirilecek. Yapılacaklar: buton denetimi, ekran boyutu kontrolü, dürüst etiketler ve e2e kapsamı.
+
 ## Son test sonuçları
 
-27 Ekim 2026, uygulama kodu `a45b4fc` commit'i:
+29 Ekim 2026, uygulama kodu `7b9b87f` commit'i:
 
 | Kontrol | Sonuç |
 |---|---|
-| `npm run build` (tsc + Vite) | Hatasız |
-| `npm test` | **34/34** birim testi geçti |
-| `npm run test:e2e` | **33/33** uçtan uca test geçti (yaklaşık 16 dakika), sayfa hatası 0 |
-| Konsol taraması (ana sayfa, mimari, ışık gösterisi, şampiyonluk atmosferi, şehir, paylaşım, görsel yakalama, patlatma + kesit) | Hata yok; tek uyarı R3F'nin kullandığı `THREE.Clock` için kütüphane kaynaklı kullanımdan kaldırma uyarısı |
-| Görsel kontrol (orta kalite, gece / alacakaranlık / gündüz) | Işık, gökyüzü ve ortam yansımaları beklendiği gibi, artefakt yok |
+| `npm run build` (tsc + Vite) | Hatasız, uyarısız |
+| `npm test` | **37/37** birim testi geçti |
+| `npm run test:e2e` | **35/35** uçtan uca test geçti (yaklaşık 26 dakika); sayfa hatası 0, filtrelenen sürücü veya kütüphane konsol hatası 0 |
+| Buton denetimi (her görünür düğmeye tıklayıp durum, tasarım, kamera, panel içeriği, indirme, iletişim kutusu veya bildirim değişikliği arar) | İlk tam tur 336 düğme, son derlemeyle hedefli tur 160 düğme; **etkisiz düğme yok**. Beş tıklama, önceki tıklamanın başlattığı görsel yakalama sürerken ekranı bilinçli olarak örten "görsel oluşturuluyor" katmanına takıldı. Bu makinede bir yakalama 20 sn'yi aşıyor. |
+| Aşama 1 doğrulama betiği (açılış senkronu, gece-gündüz ara değerleri, bölge gezgini, fare etiketi, ayarlar paneli, cam bulanıklığı, WebGL'siz cihaz, sekiz ekran boyutu) | Tüm kontroller geçti. Gece→gündüz ölçümü: gökyüzü ışığı 0,42'den 1,4'e kademeli ilerliyor (0,51 → 0,82 → 0,95 → 1,05 → 1,13 …). |
 
-Ortam: başsız Chromium (Playwright 1.63.0), yazılım tabanlı WebGL (SwiftShader), 4 çekirdekli bulut konteyneri, düşük kalite ayarı; masaüstü 1440×900, mobil 390×844 dokunmatik emülasyon. Bu ortamda kare hızı saniyede 1'in altına inebildiği için testler sabit süre yerine durum değişikliğini bekler. Her test `E2E_ONLY` ile tek başına da çalışır; tam koşudan sonra kendi sayfasına giden dört test (ortam, Inspector, DNA çakışması, geri al/yinele) ayrıca tek tek doğrulandı.
-
-Bu turda testlerin ortaya çıkardığı ve düzeltilen sorunlar:
-
-- Görsel yakalama bir sonraki kareyi yalnızca 4 sn bekliyordu; kareleri saniyeler süren cihazlarda dışa aktarım, arşiv küçük resmi ve galeri görselleri boş dönebiliyordu. Bekleme 20 sn'ye çıkarıldı; 3D dünya kapanırsa bekleyen yakalama hemen sonlanır.
-- 3D dünya hazır olmadan gelen kamera istekleri kayboluyordu; artık kuyruğa alınıp dünya hazır olunca uygulanıyor.
-- 2D'den 3D'ye dönüşte geç kapanan eski kamera bileşeni "dünya hazır" bayrağını sıfırlıyordu; sahiplik denetimi eklendi.
-- Tam ekran katmanlar (mobil menü, paylaşılan tasarım iletişim kutusu) açıkken sahne görünmediği hâlde çizilmeye devam ediyordu; artık duraklatılıyor.
-- Galeri, kaç görselin hazır olduğunu gösteriyor.
+Ortam: başsız Chromium (Playwright 1.63.0), yazılım tabanlı WebGL (SwiftShader), 4 çekirdekli bulut konteyneri, düşük kalite ayarı. Bu ortamda kare hızı saniyede 1'in altına inebildiği için testler sabit süre yerine durum değişikliğini bekler ve `E2E_TIMEOUT_SCALE` ile zaman aşımları uzatılır. Her test `E2E_ONLY` ile tek başına da çalışır.
 
 Kapsam dışında kalanlar için bkz. [Test edilmemiş veya sınırlı test edilmiş özellikler](#test-edilmemiş-veya-sınırlı-test-edilmiş-özellikler).
