@@ -270,7 +270,7 @@ Bu aşamada DNA Engine, Material Lab ve What-If aynı temel üzerinde derinleşt
 | Görsel yakalamalar ışığın geçişin ortasındaki hâlini kaydedebiliyordu. | Işık rengi ve yoğunluğu yumuşak geçişle değişiyordu. | Yakalama sırasında ışıklar ve gökyüzü anında yerine oturuyor; yakalamadan sonra görünüm de anında kendi hâline dönüyor. |
 | "Ne olur?" maç gecesi karşılaştırması gündüz ışığında çekilebiliyordu. | Yakalama o anki gün saatini kullanıyordu. | Yakalamaya gün saati seçeneği eklendi. Gece sorusu gece, çatı sorusu alacakaranlıkta çekiliyor. |
 | "Dinamik renk geçişi" tek karede sabit ışıktan ayırt edilemiyordu. | Yalnız parlaklık değişiyordu. | Cephe boyunca ana ve ikincil renk arasında yavaş akan bir dalga. |
-| Saha bakımı halkaları, atık istasyonları ve taraftar meydanı neredeyse görünmüyordu. | Çok soluk malzeme (%12 opaklık), 1 m'lik kutular, birkaç ince totem. | Sulama halkaları belirginleşti; atık istasyonlarına gölgelik ve zemin eklendi; taraftar meydanının sınırı 2D plandaki gibi işaretlendi. |
+| Saha bakımı halkaları, atık istasyonları ve taraftar meydanı neredeyse görünmüyordu. | Çok soluk malzeme (%12–18 opaklık), 1 m'lik kutular, birkaç ince totem. | Sulama halkaları belirginleşti; atık istasyonlarına gölgelik ve zemin eklendi; taraftar meydanının sınırı 2D plandaki gibi işaretlendi. |
 | Medya cephesi, seçim vurgusu, erişilebilir rotalar ve sulama halkaları azaltılmış harekette de hareket ediyordu. | Hareket ayarı bu dört yerde denetlenmiyordu. | Azaltılmış harekette dördü de duruyor. |
 
 ### DNA Engine
@@ -292,24 +292,27 @@ Bu aşamada DNA Engine, Material Lab ve What-If aynı temel üzerinde derinleşt
 
 ### Denetim: önce ve sonra
 
-Değişen piksel oranı, 480×300 görsel. İkinci turda çevre ve yeşil sistem seçenekleri, modüllerinin kamerayı götürdüğü açılardan ölçüldü. Bu açılar ilk turdaki uzak kuşbakışından daha yakın olduğu için bu satırlardaki artışın bir kısmı açıdan gelir.
+Değerler değişen piksel oranıdır (480×300 görsel). İkinci turda bazı parametreler, ilgili aracın kamerayı götürdüğü daha yakın açılardan ölçüldü: ekranlar ve koltuklar stadyum içinden, meydan ve sosyal alan yakın meydan görünümünden, çevre ve yeşil sistemler kendi modüllerinin açılarından. Bu satırlardaki artışın bir kısmı açıdan gelir. Ekran düzenindeki artışın tamamı açıdan gelir; ekran kodu bu aşamada değişmedi.
 
 | Parametre | İlk tur | Son tur |
 |---|---|---|
-| Görsel dil (4 alternatif) | %0,00 | %2,9–8,8 |
-| Çatı ışığı: halo / segmentli / tam taç | %0,19–0,49 | %2,1–5,6 |
+| Görsel dil (4 alternatif) | %0,00 | %4,1–9,0 |
+| Çatı ışığı: halo / segmentli / tam taç | %0,19–0,49 | %2,1–5,9 |
 | Çatı ışığı: ince kenar (bilerek ince) | %0,12 | %0,21 |
-| Işık halkası yoğunluğu (%55 → %95) | %0,08 | %1,15 |
-| Cephe ışığı: sabit → dinamik | %0,30 | %8,1 |
-| Ekran düzeni: bant → genişletilmiş | %0,20 | %2,3 |
-| Meydan karakteri (park / etkinlik / bahçe) | %0,3–2,9 | %2,2–11,8 |
+| Işık halkası yoğunluğu (%55 → %95) | %0,08 | %1,14 |
+| Cephe ışığı: sabit → dinamik | %0,30 | %7,7 |
+| Ekran düzeni: bant → genişletilmiş | %0,20 | %1,2 |
+| Ekran düzeni: bant → standart (yalnız 1,1 m'lik LED bandı kalkar) | %0,27 | %0,9 |
+| Meydan karakteri (park / etkinlik / bahçe) | %0,3–2,9 | %2,2–11,9 |
 | Taraftar meydanı | %0,06 | %1,2 |
 | Yağmur suyu yönetimi | %0,05 | %3,7 |
-| Verimli aydınlatma | %0,21 | %27 |
+| Verimli aydınlatma | %0,21 | %26 |
 | Saha bakımı | %0,22 | %12,6 |
 | Atık azaltma | %0,03 | %1,1 |
 | Yeşil ulaşım bağlantısı | %0,00 | %0,8 |
 | Erişilebilir rotalar (kuşbakışı) | %0,00 | %0,4 |
+| Buluşma noktaları | %0,05 | %0,3 |
+| Erişilebilir hizmet noktaları (kuşbakışı) | %0,00 | %0,01 |
 
 Malzemeler, koreografi, gece atmosferi ve çatı formu ilk turda da belirgindi (%1,5–54).
 
@@ -324,6 +327,20 @@ Malzemeler, koreografi, gece atmosferi ve çatı formu ilk turda da belirgindi (
 - **Sonraki aşamalar:** ışık laboratuvarı (Light Show Composer), maç günü simülatörü ve akıllı stadyum sistemleri, aynı denetim ve test yaklaşımıyla.
 
 ## Son test sonuçları
+
+### Aşama 2
+
+29 Ekim 2026, uygulama kodu `606f1ed` commit'i:
+
+| Kontrol | Sonuç |
+|---|---|
+| `npm run build` (tsc + Vite) | Hatasız, uyarısız |
+| `npm test` | **48/48** birim testi geçti (11'i yeni) |
+| `npm run test:e2e` | **39/39** uçtan uca test geçti (4'ü yeni; testlerin toplam süresi yaklaşık 16 dakika); sayfa hatası 0, filtrelenen sürücü veya kütüphane konsol hatası 0 |
+| `npm run audit:params` (30 parametre, 63 karşılaştırma) | İlk tur 24 etkisiz veya zayıf sonuç; son tur **6 zayıf sonuç**, hepsi küçük veya bilerek ince öğeler: ince kenar ışığı (%0,2), bant → standart ekran (%0,9), buluşma noktaları (%0,3), yeşil ulaşım bağlantısı (%0,8), kuşbakışında erişilebilir rotalar (%0,4) ve hizmet noktaları (%0,01). Ayrıntılar Aşama 2 raporunda. |
+| Görsel kontrol | DNA paneli 1440×900 ve 390×844'te (açıklamalar, "özel" etiketi, önizleme bandı, "Modelde göster"), beş görsel dilin cephesi, beş çatı ışığı stili gece, dinamik ve sabit cephe ışığı, stadyum içinin gece aydınlığı (değişiklik öncesi ve sonrası aynı açılardan), Material Lab yakın plan açıları, ekran ve meydan görünümleri, kuşbakışında rotalar ve hendekler. |
+
+### Aşama 1
 
 29 Ekim 2026, uygulama kodu `7b9b87f` commit'i:
 
