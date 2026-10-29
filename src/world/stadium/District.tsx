@@ -46,7 +46,8 @@ function ribbonGeometry(points: THREE.Vector3[], width: number, y = 0.08) {
     uv.push(acc / 10, 0, acc / 10, 1);
     if (i < points.length - 1) {
       const k = i * 2;
-      idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2);
+      // counter-clockwise seen from above: the ribbon faces up (it used to face down and was culled)
+      idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3);
     }
   }
   const g = new THREE.BufferGeometry();

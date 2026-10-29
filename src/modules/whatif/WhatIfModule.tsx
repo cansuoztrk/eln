@@ -11,6 +11,7 @@ import { LEVER_LABELS, LEVER_LIMITS, QUESTIONS, applyLevers, leversFromDesign, t
 import { Needs3D } from '@/shell/Needs3D';
 
 const SLOT_NAMES = ['A', 'B', 'C'];
+const ENV_NAME = { night: 'gece', dusk: 'alacakaranlık', day: 'gündüz' } as const;
 
 export default function WhatIfModule() {
   const design = useDesign((s) => s.design);
@@ -28,6 +29,12 @@ export default function WhatIfModule() {
     setSlots(q.slots.map((s, i) => ({ name: q.names[i], levers: { ...base, ...s } })));
     setShots(null);
     worldApi.flyTo(q.pose, { mode: 'explorer' });
+    // a lighting question cannot be judged in daylight
+    const v = useView.getState();
+    if (q.env && q.env !== 'day' && v.env === 'day') {
+      v.set({ env: q.env });
+      v.toast(`Bu soru ışığa bağlı: ${ENV_NAME[q.env]} görünümüne geçildi.`, 'info');
+    }
   };
 
   useEffect(() => {
@@ -40,7 +47,7 @@ export default function WhatIfModule() {
   const compare = async () => {
     setBusy(true);
     const out: (string | null)[] = [];
-    for (const cfg of configs) out.push(await worldApi.capture({ preview: cfg, pose: question.pose, width: 800, height: 500 }));
+    for (const cfg of configs) out.push(await worldApi.capture({ preview: cfg, pose: question.pose, env: question.env, width: 800, height: 500 }));
     setShots(out);
     setBusy(false);
   };
@@ -127,6 +134,9 @@ export default function WhatIfModule() {
 
       {shots && (
         <Section title="Karşılaştırma" kicker="Tasarım farkları ve açıklamalar">
+          <p className="field-hint mt-0 mb-2.5">
+            Görseller aynı kamera açısından{question.env ? `, ${ENV_NAME[question.env]} ışığında` : ''} alındı; yalnızca senaryo seçimleri farklıdır.
+          </p>
           <div className="flex flex-col gap-3">
             {slots.map((s, i) => {
               const diffs = diffDesigns(design, configs[i]).filter((d) => !d.key.startsWith('show.') || d.key === 'show.active' || d.key === 'show.preset');

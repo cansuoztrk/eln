@@ -41,17 +41,16 @@ export default function GalleryModule() {
 
   const generate = async () => {
     setBusy(true);
-    const prev = useView.getState().env;
     const out: Record<string, string> = {};
     setDone(0);
     for (const s of SHOTS) {
-      set({ env: s.env ?? 'night', section: s.section ?? 'off' });
+      set({ section: s.section ?? 'off' });
       const preview = s.show ? applyPatch(design, { show: { ...SHOW_BY_ID['golden-halo'].look, active: true, preset: 'golden-halo' } }) : undefined;
-      const url = await worldApi.capture({ ...s.opts, preview, width: 1280, height: 720 });
+      const url = await worldApi.capture({ ...s.opts, env: s.env ?? 'night', preview, width: 1280, height: 720 });
       if (url) out[s.id] = url;
       setDone((n) => n + 1);
     }
-    set({ env: prev, section: 'off' });
+    set({ section: 'off' });
     setImages(out);
     setBusy(false);
   };

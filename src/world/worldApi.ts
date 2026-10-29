@@ -6,7 +6,7 @@
 import type * as THREE from 'three';
 import type { DesignConfig } from '@/core/model/design';
 import type { LayerId } from '@/core/layers';
-import type { CameraMode } from '@/core/store/viewStore';
+import type { CameraMode, EnvMode } from '@/core/store/viewStore';
 
 export type Vec3 = [number, number, number];
 
@@ -22,6 +22,8 @@ export interface CaptureOptions {
   height?: number;
   pose?: CameraPose;
   preview?: DesignConfig | null;
+  /** time of day for this image only; the view returns to its own afterwards */
+  env?: EnvMode;
   mime?: 'image/png' | 'image/jpeg';
   quality?: number;
 }

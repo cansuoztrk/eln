@@ -7,13 +7,14 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useEffectiveDesign } from '@/core/store/effective';
+import { useView } from '@/core/store/viewStore';
 import { useClipping } from './clipping';
 import { LayerGroup, Selectable } from './LayerGroup';
 import { PROFILE, ringWall, roofY, sweepProfile } from './geometry';
 import { createLightMaterial } from './lightMaterial';
 import { applyInstances, radialMatrix } from './radial';
-import { runtime } from '../runtime';
-import { CANOPY_OUTER_D, canopyY } from './Envelope';
+import { PROFILE_INDEX, runtime } from '../runtime';
+import { CANOPY_OUTER_D, COMPRESSION_RING_D, canopyY } from './Envelope';
 
 function useLightMat(opts: Parameters<typeof createLightMaterial>[0], deps: unknown[]) {
   const clipping = useClipping();
@@ -28,7 +29,7 @@ function useLightMat(opts: Parameters<typeof createLightMaterial>[0], deps: unkn
 export function useFacadeSkinMaterial(media: THREE.Texture) {
   const design = useEffectiveDesign();
   const mode = design.facade.lighting;
-  const mat = useLightMat({ vertical: true, gain: 0.5, media, mediaRepeat: [6, 1] }, [media]);
+  const mat = useLightMat({ vertical: true, gain: 0.5, media, mediaRepeat: [6, 1], channel: 'facade' }, [media]);
   useFrame(() => {
     const u = mat.uniforms;
     if (mode === 'static') {
@@ -36,14 +37,16 @@ export function useFacadeSkinMaterial(media: THREE.Texture) {
       u.uGain.value = 0.28;
       u.uMediaMix.value = 0;
     } else if (mode === 'dynamic') {
-      u.uProfileOverride.value = -1;
+      // a slow wave of the two palette colours along the facade, unless a light show drives it
+      u.uProfileOverride.value = runtime.showDriven ? -1 : PROFILE_INDEX.wave;
       u.uGain.value = 0.45;
       u.uMediaMix.value = 0;
     } else {
       u.uProfileOverride.value = -1;
       u.uGain.value = 0.5;
       u.uMediaMix.value = 0.7;
-      u.uMediaOffset.value.x = (runtime.time * 0.01) % 1;
+      // the media content drifts slowly; it holds still with reduced motion
+      if (!useView.getState().reducedMotion) u.uMediaOffset.value.x = (runtime.time * 0.01) % 1;
     }
   });
   return mat;
@@ -59,16 +62,23 @@ export function Lighting() {
   const yFn = extended ? canopyY : roofY;
   const outerD = (extended ? CANOPY_OUTER_D : PROFILE.roofOuterD) + 0.12;
 
-  const ringMat = useLightMat({ gain: 1.6, segmentGap: style === 'segmented' }, [style]);
+  const segmented = style === 'segmented';
+  const ringMat = useLightMat({ gain: 1.6, segmentGap: segmented }, [segmented]);
+  const bandMat = useLightMat({ gain: 1.3, segmentGap: segmented, offset: 0.03 }, [segmented]);
   const crownMat = useLightMat({ gain: 1.2, offset: 0.25 }, []);
   const haloMat = useLightMat({ gain: 2.2, offset: 0.1 }, []);
-  const facadeCrownMat = useLightMat({ gain: 1.0, offset: 0.5 }, []);
+  const facadeCrownMat = useLightMat({ gain: 1.0, offset: 0.5, channel: 'facade' }, []);
 
   const geo = useMemo(() => {
     const ringH = style === 'subtle-rim' ? 0.35 : 1.0;
     const y0 = yFn(innerD + 0.12);
+    const bandY = PROFILE.roofInnerY + PROFILE.roofThickness;
     return {
       ring: ringWall(innerD, y0 + (PROFILE.roofThickness - ringH) / 2, y0 + (PROFILE.roofThickness + ringH) / 2),
+      // light band on both faces of the compression ring above the inner edge (see Structure):
+      // tall enough to read from aerial views, where the 1.4 m fascia is a hairline
+      band: ringWall(COMPRESSION_RING_D - 0.12, bandY + 0.4, bandY + 2.2),
+      bandOuter: ringWall(COMPRESSION_RING_D + 0.12, bandY + 0.4, bandY + 2.2),
       crown: ringWall(outerD, yFn(outerD - 0.12) + 0.2, yFn(outerD - 0.12) + PROFILE.roofThickness - 0.2),
       halo: ringWall(PROFILE.roofInnerD - 2.62, PROFILE.roofInnerY + 4.7, PROFILE.roofInnerY + 6.0),
       facadeCrown: sweepProfile([
@@ -96,12 +106,19 @@ export function Lighting() {
   });
 
   const showRing = style !== 'none';
+  const showBand = style === 'halo-ring' || style === 'segmented' || style === 'full-crown';
   const showCrown = style === 'full-crown';
   return (
     <LayerGroup id="lighting">
       {showRing && (
         <Selectable id="lightRing">
           <mesh geometry={geo.ring} material={ringMat} />
+          {showBand && (
+            <>
+              <mesh geometry={geo.band} material={bandMat} />
+              <mesh geometry={geo.bandOuter} material={bandMat} />
+            </>
+          )}
         </Selectable>
       )}
       {showCrown && <mesh geometry={geo.crown} material={crownMat} />}

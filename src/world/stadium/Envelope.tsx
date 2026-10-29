@@ -10,6 +10,7 @@ import { LayerGroup, Selectable } from './LayerGroup';
 import { GATE_BREAKS, PROFILE, gateAt, ringSamples, ringWall, roofY, sweepProfile, withBreaks } from './geometry';
 import { useConceptMaterial } from './materials';
 import { applyInstances, radialMatrix } from './radial';
+import { FIN_INNER_OFFSET, finLayout } from './finStyles';
 
 function roofSurface(d0: number, d1: number, lift: number, steps = 10, yFn: (d: number) => number = roofY) {
   const prof = [];
@@ -27,6 +28,8 @@ export function canopyY(d: number) {
   return roofY(PROFILE.roofOuterD) - 13 * t * t;
 }
 export const CANOPY_OUTER_D = PROFILE.roofOuterD + 20;
+/** compression ring standing on the roof's inner edge (also carries the roof light band) */
+export const COMPRESSION_RING_D = PROFILE.roofInnerD + 0.6;
 
 export function Roof() {
   const design = useEffectiveDesign();
@@ -114,7 +117,7 @@ export function Structure() {
     applyInstances(colRef.current, cols);
   }, [count, extended]);
 
-  const ringGeo = useMemo(() => ringWall(PROFILE.roofInnerD + 0.6, PROFILE.roofInnerY + PROFILE.roofThickness, PROFILE.roofInnerY + PROFILE.roofThickness + 2.6), []);
+  const ringGeo = useMemo(() => ringWall(COMPRESSION_RING_D, PROFILE.roofInnerY + PROFILE.roofThickness, PROFILE.roofInnerY + PROFILE.roofThickness + 2.6), []);
   useEffect(() => () => ringGeo.dispose(), [ringGeo]);
 
   return (
@@ -133,25 +136,25 @@ export function Structure() {
 }
 
 const FIN_D = PROFILE.facadeD + 0.9;
+const FIN_INNER_D = PROFILE.facadeD + FIN_INNER_OFFSET;
 
 export function Facade({ skinMaterial }: { skinMaterial: THREE.Material }) {
   const design = useEffectiveDesign();
   const quality = useView((s) => s.quality);
   const fin = useConceptMaterial(design.materials.facade, [1, 8], THREE.DoubleSide);
   const ref = useRef<THREE.InstancedMesh>(null);
-  const count = quality === 'low' ? 140 : 220;
+  const slots = quality === 'low' ? 140 : 220;
+  const language = design.language;
 
+  // the visual language sets the fins' rhythm, depth, angle and height (see finStyles)
   useLayoutEffect(() => {
-    const mats: THREE.Matrix4[] = [];
-    for (let i = 0; i < count; i++) {
-      const s = (i + 0.5) / count;
-      const atGate = gateAt(s) !== null;
-      const y0 = atGate ? 8 : 1.2;
-      const h = PROFILE.facadeTop - y0;
-      mats.push(radialMatrix(s, FIN_D, y0 + h / 2, new THREE.Vector3(1, h, 1), 0.045));
-    }
+    const mats = finLayout(language, slots).map((f) => {
+      const y0 = gateAt(f.s) !== null ? 8 : 1.2;
+      const h = PROFILE.facadeTop - f.drop - y0;
+      return radialMatrix(f.s, FIN_INNER_D + f.depth / 2, y0 + h / 2, new THREE.Vector3(f.width, h, f.depth), f.tilt, f.yaw);
+    });
     applyInstances(ref.current, mats);
-  }, [count]);
+  }, [slots, language]);
 
   const geo = useMemo(
     () => ({
@@ -171,7 +174,7 @@ export function Facade({ skinMaterial }: { skinMaterial: THREE.Material }) {
       <mesh geometry={geo.skinLow} material={skinMaterial} />
       <mesh geometry={geo.skinHigh} material={skinMaterial} />
       <instancedMesh ref={ref} args={[undefined, undefined, 220]} material={fin}>
-        <boxGeometry args={[0.55, 1, 2.6]} />
+        <boxGeometry args={[1, 1, 1]} />
       </instancedMesh>
       <mesh geometry={geo.cap} material={fin} />
     </LayerGroup>

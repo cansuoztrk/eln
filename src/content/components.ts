@@ -135,13 +135,14 @@ export const COMPONENTS: Record<string, ComponentInfo> = {
   },
   lightRing: {
     name: 'Çatı ışık halkası',
-    purpose: 'İç çatı kenarı boyunca uzanan ve gösterilerle senkronize olan ışık bandı.',
+    purpose: 'İç çatı kenarı ve basma halkası boyunca uzanan, gösterilerle senkronize ışık bantları. Stile göre ince bir çizgi, kalın bir halka, segmentli bir ritim veya dış kenarla birlikte tam taç olarak görünür.',
     status: ['concept'],
     options: [
+      { label: 'Çatı aydınlatma stili', module: 'design' },
       { label: 'Halka yoğunluğu', module: 'design' },
       { label: 'Işık gösterisi', module: 'lightshow' },
     ],
-    notes: ['Animasyon hızı fotosensitiviteye karşı sınırlandırılmıştır.'],
+    notes: ['Cephe ışığı bu halkadan bağımsızdır; halka yoğunluğu yalnızca çatı ışığını etkiler.', 'Animasyon hızı fotosensitiviteye karşı sınırlandırılmıştır.'],
   },
   floodlights: {
     name: 'Projektörler',

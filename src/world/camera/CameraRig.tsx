@@ -217,8 +217,10 @@ export function CameraRig() {
       const prevControls = c.toJSON();
       const prevMode = view.cameraMode;
       const prevFov = camera.fov;
+      const prevEnv = view.env;
       set({ capturing: true });
       try {
+        if (opts.env) set({ env: opts.env });
         if (opts.preview !== undefined) view.setPreview(opts.preview, prevLabel || 'capture');
         if (opts.pose) {
           const fps = opts.pose.target && new THREE.Vector3(...opts.pose.pos).distanceTo(new THREE.Vector3(...opts.pose.target)) < 5;
@@ -238,12 +240,16 @@ export function CameraRig() {
         return await requestFrameCapture(opts.width ?? 1280, opts.height ?? 720, opts.mime ?? 'image/jpeg', opts.quality ?? 0.88);
       } finally {
         if (opts.preview !== undefined) useView.getState().setPreview(prevPreview, prevLabel);
+        if (opts.env) set({ env: prevEnv });
         if (opts.pose) {
           configure(c, prevMode);
           c.fromJSON(prevControls, false);
           camera.fov = prevFov;
           camera.updateProjectionMatrix();
         }
+        // lights and sky settle instantly while capturing: two more frames return them to the
+        // view's own state at once instead of fading back from the captured one
+        if (opts.env || opts.preview !== undefined) await waitFrames(2);
         set({ capturing: false });
       }
     };

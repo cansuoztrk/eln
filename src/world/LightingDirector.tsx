@@ -16,6 +16,13 @@ import { SHOW_BY_ID, lookFromShow, speedToHz } from '@/core/model/lightshow';
 import { lightUniforms, runtime, PROFILE_INDEX } from './runtime';
 import { hexToRgb } from './stadium/seatPainter';
 
+/**
+ * Facade light level of the architectural look. It used to follow the roof
+ * ring, so dimming the ring (or switching the roof light off) also darkened
+ * the facade; it is now its own constant, equal to what the default ring gave.
+ */
+export const ARCH_FACADE_INTENSITY = 0.59;
+
 export function architecturalLook(d: DesignConfig): ShowLook {
   const mode = d.facade.lighting;
   return {
@@ -117,13 +124,22 @@ export function LightingDirector() {
 
     let look: ShowLook = architecturalLook(design);
     let fade = 1;
-    if (design.show.active) look = lookFromShow(design.show);
+    // a light show drives the whole building; the architectural look lights the facade on its own level
+    let showDriven = false;
+    if (design.show.active) {
+      look = lookFromShow(design.show);
+      showDriven = true;
+    }
     if (atmosphere !== 'silent' && atmosphere !== 'ambient') {
       const preset = spec.intro && atmoElapsed < (spec.introSeconds ?? 0) ? spec.intro : spec.then;
-      if (preset && preset !== 'arch') look = SHOW_BY_ID[preset].look;
+      if (preset && preset !== 'arch') {
+        look = SHOW_BY_ID[preset].look;
+        showDriven = true;
+      }
       if (spec.led && (!preset || preset === 'arch')) look = { ...look, led: spec.led };
     }
     if (runtime.show.playing) {
+      showDriven = true;
       const r = sequenceLook(design, now - runtime.show.startedAt);
       look = r.look;
       fade = r.fade;
@@ -140,13 +156,17 @@ export function LightingDirector() {
     }
     runtime.show.look = look;
     runtime.show.fade = fade;
+    runtime.showDriven = showDriven;
 
-    // colours & intensity (smoothed)
-    const k = 1 - Math.exp(-dt * 3.5);
+    // colours & intensity (smoothed; an image capture shows the settled state at once)
+    const capturing = useView.getState().capturing;
+    const k = capturing ? 1 : 1 - Math.exp(-dt * 3.5);
     lightUniforms.uColorA.value.lerp(tmpA.set(look.primary), k);
     lightUniforms.uColorB.value.lerp(tmpB.set(look.secondary), k);
     const targetI = (0.04 + look.ring * 1.0) * fade;
     lightUniforms.uIntensity.value += (targetI - lightUniforms.uIntensity.value) * k;
+    const targetF = showDriven ? targetI : ARCH_FACADE_INTENSITY * fade;
+    lightUniforms.uFacadeIntensity.value += (targetF - lightUniforms.uFacadeIntensity.value) * k;
     lightUniforms.uProfile.value = PROFILE_INDEX[look.profile];
     lightUniforms.uHz.value = speedToHz(look.speed, reduced);
     lightUniforms.uTime.value = now;
@@ -154,10 +174,10 @@ export function LightingDirector() {
 
     // floodlights
     const floodTarget = spec.floods;
-    runtime.floods += (floodTarget - runtime.floods) * (1 - Math.exp(-dt * 1.5));
+    runtime.floods += (floodTarget - runtime.floods) * (capturing ? 1 : 1 - Math.exp(-dt * 1.5));
     runtime.lively = spec.lively && !reduced;
     const tifoTarget = spec.tifoSeconds && atmoElapsed < spec.tifoSeconds ? 1 : 0;
-    runtime.tifo += (tifoTarget - runtime.tifo) * (1 - Math.exp(-dt * 2));
+    runtime.tifo += (tifoTarget - runtime.tifo) * (capturing ? 1 : 1 - Math.exp(-dt * 2));
     if (Math.abs(runtime.tifo - tifoTarget) < 0.02) runtime.tifo = tifoTarget;
 
     // tribune light layer

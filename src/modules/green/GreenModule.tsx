@@ -9,7 +9,7 @@ import { Badge, Icon, Note, Section, Segmented, Toggle } from '@/ui/primitives';
 type GreenKey = 'rainwater' | 'efficientLighting' | 'pitchCare' | 'landscape' | 'waste' | 'transitLink';
 
 const SYSTEMS: { key: GreenKey; name: string; text: string; impact: 'Düşük' | 'Orta' | 'Yüksek'; pose: CameraPose }[] = [
-  { key: 'efficientLighting', name: 'Verimli aydınlatma', text: 'Projektörler için verimli armatür ve senaryo bazlı aydınlatma kavramı. Modelde projektör ışık rengi değişir.', impact: 'Orta', pose: { pos: [-30, 30, 20], target: [30, 40, -40] } },
+  { key: 'efficientLighting', name: 'Verimli aydınlatma', text: 'Projektörler için verimli armatür ve senaryo bazlı aydınlatma kavramı. Modelde projektörlerin ve kasenin ışık rengi değişir (verimli: daha soğuk beyaz).', impact: 'Orta', pose: { pos: [-30, 30, 20], target: [30, 40, -40] } },
   { key: 'rainwater', name: 'Yağmur suyu yönetimi', text: 'Meydan çevresinde biyo-hendekler ve depolama tankları kavramı.', impact: 'Orta', pose: { pos: [-60, 90, 300], target: [0, 0, 170] } },
   { key: 'pitchCare', name: 'Saha bakımında kaynak optimizasyonu', text: 'Bölgesel sulama ve sensörlerle izleme kavramı (sahadaki halkalar).', impact: 'Düşük', pose: { pos: [0, 70, 60], target: [0, 0, 0] } },
   { key: 'landscape', name: 'Peyzaj ve gölgelendirme', text: 'Ağaçlar, çim alanlar ve gölgelikler; ısı adası etkisini azaltma kavramı.', impact: 'Orta', pose: { pos: [280, 70, 60], target: [170, 0, -40] } },

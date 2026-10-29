@@ -93,24 +93,78 @@ export function Slider({
   );
 }
 
-export function Select<T extends string>({ label, value, options, onChange, locked, onToggleLock }: { label: string; value: T; options: { value: T; label: string }[]; onChange: (v: T) => void; locked?: boolean; onToggleLock?: () => void }) {
+export function Select<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  locked,
+  onToggleLock,
+  hint,
+  onShow,
+  tag,
+}: {
+  label: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
+  locked?: boolean;
+  onToggleLock?: () => void;
+  /** what the current value does, read out with the field */
+  hint?: ReactNode;
+  /** frames the part of the model this field changes */
+  onShow?: () => void;
+  /** short marker next to the label, e.g. a value that differs from a preset */
+  tag?: { text: string; title: string };
+}) {
   const id = useId();
   return (
     <div className="py-1">
       <div className="flex justify-between items-center">
-        <label htmlFor={id} className="field-label">
-          {label}
-        </label>
-        {onToggleLock && <LockButton locked={!!locked} onClick={onToggleLock} label={label} />}
+        <span className="flex items-center gap-1.5 min-w-0">
+          <label htmlFor={id} className="field-label">
+            {label}
+          </label>
+          {tag && (
+            <span id={`${id}-tag`} className="field-tag" title={tag.title}>
+              {tag.text}
+              <span className="sr-only"> — {tag.title}</span>
+            </span>
+          )}
+        </span>
+        <span className="flex items-center gap-0.5">
+          {onShow && <ShowButton onClick={onShow} label={label} />}
+          {onToggleLock && <LockButton locked={!!locked} onClick={onToggleLock} label={label} />}
+        </span>
       </div>
-      <select id={id} className="select" value={value} onChange={(e) => onChange(e.target.value as T)}>
+      <select
+        id={id}
+        className="select"
+        value={value}
+        onChange={(e) => onChange(e.target.value as T)}
+        aria-describedby={[tag && `${id}-tag`, hint && `${id}-hint`].filter(Boolean).join(' ') || undefined}
+      >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
           </option>
         ))}
       </select>
+      {hint && (
+        <p id={`${id}-hint`} className="field-hint">
+          {hint}
+        </p>
+      )}
     </div>
+  );
+}
+
+/** Small "show in model" action next to a field label. */
+export function ShowButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button type="button" className="text-faint hover:text-text p-1 mb-1" onClick={onClick} aria-label={`${label}: modelde göster`} title="Modelde göster">
+      <Icon name="Focus" size={14} />
+    </button>
   );
 }
 

@@ -34,6 +34,8 @@ export const runtime = {
   tifo: 0,
   /** crowd liveliness: repaint shimmer when true */
   lively: false,
+  /** a light show (design show, atmosphere moment or composer preview) drives every light this frame */
+  showDriven: false,
   /** light show playback */
   show: {
     playing: false,
@@ -54,7 +56,10 @@ export const lightUniforms = {
   uHz: { value: 0.2 },
   uColorA: { value: new THREE.Color('#c8102e') },
   uColorB: { value: new THREE.Color('#f2b631') },
+  /** roof light ribbons (the design's ring intensity, or the light show) */
   uIntensity: { value: 1 },
+  /** facade wash and facade crown: independent of the roof ring unless a light show drives the whole building */
+  uFacadeIntensity: { value: 0.59 },
   uProfile: { value: 0 },
   uMinLevel: { value: 0.35 },
   uReveal: { value: 1 },

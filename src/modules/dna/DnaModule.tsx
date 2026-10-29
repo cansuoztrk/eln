@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDesign, customizationCount } from '@/core/store/designStore';
+import { useView } from '@/core/store/viewStore';
 import { DNA_PRESETS, type DnaPreset } from '@/core/model/dna';
 import {
   CHOREOGRAPHIES,
@@ -28,8 +29,12 @@ import {
   prettyValue,
 } from '@/core/model/labels';
 import { evaluateRules } from '@/core/model/rules';
-import { Badge, ColorField, Icon, LockButton, Section, Select, Slider } from '@/ui/primitives';
+import { Badge, ColorField, Icon, LockButton, Section, Select, ShowButton, Slider } from '@/ui/primitives';
 import { RuleList } from './RuleList';
+import { paramHint } from './paramGuide';
+import { showInModel } from './showInModel';
+
+const previewLabelOf = (p: DnaPreset) => `DNA: ${p.name}`;
 
 function opts<T extends string>(values: readonly T[], labels: Record<T, string>) {
   return values.map((v) => ({ value: v, label: labels[v] }));
@@ -44,11 +49,47 @@ export default function DnaModule() {
   const [pending, setPending] = useState<DnaPreset | null>(null);
   const findings = useMemo(() => evaluateRules(design), [design]);
   const custom = customizationCount(design);
+  // choices that no longer match the active DNA preset
+  const customized = useMemo(() => {
+    const preset = DNA_PRESETS.find((p) => p.id === design.dna);
+    return new Set(preset ? diffDesigns(applyPatch(design, preset.patch), design).map((c) => c.key) : []);
+  }, [design]);
+  const customTag = { text: 'özel', title: "Aktif DNA'nın önerdiği seçimden farklı" };
+  const view2D = useView((s) => s.view2D);
+  const previewLabel = useView((s) => s.previewLabel);
+  const setPreview = useView((s) => s.setPreview);
+
+  // a DNA preview belongs to this module; leaving it returns to the design
+  useEffect(
+    () => () => {
+      if (useView.getState().previewLabel.startsWith('DNA: ')) useView.getState().setPreview(null);
+    },
+    [],
+  );
 
   const lockProps = (key: string) => ({ locked: locks.includes(key), onToggleLock: () => toggleLock(key) });
-  const sel = <T extends string>(key: string, values: readonly T[], labels: Record<T, string>) => (
-    <Select label={KEY_LABEL[key]} value={getAt(design, key) as T} options={opts(values, labels)} onChange={(v) => setKey(key, v, `${KEY_LABEL[key]}: ${labels[v]}`)} {...lockProps(key)} />
-  );
+  // "show in model" needs the 3D view; the 2D plan already shows every choice at once
+  const show = (key: string) => (view2D ? undefined : () => showInModel(key));
+  const sel = <T extends string>(key: string, values: readonly T[], labels: Record<T, string>) => {
+    const value = getAt(design, key) as T;
+    return (
+      <Select
+        label={KEY_LABEL[key]}
+        value={value}
+        options={opts(values, labels)}
+        onChange={(v) => setKey(key, v, `${KEY_LABEL[key]}: ${labels[v]}`)}
+        hint={paramHint(key, value)}
+        onShow={show(key)}
+        tag={customized.has(key) ? customTag : undefined}
+        {...lockProps(key)}
+      />
+    );
+  };
+
+  const togglePreview = (p: DnaPreset) => {
+    if (previewLabel === previewLabelOf(p)) setPreview(null);
+    else setPreview(applyPatch(design, p.patch, new Set(locks)), previewLabelOf(p));
+  };
 
   const requestDna = (p: DnaPreset) => {
     const next = applyPatch(design, p.patch, new Set(locks));
@@ -68,30 +109,36 @@ export default function DnaModule() {
           {locks.length > 0 && <span> · {locks.length} kilitli seçim</span>}
         </div>
         <div className="grid grid-cols-1 gap-2">
-          {DNA_PRESETS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => requestDna(p)}
-              aria-pressed={design.dna === p.id}
-              className={`text-left rounded-xl border p-3 transition ${design.dna === p.id ? 'border-aslan bg-aslan/10' : 'border-line bg-surface-2 hover:border-white/20'}`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="display font-semibold text-[14.5px]">{p.name}</span>
-                {design.dna === p.id && <Icon name="Check" size={16} className="text-gold" />}
-              </div>
-              <div className="text-[12px] text-gold/90 mt-0.5">{p.tagline}</div>
-              <div className="text-[12px] muted mt-1.5 leading-snug">{p.description}</div>
-              <div className="flex flex-wrap gap-1 mt-2">
-                {p.changes.map((c) => (
-                  <span key={c} className="text-[10.5px] px-1.5 py-0.5 rounded-md bg-white/5 border border-line">
-                    {c}
+          {DNA_PRESETS.map((p) => {
+            const active = design.dna === p.id;
+            const previewing = previewLabel === previewLabelOf(p);
+            return (
+              <div key={p.id} className={`relative rounded-xl border transition ${active ? 'border-aslan bg-aslan/10' : previewing ? 'border-gold/60 bg-gold/5' : 'border-line bg-surface-2 hover:border-white/20'}`}>
+                <button type="button" onClick={() => requestDna(p)} aria-pressed={active} className="block w-full text-left rounded-xl p-3">
+                  <span className="flex items-center gap-2 pr-24">
+                    <span className="display font-semibold text-[14.5px]">{p.name}</span>
+                    {active && <Icon name="Check" size={16} className="text-gold shrink-0" />}
                   </span>
-                ))}
+                  <span className="block text-[12px] text-gold/90 mt-0.5 pr-24">{p.tagline}</span>
+                  <span className="block text-[12px] muted mt-1.5 leading-snug">{p.description}</span>
+                  <span className="flex flex-wrap gap-1 mt-2">
+                    {p.changes.map((c) => (
+                      <span key={c} className="text-[10.5px] px-1.5 py-0.5 rounded-md bg-white/5 border border-line">
+                        {c}
+                      </span>
+                    ))}
+                  </span>
+                </button>
+                {!active && (
+                  <button type="button" className={`btn btn-sm absolute top-2.5 right-2.5 ${previewing ? 'border-gold/60 text-gold' : ''}`} aria-pressed={previewing} aria-label={`Önizle: ${p.name}`} onClick={() => togglePreview(p)}>
+                    <Icon name={previewing ? 'EyeOff' : 'Eye'} size={14} /> {previewing ? 'Kapat' : 'Önizle'}
+                  </button>
+                )}
               </div>
-            </button>
-          ))}
+            );
+          })}
         </div>
+        <p className="field-hint">Önizle, DNA'yı tasarımınızı değiştirmeden modelde gösterir; üstteki bantla uygulayabilir veya tasarıma dönebilirsiniz. Kilitli seçimler önizlemede de korunur.</p>
       </Section>
 
       {pending && (
@@ -137,8 +184,10 @@ export default function DnaModule() {
           <div className="flex-1">
             <Slider label="Işık halkası yoğunluğu" value={design.roof.ring} onChange={(v) => setKey('roof.ring', v, `Halka yoğunluğu ${Math.round(v * 100)}%`)} />
           </div>
+          {!view2D && <ShowButton label="Işık halkası yoğunluğu" onClick={() => showInModel('roof.ring')} />}
           <LockButton label="Işık halkası yoğunluğu" {...{ locked: locks.includes('roof.ring'), onClick: () => toggleLock('roof.ring') }} />
         </div>
+        <p className="field-hint -mt-0.5 mb-1">{paramHint('roof.ring', design.roof.ring)}</p>
         {sel('facade.lighting', FACADE_LIGHTING, FACADE_LIGHTING_LABEL)}
         {sel('screens.layout', SCREEN_LAYOUTS, SCREEN_LABEL)}
         {sel('seats.choreography', CHOREOGRAPHIES, CHOREO_LABEL)}
@@ -155,6 +204,7 @@ export default function DnaModule() {
             <LockButton label="İkincil renk" locked={locks.includes('palette.secondary')} onClick={() => toggleLock('palette.secondary')} />
           </div>
         </div>
+        <p className="field-hint">{paramHint('palette', null)}</p>
       </Section>
     </div>
   );

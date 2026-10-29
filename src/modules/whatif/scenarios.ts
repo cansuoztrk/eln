@@ -1,6 +1,7 @@
 import { applyPatch, type DesignConfig, type DesignPatch, type ShowPresetId } from '@/core/model/design';
 import { SHOW_BY_ID } from '@/core/model/lightshow';
 import type { CameraPose } from '@/world/worldApi';
+import type { EnvMode } from '@/core/store/viewStore';
 
 export interface Levers {
   roof: 'lighting-only' | 'halo' | 'canopy';
@@ -65,6 +66,8 @@ export interface Question {
   id: string;
   text: string;
   pose: CameraPose;
+  /** light at which the comparison images are taken, when the answer depends on it */
+  env?: EnvMode;
   slots: Partial<Levers>[];
   names: string[];
 }
@@ -74,6 +77,8 @@ export const QUESTIONS: Question[] = [
     id: 'roof',
     text: 'Daha kapsamlı çatı modernizasyonu yerine yalnızca aydınlatmayı geliştirmek nasıl görünür?',
     pose: { pos: [250, 110, 280], target: [0, 30, 0] },
+    // dusk: the roof forms still read and the lighting-only option is visible
+    env: 'dusk',
     slots: [{ roof: 'lighting-only' }, { roof: 'halo' }, { roof: 'canopy' }],
     names: ['Yalnızca ışık', 'Halo eklentisi', 'Genişletilmiş kanopi'],
   },
@@ -109,6 +114,7 @@ export const QUESTIONS: Question[] = [
     id: 'night',
     text: 'Bir maç gecesinde hangi aydınlatma düzeni daha güçlü bir atmosfer yaratır?',
     pose: { pos: [180, 80, 230], target: [0, 25, 0] },
+    env: 'night',
     slots: [{ night: 'golden-halo' }, { night: 'red-wave' }, { night: 'european-night' }],
     names: ['Golden Halo', 'The Red Wave', 'European Night'],
   },

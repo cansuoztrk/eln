@@ -30,6 +30,8 @@ const fragment = /* glsl */ `
   uniform vec3 uColorA;
   uniform vec3 uColorB;
   uniform float uIntensity;
+  uniform float uFacadeIntensity;
+  uniform float uChannel;    // 0 = roof light, 1 = facade light
   uniform int uProfile;
   uniform float uMinLevel;
   uniform float uReveal;
@@ -84,10 +86,11 @@ const fragment = /* glsl */ `
     }
     float vert = 1.0;
     if (uVertical > 0.5) vert = mix(1.0, 0.18, smoothstep(0.0, 1.0, vUv.y));
-    vec3 col = mix(uColorA, uColorB, clamp(m, 0.0, 1.0)) * level * uIntensity * uGain * uReveal * vert;
+    float intensity = uChannel > 0.5 ? uFacadeIntensity : uIntensity;
+    vec3 col = mix(uColorA, uColorB, clamp(m, 0.0, 1.0)) * level * intensity * uGain * uReveal * vert;
     if (uMediaMix > 0.0) {
       vec3 media = texture2D(uMediaMap, vUv * uMediaRepeat + uMediaOffset).rgb;
-      col = mix(col, media * 2.2 * uIntensity * uReveal, uMediaMix);
+      col = mix(col, media * 2.2 * intensity * uReveal, uMediaMix);
     }
     gl_FragColor = vec4(col, 1.0);
     #include <tonemapping_fragment>
@@ -103,6 +106,8 @@ export interface LightMaterialOptions {
   side?: THREE.Side;
   /** fixed profile index, ignoring the global look */
   profile?: number;
+  /** which intensity the element follows: the roof ring (default) or the facade light */
+  channel?: 'roof' | 'facade';
   media?: THREE.Texture;
   mediaRepeat?: [number, number];
 }
@@ -117,6 +122,7 @@ export function createLightMaterial(opts: LightMaterialOptions = {}) {
       uVertical: { value: opts.vertical ? 1 : 0 },
       uSegmentGap: { value: opts.segmentGap ? 1 : 0 },
       uOffset: { value: opts.offset ?? 0 },
+      uChannel: { value: opts.channel === 'facade' ? 1 : 0 },
       uProfileOverride: { value: opts.profile ?? -1 },
       uMediaMap: { value: opts.media ?? null },
       uMediaMix: { value: 0 },

@@ -240,6 +240,8 @@ export function SceneLights() {
   const hemi = useRef<THREE.HemisphereLight>(null);
   const sun = useRef<THREE.DirectionalLight>(null);
   const flood = useRef<THREE.PointLight>(null);
+  // efficient (LED) floodlights read cooler and whiter than the warm reference lamps
+  const efficient = useEffectiveDesign().green.efficientLighting;
   useFrame(() => {
     if (hemi.current) {
       hemi.current.color.copy(look.hemi);
@@ -257,8 +259,9 @@ export function SceneLights() {
     <>
       <hemisphereLight ref={hemi} args={['#8fa0d0', '#15161a', 0.5]} />
       <directionalLight ref={sun} position={[300, 600, 200]} intensity={0.4} />
-      {/* soft fill that represents the bowl being lit by its own floodlights */}
-      <pointLight ref={flood} position={[0, 70, 0]} intensity={9000} distance={260} decay={1.6} color="#fff1dc" />
+      {/* soft fill that represents the bowl being lit by its own floodlights; it sits below the roof
+          (as the floodlights do) so it does not light the roof's top surface into a glare spot */}
+      <pointLight ref={flood} position={[0, 36, 0]} intensity={500} distance={220} decay={1} color={efficient ? '#eef4ff' : '#ffe6bd'} />
       <ambientLight intensity={0.08} />
     </>
   );

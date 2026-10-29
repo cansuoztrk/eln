@@ -8,7 +8,8 @@ import { useEffectiveDesign } from '@/core/store/effective';
 import { useView } from '@/core/store/viewStore';
 import { MEETING_POINTS, ZONES, type ZoneId } from '@/core/district';
 import { MATERIAL_BY_ID } from '@/core/model/materials';
-import { GATES, INNER, PITCH, PROFILE, bowlPoint } from '@/world/stadium/geometry';
+import { GATES, INNER, PITCH, PROFILE, bowlPoint, innerPoint } from '@/world/stadium/geometry';
+import { FIN_INNER_OFFSET, finLayout } from '@/world/stadium/finStyles';
 import { PATHS } from '@/world/stadium/District';
 import { LAYER_LABEL } from '@/core/layers';
 
@@ -16,6 +17,21 @@ function ring(d: number) {
   const hw = INNER.hw + d;
   const hd = INNER.hd + d;
   return { x: -hw, y: -hd, width: hw * 2, height: hd * 2, rx: INNER.r + d };
+}
+
+/** Facade fins in plan: each a short line along its depth, turned by its louvre angle (same data as the 3D facade). */
+function planFins(language: Parameters<typeof finLayout>[0]) {
+  return finLayout(language, 220).map((f) => {
+    const p = innerPoint(f.s);
+    const d = PROFILE.facadeD + FIN_INNER_OFFSET + f.depth / 2;
+    const cx = p.x + p.nx * d;
+    const cz = p.z + p.nz * d;
+    // depth axis: the outward normal turned about the vertical by the fin's yaw
+    const dx = Math.sin(f.yaw) * p.nz + Math.cos(f.yaw) * p.nx;
+    const dz = -Math.sin(f.yaw) * p.nx + Math.cos(f.yaw) * p.nz;
+    const h = f.depth / 2;
+    return { x1: cx - dx * h, y1: cz - dz * h, x2: cx + dx * h, y2: cz + dz * h, w: f.width };
+  });
 }
 
 /** Object Inspector entry opened by each district zone of the plan. */
@@ -83,6 +99,7 @@ export default function Plan2D() {
   const lowerFill = choreo === 'none' ? '#3a3d44' : d.palette.primary;
   const upperFill = choreo === 'none' ? '#33363d' : choreo === 'halves' || choreo === 'stripes' ? d.palette.secondary : d.palette.primary;
   const facadeColor = MATERIAL_BY_ID[d.materials.facade].visual.color;
+  const fins = useMemo(() => planFins(d.language), [d.language]);
   const ringW = 1 + d.roof.ring * 4;
   return (
     <div className="absolute inset-0 bg-[#0a0c11] flex items-center justify-center">
@@ -117,7 +134,16 @@ export default function Plan2D() {
           d.access.routes &&
           paths.access.map((p, i) => <polyline key={i} className="plan-part" onClick={pick('accessRoutes')} points={pts(p)} fill="none" stroke={selected === 'access' || selected === 'accessRoutes' ? GOLD : '#4ea3ff'} strokeWidth="3" />)}
         {layers.massing && <rect {...ring(PROFILE.facadeD + 12)} className="plan-part" onClick={pick('massing')} fill="#22252c" stroke="#3a3e47" />}
-        {layers.facade && <rect {...ring(PROFILE.facadeD)} className="plan-part" onClick={pick('facade')} fill="none" stroke={facadeColor} strokeWidth="5" />}
+        {layers.facade && (
+          <g className="plan-part" onClick={pick('facade')}>
+            {/* wide transparent hit area, the skin line and the fins of the chosen visual language */}
+            <rect {...ring(PROFILE.facadeD + 1)} fill="none" stroke="transparent" strokeWidth="7" />
+            <rect {...ring(PROFILE.facadeD)} fill="none" stroke={facadeColor} strokeOpacity="0.55" strokeWidth="1" />
+            {fins.map((f, i) => (
+              <line key={i} x1={f.x1} y1={f.y1} x2={f.x2} y2={f.y2} stroke={facadeColor} strokeWidth={Math.max(0.6, f.w)} />
+            ))}
+          </g>
+        )}
         {layers.facade && d.facade.lighting !== 'static' && <rect {...ring(PROFILE.facadeD + 3)} fill="none" stroke={d.palette.primary} strokeWidth="1.5" opacity="0.9" pointerEvents="none" />}
         {layers.upperTier && <rect {...ring(PROFILE.backD)} className="plan-part" onClick={pick('upperTier')} fill={upperFill} opacity="0.55" />}
         {layers.concourse && <rect {...ring(PROFILE.crossAisle[1])} className="plan-part" onClick={pick('concourse')} fill="#2a2d35" />}

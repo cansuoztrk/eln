@@ -55,7 +55,7 @@ export function targetLook(env: EnvMode, night: NightTint): EnvLook {
     sun: new THREE.Color(day ? '#fff6e6' : dusk ? '#ffb27a' : '#b9c8ff'),
     sunIntensity: day ? 2.6 : dusk ? 1.1 : 0.35,
     sunPos: dusk ? new THREE.Vector3(-600, 180, -300) : new THREE.Vector3(300, 600, 200),
-    flood: day ? 0 : 9000,
+    flood: day ? 0 : 500,
     city: new THREE.Color(day ? '#8c929c' : '#1a1d24'),
     cityGlow: day ? 0.05 : dusk ? 0.45 : 0.8,
     hills: new THREE.Color(day ? '#4d5a46' : '#0b0d10'),
