@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useEffectiveDesign } from '@/core/store/effective';
+import { useView } from '@/core/store/viewStore';
 import { PITCH } from './geometry';
 import { pitchTexture } from '../textures';
 import { runtime } from '../runtime';
@@ -25,7 +26,7 @@ export function Pitch() {
   const white = useMemo(() => new THREE.MeshStandardMaterial({ color: '#f4f4f4', emissive: '#ffffff', emissiveIntensity: 0.25 }), []);
   white.clippingPlanes = clipping;
   const irrigation = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: '#4fc3f7', transparent: true, opacity: 0.18, depthWrite: false, side: THREE.DoubleSide }),
+    () => new THREE.MeshBasicMaterial({ color: '#4fc3f7', transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide }),
     [],
   );
 
@@ -34,7 +35,8 @@ export function Pitch() {
     const target = 0.08 + runtime.floods * 0.42;
     mat.userData.baseEmissiveIntensity = target;
     if (mat.emissiveIntensity !== target && mat.emissive.equals(mat.userData.baseEmissive)) mat.emissiveIntensity = target;
-    irrigation.opacity = 0.12 + 0.06 * Math.sin(runtime.time * 1.2);
+    // irrigation zones breathe slowly; steady with reduced motion
+    irrigation.opacity = useView.getState().reducedMotion ? 0.32 : 0.3 + 0.05 * Math.sin(runtime.time * 1.2);
   });
 
   const L = PITCH.length + RUNOFF * 2;

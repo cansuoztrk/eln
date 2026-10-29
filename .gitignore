@@ -5,3 +5,4 @@ dist
 .env
 .env.local
 tests/e2e/output
+tests/audit/output

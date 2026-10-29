@@ -4,6 +4,8 @@ import { FIN_STYLES, finLayout } from '@/world/stadium/finStyles';
 import { PARAM_GUIDE, paramHint } from '@/modules/dna/paramGuide';
 import { VIEWS } from '@/world/camera/views';
 import { QUESTIONS } from '@/modules/whatif/scenarios';
+import * as THREE from 'three';
+import { ribbonGeometry } from '@/world/stadium/ribbon';
 
 describe('visual language drives the facade fins', () => {
   const signature = (lang: (typeof VISUAL_LANGUAGES)[number]) =>
@@ -82,5 +84,35 @@ describe('What-If comparisons are taken in the light they are about', () => {
   it('captures the match-night question at night and the roof question at dusk', () => {
     expect(QUESTIONS.find((q) => q.id === 'night')?.env).toBe('night');
     expect(QUESTIONS.find((q) => q.id === 'roof')?.env).toBe('dusk');
+  });
+});
+
+describe('ground ribbons (routes, paths, swales)', () => {
+  it('face up so they are drawn when seen from above, whichever way the path runs', () => {
+    const paths = [
+      [new THREE.Vector3(0, 0, 0), new THREE.Vector3(10, 0, 0), new THREE.Vector3(20, 0, 5)],
+      [new THREE.Vector3(0, 0, 0), new THREE.Vector3(-5, 0, -10), new THREE.Vector3(-20, 0, -12)],
+    ];
+    for (const pts of paths) {
+      const g = ribbonGeometry(pts, 3);
+      const pos = g.getAttribute('position');
+      const idx = g.getIndex()!;
+      const v = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+      for (let i = 0; i < idx.count; i += 3) {
+        v.forEach((p, j) => p.fromBufferAttribute(pos, idx.getX(i + j)));
+        const n = new THREE.Vector3().subVectors(v[1], v[0]).cross(new THREE.Vector3().subVectors(v[2], v[0]));
+        expect(n.y).toBeGreaterThan(0);
+      }
+    }
+  });
+});
+
+describe('NaN-safe bump mapping', () => {
+  it('patches the three.js bump map chunk so a degenerate pixel keeps its normal', async () => {
+    const THREE_ = await import('three');
+    await import('@/world/shaderFixes');
+    const chunk = THREE_.ShaderChunk.bumpmap_pars_fragment;
+    expect(chunk).toContain('return surf_norm;');
+    expect(chunk).not.toMatch(/return normalize\( abs\( fDet \) \* surf_norm - vGrad \);/);
   });
 });

@@ -13,6 +13,7 @@ import { GATES, PROFILE, bowlPoint, innerPoint } from './geometry';
 import { pavingTexture } from '../textures';
 import { labelTexture } from '../labels';
 import { runtime } from '../runtime';
+import { ribbonGeometry } from './ribbon';
 
 function std(params: THREE.MeshStandardMaterialParameters) {
   const m = new THREE.MeshStandardMaterial(params);
@@ -27,35 +28,6 @@ function gatePos(id: string, extra = 14) {
   const g = GATES.find((x) => x.id === id)!;
   const p = bowlPoint(g.s, PROFILE.facadeD + extra, 0);
   return new THREE.Vector3(p.x, 0, p.z);
-}
-
-/** Flat ribbon along a polyline (on the ground). */
-function ribbonGeometry(points: THREE.Vector3[], width: number, y = 0.08) {
-  const pos: number[] = [];
-  const idx: number[] = [];
-  const uv: number[] = [];
-  let acc = 0;
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i];
-    const a = points[Math.max(0, i - 1)];
-    const b = points[Math.min(points.length - 1, i + 1)];
-    const dir = new THREE.Vector3().subVectors(b, a).setY(0).normalize();
-    const n = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(width / 2);
-    if (i > 0) acc += p.distanceTo(points[i - 1]);
-    pos.push(p.x + n.x, y, p.z + n.z, p.x - n.x, y, p.z - n.z);
-    uv.push(acc / 10, 0, acc / 10, 1);
-    if (i < points.length - 1) {
-      const k = i * 2;
-      // counter-clockwise seen from above: the ribbon faces up (it used to face down and was culled)
-      idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3);
-    }
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  g.setIndex(idx);
-  g.computeVertexNormals();
-  return g;
 }
 
 function curve(...pts: [number, number][]) {
@@ -227,11 +199,24 @@ function MeetingPin({ x, z, label }: { x: number; z: number; label: string }) {
   );
 }
 
-function WasteStation({ x, z }: { x: number; z: number }) {
-  const colors = ['#2e7dd1', '#f2b631', '#3fbf8a'];
+const WASTE_COLORS = ['#2e7dd1', '#f2b631', '#3fbf8a'];
+
+/** Sorting station: three bins under a light canopy on a green pad, readable from the plaza views. */
+function WasteStation({ x, z, pad, roof }: { x: number; z: number; pad: THREE.Material; roof: THREE.Material }) {
   return (
     <group position={[x, 0, z]}>
-      {colors.map((c, i) => (
+      <mesh rotation-x={-Math.PI / 2} position={[0, 0.05, 0]} material={pad}>
+        <planeGeometry args={[7, 4.5]} />
+      </mesh>
+      <mesh position={[0, 2.7, 0]} material={roof}>
+        <boxGeometry args={[5.6, 0.2, 2.8]} />
+      </mesh>
+      {[-2.6, 2.6].map((px) => (
+        <mesh key={px} position={[px, 1.35, -1.2]} material={roof}>
+          <boxGeometry args={[0.16, 2.7, 0.16]} />
+        </mesh>
+      ))}
+      {WASTE_COLORS.map((c, i) => (
         <mesh key={c} position={[(i - 1) * 1.4, 0.7, 0]}>
           <boxGeometry args={[1.1, 1.4, 1.1]} />
           <meshStandardMaterial color={c} emissive={c} emissiveIntensity={0.35} />
@@ -255,11 +240,14 @@ export function Surroundings() {
   const stage = useMemo(() => std({ color: '#1d2027', roughness: 0.6 }), []);
   const lawn = useMemo(() => std({ color: '#2b5a33', roughness: 1 }), []);
   const totem = useMemo(() => std({ color: '#111', emissive: design.palette.primary, emissiveIntensity: 1.2 }), [design.palette.primary]);
+  const fanEdge = useMemo(() => std({ color: '#2a1316', emissive: design.palette.primary, emissiveIntensity: 0.45, roughness: 0.7 }), [design.palette.primary]);
   const pole = useMemo(() => std({ color: '#888', emissive: '#fff0d0', emissiveIntensity: 0.6 }), []);
   const social = ZONE_BY_ID.social;
   const museum = ZONE_BY_ID.museum;
   const lawnZone = ZONE_BY_ID.eventLawn;
   const event = design.plaza.character === 'event';
+  const wastePad = useMemo(() => std({ color: '#2f6f4f', roughness: 0.9 }), []);
+  const wasteRoof = useMemo(() => std({ color: '#e9e2d0', roughness: 0.6, emissive: '#3fbf8a', emissiveIntensity: 0.2 }), []);
 
   return (
     <LayerGroup id="surroundings">
@@ -269,6 +257,17 @@ export function Surroundings() {
       </mesh>
       {design.district.fanZone && (
         <Selectable id="fanPlaza">
+          {/* the zone's edge marking (as in the 2D plan), so the fan plaza reads as a place and not only as totems */}
+          {[
+            [fan.x, fan.z - fan.d / 2, fan.w, 1.6],
+            [fan.x, fan.z + fan.d / 2, fan.w, 1.6],
+            [fan.x - fan.w / 2, fan.z, 1.6, fan.d],
+            [fan.x + fan.w / 2, fan.z, 1.6, fan.d],
+          ].map(([x, z, w, d]) => (
+            <mesh key={`${x}${z}`} position={[x, 0.08, z]} material={fanEdge}>
+              <boxGeometry args={[w, 0.16, d]} />
+            </mesh>
+          ))}
           {[-50, -17, 17, 50].map((x) => (
             <mesh key={x} position={[x, 4, fan.z - 22]} material={totem}>
               <boxGeometry args={[1.2, 8, 1.2]} />
@@ -359,7 +358,7 @@ export function Surroundings() {
       {design.green.waste && (
         <Selectable id="waste">
           {[[30, 140], [-30, 140], [social.x, social.z + 32], [120, -120], [-120, 60]].map(([x, z]) => (
-            <WasteStation key={`${x}${z}`} x={x} z={z} />
+            <WasteStation key={`${x}${z}`} x={x} z={z} pad={wastePad} roof={wasteRoof} />
           ))}
         </Selectable>
       )}
@@ -372,9 +371,9 @@ export function Surroundings() {
 export function AccessRoutes() {
   const design = useEffectiveDesign();
   const mat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#4ea3ff', toneMapped: false, transparent: true, opacity: 0.9 }), []);
-  const geos = useMemo(() => [PATHS.accessDropoffToG(), PATHS.accessTransitToC(), PATHS.accessPlazaToA()].map((p) => ribbonGeometry(p, 3.2, 0.12)), []);
+  const geos = useMemo(() => [PATHS.accessDropoffToG(), PATHS.accessTransitToC(), PATHS.accessPlazaToA()].map((p) => ribbonGeometry(p, 4, 0.12)), []);
   useFrame(() => {
-    mat.opacity = 0.65 + 0.25 * Math.sin(runtime.time * 2);
+    mat.opacity = useView.getState().reducedMotion ? 0.85 : 0.7 + 0.2 * Math.sin(runtime.time * 2);
   });
   const platforms = useMemo(() => [0.03, 0.22, 0.47, 0.72].map((s) => bowlPoint(s, PROFILE.crossAisle[0] + 1.6, PROFILE.midSlabY + 0.3)), []);
   const service = useMemo(() => [0.1, 0.35, 0.6, 0.85].map((s) => bowlPoint(s, PROFILE.facadeD + 9, 1.3)), []);
@@ -399,6 +398,10 @@ export function AccessRoutes() {
             <mesh position={[0, 3, 0]}>
               <cylinderGeometry args={[0.6, 0.6, 6, 12]} />
               <meshStandardMaterial color="#4ea3ff" emissive="#4ea3ff" emissiveIntensity={0.9} />
+            </mesh>
+            {/* ring on the plinth marking the service point, readable from above */}
+            <mesh rotation-x={-Math.PI / 2} position={[0, p.y + 0.04, 0]} material={mat}>
+              <ringGeometry args={[3.2, 4.6, 32]} />
             </mesh>
           </group>
         ))}
@@ -446,7 +449,7 @@ export function Transit() {
   const station = useMemo(() => std({ color: '#d8dde5', roughness: 0.4, metalness: 0.2, emissive: '#5b9bd5', emissiveIntensity: 0.25 }), []);
   const lot = useMemo(() => std({ color: '#202227', roughness: 0.95 }), []);
   const paths = useMemo(() => [PATHS.transitToE(), PATHS.transitToD(), PATHS.dropoffToF(), PATHS.plazaToA()].map((p) => ribbonGeometry(p, 6, 0.07)), []);
-  const links = useMemo(() => [PATHS.transitToE(), PATHS.transitToD()].map((p) => ribbonGeometry(p, 2.4, 0.1)), []);
+  const links = useMemo(() => [PATHS.transitToE(), PATHS.transitToD()].map((p) => ribbonGeometry(p, 3.6, 0.1)), []);
   const park = ZONE_BY_ID.parking;
   return (
     <LayerGroup id="transit">

@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "test:e2e": "node tests/e2e/run.mjs"
+    "test:e2e": "node tests/e2e/run.mjs",
+    "audit:params": "node tests/audit/params.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

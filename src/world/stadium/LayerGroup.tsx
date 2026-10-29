@@ -23,7 +23,8 @@ function useHighlight(ref: RefObject<THREE.Object3D | null>, active: boolean) {
   useFrame(() => {
     const g = ref.current;
     if (!g || (!active && !touched.current)) return;
-    const pulse = 0.3 + 0.22 * Math.sin(runtime.time * 3);
+    // a steady highlight with reduced motion
+    const pulse = useView.getState().reducedMotion ? 0.42 : 0.3 + 0.22 * Math.sin(runtime.time * 3);
     forEachStandard(g, (sm) => {
       if (active) {
         sm.emissive.copy(HIGHLIGHT);

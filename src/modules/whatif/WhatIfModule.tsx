@@ -107,13 +107,16 @@ export default function WhatIfModule() {
                     onChange={(v) => update(i, { night: v as Levers['night'] })}
                   />
                 </div>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  {findings.map((f) => (
-                    <Badge key={f.id} kind={f.severity === 'engineering' ? 'eng' : 'concept'}>
-                      {f.severity === 'engineering' ? 'Mühendislik' : 'Çakışma'}
-                    </Badge>
-                  ))}
-                </div>
+                {findings.length > 0 && (
+                  <ul className="flex flex-col gap-1 mt-2">
+                    {findings.map((f) => (
+                      <li key={f.id} className="flex items-start gap-1.5 text-[11.5px] leading-snug">
+                        <Badge kind={f.severity === 'engineering' ? 'eng' : 'concept'}>{f.severity === 'engineering' ? 'Mühendislik' : 'Çakışma'}</Badge>
+                        <span className="pt-px">{f.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 <div className="flex gap-1.5 mt-2">
                   <button type="button" className="btn btn-sm" onClick={() => setPreview(configs[i], `What-If ${SLOT_NAMES[i]}: ${s.name}`)}>
                     <Icon name="Eye" size={14} /> 3D’de göster

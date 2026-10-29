@@ -21,7 +21,8 @@
 9. [Bilinen sınırlar ve sonraki adımlar](#bilinen-sınırlar-ve-sonraki-adımlar)
 10. [Kaynaklar](#kaynaklar)
 11. [Aşama 1 — Temel ürün: durum raporu](#aşama-1--temel-ürün-durum-raporu)
-12. [Son test sonuçları](#son-test-sonuçları)
+12. [Aşama 2 — Mimari tasarım motoru: durum raporu](#aşama-2--mimari-tasarım-motoru-durum-raporu)
+13. [Son test sonuçları](#son-test-sonuçları)
 
 ---
 
@@ -148,9 +149,11 @@ src/
     district.ts         Şematik çevre master planı
   world/                Stadium World + Camera System
     stadium/            Prosedürel geometri (geometry.ts) ve 15 katman bileşeni
-    camera/             CameraRig (Explorer/Walkthrough/Seat, intro, klavye, yakalama), POI'ler
+    camera/             CameraRig (Explorer/Walkthrough/Seat, intro, klavye, yakalama), POI'ler,
+                        tasarım araçlarının ortak adlandırılmış görünümleri (views.ts)
     LightingDirector    Gösteri/atmosfer/mimari ışık önceliklendirmesi
     Renderer            Bloom kompozitörü + istenen çözünürlükte görsel yakalama
+    shaderFixes.ts      three.js kabartma (bump) hesabına NaN koruması
     worldApi.ts         Modüllerin 3D dünyayı yönettiği emir köprüsü
   modules/              Her işlev grubu ayrı ve tembel yüklenen modül
   shell/                Üst bar, gezinme, hero, paneller, 2D plan
@@ -164,7 +167,9 @@ Temel kararlar:
 - **Tek koordinat sistemi:** Kase, iç yuvarlatılmış dikdörtgen + kesit profili (d, y) ile tanımlanır: `P(s, d) = iç(s) + d · normal(s)`. Tribünler, çatı, cephe, kesit kapakları, koltuk konumları ve kalabalık ağı aynı parametrizasyonu kullanır.
 - **Etkin tasarım:** 3D dünya `preview ?? design` gösterir. Time Machine, What-If, Material Lab A/B, Scenario Economy ve sunum, kullanıcının tasarımını bozmadan geçici önizleme kullanır.
 - **Dış veri doğrulama:** Paylaşım bağlantıları, içe aktarılan JSON, localStorage ve uzak AI yanıtları `sanitizeDesign` ile şema/enum/aralık kontrolünden geçer.
-- **Kare başı durum React dışında:** Animasyon `runtime` nesnesinde tutulur; ışık gösterisi tek bir paylaşılan shader uniform setiyle bütün ışık şeritlerini sürer.
+- **Kare başı durum React dışında:** Animasyon `runtime` nesnesinde tutulur; ışık gösterisi tek bir paylaşılan shader uniform setiyle bütün ışık şeritlerini sürer. Çatı ışığı ve cephe ışığı ayrı yoğunluk kanallarındadır; bir ışık gösterisi çalışırken ikisi birlikte yönetilir.
+- **Parametre = görünür etki:** Her tasarım parametresi modelde ölçülebilir bir değişiklik yapmalıdır. Bu, her değeri aynı kamera açısından işleyip piksel farkını ölçen bir denetimle kontrol edilir (bkz. Aşama 2).
+- **Görsel yakalama:** Yakalama sırasında ışıklar ve gökyüzü geçiş beklemeden yerine oturur. Bir görsel için ayrı bir gün saati (`env`) seçilebilir; görünüm sonra kendi hâline anında döner.
 
 ## Performans ve erişilebilirlik
 
@@ -176,7 +181,7 @@ Temel kararlar:
 - Fare etiketi, imleç 180 ms hareketsiz kaldığında tek bir ışın atar; hareket, sürükleme ve dokunmatik sırasında ışın atılmaz (stadyum geometrisine her harekette ışın atmak milisaniyeler sürer).
 - 3D görüntünün merkezi arayüzün bıraktığı boş alana kaydırılır (`setViewOffset`); dışa aktarılan görseller tam kadrajdır.
 - WebGL bağlamı kaybı yakalanır; WebGL yoksa 2D plan.
-- **Azaltılmış hareket:** işletim sistemi ayarı + uygulama içi anahtar; anlık kamera geçişleri, sabit ışık, otomatik dönüş/konfeti kapalı.
+- **Azaltılmış hareket:** işletim sistemi ayarı + uygulama içi anahtar; anlık kamera geçişleri, sabit ışık, otomatik dönüş/konfeti kapalı. Medya cephesi içeriği, dinamik cephe dalgası, seçim vurgusu, erişilebilir rota ve sulama nabızları durur.
 - Klavye: atla bağlantısı, odak halkaları, 3D görünümde ok tuşları/W-A-S-D/R/N/P/+/−, sunumda ←/→/Esc, lightbox'ta ←/→/Esc.
 - Ekran okuyucu: ARIA etiketleri, `aria-live` duyuruları (tasarım değişiklikleri, gösteri adımları), grafikler için tablo görünümü, renk tek başına bilgi taşımaz.
 - Kompakt düzen (telefon ve dikey tablet, 1024 px altı): alt sayfa paneli (küçült/genişlet), tam ekran modül menüsü, 3D görünüm panelin üstünde yeniden boyutlanır, kamera düğmeleri tek satır simge. Düzen CSS kırılma noktasıyla aynı medya sorgusunu izler; cihaz döndürülünce güncellenir.
@@ -187,8 +192,9 @@ Temel kararlar:
 
 | Komut | Kapsam |
 |---|---|
-| `npm test` | 37 birim testi: doğrulama ve paylaşım kodlaması, kilitler ve yamalar, çakışma kuralları, Time Machine aşamaları, fotosensitivite sınırı, AI Architect yorumlayıcısı (brief'teki 7 örnek dahil), sunucu şeması ↔ veri modeli uyumu, kalabalık simülasyonu, geometri, koltuk ölçüleri, bölge gezgini listesi ↔ 3D sahnedeki seçilebilir parçalar uyumu |
-| `npm run test:e2e` | Gerçek arayüzde Playwright testleri: 5 CTA, 10 gezinti noktası, klavye ve yürüme sınırı, katmanlar/patlatma/odak/kesit, Inspector, DNA + onay + kilit + çakışma önerisi, geri al/yinele, Material Lab A/B görseli, ışık gösterisi oynatma, Time Machine, What-If görselleri, atmosfer ve ses, koltuk karşılaştırması, kalabalık simülasyonu, Stadium OS, Green Engine, Stadium City, Economy, Roadmap, Fan Journey indirme, AI Architect + geri alma, arşiv (kaydet/sürüm/aç/karşılaştır/sil), paylaşım bağlantısı gidiş-dönüş, bozuk bağlantı hatası, JSON/MD/PNG indirme, galeri lightbox, sunum, rapor görselleri + HTML, 2D görünüm, azaltılmış hareket, ayarlar panelinin Escape ile kapanıp odağı geri vermesi, gece→gündüz geçişinin ara ışık seviyelerinden geçmesi, bölge gezgini (seçim, kamera odağı, Inspector), fare etiketi ve imleç, ilk ziyaret açılışı (başlık sekansı, gizli üst çubuk, odaktaki atla düğmesi), WebGL'siz cihaz (2D plan, plan üzerinde seçim, açıklamalı devre dışı özellikler), mobil menü ve alt sayfa |
+| `npm test` | 48 birim testi: doğrulama ve paylaşım kodlaması, kilitler ve yamalar, çakışma kuralları, Time Machine aşamaları, fotosensitivite sınırı, AI Architect yorumlayıcısı (brief'teki 7 örnek dahil), sunucu şeması ↔ veri modeli uyumu, kalabalık simülasyonu, geometri, koltuk ölçüleri, bölge gezgini listesi ↔ 3D sahnedeki seçilebilir parçalar uyumu, görsel dile göre kanat düzeni, DNA açıklamalarının her değeri kapsaması ve var olan görünümlere bağlanması, What-If sorularının gün saati, yer şeritlerinin yukarı bakması, kabartma hesabının NaN koruması |
+| `npm run test:e2e` | Gerçek arayüzde Playwright testleri: 5 CTA, 10 gezinti noktası, klavye ve yürüme sınırı, katmanlar/patlatma/odak/kesit, Inspector, DNA + onay + kilit + çakışma önerisi, geri al/yinele, Material Lab A/B görseli, ışık gösterisi oynatma, Time Machine, What-If görselleri, atmosfer ve ses, koltuk karşılaştırması, kalabalık simülasyonu, Stadium OS, Green Engine, Stadium City, Economy, Roadmap, Fan Journey indirme, AI Architect + geri alma, arşiv (kaydet/sürüm/aç/karşılaştır/sil), paylaşım bağlantısı gidiş-dönüş, bozuk bağlantı hatası, JSON/MD/PNG indirme, galeri lightbox, sunum, rapor görselleri + HTML, 2D görünüm, azaltılmış hareket, ayarlar panelinin Escape ile kapanıp odağı geri vermesi, gece→gündüz geçişinin ara ışık seviyelerinden geçmesi, bölge gezgini (seçim, kamera odağı, Inspector), fare etiketi ve imleç, ilk ziyaret açılışı (başlık sekansı, gizli üst çubuk, odaktaki atla düğmesi), WebGL'siz cihaz (2D plan, plan üzerinde seçim, açıklamalı devre dışı özellikler), mobil menü ve alt sayfa, DNA açıklamaları + önizleme + uygulama/geri alma + "modelde göster" (gece ve kamera konumu), Material Lab'de modelden örnek görseller, What-If ışık sorularında gün saati ve tek görsellik gece yakalamasının görünümü değiştirmemesi, 2D planda görsel dile göre kanat sayısı |
+| `npm run audit:params` | Parametre etki denetimi: her tasarım parametresinin her değerini aynı açıdan işler ve değişen piksel oranını ölçer; etkisiz ve zayıf değerlerin A/B görsellerini `tests/audit/output/` altına kaydeder (çalışan bir önizleme sunucusu gerekir, `AUDIT_URL`, `AUDIT_ONLY`). |
 
 E2E ortam değişkenleri: `E2E_URL` (çalışan bir sunucuyu test eder), `E2E_ONLY` (yalnızca adı bu düzenli ifadeyle eşleşen testler), `E2E_TIMEOUT_SCALE` (varsayılan 3; başsız Chromium WebGL'i CPU'da (SwiftShader) çizdiği ve bir kare saniyeler sürebildiği için tüm zaman aşımlarını çarpar).
 
@@ -246,6 +252,76 @@ Bu aşamada yeni modül eklenmedi. Var olan temel katman, "önce kaliteli ve ger
 - Fare etiketi yalnızca fareyle çalışır; dokunmatikte bölgeler bölge gezgininden seçilir.
 - Yatay telefonda 3D alanı küçük kalır, çünkü alt panel ekranın yarısını kaplar.
 - Sonraki aşamalar: mimari tasarım motoru, ışık laboratuvarı, maç günü simülatörü, akıllı stadyum sistemleri ve diğer modüller bu temel üzerinde, aynı ölçütlerle tek tek derinleştirilecek. Yapılacaklar: buton denetimi, ekran boyutu kontrolü, dürüst etiketler ve e2e kapsamı.
+
+## Aşama 2 — Mimari tasarım motoru: durum raporu
+
+Bu aşamada DNA Engine, Material Lab ve What-If aynı temel üzerinde derinleştirildi. İşe, tasarım parametrelerinin modelde gerçekten ne değiştirdiğini ölçen otomatik bir denetimle başlandı. Denetim, her parametrenin her değerini aynı kamera açısından ve aynı ışıkta işler, görüntüleri piksel piksel karşılaştırır. Değişen piksel oranı %0,2'nin altındaysa seçim "etkisiz", %1'in altındaysa "zayıf" sayılır. İlk tur, 30 parametredeki 63 karşılaştırmanın 24'ünde (17 parametre) etkisiz veya zayıf sonuç buldu. Bunların bir kısmı gerçek hataydı.
+
+### Denetimin bulduğu sorunlar ve çözümleri
+
+| Bulgu | Neden | Çözüm |
+|---|---|---|
+| "Görsel dil" modelde hiçbir şeyi değiştirmiyordu (%0). | Parametreyi hiçbir 3D veya 2D bileşen okumuyordu. | Görsel dil artık cephe kanatlarının ritmini, derinliğini, açısını ve yüksekliğini belirliyor. 2D plan aynı veriden aynı kanatları çiziyor. |
+| Çatı ışığı stilleri neredeyse ayırt edilemiyordu (%0,1–0,5). | Işık yalnızca 1,4 m'lik çatı kenarındaydı; uzaktan bir piksellik çizgi. | Halo, segmentli ve tam taç stilleri, çatının iç kenarındaki basma halkasına da ışık bandı ekliyor. Tam taç dış kenarı da yakıyor. "İnce kenar ışığı" bilerek ince bırakıldı. |
+| "Işık halkası yoğunluğu" ve "çatı ışığı: kapalı" cephe ışığını da kısıyordu. | Bütün ışık bantları tek bir yoğunluk değerini paylaşıyordu. | Cephe ışığının kendi seviyesi var. Bir ışık gösterisi çalışırken bütün bina yine birlikte yönetiliyor. |
+| Gece görünümünde çatının üstünde büyük beyaz bir parlama vardı. | Saha ışıklarını temsil eden ışık çatının yaklaşık 30 m üstündeydi. | Işık, projektörlerin bulunduğu çatı seviyesinin altına indirildi. Stadyum içinin aydınlığı korunurken parlama kalktı. Işık rengi "verimli aydınlatma" seçimini izliyor. |
+| Erişilebilir güzergâhlar, ulaşım yolları, yeşil ulaşım bağlantısı ve yağmur suyu hendekleri 3D'de hiç görünmüyordu. | Bu yer şeritlerinin üçgenleri aşağı bakıyordu; yukarıdan bakınca çizilmiyorlardı. Yalnızca 2D planda görünüyorlardı. | Üçgen yönü düzeltildi; yönü denetleyen bir birim testi eklendi. |
+| Bazı kamera açılarında görüntü tamamen siyaha dönüyordu. | three.js'in kabartma hesabı, ekranda neredeyse görünmeyen ince üçgenlerde geçersiz (NaN) değer üretiyordu. Işık parlaması (bloom) efekti bu tek pikseli bütün kareye yayıyordu. Yalnız görsel yakalamayı değil, ekrandaki görüntüyü de etkileyebiliyordu. | O piksellerde yüzey normali olduğu gibi kullanılıyor (`world/shaderFixes.ts`). Birim testi eklendi. |
+| Görsel yakalamalar ışığın geçişin ortasındaki hâlini kaydedebiliyordu. | Işık rengi ve yoğunluğu yumuşak geçişle değişiyordu. | Yakalama sırasında ışıklar ve gökyüzü anında yerine oturuyor; yakalamadan sonra görünüm de anında kendi hâline dönüyor. |
+| "Ne olur?" maç gecesi karşılaştırması gündüz ışığında çekilebiliyordu. | Yakalama o anki gün saatini kullanıyordu. | Yakalamaya gün saati seçeneği eklendi. Gece sorusu gece, çatı sorusu alacakaranlıkta çekiliyor. |
+| "Dinamik renk geçişi" tek karede sabit ışıktan ayırt edilemiyordu. | Yalnız parlaklık değişiyordu. | Cephe boyunca ana ve ikincil renk arasında yavaş akan bir dalga. |
+| Saha bakımı halkaları, atık istasyonları ve taraftar meydanı neredeyse görünmüyordu. | Çok soluk malzeme (%12 opaklık), 1 m'lik kutular, birkaç ince totem. | Sulama halkaları belirginleşti; atık istasyonlarına gölgelik ve zemin eklendi; taraftar meydanının sınırı 2D plandaki gibi işaretlendi. |
+| Medya cephesi, seçim vurgusu, erişilebilir rotalar ve sulama halkaları azaltılmış harekette de hareket ediyordu. | Hareket ayarı bu dört yerde denetlenmiyordu. | Azaltılmış harekette dördü de duruyor. |
+
+### DNA Engine
+
+- Her seçimin altında, seçilen değerin modelde neyi değiştirdiğini anlatan bir satır var. Satır ekran okuyucuya da seçimle birlikte okunuyor. Açıklamalar modelin gerçekten çizdiğini tarif ediyor; örneğin park karakterinin yalnızca peyzaj açıkken ağaç eklediğini söylüyor.
+- **Modelde göster:** Kamera, seçimin göründüğü yere gider. Işık seçimlerinde görünüm gündüzse geceye geçer ve bunu bildirir. 2D görünümde bu düğme gösterilmez; plan bütün seçimleri zaten aynı anda gösterir.
+- **DNA önizleme:** Bir DNA uygulanmadan modelde görülebilir. Üst banttan uygulanır ya da tasarıma dönülür. Kilitli seçimler önizlemede de korunur; modülden çıkınca önizleme kapanır.
+- Aktif DNA'nın önerdiğinden farklı seçimler "özel" etiketiyle işaretlenir.
+
+### Material Lab
+
+- **Modelden örnekle:** Her malzeme seçeneği, ilgili parçanın üzerinde ve aynı yakın açıdan modelin kendisinden işlenir. Tasarımın geri kalanı veya gün saati değişince örnekler geçersiz sayılır ve yeniden üretilmeleri gerekir.
+- Örnek oluşturulmadan önce gösterilen renk kutuları da malzemenin desenini (fırçalanmış, panel, frit, benek, doku), metal parlaklığını ve yarı saydamlığını yansıtıyor.
+
+### What-If
+
+- Işığa bağlı sorular kendi ışığında çekiliyor: maç gecesi gece, çatı alacakaranlıkta. Görünüm gündüzse soru seçildiğinde bildirimle geçiliyor. Karşılaştırmanın altında görsellerin hangi ışıkta alındığı yazıyor.
+- Senaryo kartlarındaki "Çakışma" ve "Mühendislik" rozetlerinin yanında sorunun kısa açıklaması var.
+
+### Denetim: önce ve sonra
+
+Değişen piksel oranı, 480×300 görsel. İkinci turda çevre ve yeşil sistem seçenekleri, modüllerinin kamerayı götürdüğü açılardan ölçüldü. Bu açılar ilk turdaki uzak kuşbakışından daha yakın olduğu için bu satırlardaki artışın bir kısmı açıdan gelir.
+
+| Parametre | İlk tur | Son tur |
+|---|---|---|
+| Görsel dil (4 alternatif) | %0,00 | %2,9–8,8 |
+| Çatı ışığı: halo / segmentli / tam taç | %0,19–0,49 | %2,1–5,6 |
+| Çatı ışığı: ince kenar (bilerek ince) | %0,12 | %0,21 |
+| Işık halkası yoğunluğu (%55 → %95) | %0,08 | %1,15 |
+| Cephe ışığı: sabit → dinamik | %0,30 | %8,1 |
+| Ekran düzeni: bant → genişletilmiş | %0,20 | %2,3 |
+| Meydan karakteri (park / etkinlik / bahçe) | %0,3–2,9 | %2,2–11,8 |
+| Taraftar meydanı | %0,06 | %1,2 |
+| Yağmur suyu yönetimi | %0,05 | %3,7 |
+| Verimli aydınlatma | %0,21 | %27 |
+| Saha bakımı | %0,22 | %12,6 |
+| Atık azaltma | %0,03 | %1,1 |
+| Yeşil ulaşım bağlantısı | %0,00 | %0,8 |
+| Erişilebilir rotalar (kuşbakışı) | %0,00 | %0,4 |
+
+Malzemeler, koreografi, gece atmosferi ve çatı formu ilk turda da belirgindi (%1,5–54).
+
+### Henüz yapılmayanlar ve bilinen sınırlar
+
+- Denetim piksel farkına dayanır. Görünürlük kamera açısına, ekran boyutuna ve ışığa bağlıdır; düşük oran her zaman hata demek değildir.
+- **Küçük işaretler:** Buluşma noktaları (%0,3) ve erişilebilir hizmet noktaları kuşbakışında birkaç piksel kalır. Yakın açılarda ve 2D planda okunur. Hizmet noktaları, Stadium OS'tan açıldığında kamera erişim katmanını çerçeveler.
+- **Kanat dilleri** mimari ifade için bir konsept aracıdır. Rüzgâr, gün ışığı, güneş kontrolü veya maliyet hesabı yapılmaz.
+- **Çatı ışık bandı** basma halkasının üzerine varsayımsal olarak yerleştirildi; gerçek bir aydınlatma tasarımı değildir.
+- **Stadyum içi ışığı** gölgesiz tek bir ışıktır. Duvarların arkasına da geçer; gece cephe kanatlarında küçük parlama noktaları görülebilir.
+- **Malzeme örnekleri** fiziksel ölçüm değildir; aynı prosedürel konsept malzemenin modeldeki görüntüsüdür.
+- **Sonraki aşamalar:** ışık laboratuvarı (Light Show Composer), maç günü simülatörü ve akıllı stadyum sistemleri, aynı denetim ve test yaklaşımıyla.
 
 ## Son test sonuçları
 

@@ -180,14 +180,18 @@ export default function DnaModule() {
         {sel('language', VISUAL_LANGUAGES, LANGUAGE_LABEL)}
         {sel('roof.form', ROOF_FORMS, ROOF_FORM_LABEL)}
         {sel('roof.light', ROOF_LIGHTS, ROOF_LIGHT_LABEL)}
-        <div className="flex items-end gap-1">
-          <div className="flex-1">
-            <Slider label="Işık halkası yoğunluğu" value={design.roof.ring} onChange={(v) => setKey('roof.ring', v, `Halka yoğunluğu ${Math.round(v * 100)}%`)} />
-          </div>
-          {!view2D && <ShowButton label="Işık halkası yoğunluğu" onClick={() => showInModel('roof.ring')} />}
-          <LockButton label="Işık halkası yoğunluğu" {...{ locked: locks.includes('roof.ring'), onClick: () => toggleLock('roof.ring') }} />
-        </div>
-        <p className="field-hint -mt-0.5 mb-1">{paramHint('roof.ring', design.roof.ring)}</p>
+        <Slider
+          label="Işık halkası yoğunluğu"
+          value={design.roof.ring}
+          onChange={(v) => setKey('roof.ring', v, `Halka yoğunluğu ${Math.round(v * 100)}%`)}
+          hint={paramHint('roof.ring', design.roof.ring)}
+          actions={
+            <>
+              {!view2D && <ShowButton label="Işık halkası yoğunluğu" onClick={() => showInModel('roof.ring')} />}
+              <LockButton label="Işık halkası yoğunluğu" locked={locks.includes('roof.ring')} onClick={() => toggleLock('roof.ring')} />
+            </>
+          }
+        />
         {sel('facade.lighting', FACADE_LIGHTING, FACADE_LIGHTING_LABEL)}
         {sel('screens.layout', SCREEN_LAYOUTS, SCREEN_LABEL)}
         {sel('seats.choreography', CHOREOGRAPHIES, CHOREO_LABEL)}

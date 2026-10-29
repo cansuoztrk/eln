@@ -300,6 +300,40 @@ await test('DNA engine: conflict detection and one-click alternatives', async ()
   assert(d.screens.layout === 'ribbon', 'suggestion not applied');
 });
 
+await test('DNA engine: value hints, DNA preview before applying, show in model, customised marks', async () => {
+  await go(page, '#/design');
+  const panel = page.locator('#panel');
+  const lang = panel.getByRole('combobox', { name: 'Görsel dil' });
+  // the field description (customised mark + value hint) is read out with the select
+  const described = () => lang.evaluate((el) => (el.getAttribute('aria-describedby') ?? '').split(' ').map((id) => document.getElementById(id)?.textContent ?? '').join(' '));
+  const dna = (await design(page)).dna;
+  await lang.selectOption('organic');
+  assert(/dalga/i.test(await described()), 'organic hint missing');
+  if (dna !== 'custom') assert(/özel/.test(await described()), 'customised mark missing');
+  await lang.selectOption('minimal');
+  assert(/yarıya/.test(await described()), 'minimal hint missing');
+  // preview a DNA without applying it, then apply it from the banner and undo
+  await panel.getByRole('button', { name: 'Önizle: Future Arena' }).click();
+  let v = await view(page);
+  assert(v.hasPreview && v.previewLabel === 'DNA: Future Arena', 'DNA preview missing');
+  assert((await design(page)).dna === dna, 'preview changed the design');
+  await page.getByRole('button', { name: 'Tasarıma dön' }).click();
+  assert(!(await view(page)).hasPreview, 'preview not cleared');
+  await panel.getByRole('button', { name: 'Önizle: Future Arena' }).click();
+  await page.getByRole('status').getByRole('button', { name: 'Uygula' }).click();
+  assert((await design(page)).dna === 'future', 'preview not applied');
+  await page.getByRole('button', { name: 'Geri al', exact: true }).click();
+  assert((await design(page)).dna === dna, 'undo did not restore the DNA');
+  // a lighting choice is shown at night, framed on the roof edge
+  await page.evaluate(() => window.__aslan.useView.getState().set({ env: 'day' }));
+  await panel.getByRole('button', { name: 'Çatı aydınlatma stili: modelde göster' }).click();
+  assert((await view(page)).env === 'night', 'roof light not shown at night');
+  await until(page, () => {
+    const p = window.__aslan.worldApi.getPose();
+    return p && Math.hypot(p.pos[0] - 60, p.pos[1] - 78, p.pos[2] - 190) < 6;
+  }, null, 30000);
+});
+
 await test('top bar: undo / redo', async () => {
   await go(page, '#/design');
   const before = (await design(page)).seats.choreography;
@@ -325,6 +359,18 @@ await test('material lab: materials apply to the model; A/B comparison renders t
   await page.locator('#panel img[alt^="Alternatif A"]').waitFor({ timeout: T(60000) });
   await page.locator('#panel img[alt^="Alternatif B"]').waitFor({ timeout: T(60000) });
   await page.getByRole('button', { name: 'Tasarıma dön' }).click();
+});
+
+await test('material lab: rendered samples come from the model', async () => {
+  await go(page, '#/materials');
+  await btn(page, 'Kaide', true).click();
+  const options = await page.locator('#panel .grid button[aria-pressed]').count();
+  await page.locator('#panel').getByRole('button', { name: 'Modelden örnekle' }).click();
+  // every option gets an image rendered from the model
+  await page.locator('#panel').getByText(/Örnekler modelin kendisinden/).waitFor({ timeout: T(180000) });
+  const images = await page.locator('#panel .grid button[aria-pressed] img').count();
+  assert(options >= 4 && images === options, `samples ${images}/${options}`);
+  assert(!(await view(page)).hasPreview, 'sampling left a preview behind');
 });
 
 await test('light show: preset applies, sequence preview plays, speed is capped', async () => {
@@ -367,6 +413,38 @@ await test('what-if: question presets and side-by-side comparison', async () => 
   await page.locator('#panel img[alt^="Senaryo A"]').waitFor({ timeout: T(60000) });
   await page.locator('#panel img[alt^="Senaryo B"]').waitFor({ timeout: T(60000) });
   await page.getByRole('button', { name: 'Tasarıma dön' }).click();
+});
+
+await test('what-if: lighting questions switch to their light; a capture can take its own time of day', async () => {
+  await go(page, '#/whatif');
+  await page.evaluate(() => window.__aslan.useView.getState().set({ env: 'day' }));
+  await page.locator('#panel').getByRole('button', { name: /maç gecesinde/ }).click();
+  assert((await view(page)).env === 'night', 'night question did not switch to night');
+  // the capture option: a night image while the view stays in daylight
+  const r = await page.evaluate(async () => {
+    const a = window.__aslan;
+    a.useView.getState().set({ env: 'day' });
+    const pose = { pos: [250, 135, 330], target: [0, 12, 0] };
+    const mean = async (url) => {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.width;
+      c.height = img.height;
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let s = 0;
+      for (let i = 0; i < d.length; i += 4) s += d[i] + d[i + 1] + d[i + 2];
+      return s / (d.length / 4) / 3;
+    };
+    const night = await a.worldApi.capture({ env: 'night', pose, width: 160, height: 100, mime: 'image/png' });
+    const day = await a.worldApi.capture({ pose, width: 160, height: 100, mime: 'image/png' });
+    return { env: a.useView.getState().env, night: night && (await mean(night)), day: day && (await mean(day)) };
+  });
+  assert(r.env === 'day', 'capture left its time of day behind');
+  assert(r.night && r.day && r.night < r.day - 20, `night capture not darker (${r.night} vs ${r.day})`);
 });
 
 await test('matchday: atmospheres change lighting state; sound turns on and off', async () => {
@@ -584,6 +662,21 @@ await test('2D plan view and reduced motion setting', async () => {
   await page.getByRole('button', { name: 'Görünüm ayarları' }).click();
   await btn(page, /Azaltılmış hareket/).click();
   await btn(page, 'Kapat', true).click();
+});
+
+await test('2D plan draws the facade fins of the chosen visual language', async () => {
+  await go(page, '#/design');
+  await page.evaluate(() => window.__aslan.useView.getState().set({ view2D: true }));
+  const fins = () => page.locator('g[data-part="facade"] line').count();
+  await page.locator('#panel').getByRole('combobox', { name: 'Görsel dil' }).selectOption('heritage');
+  await page.locator('g[data-part="facade"]').waitFor();
+  const heritage = await fins();
+  await page.locator('#panel').getByRole('combobox', { name: 'Görsel dil' }).selectOption('minimal');
+  const minimal = await fins();
+  assert(heritage === 220 && minimal === 110, `fin counts ${heritage}/${minimal}`);
+  assert(!(await page.locator('#panel').getByRole('button', { name: /modelde göster/ }).count()), 'show-in-model offered without the 3D view');
+  await page.evaluate(() => window.__aslan.useView.getState().set({ view2D: false }));
+  await worldReady(page);
 });
 
 await test('sources page lists verified facts with links', async () => {

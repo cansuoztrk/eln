@@ -180,7 +180,15 @@ export default function StadiumOSModule() {
               <strong>{design.access.servicePoints ? '4 örnek nokta' : 'Kapalı'}</strong>
             </div>
             {!design.access.routes && (
-              <button type="button" className="btn btn-sm btn-primary self-start" onClick={() => useDesign.getState().patch({ access: { routes: true, servicePoints: true } }, 'Erişilebilir rotalar açıldı', { respectLocks: false })}>
+              <button
+                type="button"
+                className="btn btn-sm btn-primary self-start"
+                onClick={() => {
+                  useDesign.getState().patch({ access: { routes: true, servicePoints: true } }, 'Erişilebilir rotalar açıldı', { respectLocks: false });
+                  // frame the routes once they are in the scene (next frame)
+                  requestAnimationFrame(() => worldApi.fitLayer('access'));
+                }}
+              >
                 Rotaları ve hizmet noktalarını göster
               </button>
             )}

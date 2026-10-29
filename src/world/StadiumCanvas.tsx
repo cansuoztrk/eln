@@ -3,6 +3,7 @@
  */
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
+import './shaderFixes';
 import { PerformanceMonitor } from '@react-three/drei';
 import { useView } from '@/core/store/viewStore';
 import { QUALITY_SETTINGS } from '@/core/quality';

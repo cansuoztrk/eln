@@ -146,13 +146,13 @@ export function PreviewBanner() {
   if (!preview || capturing || label === 'capture') return null;
   return (
     <div role="status" className="no-print fixed z-20 left-1/2 -translate-x-1/2 top-[calc(var(--top-h)+8px)] glass rounded-full pl-4 pr-1.5 py-1.5 flex items-center gap-2 text-[12.5px] shadow-xl max-w-[calc(100vw-24px)]">
-      <Icon name="Eye" size={14} className="text-gold" />
-      <span className="truncate">
+      <Icon name="Eye" size={14} className="text-gold shrink-0" />
+      <span className="truncate min-w-0">
         Önizleme: <strong>{label}</strong>
       </span>
       <button
         type="button"
-        className="btn btn-sm"
+        className="btn btn-sm shrink-0 whitespace-nowrap"
         onClick={() => {
           setDesign(preview, `Önizleme uygulandı: ${label}`);
           setPreview(null);
@@ -160,7 +160,7 @@ export function PreviewBanner() {
       >
         Uygula
       </button>
-      <button type="button" className="btn btn-sm btn-ghost" onClick={() => setPreview(null)}>
+      <button type="button" className="btn btn-sm btn-ghost shrink-0 whitespace-nowrap" onClick={() => setPreview(null)}>
         Tasarıma dön
       </button>
     </div>

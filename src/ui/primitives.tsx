@@ -70,6 +70,8 @@ export function Slider({
   max = 1,
   step = 0.01,
   format = (v) => `${Math.round(v * 100)}%`,
+  hint,
+  actions,
 }: {
   label: string;
   value: number;
@@ -78,17 +80,28 @@ export function Slider({
   max?: number;
   step?: number;
   format?: (v: number) => string;
+  hint?: ReactNode;
+  /** small buttons next to the value (show in model, lock) */
+  actions?: ReactNode;
 }) {
   const id = useId();
   return (
     <div className="py-1">
-      <div className="flex justify-between items-baseline">
+      <div className="flex justify-between items-center">
         <label htmlFor={id} className="field-label mb-0">
           {label}
         </label>
-        <span className="text-[12px] tabular-nums muted">{format(value)}</span>
+        <span className="flex items-center gap-1.5">
+          <span className="text-[12px] tabular-nums muted">{format(value)}</span>
+          {actions && <span className="flex items-center gap-0.5 [&>button]:mb-0">{actions}</span>}
+        </span>
       </div>
-      <input id={id} type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-valuetext={format(value)} />
+      <input id={id} type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} aria-valuetext={format(value)} aria-describedby={hint ? `${id}-hint` : undefined} />
+      {hint && (
+        <p id={`${id}-hint`} className="field-hint">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }

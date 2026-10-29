@@ -100,7 +100,9 @@ export default function Plan2D() {
   const upperFill = choreo === 'none' ? '#33363d' : choreo === 'halves' || choreo === 'stripes' ? d.palette.secondary : d.palette.primary;
   const facadeColor = MATERIAL_BY_ID[d.materials.facade].visual.color;
   const fins = useMemo(() => planFins(d.language), [d.language]);
-  const ringW = 1 + d.roof.ring * 4;
+  // roof light in plan: a thin rim, a wide band (halo, segmented, crown), dashed when segmented, plus the outer edge for the crown
+  const roofLight = d.roof.light;
+  const ringW = roofLight === 'subtle-rim' ? 0.8 + d.roof.ring * 1.5 : 2 + d.roof.ring * 4;
   return (
     <div className="absolute inset-0 bg-[#0a0c11] flex items-center justify-center">
       <svg viewBox="-330 -300 660 620" className="w-full h-full max-h-full" role="img" aria-label="Stadyum ve çevresinin 2D konsept planı">
@@ -135,7 +137,7 @@ export default function Plan2D() {
           paths.access.map((p, i) => <polyline key={i} className="plan-part" onClick={pick('accessRoutes')} points={pts(p)} fill="none" stroke={selected === 'access' || selected === 'accessRoutes' ? GOLD : '#4ea3ff'} strokeWidth="3" />)}
         {layers.massing && <rect {...ring(PROFILE.facadeD + 12)} className="plan-part" onClick={pick('massing')} fill="#22252c" stroke="#3a3e47" />}
         {layers.facade && (
-          <g className="plan-part" onClick={pick('facade')}>
+          <g className="plan-part" data-part="facade" onClick={pick('facade')}>
             {/* wide transparent hit area, the skin line and the fins of the chosen visual language */}
             <rect {...ring(PROFILE.facadeD + 1)} fill="none" stroke="transparent" strokeWidth="7" />
             <rect {...ring(PROFILE.facadeD)} fill="none" stroke={facadeColor} strokeOpacity="0.55" strokeWidth="1" />
@@ -158,7 +160,10 @@ export default function Plan2D() {
         )}
         {layers.roof && <rect {...ring(PROFILE.roofOuterD)} className="plan-part" onClick={pick('roof')} fill="none" stroke="#e9e2d0" strokeOpacity="0.35" strokeWidth="1.5" strokeDasharray="3 3" />}
         {layers.roof && <rect {...ring(PROFILE.roofInnerD)} className="plan-part" onClick={pick('roof')} fill="none" stroke="#e9e2d0" strokeOpacity="0.45" strokeWidth="1.5" strokeDasharray="3 3" />}
-        {layers.lighting && d.roof.light !== 'none' && <rect {...ring(PROFILE.roofInnerD)} className="plan-part" onClick={pick('lightRing')} fill="none" stroke={d.palette.secondary} strokeWidth={ringW} opacity="0.9" />}
+        {layers.lighting && roofLight !== 'none' && (
+          <rect {...ring(PROFILE.roofInnerD)} className="plan-part" onClick={pick('lightRing')} fill="none" stroke={d.palette.secondary} strokeWidth={ringW} strokeDasharray={roofLight === 'segmented' ? '22 4.5' : undefined} opacity="0.9" />
+        )}
+        {layers.lighting && roofLight === 'full-crown' && <rect {...ring(PROFILE.roofOuterD)} className="plan-part" onClick={pick('lightRing')} fill="none" stroke={d.palette.secondary} strokeWidth={1.2 + d.roof.ring * 1.5} opacity="0.85" />}
         {layers.solar && <rect {...ring(33)} className="plan-part" onClick={pick('solarRoof')} fill="none" stroke="#2b4a8a" strokeWidth="30" opacity="0.35" />}
         {selected && SELECTED_RING[selected] !== undefined && <rect {...ring(SELECTED_RING[selected])} fill="none" stroke={GOLD} strokeWidth="2.5" pointerEvents="none" />}
         {layers.transit &&
