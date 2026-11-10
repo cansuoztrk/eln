@@ -5,9 +5,11 @@ import { FACTS } from "@/content/facts";
 import { WORLD_NAV } from "@/content/navigation";
 import { resolveSection, SECTION_DEFAULTS, SECTION_KEYS, SECTION_SCHEMAS } from "@/content/sections";
 import { STUDIO_NAV } from "@/content/studio-nav";
+import { WRITTEN_DAYS, WRITTEN_LETTERS, WRITTEN_MEMORIES, WRITTEN_NOTES, WRITTEN_SECTIONS } from "@/content/writing";
 import { parseTags, tagList } from "@/features/gallery/schema";
 import { dateSchema } from "@/features/days/schema";
-import { letterSchema } from "@/features/letters/schema";
+import { LETTER_CATEGORIES, letterSchema } from "@/features/letters/schema";
+import { GOAL, NOTE_CATEGORIES, NOTE_MAX } from "@/features/reasons/schema";
 import { spotifyEmbedUrl, youtubeEmbedUrl, youtubeId } from "@/features/song/youtube";
 import { ablative, accusative, dative, genitive } from "@/lib/grammar";
 
@@ -55,29 +57,101 @@ describe("editable sections", () => {
     for (const key of SECTION_KEYS) expect(SECTION_SCHEMAS[key].safeParse(SECTION_DEFAULTS[key]).success, key).toBe(true);
   });
 
-  it("open the gift with Arda's own four sentences", () => {
-    expect(SECTION_DEFAULTS["gift.opening"].letter.split("\n\n")).toEqual([
+  it("keep Arda's own four sentences inside the opening letter", () => {
+    const letter = SECTION_DEFAULTS["gift.opening"].letter;
+    for (const sentence of [
       "Eln, bazen insanın anlatmak istediği çok fazla şey oluyor.",
       "Ben de bazılarını kelimelere, bazılarını fotoğraflara, bazılarını da küçük bir dünyaya dönüştürmek istedim.",
       "Burada sana ait bir köşe var.",
       "İstediğin zaman, istediğin kadar keşfedebilirsin.",
-    ]);
+    ]) {
+      expect(letter, sentence).toContain(sentence);
+    }
     expect(SECTION_DEFAULTS["gift.opening"].headline).toBe("Bu küçük dünyayı senin için hazırladım.");
     expect(SECTION_DEFAULTS["gift.opening"].photoId).toBeNull();
   });
 
-  it("leave every other piece of copy empty rather than invent it", () => {
-    for (const key of ["story.intro", "story.interlude", "distance.intro", "meeting.note"] as const) {
-      expect(SECTION_DEFAULTS[key].note).toBe("");
-    }
-    expect(SECTION_DEFAULTS.song.note).toBe("");
-    expect(SECTION_DEFAULTS["corner.messages"].messages).toEqual([]);
+  it("let Arda silence any passage by saving it empty", () => {
+    expect(resolveSection("story.interlude", { note: "" }).note).toBe("");
+    expect(resolveSection("corner.messages", { messages: [] }).messages).toEqual([]);
   });
 
   it("merge stored data over defaults and fall back when it is invalid", () => {
     expect(resolveSection("home.hero", { note: "x" })).toEqual({ headline: FACTS.tagline, note: "x" });
     expect(resolveSection("home.hero", null)).toEqual(SECTION_DEFAULTS["home.hero"]);
     expect(resolveSection("gift.opening", { photoId: "not-a-uuid" })).toEqual(SECTION_DEFAULTS["gift.opening"]);
+  });
+});
+
+describe("the words written for Arda (src/content/writing.ts)", () => {
+  const sections = [
+    WRITTEN_SECTIONS.giftLetter,
+    WRITTEN_SECTIONS.heroNote,
+    WRITTEN_SECTIONS.storyIntro,
+    WRITTEN_SECTIONS.storyInterlude,
+    WRITTEN_SECTIONS.distanceIntro,
+    WRITTEN_SECTIONS.meetingNote,
+    WRITTEN_SECTIONS.songNote,
+    ...WRITTEN_SECTIONS.cornerMessages,
+  ];
+  const memories = Object.values(WRITTEN_MEMORIES).flatMap((m) => [m.summary, m.description, m.specialNote]);
+  const days = Object.values(WRITTEN_DAYS).flatMap((d) => [d.subtitle, d.intro]);
+  const everything = [...sections, ...WRITTEN_LETTERS.flatMap((l) => [l.title, l.body]), ...WRITTEN_NOTES.map((n) => n.body), ...memories, ...days];
+  const lower = (text: string) => text.toLocaleLowerCase("tr-TR");
+
+  it("holds one note for every day of a year, none said twice", () => {
+    expect(WRITTEN_NOTES).toHaveLength(GOAL);
+    expect(new Set(WRITTEN_NOTES.map((n) => lower(n.body))).size).toBe(GOAL);
+    const shelves = NOTE_CATEGORIES.map((c) => c.value as string);
+    for (const note of WRITTEN_NOTES) {
+      expect(shelves, note.body).toContain(note.category);
+      expect(note.body.length, note.body).toBeLessThanOrEqual(NOTE_MAX);
+      expect(note.body.trim(), note.body).toBe(note.body);
+    }
+    // Shelves take turns, so two days in a row never come from the same one.
+    for (let i = 1; i < WRITTEN_NOTES.length; i++) expect(WRITTEN_NOTES[i].category === WRITTEN_NOTES[i - 1].category, `${i}`).toBe(false);
+  });
+
+  it("fits every letter to the shelves and limits the Studio enforces", () => {
+    const shelves = LETTER_CATEGORIES.map((c) => c.value as string);
+    expect(new Set(WRITTEN_LETTERS.map((l) => l.title)).size).toBe(WRITTEN_LETTERS.length);
+    for (const letter of WRITTEN_LETTERS) {
+      expect(shelves, letter.title).toContain(letter.category);
+      expect(letterSchema.safeParse({ title: letter.title, body: letter.body, category: letter.category, envelopeStyle: letter.envelopeStyle, seal: letter.seal, fontStyle: "serif", writtenOn: "2026-11-10", unlockOn: "", publish: false }).success, letter.title).toBe(true);
+    }
+  });
+
+  it("covers the two milestones and the four seeded special days", () => {
+    expect(Object.keys(WRITTEN_MEMORIES).sort()).toEqual(FACTS.memories.map((m) => m.dateKey).sort());
+    expect(Object.keys(WRITTEN_DAYS).sort()).toEqual(FACTS.specialDays.map((d) => d.slug).sort());
+    for (const text of memories) expect(text.length).toBeGreaterThan(0);
+  });
+
+  it("asks for nothing and never pleads", () => {
+    const pressure = [
+      "sensiz yaşayamam", "beni asla bırakma", "bana dön", "affet", "özür", "sonsuza kadar benim", "benimsin", "söz ver", "cevap ver", "cevap yaz",
+      "geri dön", "bırakıp gitme", "ne olur", "yalvar", "kırgın", "küs", "pişman", "hata yaptım", "seni bekliyorum", "haber ver", "neden yazmıyorsun",
+    ];
+    for (const text of everything) for (const phrase of pressure) expect(lower(text).includes(phrase), `"${phrase}" in: ${text.slice(0, 70)}`).toBe(false);
+  });
+
+  it("speaks only for Arda — never says what Eln feels, thinks or once said", () => {
+    const claims = ["hissettiğini biliyorum", "beni sevdiğini", "özlediğini biliyorum", "demiştin", "söylemiştin", "yazmıştın", "anlatmıştın", "mesajında", "o gece", "ilk konuştuğumuz"];
+    for (const text of everything) for (const phrase of claims) expect(lower(text).includes(phrase), `"${phrase}" in: ${text.slice(0, 70)}`).toBe(false);
+  });
+
+  it("claims nothing that is not known: no shared past in person, no voice, no call", () => {
+    const unknown = ["sesini", "sesin ", "görüntülü", "aradığında", "telefonda konuş", "buluştuğumuz", "sarıldığımız", "el ele", "öptü"];
+    for (const text of everything) for (const phrase of unknown) expect(lower(text).includes(phrase), `"${phrase}" in: ${text.slice(0, 70)}`).toBe(false);
+  });
+
+  it("writes no year, age or count by hand — numbers come from the facts", () => {
+    const source = readFileSync("src/content/writing.ts", "utf8");
+    const prose = source.slice(source.indexOf("export const WRITTEN_SECTIONS"));
+    // Digits may appear only through the computed tokens (${GAP}, ${KM}, dates), never typed into a sentence.
+    const typed = prose.replace(/\$\{[^}]+\}/g, "").match(/"[^"\n]*\d[^"\n]*"/g) ?? [];
+    expect(typed).toEqual([]);
+    expect(lower(everything.join(" "))).not.toMatch(/yaşında(sın|yım)|\d+ yaş/);
   });
 });
 

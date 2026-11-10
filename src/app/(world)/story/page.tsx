@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import Link from "next/link";
 import { Sparkle } from "@/components/decor";
 import { OwnerHint } from "@/components/layout/owner-hint";
@@ -16,12 +17,18 @@ import { compareDates, daysBetween, describeDate, formatDate, formatDaysUntil, f
 
 export const metadata: Metadata = { title: "Hikâyemiz" };
 
-function Memories({ items, start, fallbackAlt }: { items: Memory[]; start: number; fallbackAlt: string }) {
+function Memories({ items, start, fallbackAlt, anchor }: { items: Memory[]; start: number; fallbackAlt: string; anchor?: string }) {
   if (items.length === 0) return null;
   return (
     <div className="shell space-y-24 pb-8 md:space-y-36">
       {items.map((memory, i) => (
-        <MemoryCard key={memory.id} memory={memory} index={start + i} fallbackAlt={fallbackAlt} />
+        <MemoryCard
+          key={memory.id}
+          memory={memory}
+          index={start + i}
+          fallbackAlt={fallbackAlt}
+          anchored={Boolean(anchor) && memory.relationshipDateKey === anchor}
+        />
       ))}
     </div>
   );
@@ -64,7 +71,7 @@ export default async function StoryPage() {
       {chaptered ? (
         <>
           <ChapterHeading eyebrow="Chapter One" title={metRow!.label} date={met} />
-          <Memories items={first} start={0} fallbackAlt={partner.fullName} />
+          <Memories items={first} start={0} fallbackAlt={partner.fullName} anchor={DATE_KEYS.met} />
 
           {/* The days in between: counted, never described for him. */}
           <section aria-labelledby="interlude-heading" className="dusk relative my-24 overflow-hidden py-28 text-center md:my-36 md:py-40">
@@ -100,7 +107,12 @@ export default async function StoryPage() {
         </>
       ) : null}
 
-      <Memories items={second} start={first.length + between.length} fallbackAlt={partner.fullName} />
+      <Memories
+        items={second}
+        start={first.length + between.length}
+        fallbackAlt={partner.fullName}
+        anchor={chaptered ? DATE_KEYS.together : undefined}
+      />
 
       {undated.length > 0 ? (
         <section aria-labelledby="undated-heading" className="pt-24">
@@ -127,7 +139,7 @@ export default async function StoryPage() {
               ? `${formatDate(meeting.date)} · ${formatDaysUntil(meeting.daysUntil)}`
               : meeting.kind === "past" && meetingRow?.happened
                 ? formatDate(meeting.date)
-                : "Henüz bir tarihi yok. Belli olduğunda bu bölüm buradan devam edecek."}
+                : COPY.story.meetingUnknown}
           </p>
           <Link href="/distance#meeting" className="mt-8 inline-block text-[13px] font-medium tracking-wide text-accent underline-offset-4 hover:underline">
             Mesafe sayfasına git
@@ -137,7 +149,7 @@ export default async function StoryPage() {
 
       {session.role === "partner" ? (
         <p className="shell pt-20 text-center text-sm text-muted">
-          İstersen sen de bir anı ekleyebilirsin.{" "}
+          {COPY.story.addOwn}{" "}
           <Link href="/story/write" className="text-accent underline-offset-4 hover:underline">
             Bir anı yaz
           </Link>

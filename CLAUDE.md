@@ -22,8 +22,10 @@ ilgili dosyayı oku.
 
 ## Değişmez kurallar
 
-1. **Uydurma yok.** Bilinmeyen anı, konuşma, his, tarih, istatistik üretme. Doğrulanmış
-   gerçekler `docs/ELN_CONTEXT.md` içinde. Orada olmayan her şey Studio'dan girilir.
+1. **Uydurma yok.** Bilinmeyen anı, olay, konuşma, tarih, istatistik üretme; Eln'in ne
+   hissettiğini ya da düşündüğünü onun adına yazma. Doğrulanmış gerçekler `docs/ELN_CONTEXT.md`
+   içinde. Arda'nın isteğiyle metinler onun sesinden yazılır (`src/content/writing.ts`), ama
+   yalnızca **onun hisleri + kesin bilgiler** ile; mektup ve notlar Studio'ya taslak olarak girer.
 2. **Eln'in özel mesajı yayımlanmaz.** 7 Kasım mesajı yalnızca duygusal referanstır;
    cümleleri kopyalanmaz, alıntılanmaz.
 3. **Baskı mekaniği yok.** Affetmeye, cevap vermeye, geri dönmeye zorlayan hiçbir metin,
@@ -78,6 +80,7 @@ src/app/gift          ilk karşılaşma deneyimi (tam ekran)
 src/app/studio        Arda'nın içerik stüdyosu (yalnızca owner)
 src/app/api           export, medya uçları
 src/features/<modül>  queries.ts (okuma) · actions.ts (yazma) · schema.ts (Zod) · components/
+src/content           facts (kesin bilgiler) · writing (Arda'nın sesinden metinler) · copy (oda girişleri) · navigation
 src/components/ui     temel bileşenler      src/components/decor   özgün dekoratif çizimler
 src/components/motion hareket yardımcıları   src/lib               env, supabase, auth, dates, media, security
 supabase/migrations   SQL migration'ları (asla düzenleme, yenisini ekle)
@@ -98,6 +101,23 @@ Kurallar:
 ## Karar günlüğü
 
 Önemli kararlar buraya tarihle eklenir (en yeni üstte).
+
+- **2026-11-10 — Metinleri Claude yazar, Arda yayımlar.** Arda bütün cümlelerin ve paragrafların onun
+  yerine, duygusal bir dille yazılmasını istedi. Hepsi `src/content/writing.ts` içinde: bölüm metinleri
+  (varsayılan olarak yayında), 8 mektup ve 365 not (Studio → Hazır metinler'den **taslak** olarak eklenir),
+  iki dönüm noktası ve dört özel gün girişi (yalnızca boş sayfayı doldurur). Sınırlar değişmedi: olay/anı
+  uydurulmaz, Eln adına his yazılmaz, baskı/özür dili yok, sayılar `FACTS`'ten hesaplanır. Bir birim testi
+  bunları denetler. Oda girişleri ve boş durum metinleri `src/content/copy.ts`'te toplandı.
+- **2026-11-10 — Boş okuma odaları Eln'in menüsünde görünmez.** Galeri, Mektuplar, 365 Not ve Zaman Kapsülü
+  içinde bir şey olana kadar onun menülerinde yer almaz (`room_presence` — tek çağrı, RLS ile; hiçbir şey
+  kaydetmez). Kendi ekleyebileceği şeylerin bağlantıları Hesabım sayfasında her zaman durur. Arda hepsini görür.
+- **2026-11-10 — Telefonda ayrı kompozisyon.** Anı Evreni dik ekranda galaksiyi dik çevirir; galeri tek sütunda
+  ritimle akar (tam, sağdan içeri, soldan içeri); ana sayfa fotoğrafları bir büyük + iki küçük; oda listesi iki sütun;
+  günlük, yazma formuyla değil kayıtlarla açılır.
+- **2026-11-10 — Dosyanın türüne içeriği karar verir.** Yüklemede uzantı ve tarayıcının bildirdiği tür değil,
+  dosyanın ilk baytları esas alınır (telefonların `.PNG` adıyla kaydettiği JPEG'ler bu yüzden reddediliyordu).
+- **2026-11-10 — Eln'in fotoğrafları depoya girmez.** Arda'nın ilettiği 5 fotoğraf yalnızca yerel denetimde
+  gerçek yükleme hattından geçirildi; git'e eklenmedi. Yayındaki siteye Arda Studio'dan yükler.
 
 - **2026-11-10 — Anı Evreni three.js'siz.** Galaksi, canvas 2D üzerinde kendi perspektif izdüşümüyle
   çiziliyor (dön, eğ, yakınlaş, yıldıza dokun). Telefonda da masaüstünde de aynı kod, ~0 ek paket.

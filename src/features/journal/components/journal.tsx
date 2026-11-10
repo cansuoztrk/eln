@@ -1,6 +1,6 @@
 "use client";
 
-import { EyeOff, Pencil, Trash2, X } from "lucide-react";
+import { EyeOff, Pencil, PenLine, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { SmartImage } from "@/components/media/smart-image";
@@ -30,10 +30,13 @@ export function Journal({ entries, today, otherName }: { entries: Entry[]; today
   const [form, setForm] = useState<Draft>(blank);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [filter, setFilter] = useState<"all" | "mine" | "theirs">("all");
+  // With entries to read, the page opens on them; the blank page waits behind one button.
+  const [writing, setWriting] = useState(entries.length === 0);
   const { run, pending, fieldErrors } = useAction(saveEntryAction, {
     onSuccess: () => {
       setForm(blank);
       setPhotos([]);
+      setWriting(false);
       router.refresh();
     },
   });
@@ -48,14 +51,23 @@ export function Journal({ entries, today, otherName }: { entries: Entry[]; today
   function edit(entry: Entry) {
     setForm({ id: entry.id, title: entry.title, body: entry.body, entryDate: entry.entryDate, tags: entry.tags.join(", "), visibility: entry.visibility, status: entry.status });
     setPhotos(entry.photos);
-    document.getElementById("journal-composer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setWriting(true);
+    requestAnimationFrame(() => document.getElementById("journal-composer")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
   const shown = entries.filter((e) => filter === "all" || (filter === "mine" ? e.mine : !e.mine));
 
   return (
-    <div className="space-y-16">
-      <form id="journal-composer" method="post" onSubmit={save(false)} noValidate className="paper paper-grain scroll-mt-28 space-y-4 p-5 sm:p-8">
+    <div className="space-y-12">
+      {writing ? null : (
+        <div className="text-center">
+          <Button variant="outline" onClick={() => setWriting(true)}>
+            <PenLine aria-hidden="true" />
+            Bir şey yaz
+          </Button>
+        </div>
+      )}
+      <form id="journal-composer" method="post" onSubmit={save(false)} noValidate hidden={!writing} className="paper paper-grain scroll-mt-28 space-y-4 p-5 sm:p-8">
         <div className="grid gap-4 sm:grid-cols-[1fr_11rem]">
           <Field htmlFor="j-title" label="Başlık" optional error={fieldErrors.title}>
             <Input {...describedBy("j-title", fieldErrors.title)} value={form.title} maxLength={160} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
@@ -113,15 +125,16 @@ export function Journal({ entries, today, otherName }: { entries: Entry[]; today
             {pending ? <Spinner /> : null}
             {form.visibility === "private" ? "Kendime kaydet" : "Günlüğe ekle"}
           </Button>
-          {form.id ? (
+          {form.id || entries.length > 0 ? (
             <Button
               variant="ghost"
               onClick={() => {
                 setForm(blank);
                 setPhotos([]);
+                setWriting(false);
               }}
             >
-              Düzenlemeyi bırak
+              {form.id ? "Düzenlemeyi bırak" : "Vazgeç"}
             </Button>
           ) : null}
         </div>

@@ -26,7 +26,8 @@ erişim sınırları → bütün odalar), yedek → sıfırla → geri yükle pr
 | Modül | Rota | Not |
 | --- | --- | --- |
 | The Memory Universe | `/universe` | Anılar, mektuplar ve özel günler sarmal bir galakside. Canvas + kendi izdüşümü; liste görünümü erişilebilirlik için. |
-| 365 Reasons | `/reasons`, `/studio/reasons` | Boş başlar, elle yazılır; her takvim gününe bir not (ziyaretten bağımsız). |
+| 365 Reasons | `/reasons`, `/studio/reasons` | 365 hazır not taslak olarak eklenebilir; her takvim gününe bir not (ziyaretten bağımsız). |
+| Hazır metinler | `/studio/words` | Arda'nın sesinden yazılmış mektuplar, notlar, dönüm noktaları; taslak olarak eklenir, hiçbir şeyin üzerine yazmaz. |
 | Our Song | `/song` | Özgün plak çizimi; oynat/duraklat ve ses, resmî embed'i sürer. Bağlantı yoksa arama kartı. |
 | Eln's Little World | `/corner` | Kedi, fiyonk koleksiyonu, kişisel tema, sticker panosu, Arda'nın yazdığı günün mesajı. |
 | Our Future | `/future` | Hayal → Planlandı → Gerçekleşti (yalnızca onayla); istenirse taslak anı açar. |
@@ -43,29 +44,33 @@ Yeni bir oda eklendiğinde `src/content/navigation.ts` içindeki `BUILT` listesi
 | Kontrol | Sonuç |
 | --- | --- |
 | `tsc --noEmit`, `eslint .`, `next build` | temiz |
-| Birim testleri (`npm run test`) | 46 / 46 — tarih kuralları, gökyüzü, yükleme kuralları, içerik kuralları, kod kuralları |
-| RLS / güvenlik testleri (`npm run test:db`) | 23 / 23 — gerçek API üzerinden, owner / partner / yabancı / anonim |
+| Birim testleri (`npm run test`) | 54 / 54 — tarih kuralları, gökyüzü, yükleme kuralları, içerik kuralları, yazılan metinlerin kuralları, kod kuralları |
+| RLS / güvenlik testleri (`npm run test:db`) | 27 / 27 — gerçek API üzerinden, owner / partner / yabancı / anonim; dosya sahipliği ve oda doluluğu dahil |
 | Uçtan uca (`npm run test:e2e`) | 12 / 12 — üretim derlemesinde ilk kurulum hikâyesi + iki rol için bütün odalar |
-| Yedek → sıfırla → geri yükle provası | satır ve dosya sayıları birebir |
+| Yedek → sıfırla → geri yükle provası | satır ve dosya sayıları birebir (albüm kapağı düzeltmesinden sonra yeniden koşulmalı) |
+| Gerçek fotoğraflarla yükleme | 5 / 5 — biri `.PNG` adlı JPEG olanlar dahil |
+
+Bu turun bütün bulguları ve durumları: [`DEVELOPMENT_LOG.md`](../DEVELOPMENT_LOG.md).
 
 Elle bakılması gerekenler (otomatik test edilemeyenler):
 
 - **Ses kaydı:** başsız tarayıcıda mikrofon yok; kayıt akışı gerçek bir telefonda denenmeli (Safari + Chrome).
-- **Şarkı oynatıcısı:** resmî YouTube/Spotify bağlantısı henüz girilmedi; girince `/song` ve Gift'teki düğme denenmeli.
-- **Gerçek fotoğraflarla görünüm:** tasarım soyut test görselleriyle kontrol edildi; ilk gerçek yüklemelerden sonra
-  galeri ve hikâye sayfalarına bir kez göz at.
+- **Şarkı oynatıcısı:** resmî bağlantılar girildi; gömülü oynatıcı gerçek ağda (`/song` ve Gift'teki düğme) bir kez denenmeli.
+- **Gerçek iPhone:** telefon görünümü 390 px Chromium ile, Eln'in gerçek fotoğraflarıyla incelendi; Safari'de bir kez baştan sona gezilmeli.
+- **Hazır metinler:** yayımlamadan önce Arda tarafından okunmalı (`Studio → Hazır metinler`).
 - **Yayın ortamı:** Supabase bulut projesi ve barındırma henüz kurulmadı (`README.md` → Yayına alma).
 
 ## Sonra
 
-- E2E paketini genişlet: mobil görünüm kontrolleri, galeri lightbox, özel gün baskısı, kapsül açılışı.
-- Eln'in de kapsül hazırlayabilmesi (veritabanı izin veriyor; editör şimdilik yalnızca Studio'da).
-- Hayaller de Anı Evreni'nde yıldız olarak görünsün.
+Bu turda bitenler: Eln'in kapsül hazırlaması · hayallerin Anı Evreni'nde yıldız olması · sürüm geçmişi arayüzü ·
+çevrimdışı kabuk · Studio ayarlar ve yedek sayfaları · hazır metinler.
+
+- E2E paketini genişlet: mobil görünüm kontrolleri, galeri lightbox, özel gün baskısı, kapsül açılışı, hazır metinlerin eklenmesi.
+- Geri yükleme provasını albümlü veriyle yinele.
+- Animasyon kitaplığını küçült (LazyMotion) — ~15–20 KB.
 - Anı Evreni için isteğe bağlı WebGL sürümü (yalnızca yıldız sayısı çok artarsa).
-- Sürüm geçmişi arayüzü (Studio'da "önceki sürümler" + geri alma) — veriler `content_versions`'ta birikiyor.
 - Sürükle-bırak sıralama (şu an yukarı/aşağı düğmeleri).
 - Fotoğraf yüklerken EXIF'ten "çekildiği gün" önerisi.
-- Çevrimdışı için hafif bir kabuk (özel içerik önbelleğe alınmadan).
 - Eln için arayüzü Azerbaycan Türkçesi / İngilizce seçeneği.
 
 ## İlk buluşma gerçekleştiğinde

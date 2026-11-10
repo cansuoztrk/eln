@@ -76,11 +76,16 @@ export function SharedSky({ leftName, rightName }: { leftName: string; rightName
           />
         ) : null}
 
-        <div className={cn("absolute inset-x-0 bottom-0 flex justify-between px-6 pb-5 text-[11px] tracking-[0.28em] uppercase md:px-10", dark ? "text-pearl/75" : "text-ink-soft/80")}>
+        <div className={cn("absolute inset-x-0 bottom-0 flex justify-between gap-4 px-5 pb-5 text-[10px] leading-relaxed tracking-[0.22em] uppercase sm:text-[11px] sm:tracking-[0.28em] md:px-10", dark ? "text-pearl/75" : "text-ink-soft/80")}>
           {sides.map((side, i) => (
-            <span key={side.name} suppressHydrationWarning>
-              {side.name}
-              {state ? ` · ${SKY_PHASE_TR[state[i].phase]}` : ""}
+            <span key={side.name} className={cn("flex flex-col sm:block", i === 1 && "items-end text-right")} suppressHydrationWarning>
+              <span>{side.name}</span>
+              {state ? (
+                <span className="opacity-80">
+                  <span className="max-sm:hidden"> · </span>
+                  {SKY_PHASE_TR[state[i].phase]}
+                </span>
+              ) : null}
             </span>
           ))}
         </div>

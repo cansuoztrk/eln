@@ -284,6 +284,30 @@ describe("what only the owner manages", () => {
   });
 });
 
+describe("which rooms have something in them", () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const ask = (as: Client) => as.rpc("room_presence", { p_space: w.spaceId, p_day: today }).maybeSingle();
+
+  it("is answered for members only", async () => {
+    expect((await anon.rpc("room_presence", { p_space: w.spaceId, p_day: today })).error).not.toBeNull();
+    expect((await w.stranger.rpc("room_presence", { p_space: w.spaceId, p_day: today })).error).not.toBeNull();
+    const mine = await ask(w.partner);
+    expect(mine.error).toBeNull();
+    for (const room of ["gallery", "letters", "reasons", "capsules"] as const) expect(typeof mine.data![room]).toBe("boolean");
+  });
+
+  it("counts only what the asker may already read", async () => {
+    const before = (await ask(w.partner)).data!;
+    // Meaningful on an empty room; on a room that already has letters there is nothing left to prove.
+    if (before.letters) return;
+    await letter(w.owner, { status: "draft" });
+    expect((await ask(w.partner)).data!.letters).toBe(false);
+    // A sealed envelope does open the room: its title and date are shown there.
+    await letter(w.owner, { status: "published", unlock_at: future() });
+    expect((await ask(w.partner)).data!.letters).toBe(true);
+  });
+});
+
 describe("questions answered together", () => {
   it("hides the other answer until you have written yours", async () => {
     const question = await w.owner.from("questions").insert({ space_id: w.spaceId, prompt: `${TAG} together?`, together: true }).select("id").single();

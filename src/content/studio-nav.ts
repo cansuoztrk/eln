@@ -8,6 +8,7 @@ const BUILT = new Set([
   "/studio",
   "/studio/opening",
   "/studio/invite",
+  "/studio/words",
   "/studio/photos",
   "/studio/story",
   "/studio/letters",
@@ -32,6 +33,7 @@ const ALL_GROUPS: StudioNavGroup[] = [
   {
     title: "İçerik",
     items: [
+      { href: "/studio/words", label: "Hazır metinler", hint: "Senin için yazılan mektuplar ve notlar" },
       { href: "/studio/photos", label: "Fotoğraflar", hint: "Galeri ve albümler" },
       { href: "/studio/story", label: "Hikâye", hint: "Anılar ve zaman çizelgesi" },
       { href: "/studio/letters", label: "Mektuplar", hint: "Zarflar, taslaklar, kilitli mektuplar" },

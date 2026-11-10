@@ -19,6 +19,7 @@ import { Envelope } from "@/features/letters/components/envelope";
 import { listLetters } from "@/features/letters/queries";
 import { getReasons } from "@/features/reasons/queries";
 import { people, requireMember } from "@/lib/auth/session";
+import { cn } from "@/lib/cn";
 import {
   daysBetween,
   elapsed,
@@ -173,20 +174,25 @@ export default async function HomePage() {
               Tümünü gör
             </Link>
           </div>
-          <div className="mt-10 grid items-start gap-5 sm:grid-cols-3 sm:gap-8">
+          {/* On a phone: one photograph large, the next two side by side. Three across from a tablet up. */}
+          <div className="mt-10 grid grid-cols-2 items-start gap-4 sm:grid-cols-3 sm:gap-8">
             {featured.map((photo, i) => (
-              <Parallax key={photo.id} distance={i === 1 ? 70 : 30} className={i === 1 ? "sm:mt-16" : ""}>
+              <Parallax
+                key={photo.id}
+                distance={i === 1 ? 70 : 30}
+                className={cn(i === 0 && featured.length !== 2 && "col-span-2 sm:col-span-1", i === 1 && "sm:mt-16", i === 2 && "mt-10 sm:mt-0")}
+              >
                 <Reveal delay={i * 0.12}>
                   <Link href="/gallery" className="group block">
                     <SmartImage
                       image={photo.image}
                       alt={photo.altText || photo.caption || `${partner.fullName}`}
-                      sizes="(min-width: 640px) 30vw, 100vw"
+                      sizes={i === 0 ? "(min-width: 640px) 30vw, 100vw" : "(min-width: 640px) 30vw, 46vw"}
                       priority={i === 0}
                       className="rounded-[4px] shadow-paper transition-shadow duration-500 group-hover:shadow-lift"
                     />
                     {photo.caption ? (
-                      <p className="mt-3 font-display text-lg text-ink-soft italic">{photo.caption}</p>
+                      <p className="mt-3 font-display text-base leading-snug text-ink-soft italic sm:text-lg">{photo.caption}</p>
                     ) : null}
                   </Link>
                 </Reveal>
@@ -206,7 +212,7 @@ export default async function HomePage() {
           </Reveal>
           <Link href="/story" className="group mt-10 grid items-center gap-8 text-center md:grid-cols-[1fr_auto_1fr]">
             <Reveal>
-              <p className="font-display text-display leading-none text-ink transition-colors group-hover:text-accent">
+              <p className="font-display text-[clamp(5rem,18vw,5.5rem)] leading-none text-ink transition-colors group-hover:text-accent md:text-display">
                 {met.date.day}
               </p>
               <p className="mt-2 font-display text-2xl text-ink-soft italic">{formatDate(met.date).replace(/^\d+ /, "")}</p>
@@ -217,7 +223,7 @@ export default async function HomePage() {
               <Flourish className="mt-2" />
             </Reveal>
             <Reveal delay={0.24}>
-              <p className="font-display text-display leading-none text-ink transition-colors group-hover:text-accent">
+              <p className="font-display text-[clamp(5rem,18vw,5.5rem)] leading-none text-ink transition-colors group-hover:text-accent md:text-display">
                 {together.date.day}
               </p>
               <p className="mt-2 font-display text-2xl text-ink-soft italic">
@@ -270,23 +276,23 @@ export default async function HomePage() {
             Bu dünyada neler var
           </h2>
         </Reveal>
-        <Stagger as="ul" stagger={0.05} className="mt-10 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+        <Stagger as="ul" stagger={0.05} className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line lg:grid-cols-3">
           {WORLD_NAV.filter((room) => !hiddenRooms.includes(room.href)).map((room) => (
             <StaggerItem as="li" key={room.href} className="bg-ivory">
               <Link
                 href={room.href}
-                className="group flex h-full min-h-36 flex-col justify-between gap-6 p-6 transition-colors duration-500 hover:bg-accent-wash md:p-7"
+                className="group flex h-full min-h-28 flex-col justify-between gap-4 p-4 transition-colors duration-500 hover:bg-accent-wash sm:min-h-36 sm:gap-6 sm:p-6 md:p-7"
               >
                 <span className="flex items-start justify-between gap-3">
-                  <span className="eyebrow text-[10px]">{room.eyebrow}</span>
+                  <span className="eyebrow text-[9px] sm:text-[10px]">{room.eyebrow}</span>
                   <ArrowUpRight
                     className="size-4 -translate-x-1 translate-y-1 text-accent opacity-0 transition-[opacity,transform] duration-500 ease-soft group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
                     aria-hidden="true"
                   />
                 </span>
                 <span>
-                  <span className="block font-display text-3xl leading-tight text-ink">{room.label}</span>
-                  <span className="mt-1.5 block text-sm text-muted">{room.description}</span>
+                  <span className="block font-display text-2xl leading-tight text-ink sm:text-3xl">{room.label}</span>
+                  <span className="mt-1.5 hidden text-sm text-muted sm:block">{room.description}</span>
                 </span>
               </Link>
             </StaggerItem>

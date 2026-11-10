@@ -147,6 +147,8 @@ export function Moon({
   return (
     <svg viewBox="-6 -6 112 112" className={cn("size-16", className)} {...a11y(title)} {...props}>
       <circle cx="50" cy="50" r="50" fill="currentColor" opacity=".14" />
+      {/* The rim keeps a new moon looking like a moon rather than an empty disc. */}
+      <circle cx="50" cy="50" r="49.4" fill="none" stroke="currentColor" strokeWidth="1.2" opacity=".42" />
       <path
         fill="currentColor"
         d={`M50 0A50 50 0 0 ${limb} 50 100A${rx.toFixed(2)} 50 0 0 ${terminator} 50 0Z`}

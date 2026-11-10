@@ -737,6 +737,11 @@ isOneToOne: false
 "ensure_daily_notes":
 { Args: { "p_day": string,"p_space": string }; Returns: undefined
                            },
+"room_presence":
+{ Args: { "p_day": string,"p_space": string }; Returns: {
+              "capsules": boolean,"gallery": boolean,"letters": boolean,"reasons": boolean
+            }[]
+                           },
 "sealed_capsules":
 { Args: { "p_space": string }; Returns: {
               "cover_style": string,"created_by": string,"id": string,"title": string,"unlock_at": string

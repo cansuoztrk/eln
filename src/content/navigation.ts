@@ -34,14 +34,14 @@ const ALL_ROOMS: NavItem[] = [
     href: "/gallery",
     label: "Galeri",
     eyebrow: "Eln's Gallery",
-    description: "Fotoğraflar, albümler, favoriler.",
+    description: "Fotoğrafların, yan yana.",
     primary: true,
   },
   {
     href: "/letters",
     label: "Mektuplar",
     eyebrow: "Letters",
-    description: "Zarflar ve içindekiler.",
+    description: "Zarflar ve içlerinde bekleyenler.",
     primary: true,
   },
   {
@@ -61,7 +61,7 @@ const ALL_ROOMS: NavItem[] = [
     href: "/days",
     label: "Özel Günler",
     eyebrow: "Special Days",
-    description: "Doğum günleri ve yıldönümleri.",
+    description: "Takvimde bize ait günler.",
   },
   {
     href: "/reasons",
@@ -73,7 +73,7 @@ const ALL_ROOMS: NavItem[] = [
     href: "/song",
     label: "Şarkımız",
     eyebrow: "Our Song",
-    description: "Anılar Şarkısı.",
+    description: "Bizi anlatan şarkı.",
   },
   {
     href: "/future",
@@ -91,7 +91,7 @@ const ALL_ROOMS: NavItem[] = [
     href: "/voice",
     label: "Sesli Anılar",
     eyebrow: "Voice Memories",
-    description: "Kayıtlar ve sesler.",
+    description: "Yazıya sığmayanlar.",
   },
   {
     href: "/journal",
@@ -103,7 +103,7 @@ const ALL_ROOMS: NavItem[] = [
     href: "/questions",
     label: "Sorular",
     eyebrow: "Our Questions",
-    description: "Birbirimizi tanıyalım.",
+    description: "Birbirimizi biraz daha tanımak için.",
   },
   {
     href: "/corner",

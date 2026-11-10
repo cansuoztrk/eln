@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import { Flourish, Sparkle } from "@/components/decor";
 import { OwnerHint } from "@/components/layout/owner-hint";
 import { PageHeader } from "@/components/layout/page-header";
@@ -19,12 +20,12 @@ export default async function ReasonsPage() {
 
   return (
     <>
-      <PageHeader eyebrow="365 Reasons" title="365 Not" align="center" lead={nothing ? undefined : "Her güne küçük bir not. Geçmiş günler aşağıda durur."} />
+      <PageHeader eyebrow="365 Reasons" title="365 Not" align="center" lead={nothing ? undefined : archive.length > 0 ? COPY.reasons.lead : COPY.reasons.leadFirstDay} />
 
       <div className="shell-narrow space-y-20">
         {nothing ? (
-          <EmptyState art={<Sparkle className="size-6" />} title="Henüz bir not yok">
-            İlk not yazıldığında burada görünecek.
+          <EmptyState art={<Sparkle className="size-6" />} title={COPY.reasons.emptyTitle}>
+            {COPY.reasons.empty}
           </EmptyState>
         ) : null}
 

@@ -11,6 +11,7 @@ import { StarField } from "@/components/motion/star-field";
 import { Button } from "@/components/ui/button";
 import { Envelope } from "@/features/letters/components/envelope";
 import { cn } from "@/lib/cn";
+import { ablative, dative } from "@/lib/grammar";
 import { GIFT_SEEN_KEY } from "../constants";
 import { MusicToggle } from "./music-toggle";
 
@@ -159,6 +160,9 @@ export function GiftExperience({ content, exitHref = "/", preview = false }: { c
           {scene === "dusk" ? (
             <motion.div key="dusk" {...fade} className="w-full max-w-2xl">
               <LightThread tone="dusk" labels={content.cities} />
+              <p className="mt-12 font-display text-[clamp(1.75rem,6vw,2.75rem)] leading-tight text-pearl/90 italic">
+                <WordReveal text={`${ablative(content.cities[0])} ${dative(content.cities[1])}`} delay={1.8} stagger={0.3} />
+              </p>
             </motion.div>
           ) : null}
 

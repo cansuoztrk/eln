@@ -36,6 +36,8 @@ export function Universe({ stars }: { stars: Star[] }) {
   const hover = useRef<string | null>(null);
   const idleSince = useRef(0);
   const burst = useRef<{ id: string; at: number } | null>(null);
+  // The first look: the galaxy arrives from a little further away, once.
+  const arrivedAt = useRef<number | null>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [listOpen, setListOpen] = useState(false);
@@ -54,7 +56,8 @@ export function Universe({ stars }: { stars: Star[] }) {
       const star = placed.find((s) => s.id === id);
       if (star) {
         // Turn the galaxy so the chosen star comes to the front.
-        target.current = { ...target.current, yaw: Math.atan2(star.x, star.z) + Math.PI, zoom: Math.max(target.current.zoom, 1.45) };
+        const tall = window.innerHeight > window.innerWidth * 1.15;
+        target.current = { ...target.current, yaw: Math.atan2(star.x, star.z) + Math.PI, zoom: Math.max(target.current.zoom, tall ? 1.2 : 1.45) };
         // Take the short way round.
         const delta = target.current.yaw - view.current.yaw;
         target.current.yaw = view.current.yaw + Math.atan2(Math.sin(delta), Math.cos(delta));
@@ -74,6 +77,15 @@ export function Universe({ stars }: { stars: Star[] }) {
     let height = 0;
     let frame = 0;
     let running = true;
+    // On a tall screen the galaxy stands upright, so it fills a phone instead of lying across the middle of it.
+    let tall = false;
+    // The camera slides so a chosen star sits clear of its card.
+    const pan = { x: 0, y: 0 };
+    if (arrivedAt.current === null) {
+      arrivedAt.current = performance.now();
+      if (!reduce) view.current = { yaw: HOME.yaw - 1.1, pitch: HOME.pitch + 0.3, zoom: 0.5 };
+    }
+    const startedAt = arrivedAt.current;
 
     // Dust: the quiet stars behind the ones that mean something.
     const dust = Array.from({ length: small ? 170 : 420 }, (_, i) => {
@@ -96,6 +108,7 @@ export function Universe({ stars }: { stars: Star[] }) {
       const rect = canvas.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
+      tall = height > width * 1.15;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -110,23 +123,42 @@ export function Universe({ stars }: { stars: Star[] }) {
       const sp = Math.sin(v.pitch);
       const y2 = y * sp - z1 * cp;
       const z2 = y * cp + z1 * sp;
-      const fit = Math.min(width, height) / 760;
+      const fit = tall ? height / 980 : Math.min(width, height) / 700;
       const scale = (FOCAL / (FOCAL + z2)) * v.zoom * fit;
-      return { sx: width / 2 + x1 * scale, sy: height / 2 - y2 * scale * 0.92, scale, depth: z2 };
+      // Upright: the same picture turned a quarter, long axis along the screen.
+      return tall
+        ? { sx: width / 2 + pan.x + y2 * scale * 0.92, sy: height * 0.55 + pan.y + x1 * scale, scale, depth: z2 } // a little low: the title sits above it
+        : { sx: width / 2 + pan.x + x1 * scale, sy: height / 2 + pan.y - y2 * scale * 0.92, scale, depth: z2 };
     };
 
     const draw = (time: number) => {
       const v = view.current;
       const t = target.current;
-      // Ease toward where the person asked to look.
-      v.yaw += (t.yaw - v.yaw) * 0.08;
-      v.pitch += (t.pitch - v.pitch) * 0.08;
-      v.zoom += (t.zoom - v.zoom) * 0.08;
+      // Ease toward where the person asked to look — more slowly while the galaxy first arrives.
+      const ease = time - startedAt < 2600 && !reduce ? 0.03 : 0.08;
+      v.yaw += (t.yaw - v.yaw) * ease;
+      v.pitch += (t.pitch - v.pitch) * ease;
+      v.zoom += (t.zoom - v.zoom) * ease;
+
+      // Bring the chosen star to a clear spot: above its card on a phone, beside it on a wide screen.
+      const chosen = selectedRef.current ? placed.find((star) => star.id === selectedRef.current) : null;
+      if (chosen) {
+        const now = project(chosen.x, chosen.y, chosen.z, v);
+        const anchorX = small ? width / 2 : width * 0.36;
+        const anchorY = small ? Math.max(150, height * 0.27) : height / 2;
+        pan.x += (anchorX - now.sx) * 0.08;
+        pan.y += (anchorY - now.sy) * 0.08;
+      } else {
+        pan.x += -pan.x * 0.08;
+        pan.y += -pan.y * 0.08;
+      }
       // Left alone, the galaxy turns very slowly.
       if (!reduce && !selectedRef.current && time - idleSince.current > 2500) t.yaw += 0.00045;
 
       ctx.clearRect(0, 0, width, height);
       ctx.globalCompositeOperation = "lighter";
+      // The sky fades up as it arrives.
+      ctx.globalAlpha = reduce ? 1 : Math.min(1, Math.max(0, (time - startedAt) / 1800));
 
       for (const cloud of clouds) {
         const p = project(cloud.x, cloud.y, cloud.z, v);
@@ -136,7 +168,7 @@ export function Universe({ stars }: { stars: Star[] }) {
         g.addColorStop(1, `rgba(${cloud.c},0)`);
         ctx.fillStyle = g;
         ctx.beginPath();
-        ctx.ellipse(p.sx, p.sy, r, r * 0.62, 0, 0, Math.PI * 2);
+        ctx.ellipse(p.sx, p.sy, tall ? r * 0.62 : r, tall ? r : r * 0.62, 0, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -226,16 +258,32 @@ export function Universe({ stars }: { stars: Star[] }) {
       }
 
       // Names: always for the one in focus, and for the brightest once you lean in.
+      // The one in focus first, then the brightest, each only where there is room for it.
       ctx.globalCompositeOperation = "source-over";
       ctx.textAlign = "center";
-      for (const p of projected) {
-        const active = p.star.id === selectedRef.current || p.star.id === hover.current;
-        if (!active && !(p.star.size >= 4 && v.zoom > 0.85) && !(v.zoom > 1.7)) continue;
-        const offset = (2.2 + p.star.size * 1.5) * p.scale * 2.6 + 14;
-        ctx.font = `italic ${active ? 500 : 400} ${active ? 19 : 15}px "Cormorant Garamond Variable", Georgia, serif`;
-        ctx.fillStyle = `rgba(255,253,250,${active ? 0.98 : 0.72})`;
-        ctx.fillText(p.star.title.length > 34 ? `${p.star.title.slice(0, 33)}…` : p.star.title, p.sx, p.sy + offset);
+      ctx.shadowColor = "rgba(27,18,24,0.95)";
+      ctx.shadowBlur = 8;
+      const taken: { x: number; y: number; w: number; h: number }[] = [];
+      const isActive = (p: Screen) => p.star.id === selectedRef.current || p.star.id === hover.current;
+      const labelled = projected
+        .filter((p) => isActive(p) || (p.star.size >= 4 && v.zoom > 0.85) || v.zoom > 1.7)
+        .sort((a, b) => Number(isActive(b)) - Number(isActive(a)) || b.star.size - a.star.size);
+      for (const p of labelled) {
+        const active = isActive(p);
+        const size = active ? 19 : 15;
+        const text = p.star.title.length > 34 ? `${p.star.title.slice(0, 33)}…` : p.star.title;
+        ctx.font = `italic ${active ? 500 : 400} ${size}px "Cormorant Garamond Variable", Georgia, serif`;
+        const w = ctx.measureText(text).width;
+        // Keep the whole name on the screen.
+        const x = Math.min(width - w / 2 - 10, Math.max(w / 2 + 10, p.sx));
+        const y = p.sy + (2.2 + p.star.size * 1.5) * p.scale * 2.6 + 14;
+        const box = { x: x - w / 2 - 6, y: y - size, w: w + 12, h: size + 8 };
+        if (!active && taken.some((o) => box.x < o.x + o.w && box.x + box.w > o.x && box.y < o.y + o.h && box.y + box.h > o.y)) continue;
+        taken.push(box);
+        ctx.fillStyle = `rgba(255,253,250,${active ? 0.98 : 0.78})`;
+        ctx.fillText(text, x, y);
       }
+      ctx.shadowBlur = 0;
 
       screen.current = projected;
     };
@@ -311,8 +359,9 @@ export function Universe({ stars }: { stars: Star[] }) {
         return;
       }
       moved += Math.abs(dx) + Math.abs(dy);
-      target.current.yaw += dx * 0.006;
-      target.current.pitch = Math.min(1.45, Math.max(0.35, target.current.pitch + dy * 0.004));
+      // The galaxy follows the finger whichever way it stands.
+      target.current.yaw += (tall ? dy : dx) * 0.006;
+      target.current.pitch = Math.min(1.45, Math.max(0.35, target.current.pitch + (tall ? -dx : dy) * 0.004));
     };
     const up = (event: PointerEvent) => {
       const wasTap = pointers.size === 1 && moved < 8;
@@ -382,7 +431,8 @@ export function Universe({ stars }: { stars: Star[] }) {
         style={{ cursor: "grab" }}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-20 px-5 text-center md:top-24">
+      {/* The title steps back while a star is open, so the sky is the only thing speaking. */}
+      <div className={cn("pointer-events-none absolute inset-x-0 top-20 px-5 text-center transition-opacity duration-700 ease-soft md:top-24", selected && "opacity-0 md:opacity-100")}>
         <p className="eyebrow">The Memory Universe</p>
         <h1 className="mt-2 font-display text-4xl text-pearl italic md:text-5xl">Anı Evreni</h1>
         <p className="mx-auto mt-2 max-w-xs text-[13px] leading-relaxed text-pearl/60">

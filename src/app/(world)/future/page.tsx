@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import { PageHeader } from "@/components/layout/page-header";
 import { FutureBoard } from "@/features/future/components/future-board";
 import { listPlans } from "@/features/future/queries";
@@ -17,7 +18,7 @@ export default async function FuturePage() {
         eyebrow="Our Future"
         title="Hayaller"
         align="center"
-        lead={plans.length === 0 ? "Birlikte yapmak istediklerimizin listesi. Henüz boş; ilk hayali ikimizden biri ekleyebilir." : `${plans.length} hayal${done > 0 ? ` · ${done} tanesi gerçekleşti` : ""}`}
+        lead={plans.length === 0 ? COPY.future.leadEmpty : `${plans.length} hayal${done > 0 ? ` · ${done} tanesi gerçekleşti` : ""}`}
       />
       <div className="shell">
         <FutureBoard plans={plans} memoryBase={session.role === "owner" ? "/studio/story/" : "/story/write?id="} />

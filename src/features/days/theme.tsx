@@ -2,6 +2,12 @@ import type { ReactNode } from "react";
 import { Bow, Heart, Kitten, Sparkle } from "@/components/decor";
 import type { SpecialDayTheme } from "./queries";
 
+/** The small English label above a day — "your birthday" when the day belongs to whoever is reading. */
+export function dayEyebrow(theme: SpecialDayTheme, viewer: "owner" | "partner"): string {
+  if ((theme === "birthday-partner" && viewer === "partner") || (theme === "birthday-owner" && viewer === "owner")) return "Your birthday";
+  return DAY_LOOK[theme].eyebrow;
+}
+
 /** Each special day's own, restrained identity: a tint and one small drawing. */
 export const DAY_LOOK: Record<SpecialDayTheme, { surface: string; accent: string; motif: ReactNode; eyebrow: string }> = {
   "birthday-partner": {

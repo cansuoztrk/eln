@@ -48,7 +48,7 @@ export function Envelope({ styleName, seal, state = "closed", sealed, interactiv
       {/* The sheet inside. */}
       <div
         className={cn(
-          "absolute inset-x-[7%] top-[10%] h-[82%] overflow-hidden rounded-[3px] bg-pearl shadow-paper",
+          "absolute inset-x-[7%] top-[10%] z-[1] h-[82%] overflow-hidden rounded-[3px] bg-pearl shadow-paper",
           "transition-transform duration-[1100ms] ease-soft",
           open ? "-translate-y-[58%] delay-500" : "translate-y-0",
         )}
@@ -58,19 +58,19 @@ export function Envelope({ styleName, seal, state = "closed", sealed, interactiv
 
       {/* The pocket: left, right and bottom folds. */}
       <div
-        className="absolute inset-0 rounded-[10px] bg-(--env-pocket) [clip-path:polygon(0_0,50%_54%,100%_0,100%_100%,0_100%)]"
+        className="absolute inset-0 z-[2] rounded-[10px] bg-(--env-pocket) [clip-path:polygon(0_0,50%_54%,100%_0,100%_100%,0_100%)]"
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 rounded-[10px] bg-(--env-fold) [clip-path:polygon(0_100%,50%_46%,100%_100%)]"
+        className="absolute inset-0 z-[2] rounded-[10px] bg-(--env-fold) [clip-path:polygon(0_100%,50%_46%,100%_100%)]"
         aria-hidden="true"
       />
 
-      {/* The flap. */}
+      {/* The flap. Half-way through its turn it passes behind the sheet, the way a real one ends up. */}
       <div
         aria-hidden="true"
         className={cn(
-          "absolute inset-x-0 top-0 h-[58%] origin-top transition-transform duration-[900ms] ease-silk [transform-style:preserve-3d]",
+          "absolute inset-x-0 top-0 h-[58%] origin-top [transform-style:preserve-3d] [transition:transform_900ms_var(--ease-silk),z-index_0s_450ms]",
           open
             ? "z-0 [transform:rotateX(180deg)]"
             : interactive && !sealed
@@ -84,12 +84,13 @@ export function Envelope({ styleName, seal, state = "closed", sealed, interactiv
       <div
         aria-hidden="true"
         className={cn(
-          "absolute top-[56%] left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 transition-[opacity,transform] duration-500 ease-soft",
+          // Sized from the envelope itself, so the wax always sits on the tip of the flap.
+          "absolute top-[56%] left-1/2 z-20 aspect-square w-[clamp(2.25rem,16%,4rem)] -translate-x-1/2 -translate-y-1/2 transition-[opacity,scale,translate] duration-500 ease-soft",
           open ? "scale-50 opacity-0" : "scale-100 opacity-100",
           interactive && !sealed && "group-hover/env:-translate-y-[62%] group-hover/env:scale-95",
         )}
       >
-        <WaxSeal glyph={seal} className="size-[clamp(2.25rem,16%,4rem)]" style={{ color: c.seal }} />
+        <WaxSeal glyph={seal} className="block size-full" style={{ color: c.seal }} />
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
 import { DeleteAccountForm, ExportButtons, PasswordForm, ProfileForm } from "@/features/account/components/account-forms";
 import { TrashRowActions } from "@/features/studio/components/trash-row";
@@ -61,6 +62,31 @@ export default async function AccountPage() {
             </li>
           </ul>
         </Section>
+
+        {!owner ? (
+          <Section title="Sen de ekleyebilirsin">
+            <p className="text-sm leading-relaxed text-muted">
+              Hiçbiri beklenmiyor. İstersen, istediğin zaman — buradan her zaman ulaşabilirsin.
+            </p>
+            <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+              {(
+                [
+                  ["/gallery/mine", "Fotoğraflarım", "Kendi fotoğraflarını ekle"],
+                  ["/letters/write", "Mektup yaz", "Taslak olarak da kalabilir"],
+                  ["/story/write", "Anı yaz", "Hikâyeye kendi gözünden"],
+                  ["/capsules/mine", "Kapsüllerim", "Geleceğe bir şey bırak"],
+                ] as const
+              ).map(([href, label, hint]) => (
+                <li key={href}>
+                  <Link href={href} className="block rounded-xl border border-line-strong px-4 py-3 transition-colors hover:border-accent hover:bg-accent-wash">
+                    <span className="block text-[15px] font-medium text-ink">{label}</span>
+                    <span className="block text-[13px] text-muted">{hint}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        ) : null}
 
         {!owner ? (
           <Section title="Çöp kutum">

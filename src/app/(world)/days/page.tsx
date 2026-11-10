@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import { COPY } from "@/content/copy";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
@@ -7,7 +8,7 @@ import { Countdown } from "@/components/time/countdown";
 import { EmptyState } from "@/components/ui/empty-state";
 import { timezoneFor } from "@/features/dates/queries";
 import { listSpecialDays } from "@/features/days/queries";
-import { DAY_LOOK } from "@/features/days/theme";
+import { DAY_LOOK, dayEyebrow } from "@/features/days/theme";
 import { whenText } from "@/features/days/when";
 import { requireMember } from "@/lib/auth/session";
 import { cn } from "@/lib/cn";
@@ -22,10 +23,10 @@ export default async function DaysPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Special Days" title="Özel Günler" lead={days.length > 0 ? "Her yıl yeniden gelen günler. En yakın olan en üstte." : undefined} />
+      <PageHeader eyebrow="Special Days" title="Özel Günler" lead={days.length > 0 ? COPY.days.lead : undefined} />
 
       <div className="shell space-y-8">
-        {!featured ? <EmptyState title="Henüz özel bir gün yok" /> : null}
+        {!featured ? <EmptyState title={COPY.days.emptyTitle} /> : null}
 
         {featured ? (
           <Reveal>
@@ -34,7 +35,7 @@ export default async function DaysPage() {
               className={cn("group relative flex flex-col items-center overflow-hidden rounded-[2rem] border border-line px-6 py-14 text-center shadow-lift md:py-20", DAY_LOOK[featured.theme].surface)}
             >
               <div className="mb-6">{DAY_LOOK[featured.theme].motif}</div>
-              <p className="eyebrow">{DAY_LOOK[featured.theme].eyebrow}</p>
+              <p className="eyebrow">{dayEyebrow(featured.theme, session.role)}</p>
               <h2 className="mt-4 font-display text-display leading-none">{featured.title}</h2>
               <p className={cn("mt-5 font-display text-2xl italic", DAY_LOOK[featured.theme].accent)}>
                 {whenText(featured).dateText}
@@ -67,7 +68,7 @@ export default async function DaysPage() {
                     className={cn("group flex h-full min-h-72 flex-col justify-between rounded-[1.75rem] border border-line p-7 shadow-paper transition-[transform,box-shadow] duration-500 ease-soft hover:-translate-y-1 hover:shadow-lift", look.surface)}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="eyebrow text-[10px]">{look.eyebrow}</p>
+                      <p className="eyebrow text-[10px]">{dayEyebrow(day.theme, session.role)}</p>
                       <div className="origin-top-right scale-75">{look.motif}</div>
                     </div>
                     <div>

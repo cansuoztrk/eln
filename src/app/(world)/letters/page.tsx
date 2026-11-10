@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import Link from "next/link";
 import { OwnerHint } from "@/components/layout/owner-hint";
 import { PageHeader } from "@/components/layout/page-header";
@@ -36,16 +37,16 @@ export default async function LettersPage() {
       <PageHeader
         eyebrow="Letters"
         title="Mektuplar"
-        lead={nothing ? undefined : "Her zarfın içinde bir mektup var. Açmak için birine dokunman yeterli."}
+        lead={nothing ? undefined : COPY.letters.lead}
       />
 
       <div className="shell space-y-24 pb-8">
         {nothing ? (
           <EmptyState
             art={<div className="w-40"><Envelope styleName="blush" seal="heart" /></div>}
-            title="Henüz bir mektup yok"
+            title={COPY.letters.emptyTitle}
           >
-            {session.role === "owner" ? "İlk mektubunu yazdığında burada bir zarf belirecek." : "Yazıldığında burada bir zarf belirecek."}
+            {session.role === "owner" ? COPY.letters.emptyOwner : COPY.letters.emptyPartner}
           </EmptyState>
         ) : null}
 
@@ -53,33 +54,6 @@ export default async function LettersPage() {
           <OwnerHint href="/studio/letters/new" label="Mektup yaz">
             Eln&apos;e yazdığın mektuplar burada raflara dizilir.
           </OwnerHint>
-        ) : null}
-
-        {sealed.length > 0 ? (
-          <section aria-labelledby="sealed-heading">
-            <Reveal>
-              <p className="eyebrow">Sealed</p>
-              <h2 id="sealed-heading" className="mt-3 font-display text-display-sm italic">
-                Günü gelince
-              </h2>
-            </Reveal>
-            <Stagger className="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-              {sealed.map((letter) => {
-                const opens = todayIn(me.timezone, new Date(letter.unlockAt));
-                return (
-                  <StaggerItem key={letter.id}>
-                    <SealedEnvelopeCard
-                      title={letter.title}
-                      envelopeStyle={letter.envelopeStyle}
-                      seal={letter.seal}
-                      opensOn={formatDate(opens)}
-                      daysLeft={daysBetween(today, opens)}
-                    />
-                  </StaggerItem>
-                );
-              })}
-            </Stagger>
-          </section>
         ) : null}
 
         {shelves.map((shelf) => (
@@ -134,9 +108,37 @@ export default async function LettersPage() {
           </section>
         ) : null}
 
+        {sealed.length > 0 ? (
+          <section aria-labelledby="sealed-heading">
+            <Reveal>
+              <p className="eyebrow">Sealed</p>
+              <h2 id="sealed-heading" className="mt-3 font-display text-display-sm italic">
+                {COPY.letters.sealedTitle}
+              </h2>
+              <p className="mt-3 max-w-md text-muted">{COPY.letters.sealedLead}</p>
+            </Reveal>
+            <Stagger className="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+              {sealed.map((letter) => {
+                const opens = todayIn(me.timezone, new Date(letter.unlockAt));
+                return (
+                  <StaggerItem key={letter.id}>
+                    <SealedEnvelopeCard
+                      title={letter.title}
+                      envelopeStyle={letter.envelopeStyle}
+                      seal={letter.seal}
+                      opensOn={formatDate(opens)}
+                      daysLeft={daysBetween(today, opens)}
+                    />
+                  </StaggerItem>
+                );
+              })}
+            </Stagger>
+          </section>
+        ) : null}
+
         {session.role === "partner" ? (
           <p className="text-center text-sm text-muted">
-            İstersen sen de bir mektup bırakabilirsin.{" "}
+            {COPY.letters.addOwn}{" "}
             <Link href="/letters/write" className="text-accent underline-offset-4 hover:underline">
               Bir mektup yaz
             </Link>

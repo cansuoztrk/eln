@@ -9,7 +9,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Countdown } from "@/components/time/countdown";
 import { timezoneFor } from "@/features/dates/queries";
 import { getSpecialDay, listEditions, listSealedEditions, type Edition } from "@/features/days/queries";
-import { DAY_LOOK } from "@/features/days/theme";
+import { DAY_LOOK, dayEyebrow } from "@/features/days/theme";
 import { whenText } from "@/features/days/when";
 import { getPhotos } from "@/features/gallery/queries";
 import { people, requireMember } from "@/lib/auth/session";
@@ -95,7 +95,7 @@ export default async function SpecialDayPage({ params }: PageProps<"/days/[slug]
           </Link>
           <Reveal className="mt-10 flex justify-center">{look.motif}</Reveal>
           <Reveal delay={0.08}>
-            <p className="eyebrow mt-6">{look.eyebrow}</p>
+            <p className="eyebrow mt-6">{dayEyebrow(day.theme, session.role)}</p>
             <h1 className="mt-4 font-display text-display leading-[1.02]">{day.title}</h1>
             {day.subtitle ? <p className="mt-4 font-display text-2xl text-ink-soft italic">{day.subtitle}</p> : null}
           </Reveal>

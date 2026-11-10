@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import Link from "next/link";
 import { OwnerHint } from "@/components/layout/owner-hint";
 import { PageHeader } from "@/components/layout/page-header";
@@ -61,12 +62,12 @@ export default async function GalleryPage({ searchParams }: PageProps<"/gallery"
 
   return (
     <>
-      <PageHeader eyebrow="Eln's Gallery" title={album ? album.title : "Galeri"} lead={album?.description || undefined} />
+      <PageHeader eyebrow="Eln's Gallery" title={album ? album.title : "Galeri"} lead={album ? album.description || undefined : all.length > 0 ? COPY.gallery.lead : undefined} />
 
       <div className="shell space-y-14">
         {all.length === 0 ? (
           <>
-            <EmptyState title="Henüz fotoğraf yok">Fotoğraflar yüklendiğinde burada görünecek.</EmptyState>
+            <EmptyState title={COPY.gallery.emptyTitle}>{COPY.gallery.empty}</EmptyState>
             {session.role === "owner" ? (
               <OwnerHint href="/studio/photos" label="Fotoğraf yükle">
                 Galeri yalnızca senin yüklediğin gerçek fotoğrafları gösterir.
@@ -85,7 +86,7 @@ export default async function GalleryPage({ searchParams }: PageProps<"/gallery"
                 </Reveal>
                 <ul className="no-scrollbar -mx-5 mt-6 flex snap-x gap-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-4">
                   {albums.map((item) => (
-                    <li key={item.id} className="w-56 shrink-0 snap-start sm:w-auto">
+                    <li key={item.id} className="w-36 shrink-0 snap-start sm:w-auto">
                       <Link href={href(query, { album: item.id })} className="group block">
                         <div className="aspect-[4/5] overflow-hidden rounded-[3px] bg-beige shadow-paper transition-shadow duration-500 group-hover:shadow-lift">
                           {item.cover ? (
@@ -98,7 +99,7 @@ export default async function GalleryPage({ searchParams }: PageProps<"/gallery"
                             />
                           ) : null}
                         </div>
-                        <p className="mt-3 font-display text-xl text-ink transition-colors group-hover:text-accent">{item.title}</p>
+                        <p className="mt-3 font-display text-lg leading-tight text-ink transition-colors group-hover:text-accent sm:text-xl">{item.title}</p>
                         <p className="text-[12px] text-taupe">{item.photoCount} fotoğraf</p>
                       </Link>
                     </li>
@@ -154,7 +155,7 @@ export default async function GalleryPage({ searchParams }: PageProps<"/gallery"
 
         {session.role === "partner" ? (
           <p className="text-center text-sm text-muted">
-            İstersen sen de fotoğraf ekleyebilirsin.{" "}
+            {COPY.gallery.addOwn}{" "}
             <Link href="/gallery/mine" className="text-accent underline-offset-4 hover:underline">
               Fotoğraflarım
             </Link>

@@ -15,11 +15,13 @@ tahmin eden/ele geçiren biri, otomatik tarayıcılar, parola deneyen botlar.
 | Anahtarlar | Hiçbir Supabase anahtarı tarayıcıya gitmez; `NEXT_PUBLIC_` değişkeni yok; service role yalnızca `lib/supabase/admin.ts` | `lib/env.ts` |
 | Yetki | RLS her tabloda; taslak ve kilitli içerik sorgudan dönmez | `…000300_policies.sql` |
 | Depolama | Tek özel kova, üye politikası yok; erişim yalnızca sunucunun ürettiği süreli imzalı URL ile | `…000500_storage.sql`, `lib/media/server.ts` |
-| Yükleme | MIME beyaz listesi, boyut sınırı, **sihirli bayt** doğrulaması, `sharp` piksel sınırı (80 MP), yeniden kodlama | `lib/media/rules.ts`, `server.ts` |
+| Yükleme | MIME beyaz listesi, boyut sınırı, **sihirli bayt** doğrulaması (dosyanın türüne uzantı/başlık değil içerik karar verir), `sharp` piksel sınırı (80 MP), yeniden kodlama | `lib/media/rules.ts`, `server.ts` |
+| Dosya sahipliği | Bir üye yalnızca kendi yüklediği dosyayı fotoğrafa/ses kaydına bağlayabilir; bağ sonradan değiştirilemez; kayıt yolu kendi klasörünün dışını gösteremez | `…hardening.sql` (`owns_asset`, `protect_asset_link`, `media_assets_path_shape`) |
 | Girdi | Her action Zod ile doğrular; metinler düz metin olarak render edilir (HTML/Markdown yok → XSS yüzeyi yok) | `features/*/schema.ts` |
 | Hız sınırı | Giriş, kurulum, davet, yazma, yükleme; anahtar = HMAC(APP_SECRET, eylem+kimlik); ≤ 1 saat tutulur | `lib/security/rate-limit.ts`, `check_rate_limit` |
 | CSRF | Server action'lar Origin doğrular; çerezler `SameSite=Lax`; formlar `method="post"` (JS yüklenmese bile alanlar URL'ye düşmez) | Next.js + formlar |
 | Başlıklar | İstek başına nonce'lu CSP (`script-src 'nonce-…' 'strict-dynamic'`), `frame-ancestors 'none'`, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy`, HSTS (üretim) | `proxy.ts`, `next.config.ts` |
+| Çevrimdışı kabuk | Service worker yalnızca `/offline` sayfasını ve parmak izli derleme dosyalarını saklar; oturuma bağlı hiçbir yanıt (sayfa, fotoğraf, mektup) önbelleğe yazılmaz | `public/sw.js` |
 | İndeks | `X-Robots-Tag: noindex…`, `robots.txt: Disallow: /`, meta robots | `next.config.ts`, `app/robots.ts`, `app/layout.tsx` |
 | Hata mesajları | Girişte tek mesaj ("E-posta ya da parola hatalı"); geçersiz/süresi dolmuş davet tek mesaj | `loginAction`, `acceptInviteAction` |
 | Bütünlük | `space_id` / `created_by` / `uploaded_by` değiştirilemez | `app.protect_identity` |

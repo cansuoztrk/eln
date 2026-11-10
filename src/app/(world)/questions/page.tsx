@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import { PageHeader } from "@/components/layout/page-header";
 import { Questions } from "@/features/questions/components/questions";
 import { listQuestions } from "@/features/questions/queries";
@@ -17,7 +18,7 @@ export default async function QuestionsPage() {
         eyebrow="Our Questions"
         title="Sorular"
         align="center"
-        lead={questions.length === 0 ? "Henüz soru yok. Kendi sorunu ekleyebilir ya da başlangıç sorularıyla başlayabilirsin." : "Puan yok, süre yok. İstediğine, istediğin zaman cevap ver."}
+        lead={questions.length === 0 ? COPY.questions.leadEmpty : COPY.questions.lead}
       />
       <div className="shell">
         <Questions questions={questions} myName={me.name} otherName={other.name} />

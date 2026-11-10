@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import Link from "next/link";
 import { OwnerHint } from "@/components/layout/owner-hint";
 import { PageHeader } from "@/components/layout/page-header";
@@ -27,9 +28,9 @@ export default async function CapsulesPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Time Capsule" title="Zaman Kapsülü" align="center" lead={nothing ? undefined : "Günü gelince açılacaklar. Mühürlü olanların yalnızca adı ve tarihi görünür."} />
+      <PageHeader eyebrow="Time Capsule" title="Zaman Kapsülü" align="center" lead={nothing ? undefined : COPY.capsules.lead} />
       <div className="shell space-y-12">
-        {nothing ? <EmptyState art={<div className="w-40"><CapsuleArt style="rose" sealed /></div>} title="Henüz bir kapsül yok">Geleceğe bir şey bırakıldığında burada bekleyecek.</EmptyState> : null}
+        {nothing ? <EmptyState art={<div className="w-40"><CapsuleArt style="rose" sealed /></div>} title={COPY.capsules.emptyTitle}>{COPY.capsules.empty}</EmptyState> : null}
         {session.role === "owner" && capsules.filter((c) => c.mine).length === 0 ? (
           <OwnerHint href="/studio/capsules" label="Kapsül hazırla">
             Gelecekteki bir güne mektup, fotoğraf ya da ses bırakabilirsin.
@@ -63,7 +64,7 @@ export default async function CapsulesPage() {
 
         {session.role === "partner" ? (
           <p className="text-center text-sm text-muted">
-            İstersen sen de geleceğe bir şey bırakabilirsin.{" "}
+            {COPY.capsules.addOwn}{" "}
             <Link href="/capsules/mine" className="text-accent underline-offset-4 hover:underline">
               Kapsüllerim
             </Link>

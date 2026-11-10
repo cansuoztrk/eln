@@ -1,7 +1,27 @@
 # CONTENT_GUIDE — Arda için içerik rehberi
 
-Bu dünyanın değeri kodda değil, senin yazdıklarında. Site sana boş ama hazır alanlar
-verir; içini yalnızca sen doldurabilirsin. Bu rehber nereye ne yazılacağını ve tonu anlatır.
+Bu dünyanın değeri kodda değil, içindeki sözlerde. 10 Kasım 2026'da metinlerin senin yerine,
+senin sesinden yazılmasını istedin; o günden beri site **dolu** başlar. Bu rehber neyin hazır
+geldiğini, nereden değiştireceğini ve tonu anlatır.
+
+## Senin için yazılanlar
+
+Hepsi `src/content/writing.ts` içinde durur ve aynı kurallara uyar: yalnızca **senin** hislerin
+(sevgi, özlem, teşekkür, umut) ve **kesin bilgiler** (iki şehir, bir saat fark, iki tarih, doğum
+günleri, Eln'in bölümü, Hello Kitty, şarkı, henüz buluşmamış olmanız). Hiçbir olay, konuşma ya da
+anı uydurulmadı; Eln'in ne hissettiği onun adına yazılmadı; hiçbir cümle cevap, söz ya da af istemiyor.
+
+| Ne | Nerede görünür | Nasıl yönetilir |
+| --- | --- | --- |
+| Açılış mektubu (senin dört cümlen korunarak genişletildi), ana sayfa notu, hikâye girişi, 166 gün notu, mesafe girişi, buluşma notu, şarkı notu, 20 minik mesaj | Doğrudan sitede (varsayılan metin) | `Studio → Açılış` ve `Studio → Metinler`. Boş kaydedersen o satır hiç görünmez. |
+| 8 mektup (her raf için bir zarf) | Taslak olarak eklenir | `Studio → Hazır metinler → Mektupları taslak olarak ekle`, sonra tek tek oku ve yayımla. |
+| 365 not (yedi rafın her birinden sırayla) | Taslak olarak eklenir | `Studio → Hazır metinler → Notları taslak olarak ekle`, sonra `365 Not` sayfasında topluca ya da tek tek yayımla. |
+| İki dönüm noktası anısı + dört özel gün girişi | Doldurulduğu anda sitede | `Studio → Hazır metinler → Boş sayfaları doldur`. Yalnızca boş olanlar doldurulur; yazdığına dokunulmaz. |
+
+**Yayımlamadan önce oku.** Bunlar iyi bir başlangıç ama seni tanımadan yazıldı. Sana benzemeyen
+bir cümleyi sil; yalnızca senin bildiğin bir ayrıntıyı (nasıl tanıştınız, ona nasıl seslenirsin,
+neye güler) eklediğin anda metin gerçekten senin olur. Altında senin imzan duran her şeyin
+arkasında durabilmelisin.
 
 ## Önce bunları hazırla (davetten önce)
 
@@ -10,15 +30,15 @@ Studio ana ekranındaki **"Davet öncesi"** listesi aynı sırayı izler.
 1. **Açılış** — `Studio → Açılış`
    - Hediye fotoğrafı: Eln'in, senin seçtiğin tek bir fotoğrafı. (Yoksa sahne atlanır.)
    - Büyük cümle: varsayılan *"Bu küçük dünyayı senin için hazırladım."*
-   - Zarftaki not: varsayılan senin yazdığın örnek metin. Kendi sesinle değiştir.
+   - Zarftaki not: senin dört cümlen korunarak genişletildi. Tam ekran önizlemeyle oku, istersen değiştir.
 2. **Fotoğraflar** — `Studio → Fotoğraflar`. Birkaç albüm, kısa açıklamalar.
-3. **Hikâye** — `Studio → Hikâye`. İki anı hazır gelir (yalnızca başlık + tarih):
-   *6 Aralık 2025* ve *21 Mayıs 2026*. Açıklamalarını sen yaz. Aradaki 166 güne ait
-   anıları ekle — o dönem hikâyenin bir parçası.
-4. **Mektuplar** — `Studio → Mektuplar`. En az bir mektup. Kategoriler yalnızca raf;
-   metin tamamen senin.
-5. **Şarkı** — `Studio → Şarkı`. Resmî YouTube veya Spotify bağlantısını yapıştır.
-6. **Davet** — `Studio → Davet`.
+3. **Hazır metinler** — `Studio → Hazır metinler`. Mektupları ve notları taslak olarak ekle,
+   dönüm noktalarını doldur.
+4. **Hikâye** — `Studio → Hikâye`. İki anı hazır gelir: *6 Aralık 2025* ve *21 Mayıs 2026*.
+   Aradaki 166 güne ait anıları yalnızca sen yazabilirsin — o günlerde ne olduğunu kimse uyduramaz.
+5. **Mektuplar** ve **365 Not** — taslakları oku, beğendiklerini yayımla.
+6. **Şarkı** — resmî bağlantılar girildi (`Studio → Metinler` içinden değiştirilebilir).
+7. **Davet** — `Studio → Davet`.
 
 ## Ton
 
@@ -50,7 +70,7 @@ Studio ana ekranındaki **"Davet öncesi"** listesi aynı sırayı izler.
 | --- | --- | --- |
 | Anı | Başlık, tarih, kısa açıklama, istersen el yazısı "özel not" | Hatırlamadığın ayrıntıyı yazma; tarih belirsizse yalnız ay/yıl seç. |
 | Mektup | Başlık + gövde. Zarf rengi ve mühür seç. | "Açılma tarihi" verirsen o güne kadar yalnızca başlık görünür. |
-| 365 not | Tek cümlelik düşünceler. | Bir oturuşta doldurmaya çalışma. Aklına geldikçe ekle; site eldeki notlarla çalışır. |
+| 365 not | Tek cümlelik düşünceler. 365'i hazır gelir. | Kendi notlarını da ekle; site eldeki notlarla çalışır, en az gösterileni önce gösterir. |
 | Özel gün | Her yıl için ayrı "baskı": not, fotoğraf, mektup. | "Gününde açılsın" seçersen o tarihe kadar Eln göremez. |
 | Zaman kapsülü | Gelecekteki bir güne mektup/fotoğraf/ses. | Başlık kilitliyken de görünür; sürprizi başlıkta verme. |
 | Hayaller | Birlikte yapmak istediklerin. | "Gerçekleşti" yalnızca gerçekten olduğunda ve sen onaylayınca. |

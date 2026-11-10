@@ -57,7 +57,8 @@ export function GalleryView({ photos, view, memories, fallbackAlt }: Props) {
           ))}
         </ul>
       ) : (
-        <ul className="columns-1 gap-6 sm:columns-2 lg:columns-3 lg:gap-9 [&>li]:mb-9 [&>li]:break-inside-avoid lg:[&>li]:mb-14">
+        // On a phone the column breathes: a full-width photograph, then one set in from the left, then one from the right.
+        <ul className="columns-1 gap-6 sm:columns-2 lg:columns-3 lg:gap-9 [&>li]:mb-9 [&>li]:break-inside-avoid max-sm:[&>li:nth-child(3n)]:pr-[14%] max-sm:[&>li:nth-child(3n+2)]:pl-[14%] lg:[&>li]:mb-14">
           {photos.map((photo, i) => {
             const date = photo.takenOn ? parseISODate(photo.takenOn) : null;
             return (

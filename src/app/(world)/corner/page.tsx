@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import { OwnerHint } from "@/components/layout/owner-hint";
 import { PageHeader } from "@/components/layout/page-header";
 import { getSection } from "@/features/content/queries";
@@ -20,7 +21,7 @@ export default async function CornerPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Eln's Little World" title="Minik Dünya" align="center" lead="Buranın sevimli köşesi. Burada dizdiklerin yalnızca sana görünür." />
+      <PageHeader eyebrow="Eln's Little World" title="Minik Dünya" align="center" lead={COPY.corner.lead} />
       <div className="shell">
         <LittleWorld initial={prefs} message={message} name={people(session).me.name} />
       </div>

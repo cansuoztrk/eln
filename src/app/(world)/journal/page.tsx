@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import { PageHeader } from "@/components/layout/page-header";
 import { viewerToday } from "@/features/dates/queries";
 import { Journal } from "@/features/journal/components/journal";
@@ -15,7 +16,7 @@ export default async function JournalPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Shared Journal" title="Günlük" align="center" lead="İkimizin defteri. Taslaklar ve “yalnızca ben” kayıtları yazanda kalır." />
+      <PageHeader eyebrow="Shared Journal" title="Günlük" align="center" lead={COPY.journal.lead} />
       <div className="shell-narrow">
         <Journal entries={entries} today={toISODate(viewerToday(session))} otherName={other.name} />
       </div>

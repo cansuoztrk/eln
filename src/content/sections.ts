@@ -1,13 +1,15 @@
 import { z } from "zod";
 import { FACTS } from "./facts";
+import { WRITTEN_SECTIONS } from "./writing";
 
 /**
  * Editable site copy. Each section has a schema and defaults; whatever Arda
  * saves in the Studio is stored in `content_sections` and laid over them.
  *
- * Defaults are either Arda's own words (the opening note is the example he
- * wrote himself) or left empty. An empty field renders nothing — the site
- * never fills silence with invented sentiment.
+ * The defaults are the passages in `writing.ts`: written for Arda, in his
+ * voice, at his request, and built around the opening note he wrote himself.
+ * They state feelings and confirmed facts only — never an event or a memory.
+ * A field he empties in the Studio renders nothing.
  */
 
 const text = (max: number) => z.string().trim().max(max);
@@ -51,27 +53,22 @@ export const SECTION_DEFAULTS: { [K in SectionKey]: SectionData<K> } = {
   "gift.opening": {
     greeting: "Eln,",
     headline: "Bu küçük dünyayı senin için hazırladım.",
-    // Arda's own example text, word for word. He can replace it in the Studio.
-    letter: [
-      "Eln, bazen insanın anlatmak istediği çok fazla şey oluyor.",
-      "Ben de bazılarını kelimelere, bazılarını fotoğraflara, bazılarını da küçük bir dünyaya dönüştürmek istedim.",
-      "Burada sana ait bir köşe var.",
-      "İstediğin zaman, istediğin kadar keşfedebilirsin.",
-    ].join("\n\n"),
+    // Arda's own four sentences, kept, with what he asked to be written around them.
+    letter: WRITTEN_SECTIONS.giftLetter,
     signature: "Arda",
     enterLabel: "İçeri gir",
     photoId: null,
   },
   "home.hero": {
     headline: FACTS.tagline,
-    note: "",
+    note: WRITTEN_SECTIONS.heroNote,
   },
-  "story.intro": { note: "" },
-  "story.interlude": { note: "" },
-  "distance.intro": { note: "" },
-  "meeting.note": { note: "" },
-  song: { youtubeUrl: FACTS.song.youtubeUrl, spotifyUrl: FACTS.song.spotifyUrl, note: "" },
-  "corner.messages": { messages: [] },
+  "story.intro": { note: WRITTEN_SECTIONS.storyIntro },
+  "story.interlude": { note: WRITTEN_SECTIONS.storyInterlude },
+  "distance.intro": { note: WRITTEN_SECTIONS.distanceIntro },
+  "meeting.note": { note: WRITTEN_SECTIONS.meetingNote },
+  song: { youtubeUrl: FACTS.song.youtubeUrl, spotifyUrl: FACTS.song.spotifyUrl, note: WRITTEN_SECTIONS.songNote },
+  "corner.messages": { messages: [...WRITTEN_SECTIONS.cornerMessages] },
 };
 
 export const SECTION_KEYS = Object.keys(SECTION_SCHEMAS) as SectionKey[];

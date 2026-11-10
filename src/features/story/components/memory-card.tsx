@@ -12,16 +12,27 @@ import { memoryCategoryLabel } from "../schema";
  * alternates sides; without one it is a quiet typographic card that still
  * looks finished with nothing but a title and a date.
  */
-export function MemoryCard({ memory, index, fallbackAlt }: { memory: Memory; index: number; fallbackAlt: string }) {
+export function MemoryCard({
+  memory,
+  index,
+  fallbackAlt,
+  anchored = false,
+}: {
+  memory: Memory;
+  index: number;
+  fallbackAlt: string;
+  /** The memory the chapter above is named after: its date and title were just read, so they are not said twice. */
+  anchored?: boolean;
+}) {
   const date = parseISODate(memory.happenedOn);
   const flip = index % 2 === 1;
   const second = memory.photos[1];
 
   const text = (
     <div className={cn("max-w-md", !memory.cover && "mx-auto text-center")}>
-      <p className="eyebrow">{memoryCategoryLabel(memory.category)}</p>
-      {date ? (
-        <p className="mt-4 flex items-baseline gap-3 font-display text-ink">
+      {anchored ? null : <p className="eyebrow">{memoryCategoryLabel(memory.category)}</p>}
+      {date && !anchored ? (
+        <p className={cn("mt-4 flex items-baseline gap-3 font-display text-ink", !memory.cover && "justify-center")}>
           {memory.datePrecision === "day" ? <span className="text-7xl leading-none tabular-nums md:text-8xl">{date.day}</span> : null}
           <span className={cn("text-2xl leading-tight italic", !memory.cover && memory.datePrecision === "day" && "text-left")}>
             {memory.datePrecision === "year" ? date.year : (
@@ -34,10 +45,18 @@ export function MemoryCard({ memory, index, fallbackAlt }: { memory: Memory; ind
           </span>
         </p>
       ) : null}
-      <h3 className="mt-5 font-display text-4xl leading-tight text-ink transition-colors group-hover:text-accent md:text-5xl">
-        {memory.title}
-      </h3>
-      {memory.summary ? <p className="mt-4 text-[17px] leading-relaxed text-muted">{memory.summary}</p> : null}
+      {anchored ? (
+        <h3 className="sr-only">{memory.title}</h3>
+      ) : (
+        <h3 className="mt-5 font-display text-4xl leading-tight text-ink transition-colors group-hover:text-accent md:text-5xl">
+          {memory.title}
+        </h3>
+      )}
+      {memory.summary ? (
+        <p className={cn("leading-relaxed", anchored ? "font-display text-[1.7rem] leading-snug text-ink-soft italic md:text-4xl" : "mt-4 text-[17px] text-muted")}>
+          {memory.summary}
+        </p>
+      ) : null}
       <span className="mt-6 inline-block text-[13px] font-medium tracking-wide text-accent underline-offset-4 group-hover:underline">
         Anıyı aç
       </span>
@@ -51,7 +70,11 @@ export function MemoryCard({ memory, index, fallbackAlt }: { memory: Memory; ind
         aria-label={`${memory.title}${date ? ` — ${formatWithPrecision(date, memory.datePrecision)}` : ""}`}
         className={cn(
           "group block",
-          memory.cover ? "grid items-center gap-10 md:grid-cols-2 md:gap-16" : "paper mx-auto max-w-2xl px-8 py-14 md:py-20",
+          memory.cover
+            ? "grid items-center gap-8 md:grid-cols-2 md:gap-16"
+            : anchored
+              ? "mx-auto max-w-2xl px-4 text-center"
+              : "paper mx-auto max-w-2xl px-8 py-14 md:py-20",
         )}
       >
         {memory.cover ? (

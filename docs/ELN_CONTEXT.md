@@ -48,8 +48,19 @@ Türetilen ve kodda hesaplanan (asla elle yazılmayan) değerler:
 - Nasıl/nerede tanıştıkları.
 - Doğum yılları.
 - İlk buluşmanın tarihi, yeri, planı; herhangi bir seyahat bilgisi.
-- Her mektubun, 365 notun, anı açıklamasının gerçek metni.
+- Belirli anıların, konuşmaların ve o günlerin ayrıntıları (bunlar yazılan hiçbir metinde yer almaz).
 - Ortak hayaller listesi.
+- Arda ile Eln'in sesli/görüntülü görüşüp görüşmediği; Eln'in huyları, alışkanlıkları, sevdiği şeyler
+  (Hello Kitty dışında). Metinler bunlar hakkında bir şey iddia etmez.
+
+## Metinleri kim yazar
+
+Arda 10 Kasım 2026'da bütün cümlelerin ve paragrafların onun yerine, duygusal bir dille yazılmasını
+istedi. Bu metinler `src/content/writing.ts` içindedir ve yukarıdaki "Bilinenler"den başka hiçbir
+şeye dayanmaz: Arda'nın kendi hisleri + kesin bilgiler. Olay/anı/konuşma uydurulmaz, Eln'in hisleri
+onun adına yazılmaz, sayılar ve tarihler elle değil `FACTS` üzerinden hesaplanır. Mektuplar ve notlar
+Studio'ya **taslak** olarak girer; Arda okuyup yayımlamadan Eln görmez. Kurallar birim testiyle korunur
+(`tests/unit/content.test.ts` → "the words written for Arda").
 
 ## Duygusal referans (yayımlanmaz)
 

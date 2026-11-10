@@ -18,6 +18,9 @@ type Props = {
 };
 
 const SWIPE = 70;
+const SWIPE_DOWN = 110;
+/** A phone is handed the 1280px copy, a large screen the 2400px one. */
+const srcSet = (photo: Photo) => `${photo.image.medium} 1280w, ${photo.image.large} 2400w`;
 
 /**
  * One photograph, full screen, nothing over it. Arrow keys, the on-screen
@@ -42,7 +45,10 @@ export function Lightbox({ photos, index, onIndexChange, memories = {} }: Props)
     if (index === null) return;
     for (const offset of [1, -1]) {
       const neighbour = photos[(index + offset + count) % count];
-      if (neighbour) new window.Image().src = neighbour.image.large;
+      if (!neighbour) continue;
+      const warm = new window.Image();
+      warm.sizes = "100vw";
+      warm.srcset = srcSet(neighbour);
     }
   }, [index, photos, count]);
 
@@ -57,7 +63,7 @@ export function Lightbox({ photos, index, onIndexChange, memories = {} }: Props)
   return (
     <Dialog.Root open={photo !== null} onOpenChange={(open) => !open && onIndexChange(null)}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[60] bg-night/96 data-[state=open]:animate-[fade-up_0.35s_ease_both]" />
+        <Dialog.Overlay className="fixed inset-0 z-[60] bg-night data-[state=open]:animate-[fade-up_0.35s_ease_both]" />
         <Dialog.Content
           aria-describedby={undefined}
           onKeyDown={onKeyDown}
@@ -80,22 +86,27 @@ export function Lightbox({ photos, index, onIndexChange, memories = {} }: Props)
               {photo ? (
                 <motion.div
                   key={photo.id}
-                  className="absolute inset-0 flex touch-pan-y items-center justify-center px-3 sm:px-20"
+                  className="absolute inset-0 flex touch-none items-center justify-center px-3 sm:px-20"
                   initial={{ opacity: 0, scale: reduce ? 1 : 0.985 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: reduce ? 0.15 : 0.4, ease: EASE_SOFT }}
-                  drag={count > 1 && !reduce ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.35}
+                  drag={reduce ? false : count > 1 ? true : "y"}
+                  dragDirectionLock
+                  dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                  dragElastic={{ left: 0.35, right: 0.35, top: 0, bottom: 0.5 }}
                   onDragEnd={(_, info) => {
-                    if (info.offset.x < -SWIPE || info.velocity.x < -500) go(1);
-                    else if (info.offset.x > SWIPE || info.velocity.x > 500) go(-1);
+                    const sideways = Math.abs(info.offset.x) > Math.abs(info.offset.y);
+                    if (!sideways && (info.offset.y > SWIPE_DOWN || info.velocity.y > 700)) onIndexChange(null);
+                    else if (sideways && (info.offset.x < -SWIPE || info.velocity.x < -500)) go(1);
+                    else if (sideways && (info.offset.x > SWIPE || info.velocity.x > 500)) go(-1);
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element -- signed large variant, shown as-is */}
                   <img
                     src={photo.image.large}
+                    srcSet={srcSet(photo)}
+                    sizes="100vw"
                     alt={photo.altText || photo.caption || "Fotoğraf"}
                     draggable={false}
                     className="max-h-full max-w-full rounded-[3px] object-contain shadow-lift select-none"

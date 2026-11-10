@@ -12,6 +12,8 @@ Kaynak: `supabase/migrations/*.sql`. Bu dosya özet; kesin tanım SQL'dir. Migra
 | `…000300_policies.sql` | RLS politikaları (iki üretici fonksiyonla tek biçim) |
 | `…000400_behaviour.sql` | Medya görünürlüğü, sürüm geçmişi, değişiklik kaydı, mühürlü görünümler, günün notu, kurulum, davet kabulü |
 | `…000500_storage.sql` | Özel `media` kovası (üye politikası yok) |
+| `20261110000200_room_presence.sql` | `room_presence(space, day)`: hangi okuma odasında bir şey olduğunu tek çağrıda söyler (çağıranın yetkisiyle, RLS altında) |
+| `20261110000100_hardening.sql` | Denetim sıkılaştırması: depolama yolu biçim denetimi, "dosya yalnızca yükleyenin" kuralı, `asset_id` değişmezliği, ek bağlantılarını yerinde güncelleme |
 
 ## Tablolar
 
@@ -55,6 +57,8 @@ Ortak sütunlar: `id uuid`, `space_id`, `created_by` (varsayılan `auth.uid()`),
 | Site ayarı tablolarını yalnızca owner yazar | `apply_owner_managed_policies` |
 | `space_id`, `created_by`, `uploaded_by` değiştirilemez | `app.protect_identity` tetikleyicisi |
 | Medya satırını üyeler yalnızca ekleyebilir (pending/private); güncelleme/silme yok | `media_assets` |
+| Medya satırının yolu yalnızca kendi kimliğine ait klasörü gösterebilir | `media_assets_path_shape` |
+| Fotoğraf/ses kaydı yalnızca **yazarın kendi yüklediği** dosyayı sarabilir; sonradan başka dosyaya çevrilemez | `app.owns_asset`, `protect_asset_link` |
 | Sürüm geçmişini yalnızca yazarı okur | `content_versions` |
 
 Yardımcılar `app` şemasındadır (`is_member`, `is_owner`, …), `security definer` + boş `search_path`,
@@ -66,6 +70,7 @@ API'ye açık değildir.
 | --- | --- | --- |
 | `sealed_letters(space)`, `sealed_capsules(space)`, `sealed_editions(space)` | üyeler | Mühürlü içeriğin yalnızca başlık + açılma tarihini döndürür |
 | `ensure_daily_notes(space, day)` | üyeler | Başlangıçtan `day`'e kadar her güne not atar (ziyaretten bağımsız) |
+| `room_presence(space, day)` | üyeler | Galeri / mektuplar / 365 not / kapsül odalarında, **soranın görebildiği** bir şey var mı (`security invoker`; hiçbir şey kaydetmez) |
 | `bootstrap_space(owner, config)` | yalnızca service role | Tek seferlik kurulum |
 | `accept_invite(token_hash, user, profile)` | yalnızca service role | Davet kabulü |
 | `check_rate_limit(key, max, window)` | yalnızca service role | Deneme sayacı |

@@ -165,7 +165,7 @@ export function LittleWorld({ initial, message, name }: { initial: Preferences; 
           Fiyonk koleksiyonu
         </h2>
         <p className="mt-2 text-center text-sm text-muted">Birini seç; kedinin fiyonğu da onu takar.</p>
-        <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4" role="radiogroup" aria-label="Fiyonk">
+        <ul className="mt-8 grid grid-cols-4 gap-2 sm:gap-4" role="radiogroup" aria-label="Fiyonk">
           {BOWS.map((item, index) => {
             const chosen = prefs.bow === index;
             return (
@@ -175,10 +175,10 @@ export function LittleWorld({ initial, message, name }: { initial: Preferences; 
                   role="radio"
                   aria-checked={chosen}
                   onClick={() => setPrefs((p) => ({ ...p, bow: index }))}
-                  className={cn("paper flex w-full flex-col items-center gap-3 px-4 py-6 transition-[transform,box-shadow,border-color] duration-300 ease-soft hover:-translate-y-1 hover:shadow-lift", chosen && "border-accent ring-2 ring-accent-soft")}
+                  className={cn("paper flex w-full flex-col items-center gap-2 px-1 py-4 transition-[transform,box-shadow,border-color] duration-300 ease-soft hover:-translate-y-1 hover:shadow-lift sm:gap-3 sm:px-4 sm:py-6", chosen && "border-accent ring-2 ring-accent-soft")}
                 >
-                  <Bow className="w-20 text-ink-soft" style={{ "--bow-fill": item.fill, "--bow-knot": item.knot } as CSSProperties} />
-                  <span className="text-[13px] font-medium text-ink">{item.name}</span>
+                  <Bow className="w-12 text-ink-soft sm:w-20" style={{ "--bow-fill": item.fill, "--bow-knot": item.knot } as CSSProperties} />
+                  <span className="text-[11px] leading-tight font-medium text-ink sm:text-[13px]">{item.name}</span>
                 </button>
               </li>
             );

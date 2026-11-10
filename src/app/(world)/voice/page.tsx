@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COPY } from "@/content/copy";
 import { PageHeader } from "@/components/layout/page-header";
 import { Recorder } from "@/features/voice/components/recorder";
 import { VoiceList } from "@/features/voice/components/voice-list";
@@ -13,10 +14,10 @@ export default async function VoicePage() {
 
   return (
     <>
-      <PageHeader eyebrow="Voice Memories" title="Sesli Anılar" align="center" lead="Bazı şeyler yazıyla değil, sesle saklanır." />
+      <PageHeader eyebrow="Voice Memories" title="Sesli Anılar" align="center" lead={COPY.voice.lead} />
       <div className="shell-narrow space-y-10">
         <Recorder />
-        {voices.length > 0 ? <VoiceList voices={voices} /> : <p className="text-center text-muted">Henüz bir ses kaydı yok.</p>}
+        {voices.length > 0 ? <VoiceList voices={voices} /> : <p className="text-center text-muted">{COPY.voice.empty}</p>}
       </div>
     </>
   );
