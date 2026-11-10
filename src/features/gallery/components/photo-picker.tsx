@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ImagePlus } from "lucide-react";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { PhotoUploader } from "@/components/media/photo-uploader";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -40,11 +40,14 @@ export function PhotoPicker({ value, onChange, multiple = false, trigger, title 
     }
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    setSelected(value);
-    void load();
-  }, [open, value, load]);
+  // Opening the picker starts from the current choice and a fresh library.
+  function onOpenChange(next: boolean) {
+    if (next) {
+      setSelected(value);
+      void load();
+    }
+    setOpen(next);
+  }
 
   function toggle(id: string) {
     setSelected((current) => {
@@ -63,7 +66,7 @@ export function PhotoPicker({ value, onChange, multiple = false, trigger, title 
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="outline">

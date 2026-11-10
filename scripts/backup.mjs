@@ -26,6 +26,7 @@ const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const out = arg("--out") || join("backups", stamp);
 const wantDb = !flag("--media-only");
 const wantMedia = !flag("--db-only");
+let partial = false;
 
 async function backupData() {
   const dir = join(out, "data");
@@ -76,7 +77,15 @@ function backupSql() {
   ];
   for (const [file, options] of dumps) {
     const result = spawnSync("pg_dump", [url, ...options, "-f", join(dir, file)], { stdio: ["ignore", "ignore", "pipe"] });
-    if (result.status !== 0) throw new Error(`pg_dump ${file}: ${result.stderr.toString().slice(0, 300)}`);
+    if (result.status !== 0) {
+      // The SQL dump is an extra. It must never stop the JSON export or the media backup.
+      const reason = result.stderr.toString().trim().split("\n").slice(0, 2).join(" ");
+      console.log(`! SQL dökümü alınamadı (${file}): ${reason}`);
+      console.log("  JSON dışa aktarımı ve medya yedeği etkilenmez. Sunucuyla aynı ana sürümde pg_dump kur");
+      console.log("  ya da: npx supabase db dump --db-url \"$DATABASE_URL\" -f backups/app.sql");
+      partial = true;
+      return;
+    }
   }
   console.log(`✓ SQL dökümü → ${dir}`);
 }
@@ -139,7 +148,7 @@ try {
     backupSql();
   }
   if (wantMedia) await backupMedia();
-  console.log(`\nYedek hazır: ${out}`);
+  console.log(`\nYedek hazır: ${out}${partial ? " (SQL dökümü hariç)" : ""}`);
   console.log("Bu klasörü siteden bağımsız, en az iki farklı yerde sakla.");
 } catch (error) {
   console.error(`\nYedek alınamadı: ${error.message}`);

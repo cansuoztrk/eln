@@ -20,7 +20,7 @@ export type NavItem = {
  * Rooms that exist today. A room is listed here only once its page is built,
  * so nothing in the world ever links to a door that does not open.
  */
-const BUILT = new Set(["/story", "/gallery", "/letters", "/distance", "/days"]);
+const BUILT = new Set(["/story", "/gallery", "/letters", "/distance", "/days", "/song", "/reasons", "/universe", "/future", "/journal", "/questions", "/voice"]);
 
 const ALL_ROOMS: NavItem[] = [
   {

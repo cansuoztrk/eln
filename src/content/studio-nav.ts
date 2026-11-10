@@ -12,6 +12,7 @@ const BUILT = new Set([
   "/studio/story",
   "/studio/letters",
   "/studio/days",
+  "/studio/reasons",
   "/studio/texts",
   "/studio/trash",
 ]);

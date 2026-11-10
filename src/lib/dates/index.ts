@@ -156,26 +156,24 @@ export function isSameMonthDay(monthDay: MonthDay, today: PlainDate): boolean {
   return occurrence.month === today.month && occurrence.day === today.day;
 }
 
+/** `date` moved forward by whole months; a day that does not exist is kept on the month's last day. */
+function addMonths(date: PlainDate, months: number): PlainDate {
+  const index = date.year * 12 + (date.month - 1) + months;
+  const year = Math.floor(index / 12);
+  const month = (index % 12) + 1;
+  return { year, month, day: Math.min(date.day, daysInMonth(year, month)) };
+}
+
 /**
- * Calendar difference, the way people count: "5 ay 19 gün".
- * `from` must not be after `to`.
+ * Calendar difference, the way people count: "5 ay 20 gün".
+ * Whole months first, then the days left over. `from` must not be after `to`.
  */
 export function elapsed(from: PlainDate, to: PlainDate) {
-  let years = to.year - from.year;
-  let months = to.month - from.month;
-  let days = to.day - from.day;
-
-  if (days < 0) {
-    months -= 1;
-    const borrowMonth = to.month === 1 ? 12 : to.month - 1;
-    const borrowYear = to.month === 1 ? to.year - 1 : to.year;
-    days += daysInMonth(borrowYear, borrowMonth);
-  }
-  if (months < 0) {
-    years -= 1;
-    months += 12;
-  }
-  return { years, months, days, totalDays: daysBetween(from, to) };
+  let months = (to.year - from.year) * 12 + (to.month - from.month);
+  if (compareDates(addMonths(from, months), to) > 0) months -= 1;
+  months = Math.max(0, months);
+  const days = Math.max(0, daysBetween(addMonths(from, months), to));
+  return { years: Math.floor(months / 12), months: months % 12, days, totalDays: daysBetween(from, to) };
 }
 
 // ---------------------------------------------------------------------------

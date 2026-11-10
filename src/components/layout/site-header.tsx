@@ -11,7 +11,7 @@ import { WorldMenu } from "./world-menu";
 /** Routes that sit entirely on the dusk palette and always need light chrome. */
 const DUSK_ROUTES = ["/universe"];
 /** Routes that open on a dusk hero: light chrome until the page is scrolled. */
-const DUSK_HERO_ROUTES = ["/distance"];
+const DUSK_HERO_ROUTES = ["/distance", "/song"];
 
 type Props = { isOwner: boolean; partnerName: string; ownerName: string };
 

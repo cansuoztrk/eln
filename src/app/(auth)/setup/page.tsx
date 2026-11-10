@@ -4,6 +4,8 @@ import { SetupForm } from "@/features/auth/components/setup-form";
 import { spaceExists } from "@/features/auth/queries";
 
 export const metadata: Metadata = { title: "Kurulum" };
+// Whether setup is still open depends on the database right now, never on build time.
+export const dynamic = "force-dynamic";
 
 export default async function SetupPage() {
   // Setup happens exactly once. Afterwards this page no longer exists.
