@@ -81,7 +81,7 @@ profilindeki saat diliminin günüdür. Saatler `Intl` ile saat diliminden hesap
 - `StarField` görünmezken ve sekme gizliyken durur; telefonlarda yoğunluk yarıya iner; parallax yalnızca
   ≥768px + fare. `prefers-reduced-motion` her yardımcıda dikkate alınır.
 - Görseller önceden boyutlandırılmış varyantlarla `srcset`; Next optimizer özel medyayı proxy'lemez.
-- 3D yalnızca `/universe` içinde ve dinamik import ile yüklenecek (bkz. ROADMAP).
+- Anı Evreni 3D motoru yüklemez: `src/features/universe` canvas 2D üzerinde kendi izdüşümünü çizer; sekme gizliyken durur.
 
 ## Taşınabilirlik
 

@@ -17,31 +17,33 @@ Durum tarihi: 2026-11-10. Bir madde bittiğinde burada işaretle, karar değişt
 | 9 | Admin Studio (genel bakış, açılış, fotoğraf, hikâye, mektup, tarih, metin, davet, çöp kutusu) | ✅ |
 | 10 | Kalıcı veri altyapısı (migration, RLS, sürüm geçmişi, çöp kutusu, yedek/geri yükleme betikleri) | ✅ |
 
-Doğrulama: `npm run check` (typecheck + lint + 45 birim testi), `npm run test:db` (23 RLS testi),
-tarayıcıda uçtan uca akış (kurulum → içerik → davet → Eln'in gözünden hediye → erişim sınırları),
-yedek → sıfırla → geri yükle provası.
+Doğrulama: `npm run check` (typecheck + lint + birim testleri), `npm run test:db` (RLS testleri),
+`npm run test:e2e` (üretim derlemesinde uçtan uca: kurulum → içerik → davet → Eln'in gözünden hediye →
+erişim sınırları → bütün odalar), yedek → sıfırla → geri yükle provası.
 
-## Sırada — veritabanı hazır, arayüz yazılacak
+## Biten — imza ve uzun vadeli odalar
 
-Tabloları, RLS politikaları ve testleri **şimdiden var**; eksik olan sayfalar. Bir oda yazıldığında
-`src/content/navigation.ts` içindeki `BUILT` listesine eklenir ve her menüde kendiliğinden görünür.
+| Modül | Rota | Not |
+| --- | --- | --- |
+| The Memory Universe | `/universe` | Anılar, mektuplar ve özel günler sarmal bir galakside. Canvas + kendi izdüşümü; liste görünümü erişilebilirlik için. |
+| 365 Reasons | `/reasons`, `/studio/reasons` | Boş başlar, elle yazılır; her takvim gününe bir not (ziyaretten bağımsız). |
+| Our Song | `/song` | Özgün plak çizimi; oynat/duraklat ve ses, resmî embed'i sürer. Bağlantı yoksa arama kartı. |
+| Eln's Little World | `/corner` | Kedi, fiyonk koleksiyonu, kişisel tema, sticker panosu, Arda'nın yazdığı günün mesajı. |
+| Our Future | `/future` | Hayal → Planlandı → Gerçekleşti (yalnızca onayla); istenirse taslak anı açar. |
+| Shared Journal | `/journal` | "İkimiz" / "yalnızca ben"; taslaklar kişisel; fotoğraf eklenir. |
+| Our Questions | `/questions` | Kendi soruların + isteğe bağlı başlangıç paketi; "birlikte" modu; skor yok. |
+| Voice Memories | `/voice` | Kayıt, dalga formu, oynatma; mikrofon izni yalnızca kayda basınca. |
+| Time Capsule | `/capsules`, `/studio/capsules` | Mektup, fotoğraf, ses, video bağlantısı; günü gelene dek dosyalarıyla birlikte mühürlü. |
+| Hesabım | `/account` | Profil, parola, verimi indir (JSON + ZIP), hesabımı sil. |
 
-| Sıra | Modül | Rota | Not |
-| --- | --- | --- | --- |
-| 1 | Hesabım | `/account` | Profil, "verimi indir" (JSON + ZIP), "hesabımı sil". |
-| 2 | Our Song | `/song` | Resmî embed (basınca yüklenir) ya da bağlantı kartı; `song` bölümü Studio'da hazır. |
-| 3 | 365 Reasons | `/reasons`, `/studio/reasons` | `ensure_daily_notes` hazır; not ekleme ekranı ve arşiv. Otomatik üretim yok. |
-| 4 | The Memory Universe | `/universe` | `listMemories` + `starSize/starTone` hazır. Önce 2D canvas (mobil), sonra R3F (masaüstü, dinamik import). |
-| 5 | Our Future | `/future` | Hayal → Planlandı → Gerçekleşti (yalnızca onayla); istenirse anıya dönüşür. |
-| 6 | Shared Journal | `/journal` | "Paylaşılan" / "yalnızca ben"; fotoğraf ekleme. |
-| 7 | Our Questions | `/questions` | Başlangıç soru paketi tek tıkla eklenebilir; "birlikte" modu RLS'te hazır. |
-| 8 | Voice Memories | `/voice` | `MediaRecorder`; izin yalnızca "Kaydet"e basınca; dalga formu kayıt sırasında hesaplanır. |
-| 9 | Time Capsule | `/capsules`, `/studio/capsules` | Mühürleme ve dosya gizleme RLS'te hazır; açılış animasyonu. |
-| 10 | Eln's Little World | `/corner`, `/studio/theme` | Fiyonk koleksiyonu, sticker panosu (`user_preferences`), tema seçimi (`data-theme`). |
+Yeni bir oda eklendiğinde `src/content/navigation.ts` içindeki `BUILT` listesine yazılır; her menüde kendiliğinden görünür.
 
 ## Sonra
 
-- Playwright E2E paketini depoya taşı (`tests/e2e`; şu an akışlar geliştirme betikleriyle doğrulandı).
+- E2E paketini genişlet: mobil görünüm kontrolleri, galeri lightbox, özel gün baskısı, kapsül açılışı.
+- Eln'in de kapsül hazırlayabilmesi (veritabanı izin veriyor; editör şimdilik yalnızca Studio'da).
+- Hayaller de Anı Evreni'nde yıldız olarak görünsün.
+- Anı Evreni için isteğe bağlı WebGL sürümü (yalnızca yıldız sayısı çok artarsa).
 - Sürüm geçmişi arayüzü (Studio'da "önceki sürümler" + geri alma) — veriler `content_versions`'ta birikiyor.
 - Sürükle-bırak sıralama (şu an yukarı/aşağı düğmeleri).
 - Fotoğraf yüklerken EXIF'ten "çekildiği gün" önerisi.

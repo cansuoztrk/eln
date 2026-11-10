@@ -23,7 +23,7 @@ Başka ziyaretçi yoktur. Oturum açmamış biri yalnızca giriş ekranını gö
 
 ## Modüller
 
-Durum: ✅ ilk sürümde çalışıyor · 🔜 sırada (bkz. `ROADMAP.md`)
+Durum: aşağıdaki modüllerin tümü yazıldı ve çalışıyor (ayrıntı ve sıradakiler: `ROADMAP.md`).
 
 ### İlk kilometre taşı
 | Modül | Rota | Özet |
@@ -40,7 +40,7 @@ Durum: ✅ ilk sürümde çalışıyor · 🔜 sırada (bkz. `ROADMAP.md`)
 ### İmza özellikler
 | Modül | Rota | Özet |
 | --- | --- | --- |
-| Memory Universe | `/universe` | Anılar, mektuplar, tarihler, hayaller yıldız olarak. Masaüstü 3D, mobil 2D. |
+| Memory Universe | `/universe` | Anılar, mektuplar ve özel günler yıldız olarak; çevrilir, yakınlaşılır, yıldıza dokunulur. Telefonda da aynı. |
 | 365 Reasons | `/reasons` | Arda'nın yazdığı notlar; günde bir not; arşiv. Otomatik üretim yok. |
 | Our Song | `/song` | Onur Can Özcan — Anılar Şarkısı. Resmî embed veya bağlantı kartı. |
 | Eln's Little World | `/corner` | Fiyonk koleksiyonu, sticker panosu, tema seçenekleri, tatlı günlük mesajlar. |

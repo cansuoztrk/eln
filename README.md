@@ -61,6 +61,7 @@ Yayın öncesi güvenlik listesi: [`docs/SECURITY.md`](docs/SECURITY.md).
 | `npm run dev` | Geliştirme sunucusu |
 | `npm run check` | Typecheck + lint + birim testleri |
 | `npm run test:db` | RLS / güvenlik testleri (yerel Supabase açıkken) |
+| `npm run db:reset && npm run build && npm run test:e2e` | Uçtan uca testler (boş veritabanı + üretim derlemesi) |
 | `npm run db:start` · `db:stop` · `db:reset` | Yerel Supabase |
 | `npm run db:types` | Veritabanından TypeScript tiplerini üret |
 | `npm run backup` | Veri (JSON) + medya yedeği |

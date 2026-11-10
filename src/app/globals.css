@@ -124,17 +124,17 @@
   color-scheme: light;
 }
 
-:root[data-theme="rose"] {
+[data-theme="rose"] {
   --accent: #8e4a5e;
   --accent-soft: #e9b3c0;
   --accent-wash: #f6dbe1;
 }
-:root[data-theme="champagne"] {
+[data-theme="champagne"] {
   --accent: #8a6a3c;
   --accent-soft: #ead9bb;
   --accent-wash: #f6eedd;
 }
-:root[data-theme="pearl"] {
+[data-theme="pearl"] {
   --accent: #7b6259;
   --accent-soft: #e8d5c7;
   --accent-wash: #f6efe8;

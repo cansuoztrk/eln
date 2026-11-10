@@ -23,8 +23,8 @@ Kaynak: `src/app/globals.css` (`@theme`). Tailwind v4, CSS-first. Burada olmayan
 | `ink` | `#2e2422` | Başlık |
 | `night` `dusk` `plum` | `#241a1e` `#3a2930` `#5b3a47` | Pembe alacakaranlık |
 
-Anlamsal: `accent`, `accent-soft`, `accent-wash`, `line`, `line-strong` — temalar (`data-theme`) yalnızca
-bunları değiştirir. Pembe duygu, nude/ivory yüzey, rose gold/şampanya yalnızca özel parçalar.
+Anlamsal: `accent`, `accent-soft`, `accent-wash`, `line`, `line-strong` — temalar (`data-theme`: `rose`,
+`champagne`, `pearl`; kişi başına, Minik Dünya'dan seçilir) yalnızca bunları değiştirir. Pembe duygu, nude/ivory yüzey, rose gold/şampanya yalnızca özel parçalar.
 
 ## Tipografi
 

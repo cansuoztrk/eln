@@ -87,7 +87,7 @@ export default async function HomePage() {
                   {formatNumber(met.days)}
                 </p>
                 <p className="mt-3 font-display text-2xl text-ink-soft italic">gündür tanışıyoruz</p>
-                <p className="mt-2 text-sm text-taupe">{formatDate(met.date)}&apos;ten bugüne</p>
+                <p className="mt-2 text-sm text-taupe">{formatDate(met.date)} tarihinden bugüne</p>
               </StaggerItem>
             ) : null}
             {together ? (
@@ -97,7 +97,7 @@ export default async function HomePage() {
                 </p>
                 <p className="mt-3 font-display text-2xl text-ink-soft italic">gündür birlikteyiz</p>
                 <p className="mt-2 text-sm text-taupe">
-                  {formatDate(together.date)}&apos;ten bugüne · {formatElapsed(elapsed(together.date, today))}
+                  {formatDate(together.date)} tarihinden bugüne · {formatElapsed(elapsed(together.date, today))}
                 </p>
               </StaggerItem>
             ) : null}

@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { trashAction } from "@/features/trash/actions";
 import { cn } from "@/lib/cn";
+import { genitive } from "@/lib/grammar";
 import { useAction } from "@/lib/use-action";
 import { addQuestionAction, addStarterQuestionsAction, saveAnswerAction } from "../actions";
 import type { QuestionCard } from "../queries";
@@ -169,7 +170,7 @@ function QuestionCardView({ question, myName, otherName }: { question: QuestionC
             <p className="prose-letter mt-1 font-display text-xl leading-relaxed text-ink-soft">{question.theirAnswer}</p>
           ) : (
             <p className="mt-1 text-[14px] text-muted">
-              {question.together && !question.myAnswer ? `Bu bir "birlikte" sorusu: sen yazdıktan sonra ${otherName}'in cevabı (varsa) görünür.` : "Henüz bir cevap yok."}
+              {question.together && !question.myAnswer ? `Bu bir "birlikte" sorusu: sen yazdıktan sonra ${genitive(otherName)} cevabı (varsa) görünür.` : "Henüz bir cevap yok."}
             </p>
           )}
         </div>

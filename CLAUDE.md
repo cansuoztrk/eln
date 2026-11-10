@@ -53,7 +53,7 @@ ilgili dosyayı oku.
 - Supabase: Postgres + Auth + Storage, tümü RLS arkasında. Yerel geliştirme için Docker'da
   `npx supabase start`.
 - Fontlar `@fontsource-variable/*` ile kendi sunucumuzdan (Google'a istek yok).
-- 3D (three / R3F / drei) yalnızca `/universe` rotasında, dinamik import ile.
+- Anı Evreni (`/universe`) 3D motoru kullanmaz: düz bir canvas üzerinde kendi küçük izdüşümüyle çizilir.
 
 ## Komutlar
 
@@ -65,7 +65,7 @@ npm run db:reset       # migration'ları sıfırdan uygula
 npm run db:types       # src/lib/supabase/database.types.ts üret
 npm run test           # Vitest (birim)
 npm run test:db        # Vitest (RLS/entegrasyon — yerel Supabase'e karşı)
-npm run test:e2e       # Playwright (yerel Supabase + next start'a karşı)
+npm run test:e2e       # Playwright — önce: npm run db:reset && npm run build (boş veritabanı ister)
 npm run backup         # veritabanı JSON + medya yedeği (bkz. docs/BACKUP_GUIDE.md)
 ```
 
@@ -81,7 +81,7 @@ src/features/<modül>  queries.ts (okuma) · actions.ts (yazma) · schema.ts (Zo
 src/components/ui     temel bileşenler      src/components/decor   özgün dekoratif çizimler
 src/components/motion hareket yardımcıları   src/lib               env, supabase, auth, dates, media, security
 supabase/migrations   SQL migration'ları (asla düzenleme, yenisini ekle)
-tests/                unit · db · e2e
+tests/                unit (saf mantık + kod kuralları) · db (RLS) · e2e (ilk kurulum hikâyesi)
 ```
 
 Kurallar:
@@ -98,6 +98,20 @@ Kurallar:
 ## Karar günlüğü
 
 Önemli kararlar buraya tarihle eklenir (en yeni üstte).
+
+- **2026-11-10 — Anı Evreni three.js'siz.** Galaksi, canvas 2D üzerinde kendi perspektif izdüşümüyle
+  çiziliyor (dön, eğ, yakınlaş, yıldıza dokun). Telefonda da masaüstünde de aynı kod, ~0 ek paket.
+  `three` / R3F / drei bu yüzden bağımlılıklardan çıkarıldı; WebGL sürümü gerekirse ayrı bir karar.
+- **2026-11-10 — Navigasyon yalnızca var olanı gösterir.** `src/content/navigation.ts` ve
+  `studio-nav.ts` içindeki `BUILT` listeleri; bir birim testi her bağlantının bir sayfası olduğunu doğrular.
+- **2026-11-10 — `notFound()` akışlı sayfalarda 200 döner.** `loading.tsx` yüzünden durum kodu 200,
+  içerik 404 sayfasıdır. Gizli içerik için durum koduna değil RLS'e güvenilir (taslak/kilitli satır hiç dönmez).
+- **2026-11-10 — `/setup` zorunlu dinamik.** Üretim derlemesi sayfayı statik üretiyordu; kurulum durumu
+  derleme anına değil o anki veritabanına bakmalı (`dynamic = "force-dynamic"`).
+- **2026-11-10 — Yedekte isteğe bağlı adım kalanını durdurmaz.** `pg_dump` sürüm uyuşmazlığında SQL dökümü
+  uyarıyla atlanır; JSON + medya yedeği yine tamamlanır.
+- **2026-11-10 — Alt ajanlar bu planda kullanılmıyor.** Paralel alt ajan denemesi kullanım limitini
+  tüketti ve dosya üretmedi. İş tek oturumda, sırayla yapılır.
 
 - **2026-11-09 — Davet akışı.** Eln tek kullanımlık, süreli bir bağlantıyla gelir ve yalnızca
   bir parola belirler ("anahtarını sen seç"). Hesap sunucuda service-role ile oluşturulur;

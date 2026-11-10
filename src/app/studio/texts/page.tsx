@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getSectionDraft } from "@/features/content/queries";
+import { MessagesForm } from "@/features/studio/components/messages-form";
 import { SectionForm } from "@/features/studio/components/section-form";
 import { FACTS } from "@/content/facts";
 import { requireOwner } from "@/lib/auth/session";
@@ -9,13 +10,14 @@ export const metadata: Metadata = { title: "Metinler" };
 
 export default async function StudioTextsPage() {
   const session = await requireOwner();
-  const [hero, storyIntro, interlude, distance, meeting, song] = await Promise.all([
+  const [hero, storyIntro, interlude, distance, meeting, song, corner] = await Promise.all([
     getSectionDraft(session, "home.hero"),
     getSectionDraft(session, "story.intro"),
     getSectionDraft(session, "story.interlude"),
     getSectionDraft(session, "distance.intro"),
     getSectionDraft(session, "meeting.note"),
     getSectionDraft(session, "song"),
+    getSectionDraft(session, "corner.messages"),
   ]);
   const empty = "Boş bırakırsan sayfada hiçbir şey görünmez; yerine başka bir metin konmaz.";
 
@@ -83,6 +85,7 @@ export default async function StudioTextsPage() {
           initial={song.data}
           hasDraft={song.hasDraft}
         />
+        <MessagesForm key={`corner-${corner.published.messages.length}`} initial={corner.published.messages} />
       </div>
     </StudioPage>
   );

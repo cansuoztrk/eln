@@ -11,6 +11,7 @@ import { LETTER_CATEGORIES } from "@/features/letters/schema";
 import { getMembers } from "@/lib/auth/members";
 import { people, requireMember } from "@/lib/auth/session";
 import { daysBetween, formatDate, todayIn } from "@/lib/dates";
+import { ablative } from "@/lib/grammar";
 
 export const metadata: Metadata = { title: "Mektuplar" };
 
@@ -114,7 +115,7 @@ export default async function LettersPage() {
                 {partner.name} → {owner.name}
               </p>
               <h2 id="from-partner" className="mt-3 font-display text-display-sm italic">
-                {partner.name}&apos;den
+                {ablative(partner.name)}
               </h2>
             </Reveal>
             <Stagger className="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">

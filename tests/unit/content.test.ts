@@ -9,6 +9,7 @@ import { parseTags, tagList } from "@/features/gallery/schema";
 import { dateSchema } from "@/features/days/schema";
 import { letterSchema } from "@/features/letters/schema";
 import { spotifyEmbedUrl, youtubeEmbedUrl, youtubeId } from "@/features/song/youtube";
+import { ablative, accusative, dative, genitive } from "@/lib/grammar";
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -108,6 +109,14 @@ describe("schemas", () => {
     expect(youtubeEmbedUrl("dQw4w9WgXcQ")).toContain("youtube-nocookie.com/embed/dQw4w9WgXcQ");
     expect(spotifyEmbedUrl("https://open.spotify.com/intl-tr/track/4cOdK2wGLETKBW3PvgPWqT?si=x")).toBe("https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT");
     expect(spotifyEmbedUrl("https://spotify.evil.example/track/4cOdK2wGLETKBW3PvgPWqT")).toBeNull();
+  });
+});
+
+describe("Turkish case endings", () => {
+  it("follow vowel harmony for both names", () => {
+    expect([genitive("Eln"), dative("Eln"), ablative("Eln"), accusative("Eln")]).toEqual(["Eln'in", "Eln'e", "Eln'den", "Eln'i"]);
+    expect([genitive("Arda"), dative("Arda"), ablative("Arda"), accusative("Arda")]).toEqual(["Arda'nın", "Arda'ya", "Arda'dan", "Arda'yı"]);
+    expect([genitive("Elnare"), ablative("Bakü"), ablative("İstanbul"), ablative("Mert")]).toEqual(["Elnare'nin", "Bakü'den", "İstanbul'dan", "Mert'ten"]);
   });
 });
 

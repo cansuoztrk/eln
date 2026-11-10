@@ -10,14 +10,14 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --project unit",
     "test:db": "vitest run --project db",
-    "test:e2e": "playwright test --trace off",
     "check": "npm run typecheck && npm run lint && npm run test",
     "db:start": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,supavisor,mailpit,postgres-meta",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "backup": "node scripts/backup.mjs",
-    "restore": "node scripts/restore.mjs"
+    "restore": "node scripts/restore.mjs",
+    "test:e2e": "playwright test --trace off"
   },
   "dependencies": {
     "@fontsource-variable/caveat": "^5.3.0",
