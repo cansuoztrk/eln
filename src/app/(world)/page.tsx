@@ -13,8 +13,11 @@ import { daysAway, listSpecialDays } from "@/features/days/queries";
 import { listGalleryPhotos } from "@/features/gallery/queries";
 import { FirstVisit } from "@/features/home/components/first-visit";
 import { Hero } from "@/features/home/components/hero";
+import { Tonight } from "@/features/home/components/tonight";
+import { getHiddenRooms } from "@/features/home/queries";
 import { Envelope } from "@/features/letters/components/envelope";
 import { listLetters } from "@/features/letters/queries";
+import { getReasons } from "@/features/reasons/queries";
 import { people, requireMember } from "@/lib/auth/session";
 import {
   daysBetween,
@@ -32,12 +35,14 @@ export default async function HomePage() {
   const { owner, partner, me } = people(session);
   const today = viewerToday(session);
 
-  const [hero, dates, specialDays, favourites, letters] = await Promise.all([
+  const [hero, dates, specialDays, favourites, letters, reasons, hiddenRooms] = await Promise.all([
     getSection(session, "home.hero"),
     listDates(session),
     listSpecialDays(session),
     listGalleryPhotos(session, { favorites: true }),
     listLetters(session),
+    getReasons(session),
+    getHiddenRooms(session),
   ]);
   const photos = favourites.length > 0 ? favourites : await listGalleryPhotos(session);
   const featured = photos.slice(0, 3);
@@ -71,6 +76,27 @@ export default async function HomePage() {
           </OwnerHint>
         </div>
       ) : null}
+
+      {/* Today: the part of the home page that is different every day. */}
+      <section aria-labelledby="today-heading" className="shell pb-6 md:pb-10">
+        <h2 id="today-heading" className="sr-only">
+          Bugün
+        </h2>
+        <div className={reasons.today ? "grid gap-6 md:grid-cols-[1.35fr_1fr]" : "mx-auto max-w-xl"}>
+          {reasons.today ? (
+            <Reveal>
+              <Link href="/reasons" className="paper paper-grain group flex h-full min-h-56 flex-col justify-center px-7 py-10 text-center sm:px-12">
+                <p className="eyebrow">Bugünün notu</p>
+                <p className="prose-letter mx-auto mt-5 max-w-lg font-display text-[clamp(1.5rem,3.4vw,2.1rem)] leading-[1.35] text-ink">{reasons.today.body}</p>
+                <p className="mt-5 font-hand text-2xl text-accent">— {owner.name}</p>
+              </Link>
+            </Reveal>
+          ) : null}
+          <Reveal delay={0.1}>
+            <Tonight ownerCity={owner.city} partnerCity={partner.city} />
+          </Reveal>
+        </div>
+      </section>
 
       {met || together ? (
         <section aria-labelledby="since-heading" className="shell py-20 md:py-28">
@@ -245,7 +271,7 @@ export default async function HomePage() {
           </h2>
         </Reveal>
         <Stagger as="ul" stagger={0.05} className="mt-10 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
-          {WORLD_NAV.map((room) => (
+          {WORLD_NAV.filter((room) => !hiddenRooms.includes(room.href)).map((room) => (
             <StaggerItem as="li" key={room.href} className="bg-ivory">
               <Link
                 href={room.href}

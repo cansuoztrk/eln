@@ -4,6 +4,7 @@ import "@fontsource-variable/cormorant-garamond/wght.css";
 import "@fontsource-variable/cormorant-garamond/wght-italic.css";
 import "@fontsource-variable/dm-sans/wght.css";
 import "@fontsource-variable/caveat/wght.css";
+import { OfflineReady } from "@/components/layout/offline-ready";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,7 +34,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="tr">
-      <body className="bg-ivory text-ink-soft antialiased">{children}</body>
+      <body className="bg-ivory text-ink-soft antialiased">
+        {children}
+        <OfflineReady />
+      </body>
     </html>
   );
 }

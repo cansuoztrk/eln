@@ -17,7 +17,7 @@ Kaynak: `src/app/globals.css` (`@theme`). Tailwind v4, CSS-first. Burada olmayan
 | `champagne` | `#ead9bb` | Özel detay |
 | `gold` | `#b8996a` | Yıldız, ince çizgi |
 | `rosegold` | `#b98a78` | Özel detay |
-| `taupe` | `#8a7468` | Etiket, sessiz metin (yalnızca büyük/ikincil) |
+| `taupe` | `#806a5f` | Etiket, sessiz metin (ivory üstünde 4.7:1) |
 | `muted` | `#75635b` | İkincil gövde metni (AA) |
 | `ink-soft` | `#4a3b37` | Gövde metni |
 | `ink` | `#2e2422` | Başlık |

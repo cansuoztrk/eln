@@ -5,7 +5,7 @@ import type { Session } from "@/lib/auth/session";
 import { createAdminClient, MEDIA_BUCKET } from "@/lib/supabase/admin";
 import type { Tables } from "@/lib/supabase/database.types";
 import { toJson } from "@/lib/supabase/json";
-import { baseMime, extensionFor, rejectionReason, sniff, sniffMatches, type MediaKind } from "./rules";
+import { baseMime, extensionFor, isAllowed, rejectionReason, sniff, type MediaKind } from "./rules";
 
 /**
  * The media pipeline.
@@ -100,14 +100,18 @@ export async function finalizeUpload(
   const original = Buffer.from(await download.data.arrayBuffer());
   const kind = asset.kind as MediaKind;
 
-  const reason = rejectionReason(kind, { type: asset.mime_type, size: original.byteLength });
-  if (reason) return discard(reason);
-  if (!sniffMatches(asset.mime_type, sniff(original.subarray(0, 16)))) {
-    return discard("Dosyanın içeriği türüyle uyuşmuyor.");
+  // What the file really is, read from its first bytes. A photo saved with the
+  // wrong extension (an iPhone JPEG named .PNG, say) is still a photo: the
+  // content decides, and the stored type is corrected to match it.
+  const actual = sniff(original.subarray(0, 16));
+  const reason = rejectionReason(kind, { type: actual ?? asset.mime_type, size: original.byteLength });
+  if (!actual || !isAllowed(kind, actual) || reason) {
+    return discard(reason ?? (kind === "image" ? "Bu dosya bir fotoğraf gibi görünmüyor." : "Bu dosya bir ses kaydı gibi görünmüyor."));
   }
 
   const update: Partial<MediaAsset> = {
     state: "ready",
+    mime_type: actual,
     byte_size: original.byteLength,
     checksum_sha256: createHash("sha256").update(original).digest("hex"),
   };

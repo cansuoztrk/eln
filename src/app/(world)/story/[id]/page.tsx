@@ -7,7 +7,9 @@ import { Flourish } from "@/components/decor";
 import { OwnerHint } from "@/components/layout/owner-hint";
 import { SmartImage } from "@/components/media/smart-image";
 import { Reveal } from "@/components/motion/reveal";
+import { listAlbums } from "@/features/gallery/queries";
 import { getMemory, listMemories } from "@/features/story/queries";
+import { listVoices } from "@/features/voice/queries";
 import { memoryCategoryLabel } from "@/features/story/schema";
 import { people, requireMember } from "@/lib/auth/session";
 import { formatWithPrecision, parseISODate } from "@/lib/dates";
@@ -22,6 +24,10 @@ export default async function MemoryPage({ params }: PageProps<"/story/[id]">) {
   const [memory, all] = await Promise.all([getMemory(session, id), listMemories(session, { withPhotos: false })]);
   if (!memory) notFound();
 
+  const [voice, album] = await Promise.all([
+    memory.voiceMemoryId ? listVoices(session).then((list) => list.find((v) => v.id === memory.voiceMemoryId) ?? null) : null,
+    memory.albumId ? listAlbums(session).then((list) => list.find((a) => a.id === memory.albumId) ?? null) : null,
+  ]);
   const { partner } = people(session);
   const date = parseISODate(memory.happenedOn);
   const position = all.findIndex((m) => m.id === memory.id);
@@ -106,6 +112,25 @@ export default async function MemoryPage({ params }: PageProps<"/story/[id]">) {
           <OwnerHint href={`/studio/story/${memory.id}`} label="Anıyı yaz">
             Bu anının şimdilik yalnızca başlığı ve tarihi var. Gerisini yalnızca sen anlatabilirsin.
           </OwnerHint>
+        ) : null}
+
+        {voice ? (
+          <Reveal delay={0.1}>
+            <figure className="paper mt-12 p-5">
+              <figcaption className="mb-3 text-[13px] text-taupe">
+                Ses kaydı · <span className="text-ink">{voice.title}</span>
+              </figcaption>
+              <audio controls preload="none" src={voice.url} className="w-full" />
+            </figure>
+          </Reveal>
+        ) : null}
+
+        {album ? (
+          <p className="mt-10 text-center">
+            <Link href={`/gallery?album=${album.id}`} className="text-[13px] font-medium tracking-wide text-accent underline-offset-4 hover:underline">
+              Albümü aç: {album.title}
+            </Link>
+          </p>
         ) : null}
 
         {memory.tags.length > 0 ? (

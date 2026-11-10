@@ -13,9 +13,9 @@ const DUSK_ROUTES = ["/universe"];
 /** Routes that open on a dusk hero: light chrome until the page is scrolled. */
 const DUSK_HERO_ROUTES = ["/distance", "/song"];
 
-type Props = { isOwner: boolean; partnerName: string; ownerName: string };
+type Props = { isOwner: boolean; partnerName: string; ownerName: string; hiddenRooms: string[] };
 
-export function SiteHeader({ isOwner, partnerName, ownerName }: Props) {
+export function SiteHeader({ isOwner, partnerName, ownerName, hiddenRooms }: Props) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,7 +55,7 @@ export function SiteHeader({ isOwner, partnerName, ownerName }: Props) {
           </Link>
 
           <nav aria-label="Ana bölümler" className="hidden items-center gap-9 lg:flex">
-            {PRIMARY_NAV.map((item) => {
+            {PRIMARY_NAV.filter((item) => !hiddenRooms.includes(item.href)).map((item) => {
               const active = isActive(pathname, item.href);
               return (
                 <Link
@@ -123,13 +123,15 @@ export function SiteHeader({ isOwner, partnerName, ownerName }: Props) {
         aria-label="Hızlı gezinme"
         className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/92 pt-1.5 backdrop-blur-md md:hidden"
       >
-        <ul className="mx-auto grid max-w-md grid-cols-5">
+        <ul className="mx-auto grid max-w-md auto-cols-fr grid-flow-col">
           {[
             { href: "/", label: "Ev", icon: Home, exact: true },
             { href: "/story", label: "Hikâye", icon: BookHeart },
             { href: "/gallery", label: "Galeri", icon: Images },
             { href: "/letters", label: "Mektup", icon: Mail },
-          ].map(({ href, label, icon: Icon, exact }) => {
+          ]
+            .filter((item) => !hiddenRooms.includes(item.href))
+            .map(({ href, label, icon: Icon, exact }) => {
             const active = exact ? pathname === href : isActive(pathname, href);
             return (
               <li key={href}>
@@ -168,6 +170,7 @@ export function SiteHeader({ isOwner, partnerName, ownerName }: Props) {
         isOwner={isOwner}
         partnerName={partnerName}
         ownerName={ownerName}
+        hiddenRooms={hiddenRooms}
       />
     </>
   );

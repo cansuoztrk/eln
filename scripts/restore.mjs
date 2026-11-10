@@ -62,15 +62,30 @@ async function restoreData() {
     }
   }
 
+  // Albums point at their cover photo and photos point at their album. Albums go
+  // in first without a cover; the covers are set once the photos exist.
+  const covers = [];
+
   for (const name of TABLES) {
-    const rows = table(name);
+    let rows = table(name);
+    if (name === "albums") {
+      for (const album of rows) if (album.cover_photo_id) covers.push({ id: album.id, cover_photo_id: album.cover_photo_id });
+      rows = rows.map((album) => ({ ...album, cover_photo_id: null }));
+    }
     console.log(`${dry ? "[dry] " : ""}${name}: ${rows.length} satır`);
     if (dry || rows.length === 0) continue;
     for (let i = 0; i < rows.length; i += 500) {
       const { error } = await supabase.from(name).upsert(rows.slice(i, i + 500));
       if (error) throw new Error(`${name}: ${error.message}`);
     }
+    if (name === "photos") {
+      for (const cover of covers) {
+        const { error } = await supabase.from("albums").update({ cover_photo_id: cover.cover_photo_id }).eq("id", cover.id);
+        if (error) throw new Error(`albums (kapak): ${error.message}`);
+      }
+    }
   }
+  if (covers.length) console.log(`${dry ? "[dry] " : ""}albüm kapakları: ${covers.length}`);
 }
 
 async function restoreMedia() {

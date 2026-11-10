@@ -43,6 +43,9 @@ export const memorySchema = z.object({
   category: z.enum(MEMORY_CATEGORIES.map((c) => c.value) as [MemoryCategory, ...MemoryCategory[]]),
   tags: tagList,
   photoIds: z.array(z.uuid()).max(40),
+  /** An album this memory belongs with, and a voice memory to play inside it. Both optional. */
+  albumId: z.uuid().nullable(),
+  voiceMemoryId: z.uuid().nullable(),
   starSize: z.number().int().min(1).max(5),
   starTone: z.enum(["blush", "rose", "champagne", "pearl", "gold"]),
   publish: z.boolean(),

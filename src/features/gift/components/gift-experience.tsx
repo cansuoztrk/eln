@@ -175,8 +175,8 @@ export function GiftExperience({ content, exitHref = "/", preview = false }: { c
                   alt={content.photoAlt}
                   sizes="(min-width: 640px) 21rem, 74vw"
                   priority
-                  className="aspect-[4/5]"
                   mode="fill"
+                  style={{ aspectRatio: Math.min(1.25, Math.max(0.62, content.photo.width / Math.max(1, content.photo.height))) }}
                 />
                 {reduce ? null : (
                   <motion.span

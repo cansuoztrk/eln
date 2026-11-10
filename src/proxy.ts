@@ -11,7 +11,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * and the database enforces row level security underneath both.
  */
 
-const PUBLIC_PATHS = [/^\/login$/, /^\/setup$/, /^\/invite\/[^/]+$/, /^\/unconfigured$/];
+const PUBLIC_PATHS = [/^\/login$/, /^\/setup$/, /^\/invite\/[^/]+$/, /^\/unconfigured$/, /^\/offline$/];
 
 const REQUIRED = [
   "SUPABASE_URL",
@@ -130,6 +130,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Everything except build output and static files.
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|robots.txt|.*\\.(?:svg|png|jpg|jpeg|webp|avif|ico|woff2?)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|robots.txt|sw.js|.*\\.(?:svg|png|jpg|jpeg|webp|avif|ico|woff2?)$).*)",
   ],
 };

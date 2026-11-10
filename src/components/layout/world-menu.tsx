@@ -18,10 +18,11 @@ type Props = {
   isOwner: boolean;
   partnerName: string;
   ownerName: string;
+  hiddenRooms: string[];
 };
 
 /** The whole world on one dusk-coloured page. */
-export function WorldMenu({ open, onOpenChange, isOwner, partnerName, ownerName }: Props) {
+export function WorldMenu({ open, onOpenChange, isOwner, partnerName, ownerName, hiddenRooms }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const reduce = useReducedMotion();
@@ -64,7 +65,7 @@ export function WorldMenu({ open, onOpenChange, isOwner, partnerName, ownerName 
 
           <nav aria-label="Tüm bölümler" className="shell relative flex-1 py-6 md:py-12">
             <ul className="grid gap-x-12 gap-y-1 sm:grid-cols-2 lg:grid-cols-3">
-              {WORLD_NAV.map((item, index) => {
+              {WORLD_NAV.filter((item) => !hiddenRooms.includes(item.href)).map((item, index) => {
                 const active = isActive(pathname, item.href);
                 return (
                   <motion.li

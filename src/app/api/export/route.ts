@@ -1,7 +1,8 @@
 import { Zip, ZipPassThrough } from "fflate";
 import { collectExport } from "@/features/account/export";
 import { getSession } from "@/lib/auth/session";
-import { todayIn, toISODate } from "@/lib/dates";
+import { viewerToday } from "@/features/dates/queries";
+import { toISODate } from "@/lib/dates";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { createAdminClient, MEDIA_BUCKET } from "@/lib/supabase/admin";
 
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
   }
 
   const format = new URL(request.url).searchParams.get("format");
-  const name = `elnare-${session.role === "owner" ? "arda" : "eln"}-${toISODate(todayIn(session.profile.timezone, new Date()))}`;
+  const name = `elnare-${session.role === "owner" ? "arda" : "eln"}-${toISODate(viewerToday(session))}`;
   const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
 
   if (format !== "zip") {

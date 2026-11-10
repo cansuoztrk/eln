@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
+import { VersionHistory } from "@/features/history/components/version-history";
+import { listVersions } from "@/features/history/queries";
 import { LetterEditor } from "@/features/letters/components/letter-editor";
 import { getLetter, listMyLetters } from "@/features/letters/queries";
 import { people, requireMember } from "@/lib/auth/session";
@@ -24,6 +26,7 @@ export default async function WriteLetterPage({ searchParams }: PageProps<"/lett
   ]);
   if (typeof id === "string" && (!existing || !existing.mine)) notFound();
 
+  const versions = existing ? await listVersions(session, "letters", existing.id) : [];
   const unlockDay = existing?.unlockAt ? todayIn(other.timezone, new Date(existing.unlockAt)) : null;
 
   return (
@@ -31,7 +34,7 @@ export default async function WriteLetterPage({ searchParams }: PageProps<"/lett
       <PageHeader eyebrow="Write" title={existing ? "Mektubu düzenle" : "Bir mektup yaz"} />
       <div className="shell space-y-16">
         <LetterEditor
-          key={existing?.id ?? "new"}
+          key={existing ? `${existing.id}-${existing.updatedAt}` : "new"}
           authorName={me.name}
           recipientName={other.name}
           backHref="/letters/write"
@@ -63,6 +66,8 @@ export default async function WriteLetterPage({ searchParams }: PageProps<"/lett
                 }
           }
         />
+
+        <VersionHistory table="letters" versions={versions} timeZone={me.timezone} />
 
         {mine.length > 0 ? (
           <section aria-labelledby="my-letters">

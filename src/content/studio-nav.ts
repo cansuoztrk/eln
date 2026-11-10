@@ -16,6 +16,8 @@ const BUILT = new Set([
   "/studio/capsules",
   "/studio/texts",
   "/studio/trash",
+  "/studio/settings",
+  "/studio/backup",
 ]);
 
 const ALL_GROUPS: StudioNavGroup[] = [
@@ -42,7 +44,9 @@ const ALL_GROUPS: StudioNavGroup[] = [
     title: "Site",
     items: [
       { href: "/studio/texts", label: "Metinler", hint: "Sayfa metinleri ve şarkı" },
+      { href: "/studio/settings", label: "Ayarlar", hint: "Adlar, şehirler, saat dilimleri" },
       { href: "/studio/trash", label: "Çöp kutusu", hint: "Silinenleri geri al" },
+      { href: "/studio/backup", label: "Yedek", hint: "Kopyasını elinde tut" },
     ],
   },
 ];

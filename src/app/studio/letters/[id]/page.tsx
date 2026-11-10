@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { VersionHistory } from "@/features/history/components/version-history";
+import { listVersions } from "@/features/history/queries";
 import { LetterEditor } from "@/features/letters/components/letter-editor";
 import { getLetter } from "@/features/letters/queries";
 import { LETTER_CATEGORIES, type LetterCategory } from "@/features/letters/schema";
@@ -18,6 +20,7 @@ export default async function EditLetterPage({ params }: PageProps<"/studio/lett
   const letter = await getLetter(session, id);
   if (!letter || !letter.mine) notFound();
 
+  const versions = await listVersions(session, "letters", letter.id);
   const { me, other } = people(session);
   const known = LETTER_CATEGORIES.some((c) => c.value === letter.category);
   const unlockDay = letter.unlockAt ? todayIn(other.timezone, new Date(letter.unlockAt)) : null;
@@ -25,7 +28,7 @@ export default async function EditLetterPage({ params }: PageProps<"/studio/lett
   return (
     <StudioPage title="Mektubu düzenle">
       <LetterEditor
-        key={letter.id}
+        key={`${letter.id}-${letter.updatedAt}`}
         authorName={me.name}
         recipientName={other.name}
         backHref="/studio/letters"
@@ -42,6 +45,7 @@ export default async function EditLetterPage({ params }: PageProps<"/studio/lett
           status: letter.status,
         }}
       />
+      <VersionHistory table="letters" versions={versions} timeZone={me.timezone} />
     </StudioPage>
   );
 }

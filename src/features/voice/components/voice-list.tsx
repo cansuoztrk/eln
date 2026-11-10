@@ -1,12 +1,14 @@
 "use client";
 
-import { Pause, Play, Trash2 } from "lucide-react";
+import { Pause, Pencil, Play, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { Reveal } from "@/components/motion/reveal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Confirm } from "@/components/ui/confirm";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Field, Input, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
 import { trashAction } from "@/features/trash/actions";
 import { formatDate, parseISODate } from "@/lib/dates";
@@ -22,6 +24,9 @@ function VoiceCard({ voice }: { voice: Voice }) {
   const [position, setPosition] = useState(0);
   const [busy, start] = useTransition();
   const [loadedDuration, setLoadedDuration] = useState(0);
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(voice.title);
+  const [description, setDescription] = useState(voice.description);
   const date = parseISODate(voice.recordedOn);
   const total = voice.durationMs / 1000 || loadedDuration;
 
@@ -103,9 +108,12 @@ function VoiceCard({ voice }: { voice: Voice }) {
           >
             {voice.status === "published" ? "Taslağa al" : "Paylaş"}
           </Button>
+          <Button size="icon-sm" variant="ghost" aria-label="Adını ve notunu düzenle" className="ml-auto" onClick={() => setEditing(true)}>
+            <Pencil aria-hidden="true" />
+          </Button>
           <Confirm
             trigger={
-              <Button size="icon-sm" variant="ghost" aria-label="Kaydı çöp kutusuna taşı" className="ml-auto text-taupe hover:text-[#8c3b3b]">
+              <Button size="icon-sm" variant="ghost" aria-label="Kaydı çöp kutusuna taşı" className="text-taupe hover:text-[#8c3b3b]">
                 <Trash2 aria-hidden="true" />
               </Button>
             }
@@ -119,6 +127,44 @@ function VoiceCard({ voice }: { voice: Voice }) {
             }}
           />
         </div>
+      ) : null}
+
+      {editing ? (
+        <Dialog open onOpenChange={(open) => !open && setEditing(false)}>
+          <DialogContent size="sm" title="Kaydı düzenle">
+            <form
+              method="post"
+              noValidate
+              className="space-y-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                start(async () => {
+                  const result = await saveVoiceAction({ id: voice.id, title, description, publish: voice.status === "published" });
+                  toast(result.ok ? "Kaydedildi." : result.error, result.ok ? "ok" : "error");
+                  if (result.ok) {
+                    setEditing(false);
+                    router.refresh();
+                  }
+                });
+              }}
+            >
+              <Field htmlFor={`voice-title-${voice.id}`} label="Kaydın adı">
+                <Input id={`voice-title-${voice.id}`} value={title} maxLength={120} onChange={(e) => setTitle(e.target.value)} />
+              </Field>
+              <Field htmlFor={`voice-note-${voice.id}`} label="Not" optional>
+                <Textarea id={`voice-note-${voice.id}`} rows={3} className="min-h-24" value={description} maxLength={2000} onChange={(e) => setDescription(e.target.value)} />
+              </Field>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setEditing(false)}>
+                  Vazgeç
+                </Button>
+                <Button type="submit" disabled={busy || title.trim().length === 0}>
+                  Kaydet
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       ) : null}
     </article>
   );

@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/session";
-import { compareDates, occurrenceIn, startOfDayIn, todayIn } from "@/lib/dates";
+import { viewerToday } from "@/features/dates/queries";
+import { compareDates, occurrenceIn, startOfDayIn } from "@/lib/dates";
 import { fail, GENERIC_ERROR, invalid, ok, type ActionResult } from "@/lib/result";
 import {
   dateSchema,
@@ -86,7 +87,7 @@ export async function setHappenedAction(id: string, happened: boolean): Promise<
       return fail("Önce buluşmanın tam tarihini (gün, ay, yıl) gir.");
     }
     const date = { year: row.year, month: row.month, day: row.day };
-    if (compareDates(date, todayIn(session.profile.timezone, new Date())) > 0) {
+    if (compareDates(date, viewerToday(session)) > 0) {
       return fail("Henüz gelmemiş bir gün gerçekleşmiş olarak işaretlenemez.");
     }
   }

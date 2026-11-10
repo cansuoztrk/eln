@@ -31,7 +31,11 @@ describe("the confirmed facts", () => {
     expect(date("arda_birthday")).toMatchObject({ day: 7, month: 11, year: null, person: "owner" });
     expect(FACTS.owner).toMatchObject({ name: "Arda", city: "İstanbul", timezone: "Europe/Istanbul" });
     expect(FACTS.partner).toMatchObject({ name: "Eln", fullName: "Elnare", city: "Bakü", timezone: "Asia/Baku" });
-    expect(FACTS.song).toEqual({ artist: "Onur Can Özcan", title: "Anılar Şarkısı" });
+    expect(FACTS.song).toMatchObject({ artist: "Onur Can Özcan", title: "Anılar Şarkısı" });
+    // The official links, stored without share-tracking parameters.
+    expect(youtubeId(FACTS.song.youtubeUrl)).toBe("bpMRUwYpNkM");
+    expect(spotifyEmbedUrl(FACTS.song.spotifyUrl)).toBe("https://open.spotify.com/embed/track/4TJCZsX5VjPZwUfho4mknR");
+    expect(FACTS.song.youtubeUrl + FACTS.song.spotifyUrl).not.toMatch(/[?&]si=/);
   });
 
   it("leave the first meeting undated and not yet happened", () => {
@@ -66,7 +70,7 @@ describe("editable sections", () => {
     for (const key of ["story.intro", "story.interlude", "distance.intro", "meeting.note"] as const) {
       expect(SECTION_DEFAULTS[key].note).toBe("");
     }
-    expect(SECTION_DEFAULTS.song).toEqual({ youtubeUrl: "", spotifyUrl: "", note: "" });
+    expect(SECTION_DEFAULTS.song.note).toBe("");
     expect(SECTION_DEFAULTS["corner.messages"].messages).toEqual([]);
   });
 
@@ -155,6 +159,18 @@ describe("rules the code must keep (see CLAUDE.md)", () => {
     const sql = walk("supabase/migrations").map(read).join("\n").toLowerCase();
     for (const column of ["read_at", "opened_at", "seen_at", "viewed_at", "last_seen", "last_visit", "view_count", "visit_count", "last_sign_in", "ip_address", "user_agent", "latitude", "longitude"]) {
       expect(sql.includes(column), column).toBe(false);
+    }
+  });
+
+  it("backs up every table the migrations create", async () => {
+    const sql = walk("supabase/migrations").map(read).join("\n");
+    const created = [...sql.matchAll(/create table public\.([a-z_]+)/g)].map((m) => m[1]).sort();
+    const { TABLES } = (await import("../../scripts/_env.mjs")) as { TABLES: string[] };
+    expect([...TABLES].sort()).toEqual(created);
+    // Parents must come before the rows that point at them.
+    const before = (a: string, b: string) => TABLES.indexOf(a) < TABLES.indexOf(b);
+    for (const [parent, child] of [["private_spaces", "profiles"], ["media_assets", "photos"], ["albums", "photos"], ["photos", "memory_photos"], ["memories", "memory_photos"], ["voice_memories", "memories"], ["letters", "special_day_editions"], ["time_capsules", "time_capsule_items"], ["questions", "answers"], ["daily_notes", "daily_note_schedule"], ["memories", "future_plans"]]) {
+      expect(before(parent, child), `${parent} before ${child}`).toBe(true);
     }
   });
 

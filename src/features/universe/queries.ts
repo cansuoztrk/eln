@@ -1,6 +1,9 @@
 import "server-only";
+import { viewerTimezone } from "@/features/dates/queries";
 import { listSpecialDays } from "@/features/days/queries";
 import { whenText } from "@/features/days/when";
+import { listPlans } from "@/features/future/queries";
+import { STATE_LABEL } from "@/features/future/schema";
 import { listLetters } from "@/features/letters/queries";
 import { listMemories } from "@/features/story/queries";
 import { memoryCategoryLabel, type StarTone } from "@/features/story/schema";
@@ -10,7 +13,7 @@ import type { SignedImage } from "@/lib/media/server";
 
 export type Star = {
   id: string;
-  kind: "memory" | "letter" | "sealed" | "day";
+  kind: "memory" | "letter" | "sealed" | "day" | "dream";
   title: string;
   /** ISO date used for ordering along the spiral; null when unknown. */
   date: string | null;
@@ -31,12 +34,12 @@ const excerpt = (text: string, max = 240) => (text.length > max ? `${text.slice(
 
 /**
  * Everything that shines in the Memory Universe: memories, letters, the
- * special days. Each star is something that really exists on the site — the
+ * special days, the dreams. Each star is something that really exists on the site — the
  * sky is exactly as full as the story is.
  */
 export async function listStars(session: Session): Promise<Star[]> {
-  const [memories, letters, days] = await Promise.all([listMemories(session), listLetters(session), listSpecialDays(session)]);
-  const tz = session.profile.timezone;
+  const [memories, letters, days, plans] = await Promise.all([listMemories(session), listLetters(session), listSpecialDays(session), listPlans(session)]);
+  const tz = viewerTimezone(session);
 
   const stars: Star[] = [];
 
@@ -117,6 +120,26 @@ export async function listStars(session: Session): Promise<Star[]> {
       tone: "gold",
       cluster: "days",
       clusterLabel: "Özel günler",
+    });
+  }
+
+  // Dreams glow faintly until they come true; the ones already lived are kept as memories instead.
+  for (const plan of plans.filter((p) => p.state !== "done")) {
+    stars.push({
+      id: `dream-${plan.id}`,
+      kind: "dream",
+      title: plan.title,
+      date: null,
+      dateLabel: STATE_LABEL[plan.state],
+      text: plan.description ? excerpt(plan.description) : "",
+      image: null,
+      imageAlt: "",
+      href: "/future",
+      action: "Hayallere git",
+      size: 1,
+      tone: "blush",
+      cluster: "dreams",
+      clusterLabel: "Hayaller",
     });
   }
 

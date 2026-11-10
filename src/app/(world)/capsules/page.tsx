@@ -60,6 +60,15 @@ export default async function CapsulesPage() {
             </StaggerItem>
           ))}
         </Stagger>
+
+        {session.role === "partner" ? (
+          <p className="text-center text-sm text-muted">
+            İstersen sen de geleceğe bir şey bırakabilirsin.{" "}
+            <Link href="/capsules/mine" className="text-accent underline-offset-4 hover:underline">
+              Kapsüllerim
+            </Link>
+          </p>
+        ) : null}
       </div>
     </>
   );

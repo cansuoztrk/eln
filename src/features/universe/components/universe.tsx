@@ -18,7 +18,7 @@ type Screen = { star: Placed; sx: number; sy: number; scale: number; depth: numb
 const HOME: View = { yaw: 0.5, pitch: 0.95, zoom: 1 };
 const FOCAL = 900;
 const CONTROL = "grid size-11 place-items-center rounded-full bg-pearl/10 text-pearl backdrop-blur transition-colors hover:bg-pearl/20";
-const KIND_LABEL: Record<Star["kind"], string> = { memory: "Anı", letter: "Mektup", sealed: "Mühürlü mektup", day: "Özel gün" };
+const KIND_LABEL: Record<Star["kind"], string> = { memory: "Anı", letter: "Mektup", sealed: "Mühürlü mektup", day: "Özel gün", dream: "Hayal" };
 
 /**
  * The Memory Universe: every memory, letter and special day as a star on a

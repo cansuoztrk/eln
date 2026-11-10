@@ -7,7 +7,7 @@ import { StarField } from "@/components/motion/star-field";
 import { Countdown } from "@/components/time/countdown";
 import { DATE_KEYS } from "@/content/facts";
 import { getSection } from "@/features/content/queries";
-import { getDate, viewerToday } from "@/features/dates/queries";
+import { getDate, viewerTimezone, viewerToday } from "@/features/dates/queries";
 import { CityCard } from "@/features/distance/components/city-card";
 import { DeleteNoteButton, NoteComposer } from "@/features/distance/components/notes";
 import { SharedSky } from "@/features/distance/components/shared-sky";
@@ -192,7 +192,7 @@ export default async function DistancePage() {
               <p className="mt-2 text-pearl/70">{formatDaysUntil(meeting.daysUntil)}</p>
               <Countdown
                 tone="dusk"
-                target={startOfDayIn(session.profile.timezone, meeting.date).toISOString()}
+                target={startOfDayIn(viewerTimezone(session), meeting.date).toISOString()}
                 doneLabel="Bugün"
                 className="mt-10 justify-center"
               />

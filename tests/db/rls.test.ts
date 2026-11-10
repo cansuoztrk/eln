@@ -182,6 +182,44 @@ describe("media follows the content that wraps it", () => {
   });
 });
 
+describe("files cannot be borrowed", () => {
+  it("a photo can only wrap its author's own upload, and cannot be re-pointed", async () => {
+    const mine = randomUUID();
+    const theirs = randomUUID();
+    await w.owner.from("media_assets").insert({ id: mine, space_id: w.spaceId, kind: "image", original_path: `${w.spaceId}/originals/${mine}/original.jpg`, mime_type: "image/jpeg", original_filename: `${TAG} owner-private.jpg` });
+    await w.partner.from("media_assets").insert({ id: theirs, space_id: w.spaceId, kind: "image", original_path: `${w.spaceId}/originals/${theirs}/original.jpg`, mime_type: "image/jpeg", original_filename: `${TAG} partner-own.jpg` });
+    await admin.from("media_assets").update({ state: "ready" }).in("id", [mine, theirs]);
+
+    // Wrapping the owner's private file in her own published photo must fail…
+    const borrowed = await w.partner.from("photos").insert({ space_id: w.spaceId, asset_id: mine, caption: `${TAG} borrowed`, status: "published" });
+    expect(borrowed.error).not.toBeNull();
+    expect((await admin.from("media_assets").select("visibility").eq("id", mine).single()).data!.visibility).toBe("private");
+
+    // …and so must re-pointing a photo of her own at it.
+    const own = await w.partner.from("photos").insert({ space_id: w.spaceId, asset_id: theirs, caption: `${TAG} own photo` }).select("id").single();
+    expect(own.error).toBeNull();
+    expect((await w.partner.from("photos").update({ asset_id: mine }).eq("id", own.data!.id)).error).not.toBeNull();
+
+    // A voice memory cannot wrap an image.
+    expect((await w.partner.from("voice_memories").insert({ space_id: w.spaceId, asset_id: theirs, title: `${TAG} not audio` })).error).not.toBeNull();
+  });
+
+  it("an upload can only be registered at its own path", async () => {
+    const id = randomUUID();
+    const other = randomUUID();
+    const base = { space_id: w.spaceId, kind: "image", mime_type: "image/jpeg", original_filename: `${TAG} path.jpg` };
+    for (const original_path of [
+      `${w.spaceId}/originals/${other}/original.jpg`, // someone else's slot
+      `${w.spaceId}/variants/${id}/large.webp`, // a served variant
+      `${randomUUID()}/originals/${id}/original.jpg`, // another space
+      `${w.spaceId}/audio/${id}/original.jpg`, // wrong folder for an image
+    ]) {
+      expect((await w.partner.from("media_assets").insert({ ...base, id, original_path })).error, original_path).not.toBeNull();
+    }
+    expect((await w.partner.from("media_assets").insert({ ...base, id, original_path: `${w.spaceId}/originals/${id}/original.jpg` })).error).toBeNull();
+  });
+});
+
 describe("authorship", () => {
   it("nobody rewrites or removes the other's letter", async () => {
     const mine = await letter(w.owner, { status: "published", title: `${TAG} owner letter` });

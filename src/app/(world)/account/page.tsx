@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/page-header";
 import { DeleteAccountForm, ExportButtons, PasswordForm, ProfileForm } from "@/features/account/components/account-forms";
+import { TrashRowActions } from "@/features/studio/components/trash-row";
+import { listTrash } from "@/features/studio/queries";
 import { people, requireMember } from "@/lib/auth/session";
+import { formatDate, todayIn } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Hesabım" };
 
@@ -18,6 +21,8 @@ export default async function AccountPage() {
   const session = await requireMember();
   const { me, other } = people(session);
   const owner = session.role === "owner";
+  // The owner's trash lives in the Studio; here it is for whoever has no Studio.
+  const trash = owner ? [] : await listTrash(session);
 
   return (
     <>
@@ -56,6 +61,28 @@ export default async function AccountPage() {
             </li>
           </ul>
         </Section>
+
+        {!owner ? (
+          <Section title="Çöp kutum">
+            {trash.length === 0 ? (
+              <p className="text-[15px] text-muted">Sildiğin bir şey olursa burada bekler; geri alabilir ya da kalıcı olarak silebilirsin.</p>
+            ) : (
+              <ul className="divide-y divide-line">
+                {trash.map((item) => (
+                  <li key={`${item.table}-${item.id}`} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
+                    <div className="min-w-0">
+                      <p className="truncate text-[15px] text-ink">{item.title}</p>
+                      <p className="text-[13px] text-muted">
+                        {item.label} · {formatDate(todayIn(me.timezone, new Date(item.deletedAt)))}
+                      </p>
+                    </div>
+                    <TrashRowActions table={item.table} id={item.id} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Section>
+        ) : null}
 
         <Section title="Verimi indir">
           <p className="mb-5 text-[15px] leading-relaxed text-muted">

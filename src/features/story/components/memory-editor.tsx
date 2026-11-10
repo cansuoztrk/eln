@@ -28,6 +28,8 @@ export type MemoryDraft = {
   specialNote: string;
   category: MemoryCategory;
   tags: string;
+  albumId: string;
+  voiceMemoryId: string;
   starSize: number;
   starTone: StarTone;
   status: "draft" | "published";
@@ -38,7 +40,21 @@ export type MemoryDraft = {
  * left empty or given as just a month or a year, and nothing is required
  * beyond a title.
  */
-export function MemoryEditor({ initial, initialPhotos, backHref }: { initial: MemoryDraft; initialPhotos: Photo[]; backHref: string }) {
+type Option = { id: string; title: string };
+
+export function MemoryEditor({
+  initial,
+  initialPhotos,
+  backHref,
+  albums = [],
+  voices = [],
+}: {
+  initial: MemoryDraft;
+  initialPhotos: Photo[];
+  backHref: string;
+  albums?: Option[];
+  voices?: Option[];
+}) {
   const router = useRouter();
   const [form, setForm] = useState(initial);
   const [photos, setPhotos] = useState(initialPhotos);
@@ -52,9 +68,9 @@ export function MemoryEditor({ initial, initialPhotos, backHref }: { initial: Me
 
   const save = (publish: boolean) => (event?: FormEvent) => {
     event?.preventDefault();
-    const { status: _status, tags, ...rest } = form;
+    const { status: _status, tags, albumId, voiceMemoryId, ...rest } = form;
     void _status;
-    run({ ...rest, tags: parseTags(tags), photoIds: photos.map((p) => p.id), publish });
+    run({ ...rest, tags: parseTags(tags), photoIds: photos.map((p) => p.id), albumId: albumId || null, voiceMemoryId: voiceMemoryId || null, publish });
   };
 
   function shift(index: number, step: -1 | 1) {
@@ -122,6 +138,35 @@ export function MemoryEditor({ initial, initialPhotos, backHref }: { initial: Me
             <Input {...describedBy("m-tags", fieldErrors.tags, true)} value={form.tags} onChange={(e) => set("tags", e.target.value)} />
           </Field>
         </div>
+
+        {albums.length > 0 || voices.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2">
+            {albums.length > 0 ? (
+              <Field htmlFor="m-album" label="Albüm" optional hint="Anının altında albüme bir bağlantı çıkar.">
+                <Select id="m-album" value={form.albumId} onChange={(e) => set("albumId", e.target.value)}>
+                  <option value="">Yok</option>
+                  {albums.map((album) => (
+                    <option key={album.id} value={album.id}>
+                      {album.title}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            ) : null}
+            {voices.length > 0 ? (
+              <Field htmlFor="m-voice" label="Ses kaydı" optional hint="Anının içinde dinlenebilir.">
+                <Select id="m-voice" value={form.voiceMemoryId} onChange={(e) => set("voiceMemoryId", e.target.value)}>
+                  <option value="">Yok</option>
+                  {voices.map((voice) => (
+                    <option key={voice.id} value={voice.id}>
+                      {voice.title}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            ) : null}
+          </div>
+        ) : null}
 
         <div>
           <div className="mb-3 flex items-center justify-between gap-3">

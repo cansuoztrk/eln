@@ -140,6 +140,9 @@ export const FACTS = {
   song: {
     artist: "Onur Can Özcan",
     title: "Anılar Şarkısı",
+    // The official links Arda gave, without the share-tracking parameters.
+    youtubeUrl: "https://www.youtube.com/watch?v=bpMRUwYpNkM",
+    spotifyUrl: "https://open.spotify.com/track/4TJCZsX5VjPZwUfho4mknR",
   },
 } as const;
 

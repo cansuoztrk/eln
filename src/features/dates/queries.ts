@@ -55,7 +55,12 @@ export async function getDate(session: Session, key: string): Promise<Relationsh
 
 /** "Today" for the person looking at the page — their city, not their device. */
 export function viewerToday(session: Session, now: Date = new Date()): PlainDate {
-  return todayIn(session.profile.timezone, now);
+  return todayIn(viewerTimezone(session), now);
+}
+
+/** The viewer's timezone: the one set for their city in the space, not their device's. */
+export function viewerTimezone(session: Session): string {
+  return session.role === "owner" ? session.space.owner_timezone : session.space.partner_timezone;
 }
 
 /** A date together with what may truthfully be said about it today. */
@@ -73,5 +78,5 @@ export async function getDateStatus(
 export function timezoneFor(session: Session, date: Pick<RelationshipDate, "person">): string {
   if (date.person === "owner") return session.space.owner_timezone;
   if (date.person === "partner") return session.space.partner_timezone;
-  return session.profile.timezone;
+  return viewerTimezone(session);
 }

@@ -41,14 +41,16 @@ export async function saveCapsuleAction(input: CapsuleInput): Promise<ActionResu
     : await session.supabase.from("time_capsules").insert({ ...row, space_id: session.space.id }).select("id").maybeSingle();
   if (error || !data) return fail(GENERIC_ERROR);
 
-  // Replace the capsule's files. Row level security only accepts the author's own uploads.
-  await session.supabase.from("time_capsule_items").delete().eq("capsule_id", data.id);
+  // Bring the capsule's files in line with the chosen set: add first, then remove
+  // what was taken out. Row level security only accepts the author's own uploads.
   if (value.assetIds.length > 0) {
     const { error: itemError } = await session.supabase
       .from("time_capsule_items")
-      .insert(value.assetIds.map((assetId, index) => ({ capsule_id: data.id, asset_id: assetId, space_id: session.space.id, sort_order: index })));
+      .upsert(value.assetIds.map((assetId, index) => ({ capsule_id: data.id, asset_id: assetId, space_id: session.space.id, sort_order: index })), { onConflict: "capsule_id,asset_id" });
     if (itemError) return fail("Kapsül kaydedildi ama dosyaları eklenemedi.");
   }
+  const stale = session.supabase.from("time_capsule_items").delete().eq("capsule_id", data.id);
+  await (value.assetIds.length > 0 ? stale.not("asset_id", "in", `(${value.assetIds.join(",")})`) : stale);
 
   revalidatePath("/capsules");
   revalidatePath("/studio/capsules");

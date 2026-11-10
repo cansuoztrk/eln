@@ -16,6 +16,7 @@ export type Memory = {
   specialNote: string;
   category: string;
   tags: string[];
+  albumId: string | null;
   voiceMemoryId: string | null;
   /** Set on the two seeded milestones: "met" / "together". */
   relationshipDateKey: string | null;
@@ -53,6 +54,7 @@ async function toMemories(session: Session, rows: Row[], withPhotos: boolean): P
       specialNote: row.special_note,
       category: row.category,
       tags: row.tags,
+      albumId: row.album_id,
       voiceMemoryId: row.voice_memory_id,
       relationshipDateKey: row.relationship_date_key,
       starSize: row.star_size,

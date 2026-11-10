@@ -35,7 +35,9 @@ Türetilen ve kodda hesaplanan (asla elle yazılmayan) değerler:
 - Uzak mesafe ilişkisi: Arda İstanbul'da, Eln Bakü'de.
 - **Henüz yüz yüze buluşmadılar.** Birlikte çekilmiş fotoğraf yok.
 - Fotoğraflar: Arda yalnızca Eln'in gerçek fotoğraflarını yükleyecek.
-- Şarkıları: **Onur Can Özcan — "Anılar Şarkısı"**.
+- Şarkıları: **Onur Can Özcan — "Anılar Şarkısı"** (platformlardaki resmî adı "Anılar").
+  Resmî bağlantılar (Arda verdi, 2026-11-10; paylaşım izleme parametreleri çıkarıldı):
+  YouTube `https://www.youtube.com/watch?v=bpMRUwYpNkM` · Spotify `https://open.spotify.com/track/4TJCZsX5VjPZwUfho4mknR`.
 - Eln Hello Kitty'yi seviyor.
 - Zaman zaman kırgınlık/küslük yaşanabiliyor; proje hazırlanırken de biraz kırgınlık var.
   **Sebebi bilinmiyor ve hiçbir metinde tahmin edilmez.**
@@ -47,7 +49,6 @@ Türetilen ve kodda hesaplanan (asla elle yazılmayan) değerler:
 - Doğum yılları.
 - İlk buluşmanın tarihi, yeri, planı; herhangi bir seyahat bilgisi.
 - Her mektubun, 365 notun, anı açıklamasının gerçek metni.
-- Şarkının resmî YouTube/Spotify bağlantısı (Studio'dan girilir).
 - Ortak hayaller listesi.
 
 ## Duygusal referans (yayımlanmaz)

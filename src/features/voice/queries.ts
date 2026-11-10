@@ -52,3 +52,15 @@ export async function listVoices(session: Session): Promise<Voice[]> {
       };
     });
 }
+
+/** The viewer's own recordings, as choices for attaching one to a memory. */
+export async function listMyVoiceOptions(session: Session): Promise<{ id: string; title: string }[]> {
+  const { data } = await session.supabase
+    .from("voice_memories")
+    .select("id, title")
+    .eq("space_id", session.space.id)
+    .eq("created_by", session.userId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}

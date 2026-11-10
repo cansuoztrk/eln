@@ -32,6 +32,8 @@ export async function saveMemoryAction(input: MemoryInput): Promise<ActionResult
     special_note: value.specialNote,
     category: value.category,
     tags: value.tags,
+    album_id: value.albumId,
+    voice_memory_id: value.voiceMemoryId,
     star_size: value.starSize,
     star_tone: value.starTone,
     status: value.publish ? ("published" as const) : ("draft" as const),
@@ -46,28 +48,21 @@ export async function saveMemoryAction(input: MemoryInput): Promise<ActionResult
         .maybeSingle();
   if (error || !data) return fail(value.id ? "Bu anı kaydedilemedi." : GENERIC_ERROR);
 
-  // Replace the photo set, keeping the chosen order.
-  const { error: clearError } = await session.supabase.from("memory_photos").delete().eq("memory_id", data.id);
-  if (clearError) return fail("Anı kaydedildi ama fotoğrafları güncellenemedi.");
+  // Bring the photo set in line with the chosen order: write the new set first,
+  // then remove what is no longer in it — so a failure never leaves the memory bare.
   if (value.photoIds.length > 0) {
-    const { error: linkError } = await session.supabase.from("memory_photos").insert(
-      value.photoIds.map((photoId, index) => ({
-        memory_id: data.id,
-        photo_id: photoId,
-        space_id: session.space.id,
-        sort_order: index,
-      })),
+    const { error: linkError } = await session.supabase.from("memory_photos").upsert(
+      value.photoIds.map((photoId, index) => ({ memory_id: data.id, photo_id: photoId, space_id: session.space.id, sort_order: index })),
+      { onConflict: "memory_id,photo_id" },
     );
-    if (linkError) return fail("Anı kaydedildi ama fotoğrafları eklenemedi.");
+    if (linkError) return fail("Anı kaydedildi ama fotoğrafları güncellenemedi.");
+  }
+  const stale = session.supabase.from("memory_photos").delete().eq("memory_id", data.id);
+  const { error: clearError } = await (value.photoIds.length > 0 ? stale.not("photo_id", "in", `(${value.photoIds.join(",")})`) : stale);
+  if (clearError) return fail("Anı kaydedildi ama eski fotoğrafları kaldırılamadı.");
 
-    if (value.publish) {
-      await session.supabase
-        .from("photos")
-        .update({ status: "published" })
-        .in("id", value.photoIds)
-        .eq("created_by", session.userId)
-        .eq("status", "draft");
-    }
+  if (value.publish && value.photoIds.length > 0) {
+    await session.supabase.from("photos").update({ status: "published" }).in("id", value.photoIds).eq("created_by", session.userId).eq("status", "draft");
   }
 
   refresh();

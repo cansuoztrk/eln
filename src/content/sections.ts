@@ -70,7 +70,7 @@ export const SECTION_DEFAULTS: { [K in SectionKey]: SectionData<K> } = {
   "story.interlude": { note: "" },
   "distance.intro": { note: "" },
   "meeting.note": { note: "" },
-  song: { youtubeUrl: "", spotifyUrl: "", note: "" },
+  song: { youtubeUrl: FACTS.song.youtubeUrl, spotifyUrl: FACTS.song.spotifyUrl, note: "" },
   "corner.messages": { messages: [] },
 };
 
