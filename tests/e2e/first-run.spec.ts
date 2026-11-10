@@ -87,7 +87,7 @@ test("the owner uploads a photo and publishes it", async () => {
   await owner.reload();
   await owner.getByRole("checkbox").first().click();
   await owner.getByRole("toolbar").getByRole("button", { name: "Yayımla" }).click();
-  await expect(owner.getByText("Yayında").first()).toBeVisible();
+  await expect(owner.locator('section[aria-labelledby="library-title"] li').getByText("Yayında", { exact: true })).toBeVisible();
 
   await owner.goto("/gallery");
   await expect(owner.locator("figure button")).toHaveCount(1);
