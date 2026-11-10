@@ -1,0 +1,114 @@
+/**
+ * Every room of the world, in one list. The header, the full-screen menu,
+ * the home page map and the mobile bar all read from here, so a room that is
+ * not listed is simply not linked from anywhere.
+ */
+
+export type NavItem = {
+  href: string;
+  /** Turkish name — what the person reads. */
+  label: string;
+  /** English name — the small label above it. */
+  eyebrow: string;
+  /** One plain line about what is inside. */
+  description: string;
+  /** Shown in the desktop header and the mobile bar. */
+  primary?: boolean;
+};
+
+export const WORLD_NAV: NavItem[] = [
+  {
+    href: "/story",
+    label: "Hikâyemiz",
+    eyebrow: "Our Story",
+    description: "Tanıştığımız günden bugüne.",
+    primary: true,
+  },
+  {
+    href: "/gallery",
+    label: "Galeri",
+    eyebrow: "Eln's Gallery",
+    description: "Fotoğraflar, albümler, favoriler.",
+    primary: true,
+  },
+  {
+    href: "/letters",
+    label: "Mektuplar",
+    eyebrow: "Letters",
+    description: "Zarflar ve içindekiler.",
+    primary: true,
+  },
+  {
+    href: "/distance",
+    label: "Mesafe",
+    eyebrow: "Beyond Distance",
+    description: "İki şehir, aynı gökyüzü.",
+    primary: true,
+  },
+  {
+    href: "/universe",
+    label: "Anı Evreni",
+    eyebrow: "The Memory Universe",
+    description: "Her anı bir yıldız.",
+  },
+  {
+    href: "/days",
+    label: "Özel Günler",
+    eyebrow: "Special Days",
+    description: "Doğum günleri ve yıldönümleri.",
+  },
+  {
+    href: "/reasons",
+    label: "365 Not",
+    eyebrow: "365 Reasons",
+    description: "Her güne küçük bir not.",
+  },
+  {
+    href: "/song",
+    label: "Şarkımız",
+    eyebrow: "Our Song",
+    description: "Anılar Şarkısı.",
+  },
+  {
+    href: "/future",
+    label: "Hayaller",
+    eyebrow: "Our Future",
+    description: "Birlikte yapmak istediklerimiz.",
+  },
+  {
+    href: "/capsules",
+    label: "Zaman Kapsülü",
+    eyebrow: "Time Capsule",
+    description: "Günü gelince açılacaklar.",
+  },
+  {
+    href: "/voice",
+    label: "Sesli Anılar",
+    eyebrow: "Voice Memories",
+    description: "Kayıtlar ve sesler.",
+  },
+  {
+    href: "/journal",
+    label: "Günlük",
+    eyebrow: "Shared Journal",
+    description: "İkimizin defteri.",
+  },
+  {
+    href: "/questions",
+    label: "Sorular",
+    eyebrow: "Our Questions",
+    description: "Birbirimizi tanıyalım.",
+  },
+  {
+    href: "/corner",
+    label: "Minik Dünya",
+    eyebrow: "Eln's Little World",
+    description: "Fiyonklar, sticker'lar, tatlı şeyler.",
+  },
+];
+
+export const PRIMARY_NAV = WORLD_NAV.filter((item) => item.primary);
+
+export function isActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
