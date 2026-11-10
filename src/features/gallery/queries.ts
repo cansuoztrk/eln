@@ -181,3 +181,22 @@ export async function listAlbums(session: Session, options: { includeDrafts?: bo
     };
   });
 }
+
+/** Which published memories each photo belongs to — for "seen in" links in the lightbox. */
+export async function listPhotoMemories(
+  session: Session,
+  photoIds: string[],
+): Promise<Record<string, { id: string; title: string }[]>> {
+  if (photoIds.length === 0) return {};
+  const { data } = await session.supabase
+    .from("memory_photos")
+    .select("photo_id, memory:memories(id, title, status, deleted_at)")
+    .in("photo_id", photoIds);
+  const out: Record<string, { id: string; title: string }[]> = {};
+  for (const row of data ?? []) {
+    const memory = row.memory;
+    if (!memory || memory.status !== "published" || memory.deleted_at) continue;
+    (out[row.photo_id] ??= []).push({ id: memory.id, title: memory.title });
+  }
+  return out;
+}

@@ -146,3 +146,50 @@ export async function loadLibraryAction(): Promise<ActionResult<Photo[]>> {
   if (!session) return fail("Oturumun kapanmış. Yeniden giriş yap.");
   return ok(await listLibrary(session));
 }
+
+const MAX_BULK = 200;
+
+/** Moves several of the caller's photos into an album, or out of any album. */
+export async function movePhotosToAlbumAction(ids: string[], albumId: string | null): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session) return fail("Oturumun kapanmış. Yeniden giriş yap.");
+  if (ids.length === 0 || ids.length > MAX_BULK) return fail("Geçersiz seçim.");
+
+  const { error } = await session.supabase.from("photos").update({ album_id: albumId }).in("id", ids);
+  if (error) return fail(GENERIC_ERROR);
+
+  refresh();
+  return ok(undefined, albumId ? "Albüme taşındı." : "Albümden çıkarıldı.");
+}
+
+/** Moves several photos to the trash at once. They can be restored from there. */
+export async function trashPhotosAction(ids: string[]): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session) return fail("Oturumun kapanmış. Yeniden giriş yap.");
+  if (ids.length === 0 || ids.length > MAX_BULK) return fail("Geçersiz seçim.");
+
+  const { error } = await session.supabase
+    .from("photos")
+    .update({ deleted_at: new Date().toISOString() })
+    .in("id", ids)
+    .is("deleted_at", null);
+  if (error) return fail(GENERIC_ERROR);
+
+  refresh();
+  revalidatePath("/studio/trash");
+  return ok(undefined, "Çöp kutusuna taşındı. İstersen geri alabilirsin.");
+}
+
+export async function reorderAlbumsAction(ids: string[]): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session || session.role !== "owner") return fail("Bu işlem için yetkin yok.");
+  if (ids.length > MAX_BULK) return fail("Geçersiz sıralama.");
+
+  const results = await Promise.all(
+    ids.map((id, index) => session.supabase.from("albums").update({ sort_order: index }).eq("id", id)),
+  );
+  if (results.some((r) => r.error)) return fail(GENERIC_ERROR);
+
+  refresh();
+  return ok(undefined, "Albüm sırası kaydedildi.");
+}
