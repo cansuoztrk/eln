@@ -38,6 +38,24 @@ erişim sınırları → bütün odalar), yedek → sıfırla → geri yükle pr
 
 Yeni bir oda eklendiğinde `src/content/navigation.ts` içindeki `BUILT` listesine yazılır; her menüde kendiliğinden görünür.
 
+## Doğrulama durumu (2026-11-10)
+
+| Kontrol | Sonuç |
+| --- | --- |
+| `tsc --noEmit`, `eslint .`, `next build` | temiz |
+| Birim testleri (`npm run test`) | 46 / 46 — tarih kuralları, gökyüzü, yükleme kuralları, içerik kuralları, kod kuralları |
+| RLS / güvenlik testleri (`npm run test:db`) | 23 / 23 — gerçek API üzerinden, owner / partner / yabancı / anonim |
+| Uçtan uca (`npm run test:e2e`) | 12 / 12 — üretim derlemesinde ilk kurulum hikâyesi + iki rol için bütün odalar |
+| Yedek → sıfırla → geri yükle provası | satır ve dosya sayıları birebir |
+
+Elle bakılması gerekenler (otomatik test edilemeyenler):
+
+- **Ses kaydı:** başsız tarayıcıda mikrofon yok; kayıt akışı gerçek bir telefonda denenmeli (Safari + Chrome).
+- **Şarkı oynatıcısı:** resmî YouTube/Spotify bağlantısı henüz girilmedi; girince `/song` ve Gift'teki düğme denenmeli.
+- **Gerçek fotoğraflarla görünüm:** tasarım soyut test görselleriyle kontrol edildi; ilk gerçek yüklemelerden sonra
+  galeri ve hikâye sayfalarına bir kez göz at.
+- **Yayın ortamı:** Supabase bulut projesi ve barındırma henüz kurulmadı (`README.md` → Yayına alma).
+
 ## Sonra
 
 - E2E paketini genişlet: mobil görünüm kontrolleri, galeri lightbox, özel gün baskısı, kapsül açılışı.
