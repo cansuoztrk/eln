@@ -264,7 +264,8 @@ export function GiftExperience({ content, exitHref = "/", preview = false }: { c
                     transition={{ duration: reduce ? 0.3 : 1.1, ease: EASE_SOFT }}
                     className="flex max-h-[82dvh] w-full flex-col items-center outline-none"
                   >
-                    <article className="paper paper-grain w-full overflow-y-auto px-7 py-9 text-left sm:px-12 sm:py-12">
+                    {/* The foot of the sheet fades, so a letter longer than the screen reads as "there is more". */}
+                    <article className="paper paper-grain w-full overflow-y-auto px-7 py-9 pb-16 text-left [mask-image:linear-gradient(to_bottom,black_calc(100%_-_3.5rem),transparent)] sm:px-12 sm:py-12 sm:pb-20">
                       <p className="prose-letter font-display text-[19px] leading-[1.85] text-ink-soft sm:text-[21px]">
                         {content.letter}
                       </p>

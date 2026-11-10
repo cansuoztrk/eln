@@ -44,7 +44,7 @@ Yeni bir oda eklendiğinde `src/content/navigation.ts` içindeki `BUILT` listesi
 | Kontrol | Sonuç |
 | --- | --- |
 | `tsc --noEmit`, `eslint .`, `next build` | temiz |
-| Birim testleri (`npm run test`) | 54 / 54 — tarih kuralları, gökyüzü, yükleme kuralları, içerik kuralları, yazılan metinlerin kuralları, kod kuralları |
+| Birim testleri (`npm run test`) | 56 / 56 — tarih kuralları, gökyüzü, yükleme kuralları, içerik kuralları, yazılan metinlerin kuralları, kod kuralları |
 | RLS / güvenlik testleri (`npm run test:db`) | 27 / 27 — gerçek API üzerinden, owner / partner / yabancı / anonim; dosya sahipliği ve oda doluluğu dahil |
 | Uçtan uca (`npm run test:e2e`) | 12 / 12 — üretim derlemesinde ilk kurulum hikâyesi + iki rol için bütün odalar |
 | Yedek → sıfırla → geri yükle provası | satır ve dosya sayıları birebir (albüm kapağı düzeltmesinden sonra yeniden koşulmalı) |

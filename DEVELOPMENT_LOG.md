@@ -85,7 +85,8 @@ Arda bütün cümlelerin ve paragrafların onun yerine, duygusal bir dille yazı
 - **Sınırlar korundu.** Yalnızca Arda'nın hisleri ve kesin bilgiler. Hiçbir olay, konuşma ya da anı
   uydurulmadı; Eln'in ne hissettiği yazılmadı; 7 Kasım mesajına dokunulmadı; cevap/söz/af isteyen
   ya da kırgınlığa değinen tek cümle yok; sesli/görüntülü görüşme gibi bilinmeyen şeyler iddia
-  edilmedi; sayı ve tarihler elle yazılmadı, `FACTS`'ten hesaplanıyor. Bunların hepsi birim testiyle denetleniyor.
+  edilmedi; "bugün şunu gördüm" gibi güne iliştirilmiş küçük olaylar bile yazılmadı; sayı ve tarihler elle
+  yazılmadı, `FACTS`'ten hesaplanıyor. Bunların hepsi birim testiyle denetleniyor.
 - **Arda'nın elinde.** Mektuplar ve notlar `Studio → Hazır metinler`'den **taslak** olarak eklenir;
   o okuyup yayımlamadan Eln görmez. Dönüm noktaları yalnızca boş sayfayı doldurur.
 
@@ -95,7 +96,7 @@ Arda bütün cümlelerin ve paragrafların onun yerine, duygusal bir dille yazı
 | --- | --- |
 | `tsc --noEmit`, `eslint .` | temiz |
 | `next build` | temiz |
-| Birim testleri | 54 / 54 (içerik kuralları + yazılan metinlerin kuralları dahil) |
+| Birim testleri | 56 / 56 (içerik kuralları + yazılan metinlerin kuralları dahil) |
 | RLS / güvenlik testleri | 27 / 27 (dosya sahipliği ve oda doluluğu testleri dahil) |
 | Uçtan uca (üretim derlemesi) | 12 / 12 — kurulum → içerik → davet → hediye → erişim sınırları → iki rol için bütün odalar |
 | Gerçek fotoğraflarla yükleme | 5 / 5 yüklendi, her biri 3 EXIF'siz WebP varyantı |

@@ -145,6 +145,17 @@ describe("the words written for Arda (src/content/writing.ts)", () => {
     for (const text of everything) for (const phrase of unknown) expect(lower(text).includes(phrase), `"${phrase}" in: ${text.slice(0, 70)}`).toBe(false);
   });
 
+  it("pins no invented happening to a day — a note says what is felt, not what was seen or done today", () => {
+    for (const note of WRITTEN_NOTES) {
+      expect(/^bugün\b[^.]*\b(gördüm|dedim|aradım|çalıştım|gittim|gitti|yedim|izledim|dinledim|yürüdüm)\b/.test(lower(note.body)), note.body).toBe(false);
+    }
+  });
+
+  it("never hangs a suffix on a computed word, so the sentence stays right if a date changes", () => {
+    const source = readFileSync("src/content/writing.ts", "utf8");
+    expect(source.match(/\$\{[A-Z_]+_WEEKDAY\}[a-zçğıöşü]/g) ?? []).toEqual([]);
+  });
+
   it("writes no year, age or count by hand — numbers come from the facts", () => {
     const source = readFileSync("src/content/writing.ts", "utf8");
     const prose = source.slice(source.indexOf("export const WRITTEN_SECTIONS"));
