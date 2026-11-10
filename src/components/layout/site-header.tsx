@@ -8,8 +8,10 @@ import { isActive, PRIMARY_NAV } from "@/content/navigation";
 import { cn } from "@/lib/cn";
 import { WorldMenu } from "./world-menu";
 
-/** Routes that sit on the dusk palette and need light chrome. */
+/** Routes that sit entirely on the dusk palette and always need light chrome. */
 const DUSK_ROUTES = ["/universe"];
+/** Routes that open on a dusk hero: light chrome until the page is scrolled. */
+const DUSK_HERO_ROUTES = ["/distance"];
 
 type Props = { isOwner: boolean; partnerName: string; ownerName: string };
 
@@ -17,7 +19,9 @@ export function SiteHeader({ isOwner, partnerName, ownerName }: Props) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const dusk = DUSK_ROUTES.some((route) => isActive(pathname, route));
+  const dusk =
+    DUSK_ROUTES.some((route) => isActive(pathname, route)) ||
+    (!scrolled && DUSK_HERO_ROUTES.some((route) => pathname === route));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);

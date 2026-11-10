@@ -3,7 +3,20 @@
 export type StudioNavItem = { href: string; label: string; hint: string };
 export type StudioNavGroup = { title: string; items: StudioNavItem[] };
 
-export const STUDIO_NAV: StudioNavGroup[] = [
+/** Screens that exist today; the menu never offers one that is not built yet. */
+const BUILT = new Set([
+  "/studio",
+  "/studio/opening",
+  "/studio/invite",
+  "/studio/photos",
+  "/studio/story",
+  "/studio/letters",
+  "/studio/days",
+  "/studio/texts",
+  "/studio/trash",
+]);
+
+const ALL_GROUPS: StudioNavGroup[] = [
   {
     title: "Başlangıç",
     items: [
@@ -33,3 +46,8 @@ export const STUDIO_NAV: StudioNavGroup[] = [
     ],
   },
 ];
+
+export const STUDIO_NAV: StudioNavGroup[] = ALL_GROUPS.map((group) => ({
+  ...group,
+  items: group.items.filter((item) => BUILT.has(item.href)),
+})).filter((group) => group.items.length > 0);

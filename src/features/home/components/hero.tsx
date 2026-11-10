@@ -55,7 +55,7 @@ export function Hero({
         ) : null}
       </div>
 
-      <Reveal delay={1} className="shell relative pb-10 md:pb-14">
+      <Reveal delay={1} className="shell relative pb-28 md:pb-14">
         <div className="mx-auto grid max-w-3xl grid-cols-[auto_1fr_auto] items-end gap-3 sm:gap-6">
           {[owner, partner].map((place, i) => (
             <div key={place.city} className={i === 0 ? "order-1 text-left" : "order-3 text-right"}>

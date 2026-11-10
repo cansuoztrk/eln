@@ -16,7 +16,13 @@ export type NavItem = {
   primary?: boolean;
 };
 
-export const WORLD_NAV: NavItem[] = [
+/**
+ * Rooms that exist today. A room is listed here only once its page is built,
+ * so nothing in the world ever links to a door that does not open.
+ */
+const BUILT = new Set(["/story", "/gallery", "/letters", "/distance", "/days"]);
+
+const ALL_ROOMS: NavItem[] = [
   {
     href: "/story",
     label: "Hikâyemiz",
@@ -106,6 +112,8 @@ export const WORLD_NAV: NavItem[] = [
     description: "Fiyonklar, sticker'lar, tatlı şeyler.",
   },
 ];
+
+export const WORLD_NAV: NavItem[] = ALL_ROOMS.filter((item) => BUILT.has(item.href));
 
 export const PRIMARY_NAV = WORLD_NAV.filter((item) => item.primary);
 
