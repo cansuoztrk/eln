@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { parseEnv } from "@/lib/env-check";
 
 /**
  * Runs before every page request. Three jobs:
@@ -13,25 +14,9 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = [/^\/login$/, /^\/setup$/, /^\/invite\/[^/]+$/, /^\/unconfigured$/, /^\/offline$/];
 
-const REQUIRED = [
-  "SUPABASE_URL",
-  "SUPABASE_ANON_KEY",
-  "SUPABASE_SERVICE_ROLE_KEY",
-  "APP_SECRET",
-  "SETUP_SECRET",
-] as const;
-
-function backendOrigin(): string | null {
-  try {
-    return process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : null;
-  } catch {
-    return null;
-  }
-}
-
-function contentSecurityPolicy(nonce: string): string {
+function contentSecurityPolicy(nonce: string, backendUrl: string | undefined): string {
   const dev = process.env.NODE_ENV !== "production";
-  const backend = backendOrigin() ?? "";
+  const backend = backendUrl ? new URL(backendUrl).origin : "";
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`,
@@ -56,7 +41,9 @@ function contentSecurityPolicy(nonce: string): string {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const csp = contentSecurityPolicy(nonce);
+  // Same rules as the pages: a value that is present but wrong also leads to the explanation page.
+  const env = parseEnv();
+  const csp = contentSecurityPolicy(nonce, env.success ? env.data.SUPABASE_URL : undefined);
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
@@ -67,8 +54,7 @@ export async function proxy(request: NextRequest) {
     return response;
   };
 
-  const configured = REQUIRED.every((key) => Boolean(process.env[key]));
-  if (!configured) {
+  if (!env.success) {
     if (pathname === "/unconfigured") {
       return finish(NextResponse.next({ request: { headers: requestHeaders } }));
     }
@@ -81,7 +67,7 @@ export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const refreshed: { name: string; value: string; options: Record<string, unknown> }[] = [];
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+  const supabase = createServerClient(env.data.SUPABASE_URL, env.data.SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (list) => {

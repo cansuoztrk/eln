@@ -1,9 +1,16 @@
 import "server-only";
+import { connection } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { hashToken } from "./tokens";
 
-/** Has the one-time setup been completed? */
+/**
+ * Has the one-time setup been completed?
+ *
+ * Asked fresh on every request — never while the site is being built, when the
+ * answer would be frozen into the page (and the build has no database at all).
+ */
 export async function spaceExists(): Promise<boolean> {
+  await connection();
   const { count, error } = await createAdminClient()
     .from("private_spaces")
     .select("id", { count: "exact", head: true });
@@ -17,6 +24,7 @@ export type InvitePreview =
 
 /** What the invite page may show before the person has chosen a password. */
 export async function previewInvite(token: string): Promise<InvitePreview> {
+  await connection();
   if (token.length < 20 || token.length > 200) return { valid: false };
 
   const admin = createAdminClient();
