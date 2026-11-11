@@ -7,6 +7,8 @@ import { rateLimit } from "@/lib/security/rate-limit";
 import { createAdminClient, MEDIA_BUCKET } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
+// Gathering every file into one archive is the slowest thing the site does.
+export const maxDuration = 60;
 
 /**
  * "Verimi indir". `?format=json` returns everything the person wrote as one

@@ -8,6 +8,9 @@ import { StudioSidebar, StudioTabs } from "./studio-nav";
 
 export const metadata: Metadata = { title: { default: "Studio", template: "%s · Studio" } };
 
+// Preparing a photograph's copies can take longer than a host's default limit for a server action.
+export const maxDuration = 60;
+
 /** Arda's workshop. Partners and strangers never get past `requireOwner`. */
 export default async function StudioLayout({ children }: LayoutProps<"/studio">) {
   await requireOwner();

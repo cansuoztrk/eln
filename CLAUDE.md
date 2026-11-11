@@ -18,6 +18,7 @@ ilgili dosyayı oku.
 | `docs/SECURITY.md` / `docs/PRIVACY.md` | Auth, yükleme, günlük kaydı, izleme ile ilgili her değişiklikte |
 | `docs/CONTENT_GUIDE.md` | Arda için içerik/ton rehberi |
 | `docs/BACKUP_GUIDE.md` | Yedek, geri yükleme, taşıma, yıllık bakım |
+| `docs/KURULUM_REHBERI.md` | Siteyi yayına alma: Supabase + Vercel, adım adım (Arda için) |
 | `docs/ROADMAP.md` | Neyin bittiği, sırada ne olduğu |
 
 ## Değişmez kurallar
@@ -102,6 +103,11 @@ Kurallar:
 
 Önemli kararlar buraya tarihle eklenir (en yeni üstte).
 
+- **2026-11-11 — Yayın hazırlığı: Supabase + Vercel.** Adım adım rehber `docs/KURULUM_REHBERI.md`. Sunucu bölgesi
+  Frankfurt (`vercel.json` → `fra1`; Supabase de Frankfurt önerilir — iki şehre de yakın, sayfa başına birkaç
+  veritabanı çağrısı var). Yükleme/işleme yapan bölümlerde `maxDuration = 60` (barındırıcının varsayılan süresi
+  fotoğraf kopyalarını hazırlamaya yetmeyebilir). Supabase'in yeni anahtarlarında `SUPABASE_ANON_KEY` = Publishable
+  key, `SUPABASE_SERVICE_ROLE_KEY` = Secret key; değişken adları bilerek aynı kaldı. `SITE_URL` isteğe bağlı.
 - **2026-11-10 — Yeni kesin bilgiler ve 365 notun yayında gelmesi.** Arda anlattı: ikisi de gartic.io oynuyordu
   ama oyunda tanışmadılar; oyundan tanıdığı Nehir onu, içinde Dicle, Yusa ve Eln'in olduğu grubuna aldı. Birbirlerine
   "Mosi" / "Posi" derler; sesli konuşurlar, hiç görüntülü konuşmadılar; Arda'nın dili aşk dolu, yer yer esprili.

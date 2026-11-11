@@ -40,6 +40,8 @@ tahmin eden/ele geçiren biri, otomatik tarayıcılar, parola deneyen botlar.
 
 ## Yayına alırken
 
+Adım adım anlatım: [`KURULUM_REHBERI.md`](KURULUM_REHBERI.md). Güvenlik açısından atlanmaması gerekenler:
+
 1. `APP_SECRET` ve `SETUP_SECRET` için yeni, uzun rastgele değerler üret (`openssl rand -base64 48`).
 2. Supabase → Authentication → Sign In / Providers: **e-posta ile kayıt kapalı** ("Allow new users to sign up" kapalı).
 3. Supabase → Auth → parola en az 10 karakter; sızdırılmış parola koruması açık.

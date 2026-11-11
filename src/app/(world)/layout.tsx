@@ -7,6 +7,9 @@ import { getHiddenRooms } from "@/features/home/queries";
 import { requireMember } from "@/lib/auth/session";
 
 /** Everything inside the world. Only members ever reach this layout. */
+// Uploads made from the world (her photos, voice notes, capsules) are prepared on the server too.
+export const maxDuration = 60;
+
 export default async function WorldLayout({ children }: LayoutProps<"/">) {
   const session = await requireMember();
   const { space, role } = session;

@@ -36,6 +36,8 @@ parolanla ilk hesabı oluştur. Bu ekran bir kez çalışır ve kalıcı olarak 
 
 ## Yayına alma
 
+**Adım adım, ekran ekran anlatım:** [`docs/KURULUM_REHBERI.md`](docs/KURULUM_REHBERI.md). Aşağıdaki kısa özettir.
+
 1. [supabase.com](https://supabase.com)'da proje aç. **Authentication → Sign In / Providers**: yeni kullanıcı kaydını kapat.
 2. Şemayı gönder:
 
@@ -48,6 +50,7 @@ parolanla ilk hesabı oluştur. Bu ekran bir kez çalışır ve kalıcı olarak 
    ```
 
 3. Barındırma sağlayıcında (Vercel vb.) `.env.example`'daki değişkenleri tanımla. Hiçbiri `NEXT_PUBLIC_` değildir.
+   Supabase'in yeni anahtarlarında `SUPABASE_ANON_KEY` = *Publishable key*, `SUPABASE_SERVICE_ROLE_KEY` = *Secret key*.
 4. Yayınla, `https://<alan-adın>/setup`'ı aç, hesabını oluştur.
 5. `Studio`'da içeriği hazırla → `Studio → Davet` ile Eln'in bağlantısını oluştur ve kendin ilet.
 6. İlk yedeği al: [`docs/BACKUP_GUIDE.md`](docs/BACKUP_GUIDE.md).
