@@ -141,12 +141,17 @@ Bunları bir not dosyasına geçici olarak yaz; 6. adımda Vercel'e gireceksin.
 
 | Ne | Nerede | Neye benzer |
 | --- | --- | --- |
-| **Project URL** | Üstteki **Connect** düğmesi ya da **Project Settings → Data API** | `https://abcd….supabase.co` |
+| **Project URL** | En kolayı kendin yazmak: `https://` + **Project ID** + `.supabase.co`. (Panelde de **Project Settings → Data API** sayfasında yazar.) | `https://abcdefghijklmnopqrst.supabase.co` |
 | **Publishable key** | **Project Settings → API Keys** | `sb_publishable_…` |
 | **Secret key** | Aynı sayfa (yoksa **Create new secret key**) | `sb_secret_…` |
 
 Sayfada "anon" ve "service_role" adlı eski anahtarlar görünüyorsa onları kullanma; yukarıdaki
 ikisini kullan. **Secret key her şeye erişebilir** — yalnızca Vercel'e yazılacak.
+
+> **Project URL'de en sık yapılan üç hata** (site bunları yakalar ve söyler):
+> - `https://` olmadan yazmak (`abcd….supabase.co`)
+> - Tarayıcının adres çubuğundaki panel adresini kopyalamak (`https://supabase.com/dashboard/…`)
+> - "Connect" penceresindeki veritabanı bağlantı satırını kopyalamak (`postgresql://…`)
 
 **Kontrol:** Üç değer de elinde.
 
@@ -178,12 +183,14 @@ node -e "console.log(require('crypto').randomBytes(36).toString('base64url'))"
    | `APP_SECRET` | 5. adımdaki birinci metin |
    | `SETUP_SECRET` | 5. adımdaki ikinci metin |
 
-   Değerlerin başında ya da sonunda boşluk kalmasın.
+   Değerlerin başında ya da sonunda boşluk kalmasın. Her satırda **Production** ve **Preview**
+   kutuları işaretli olsun (varsayılan böyledir).
 4. **Deploy**. İki-üç dakika sürer; bitince konfeti çıkar ve sitenin adresi görünür
    (`eln-….vercel.app` gibi).
 
-**Kontrol:** Adresi açınca "Kurulum" ekranı geliyor. (Bunun yerine eksik ayarları sayan bir sayfa
-gelirse: aşağıda *Sorun giderme*.)
+**Kontrol:** Adresi açınca "Kurulum" ekranı geliyor. Bunun yerine **"Sunucu henüz bağlanmadı"**
+sayfası gelirse, o sayfa hangi değişkenin neden hatalı olduğunu yazar: Vercel'de onu düzelt,
+sonra **Deployments → en üstteki yayın → ⋯ → Redeploy**.
 
 ## 7. İlk hesabı oluştur
 
@@ -242,10 +249,11 @@ Yayın öncesi güvenlik listesi: [`SECURITY.md`](SECURITY.md) → *Yayına alı
 
 | Ne görüyorsun | Neden | Ne yapmalı |
 | --- | --- | --- |
-| Site "ayarlar eksik" diyen bir sayfa açıyor ve değişken adları sayıyor | O adlardaki değer Vercel'de yok ya da yanlış yazılmış | **Vercel → Settings → Environment Variables**: adı ve değeri düzelt, sonra **Deployments → ⋯ → Redeploy**. Değişiklik yeniden yayınlamadan geçerli olmaz. |
+| Vercel'de "Build Failed", günlükte `Backend is not configured. Missing or invalid: …` | 11 Kasım 2026'dan önceki sürümde, ayarlar hatalıyken derleme sırasında veritabanına bağlanılmaya çalışılıyordu | Kodun güncel hâlini `main`'e al (1. adımdaki gibi). Artık derleme her durumda geçer; hatalı ayar varsa site açılınca "Sunucu henüz bağlanmadı" sayfasında nedeniyle birlikte yazar. |
+| "Sunucu henüz bağlanmadı" sayfası | Sayfada adı geçen ayar eksik ya da hatalı; altında nedeni yazar | Vercel'de **Settings → Environment Variables**'ta düzelt, sonra **Redeploy**. |
 | `/setup` "anahtar hatalı" diyor | `SETUP_SECRET` farklı ya da başında/sonunda boşluk var | Vercel'deki değeri kopyalayıp yeniden dene; gerekirse değeri değiştirip yeniden yayınla. |
 | `/setup` giriş sayfasına atıyor | Kurulum zaten yapılmış | Normal. `/login`'den e-posta ve parolanla gir. |
-| Giriş yapılamıyor, her seferinde hata | Publishable key ya da Project URL yanlış | 4b'deki değerleri yeniden kopyala, Vercel'de güncelle, yeniden yayınla. |
+| Giriş yapılamıyor, her seferinde hata | Publishable key ya da Project URL başka bir projeye ait | 4b'deki değerleri aynı projeden yeniden kopyala, Vercel'de güncelle, yeniden yayınla. |
 | Fotoğraf "yüklenemedi" diyor | Secret key yanlış ya da `media` kovası yok | Secret key'i kontrol et; Supabase **Storage**'da `media` kovası yoksa 3. adım tamamlanmamış demektir. |
 | Site birden açılmaz oldu | Supabase projesi duraklatılmış | Supabase paneline gir → proje → **Restore project**. Birkaç dakika sürer. |
 | `npx supabase db push` parola hatası veriyor | Veritabanı parolası yanlış | **Project Settings → Database → Reset database password**, yeni parolayla `link` komutunu yeniden çalıştır. |

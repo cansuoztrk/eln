@@ -12,7 +12,7 @@ tahmin eden/ele geçiren biri, otomatik tarayıcılar, parola deneyen botlar.
 | Kurulum kilidi | `SETUP_SECRET` (sabit zamanlı karşılaştırma) + tekil alan indeksi + RPC kontrolü | `setupAction`, `bootstrap_space`, `private_spaces_singleton` |
 | Davet | 256 bit token; yalnızca SHA-256 özeti saklanır; süreli, tek kullanımlık, iptal edilebilir; owner hesabını ele geçiremez | `space_invites`, `acceptInviteAction` |
 | Oturum | Supabase Auth; çerezler `HttpOnly`, `SameSite=Lax`, üretimde `Secure`; dönen yenileme token'ı | `lib/supabase/server.ts`, `proxy.ts` |
-| Anahtarlar | Hiçbir Supabase anahtarı tarayıcıya gitmez; `NEXT_PUBLIC_` değişkeni yok; service role yalnızca `lib/supabase/admin.ts` | `lib/env.ts` |
+| Anahtarlar | Hiçbir Supabase anahtarı tarayıcıya gitmez; `NEXT_PUBLIC_` değişkeni yok; service role yalnızca `lib/supabase/admin.ts`. İki anahtar yer değiştirirse (anon yerine secret → RLS atlanırdı) sunucu açılmaz, nedenini söyler | `lib/env-check.ts`, `lib/env.ts` |
 | Yetki | RLS her tabloda; taslak ve kilitli içerik sorgudan dönmez | `…000300_policies.sql` |
 | Depolama | Tek özel kova, üye politikası yok; erişim yalnızca sunucunun ürettiği süreli imzalı URL ile | `…000500_storage.sql`, `lib/media/server.ts` |
 | Yükleme | MIME beyaz listesi, boyut sınırı, **sihirli bayt** doğrulaması (dosyanın türüne uzantı/başlık değil içerik karar verir), `sharp` piksel sınırı (80 MP), yeniden kodlama | `lib/media/rules.ts`, `server.ts` |

@@ -5,6 +5,38 @@ Yapılan ve yapılamayan işlerin dürüst kaydı. En yeni tur en üstte. Kararl
 
 ---
 
+## 2026-11-11 — İlk Vercel derlemesi düştü: düzeltme
+
+**Belirti.** Arda'nın ilk Vercel derlemesi `/login` sayfasını önceden üretirken durdu:
+`Backend is not configured. Missing or invalid: SUPABASE_URL`.
+
+**Kök neden (CRITICAL — bizde).** `/login`, "kurulum yapıldı mı?" sorusunu istek API'lerinden *önce*
+veritabanına soruyordu. Next.js sayfayı derleme anında üretmeyi denediği için sorgu derlemede çalıştı.
+Yerelde ayar dosyası olduğundan bu hiç görünmedi. Vercel'deki `SUPABASE_URL` ise hatalı girilmişti
+(**ayar hatası — Arda tarafında**), sorgu patladı ve derleme çöktü. Ayarlar doğru olsaydı derleme geçerdi
+ama veritabanına yine boş yere gidilirdi.
+
+**Yapılanlar.**
+- `spaceExists` ve `previewInvite` ilk satırda `await connection()` der: derleme hiçbir koşulda veritabanına
+  gitmez. Bir birim testi bunu korur.
+- Ayar kuralları tek yerde (`src/lib/env-check.ts`); proxy ve sayfalar aynısını kullanır. Değerler kırpılır.
+  Panel adresi, `postgresql://` satırı, sonu yollu adres ve **yer değiştirmiş anahtarlar** reddedilir.
+  Secret key'in anon yerine girilmesi RLS'i atlatırdı; artık sunucu açılmaz ve nedenini söyler.
+- Ayar hatalıyken site çökmez: `/unconfigured` her değişkeni adı ve Türkçe nedeniyle sayar (değerini asla
+  göstermez) ve Vercel'de ne yapılacağını anlatır.
+- `docs/KURULUM_REHBERI.md`: Project URL'yi Project ID'den kurma; en sık üç hata; bu belirti için sorun giderme satırı.
+
+**Doğrulama.**
+- Vercel'deki koşul yerelde birebir üretildi: ayar dosyası yokken, `SUPABASE_URL=supabase.co/proje` ile
+  derleme **düştü**. Düzeltmeden sonra aynı koşulda derleme **geçti**.
+- Hiç ayar yokken de derleme geçti.
+- Hatalı ayarla açılan sitede `/` ve `/login`, `/unconfigured`'a yönlendi. `SUPABASE_URL` için
+  "Geçerli bir adres değil. https://PROJE-ID.supabase.co biçiminde olmalı." yazdı.
+- Birim testleri 66 / 66 (8 yeni). Tip denetimi ve lint temiz. Gerçek ayarlarla RLS testleri 27 / 27, üretim
+  derlemesi temiz, uçtan uca 12 / 12.
+
+---
+
 ## 2026-11-10 — Kalite denetimi, eksiklerin tamamlanması ve metinler
 
 **Kapsam.** "Ultimate Quality Assurance & Evolution" isteği: var olan tasarım ve çalışan

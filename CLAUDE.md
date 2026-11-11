@@ -103,6 +103,12 @@ Kurallar:
 
 Önemli kararlar buraya tarihle eklenir (en yeni üstte).
 
+- **2026-11-11 — Derleme veritabanına hiç dokunmaz; ayarlar tek kurala bağlı.** İlk Vercel derlemesi `/login`'i
+  önceden üretmeye çalışırken veritabanına bağlanmaya kalktı ve hatalı `SUPABASE_URL` yüzünden çöktü. Artık istek
+  API'lerinden önce veritabanına gidebilen sorgular (`spaceExists`, `previewInvite`) ilk satırda `await connection()`
+  der; derleme ayarsız da geçer. Ayar kuralları `src/lib/env-check.ts`'te (server-only değil; proxy ve sayfalar aynı
+  kuralı kullanır): değerler kırpılır; panel adresi, bağlantı satırı ve **yer değiştirmiş anahtarlar** reddedilir
+  (anon yerine secret key RLS'i atlardı). Hatalı ayarda site çökmez, `/unconfigured` adı ve nedeni yazar — değeri asla.
 - **2026-11-11 — Yayın hazırlığı: Supabase + Vercel.** Adım adım rehber `docs/KURULUM_REHBERI.md`. Sunucu bölgesi
   Frankfurt (`vercel.json` → `fra1`; Supabase de Frankfurt önerilir — iki şehre de yakın, sayfa başına birkaç
   veritabanı çağrısı var). Yükleme/işleme yapan bölümlerde `maxDuration = 60` (barındırıcının varsayılan süresi
