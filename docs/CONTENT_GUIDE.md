@@ -8,20 +8,22 @@ geldiğini, nereden değiştireceğini ve tonu anlatır.
 
 Hepsi `src/content/writing.ts` içinde durur ve aynı kurallara uyar: yalnızca **senin** hislerin
 (sevgi, özlem, teşekkür, umut) ve **kesin bilgiler** (iki şehir, bir saat fark, iki tarih, doğum
-günleri, Eln'in bölümü, Hello Kitty, şarkı, henüz buluşmamış olmanız). Hiçbir olay, konuşma ya da
-anı uydurulmadı; Eln'in ne hissettiği onun adına yazılmadı; hiçbir cümle cevap, söz ya da af istemiyor.
+günleri, Eln'in bölümü, Hello Kitty, şarkı, henüz buluşmamış olmanız; senin anlattığın kadarıyla
+nasıl tanıştığınız, birbirinize "Mosi" / "Posi" demeniz, sesli konuşmanız). Bunların dışında hiçbir
+olay, konuşma ya da anı uydurulmadı; Eln'in ne hissettiği onun adına yazılmadı; hiçbir cümle cevap,
+söz ya da af istemiyor. Ton senin anlattığın gibi: çoğunlukla aşk dolu, yer yer esprili.
 
 | Ne | Nerede görünür | Nasıl yönetilir |
 | --- | --- | --- |
 | Açılış mektubu (senin dört cümlen korunarak genişletildi), ana sayfa notu, hikâye girişi, 166 gün notu, mesafe girişi, buluşma notu, şarkı notu, 20 minik mesaj | Doğrudan sitede (varsayılan metin) | `Studio → Açılış` ve `Studio → Metinler`. Boş kaydedersen o satır hiç görünmez. |
 | 8 mektup (her raf için bir zarf) | Taslak olarak eklenir | `Studio → Hazır metinler → Mektupları taslak olarak ekle`, sonra tek tek oku ve yayımla. |
-| 365 not (yedi rafın her birinden sırayla) | Taslak olarak eklenir | `Studio → Hazır metinler → Notları taslak olarak ekle`, sonra `365 Not` sayfasında topluca ya da tek tek yayımla. |
+| 365 not (yedi rafın her birinden sırayla) | **Doğrudan yayında** eklenir (senin isteğinle) | `Studio → Hazır metinler → 365 notu yayında ekle`. Her not yalnızca kendi gününde görünür; takvim, `365 Not` sayfasında ilk günü seçtiğinde başlar. Beğenmediğini oradan taslağa al ya da değiştir. |
 | İki dönüm noktası anısı + dört özel gün girişi | Doldurulduğu anda sitede | `Studio → Hazır metinler → Boş sayfaları doldur`. Yalnızca boş olanlar doldurulur; yazdığına dokunulmaz. |
 
-**Yayımlamadan önce oku.** Bunlar iyi bir başlangıç ama seni tanımadan yazıldı. Sana benzemeyen
-bir cümleyi sil; yalnızca senin bildiğin bir ayrıntıyı (nasıl tanıştınız, ona nasıl seslenirsin,
-neye güler) eklediğin anda metin gerçekten senin olur. Altında senin imzan duran her şeyin
-arkasında durabilmelisin.
+**Mektupları yayımlamadan önce oku.** Metinler senin anlattıklarınla yazıldı ama senin yerine
+yazıldı. Sana benzemeyen bir cümleyi sil; yalnızca senin bildiğin bir ayrıntıyı (o gün ne
+konuşuldu, neye güldünüz) eklediğin anda metin gerçekten senin olur. Altında senin imzan duran
+her şeyin arkasında durabilmelisin.
 
 ## Önce bunları hazırla (davetten önce)
 
@@ -32,11 +34,11 @@ Studio ana ekranındaki **"Davet öncesi"** listesi aynı sırayı izler.
    - Büyük cümle: varsayılan *"Bu küçük dünyayı senin için hazırladım."*
    - Zarftaki not: senin dört cümlen korunarak genişletildi. Tam ekran önizlemeyle oku, istersen değiştir.
 2. **Fotoğraflar** — `Studio → Fotoğraflar`. Birkaç albüm, kısa açıklamalar.
-3. **Hazır metinler** — `Studio → Hazır metinler`. Mektupları ve notları taslak olarak ekle,
-   dönüm noktalarını doldur.
+3. **Hazır metinler** — `Studio → Hazır metinler`. Mektupları taslak olarak, 365 notu yayında ekle;
+   dönüm noktalarını doldur. Sonra `365 Not` sayfasından takvimin ilk gününü seç.
 4. **Hikâye** — `Studio → Hikâye`. İki anı hazır gelir: *6 Aralık 2025* ve *21 Mayıs 2026*.
    Aradaki 166 güne ait anıları yalnızca sen yazabilirsin — o günlerde ne olduğunu kimse uyduramaz.
-5. **Mektuplar** ve **365 Not** — taslakları oku, beğendiklerini yayımla.
+5. **Mektuplar** — taslakları oku, beğendiklerini yayımla.
 6. **Şarkı** — resmî bağlantılar girildi (`Studio → Metinler` içinden değiştirilebilir).
 7. **Davet** — `Studio → Davet`.
 

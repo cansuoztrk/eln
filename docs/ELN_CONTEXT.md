@@ -35,31 +35,39 @@ Türetilen ve kodda hesaplanan (asla elle yazılmayan) değerler:
 - Uzak mesafe ilişkisi: Arda İstanbul'da, Eln Bakü'de.
 - **Henüz yüz yüze buluşmadılar.** Birlikte çekilmiş fotoğraf yok.
 - Fotoğraflar: Arda yalnızca Eln'in gerçek fotoğraflarını yükleyecek.
-- Şarkıları: **Onur Can Özcan — "Anılar Şarkısı"** (platformlardaki resmî adı "Anılar").
+- Şarkıları: **Onur Can Özcan — "Anılar"** (resmî adı bu; Arda 2026-11-10'da doğruladı).
   Resmî bağlantılar (Arda verdi, 2026-11-10; paylaşım izleme parametreleri çıkarıldı):
   YouTube `https://www.youtube.com/watch?v=bpMRUwYpNkM` · Spotify `https://open.spotify.com/track/4TJCZsX5VjPZwUfho4mknR`.
 - Eln Hello Kitty'yi seviyor.
+- **Nasıl tanıştılar** (Arda, 2026-11-10): İkisi de gartic.io oynuyordu ama oyunda tanışmadılar. Arda'nın
+  oyundan tanıdığı **Nehir**, onu kendi grubuna aldı; grupta **Dicle**, **Yusa** ve **Eln** vardı.
+  Bundan fazlası (o gün ne konuşuldu, grup nerede kuruluydu) bilinmiyor ve yazılmaz.
+- **Hitaplar:** Birbirlerine sık sık **"Mosi"** ya da **"Posi"** derler (iki yönde de). Arda ayrıca
+  "aşkım", "hayatım", "sevgilim" ve tatlı küçük lakaplar kullanır.
+- **Sesli konuşuyorlar; hiç görüntülü konuşmadılar.** Metinler sesten söz edebilir, görüntülü
+  görüşmeden söz etmez.
+- **Arda'nın dili:** yer yer esprili, ama çoğunlukla aşk dolu.
 - Zaman zaman kırgınlık/küslük yaşanabiliyor; proje hazırlanırken de biraz kırgınlık var.
   **Sebebi bilinmiyor ve hiçbir metinde tahmin edilmez.**
 
 ## Bilinmeyenler — uydurulmaz, Studio'dan girilir
 
 - 6 Aralık 2025 – 21 Mayıs 2026 arasında yaşanan belirli olaylar, konuşmalar, anılar.
-- Nasıl/nerede tanıştıkları.
+- Tanıştıkları günün ayrıntıları (ne konuşuldu, kim ne dedi).
 - Doğum yılları.
 - İlk buluşmanın tarihi, yeri, planı; herhangi bir seyahat bilgisi.
 - Belirli anıların, konuşmaların ve o günlerin ayrıntıları (bunlar yazılan hiçbir metinde yer almaz).
 - Ortak hayaller listesi.
-- Arda ile Eln'in sesli/görüntülü görüşüp görüşmediği; Eln'in huyları, alışkanlıkları, sevdiği şeyler
-  (Hello Kitty dışında). Metinler bunlar hakkında bir şey iddia etmez.
+- Eln'in huyları, alışkanlıkları, sevdiği başka şeyler (Hello Kitty dışında). Metinler bunlar
+  hakkında bir şey iddia etmez.
 
 ## Metinleri kim yazar
 
 Arda 10 Kasım 2026'da bütün cümlelerin ve paragrafların onun yerine, duygusal bir dille yazılmasını
 istedi. Bu metinler `src/content/writing.ts` içindedir ve yukarıdaki "Bilinenler"den başka hiçbir
 şeye dayanmaz: Arda'nın kendi hisleri + kesin bilgiler. Olay/anı/konuşma uydurulmaz, Eln'in hisleri
-onun adına yazılmaz, sayılar ve tarihler elle değil `FACTS` üzerinden hesaplanır. Mektuplar ve notlar
-Studio'ya **taslak** olarak girer; Arda okuyup yayımlamadan Eln görmez. Kurallar birim testiyle korunur
+onun adına yazılmaz, sayılar ve tarihler elle değil `FACTS` üzerinden hesaplanır. Mektuplar Studio'ya
+**taslak** olarak girer; Arda okuyup yayımlamadan Eln görmez. 365 not, Arda'nın isteğiyle doğrudan yayında eklenir. Kurallar birim testiyle korunur
 (`tests/unit/content.test.ts` → "the words written for Arda").
 
 ## Duygusal referans (yayımlanmaz)

@@ -33,7 +33,7 @@ describe("the confirmed facts", () => {
     expect(date("arda_birthday")).toMatchObject({ day: 7, month: 11, year: null, person: "owner" });
     expect(FACTS.owner).toMatchObject({ name: "Arda", city: "İstanbul", timezone: "Europe/Istanbul" });
     expect(FACTS.partner).toMatchObject({ name: "Eln", fullName: "Elnare", city: "Bakü", timezone: "Asia/Baku" });
-    expect(FACTS.song).toMatchObject({ artist: "Onur Can Özcan", title: "Anılar Şarkısı" });
+    expect(FACTS.song).toMatchObject({ artist: "Onur Can Özcan", title: "Anılar" });
     // The official links, stored without share-tracking parameters.
     expect(youtubeId(FACTS.song.youtubeUrl)).toBe("bpMRUwYpNkM");
     expect(spotifyEmbedUrl(FACTS.song.spotifyUrl)).toBe("https://open.spotify.com/embed/track/4TJCZsX5VjPZwUfho4mknR");
@@ -121,6 +121,29 @@ describe("the words written for Arda (src/content/writing.ts)", () => {
     }
   });
 
+  it("tells how they met exactly as Arda told it, and names no one he did not name", () => {
+    const met = WRITTEN_MEMORIES.met.description;
+    for (const name of [FACTS.beginning.game, FACTS.beginning.introducedBy, ...FACTS.beginning.group]) expect(met, name).toContain(name);
+    // Every other personal name in the writing is one of theirs, a friend he named, or a place.
+    const allowed = new Set(["Eln", "Elnare", "Arda", "Mosi", "Posi", FACTS.beginning.introducedBy, ...FACTS.beginning.group]);
+    const places = new Set(["İstanbul", "Bakü", "Hazar", "Boğaz", "Galata", "İçerişehir", "Kız", "Kulesi", "Hello", "Kitty", "Ay", "İngilizce", "Türk", "Teacher"]);
+    const months = new Set(["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]);
+    const strangers = new Set<string>();
+    for (const text of everything) {
+      // A capitalised word in the middle of a sentence is a proper name.
+      for (const match of text.matchAll(/(?<=[a-zçğıöşü,;] )([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)/g)) {
+        const word = match[1];
+        if (!allowed.has(word) && !places.has(word) && !months.has(word)) strangers.add(word);
+      }
+    }
+    expect([...strangers]).toEqual([]);
+  });
+
+  it("uses the names they have for each other", () => {
+    const all = everything.join(" ");
+    for (const nickname of FACTS.nicknames) expect(all, nickname).toContain(nickname);
+  });
+
   it("covers the two milestones and the four seeded special days", () => {
     expect(Object.keys(WRITTEN_MEMORIES).sort()).toEqual(FACTS.memories.map((m) => m.dateKey).sort());
     expect(Object.keys(WRITTEN_DAYS).sort()).toEqual(FACTS.specialDays.map((d) => d.slug).sort());
@@ -140,8 +163,10 @@ describe("the words written for Arda (src/content/writing.ts)", () => {
     for (const text of everything) for (const phrase of claims) expect(lower(text).includes(phrase), `"${phrase}" in: ${text.slice(0, 70)}`).toBe(false);
   });
 
-  it("claims nothing that is not known: no shared past in person, no voice, no call", () => {
-    const unknown = ["sesini", "sesin ", "görüntülü", "aradığında", "telefonda konuş", "buluştuğumuz", "sarıldığımız", "el ele", "öptü"];
+  it("claims nothing that is not known: no shared past in person, and never a video call", () => {
+    // They talk by voice (confirmed), so her voice may be spoken of; they have never had a video call.
+    expect(FACTS.talk).toEqual({ voice: true, video: false });
+    const unknown = ["görüntülü", "kamerayı", "kamerada", "yüzünü gördüğümde", "buluştuğumuz", "sarıldığımız", "el ele", "öptü"];
     for (const text of everything) for (const phrase of unknown) expect(lower(text).includes(phrase), `"${phrase}" in: ${text.slice(0, 70)}`).toBe(false);
   });
 

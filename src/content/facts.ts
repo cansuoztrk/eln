@@ -137,9 +137,24 @@ export const FACTS = {
       sortOrder: 0,
     },
   ],
+  /**
+   * How they met and how they speak to each other, as Arda told it (2026-11-10).
+   * Both played gartic.io, but did not meet in the game: Nehir, whom Arda knew
+   * from it, took him into her group, where Dicle, Yusa and Eln were.
+   */
+  beginning: {
+    game: "gartic.io",
+    introducedBy: "Nehir",
+    group: ["Dicle", "Yusa"],
+  },
+  /** What they call each other, both ways. */
+  nicknames: ["Mosi", "Posi"],
+  /** They talk by voice; they have never had a video call. */
+  talk: { voice: true, video: false },
   song: {
     artist: "Onur Can Özcan",
-    title: "Anılar Şarkısı",
+    // The official title on the platforms.
+    title: "Anılar",
     // The official links Arda gave, without the share-tracking parameters.
     youtubeUrl: "https://www.youtube.com/watch?v=bpMRUwYpNkM",
     spotifyUrl: "https://open.spotify.com/track/4TJCZsX5VjPZwUfho4mknR",

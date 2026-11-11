@@ -42,7 +42,7 @@ Durum: aşağıdaki modüllerin tümü yazıldı ve çalışıyor (ayrıntı ve 
 | --- | --- | --- |
 | Memory Universe | `/universe` | Anılar, mektuplar ve özel günler yıldız olarak; çevrilir, yakınlaşılır, yıldıza dokunulur. Telefonda da aynı. |
 | 365 Reasons | `/reasons` | Arda'nın yazdığı notlar; günde bir not; arşiv. Otomatik üretim yok. |
-| Our Song | `/song` | Onur Can Özcan — Anılar Şarkısı. Resmî embed veya bağlantı kartı. |
+| Our Song | `/song` | Onur Can Özcan — Anılar. Resmî embed veya bağlantı kartı. |
 | Eln's Little World | `/corner` | Fiyonk koleksiyonu, sticker panosu, tema seçenekleri, tatlı günlük mesajlar. |
 
 ### Uzun vadeli

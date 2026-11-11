@@ -8,8 +8,10 @@ import { fail, GENERIC_ERROR, ok, type ActionResult } from "@/lib/result";
 /**
  * The ready writing, handed to Arda. Each action only ever adds what is not
  * there yet and fills what is still empty — it never replaces a word he wrote.
- * Letters and notes arrive as drafts: Eln sees nothing until he has read them
- * and chosen to publish.
+ *
+ * Letters arrive as drafts: Eln sees none until he has read it and chosen to
+ * publish. The 365 notes arrive published, as he asked (2026-11-10); a note is
+ * still shown only on its own day, and only once the calendar has a first day.
  */
 
 async function owner() {
@@ -47,7 +49,7 @@ export async function addWrittenLettersAction(): Promise<ActionResult<{ added: n
   return ok({ added: fresh.length }, `${fresh.length} mektup taslak olarak eklendi.`);
 }
 
-/** Adds the notes that are not in the collection yet, as drafts, one shelf after another in turn. */
+/** Adds the notes that are not in the collection yet — published, one shelf after another in turn. */
 export async function addWrittenNotesAction(): Promise<ActionResult<{ added: number }>> {
   const session = await owner();
   if (!session) return fail(DENIED);
@@ -59,12 +61,17 @@ export async function addWrittenNotesAction(): Promise<ActionResult<{ added: num
 
   const start = Math.max(-1, ...(existing ?? []).map((row) => row.sort_order)) + 1;
   const { error } = await session.supabase.from("daily_notes").insert(
-    fresh.map((note, index) => ({ space_id: session.space.id, body: note.body, category: note.category, status: "draft" as const, sort_order: start + index })),
+    fresh.map((note, index) => ({ space_id: session.space.id, body: note.body, category: note.category, status: "published" as const, sort_order: start + index })),
   );
   if (error) return fail(GENERIC_ERROR);
 
-  for (const path of ["/studio/reasons", "/studio/words", "/studio"]) revalidatePath(path);
-  return ok({ added: fresh.length }, `${fresh.length} not taslak olarak eklendi.`);
+  for (const path of ["/reasons", "/", "/studio/reasons", "/studio/words", "/studio"]) revalidatePath(path);
+  return ok(
+    { added: fresh.length },
+    session.space.reasons_started_on
+      ? `${fresh.length} not yayında. Her biri kendi gününde görünecek.`
+      : `${fresh.length} not yayında. Takvimi başlatmak için 365 Not sayfasından ilk günü seç.`,
+  );
 }
 
 /** Fills the two milestone memories and the special days — only where nothing has been written. */

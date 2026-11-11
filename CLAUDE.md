@@ -25,7 +25,7 @@ ilgili dosyayı oku.
 1. **Uydurma yok.** Bilinmeyen anı, olay, konuşma, tarih, istatistik üretme; Eln'in ne
    hissettiğini ya da düşündüğünü onun adına yazma. Doğrulanmış gerçekler `docs/ELN_CONTEXT.md`
    içinde. Arda'nın isteğiyle metinler onun sesinden yazılır (`src/content/writing.ts`), ama
-   yalnızca **onun hisleri + kesin bilgiler** ile; mektup ve notlar Studio'ya taslak olarak girer.
+   yalnızca **onun hisleri + kesin bilgiler** ile; mektuplar Studio'ya taslak olarak girer.
 2. **Eln'in özel mesajı yayımlanmaz.** 7 Kasım mesajı yalnızca duygusal referanstır;
    cümleleri kopyalanmaz, alıntılanmaz.
 3. **Baskı mekaniği yok.** Affetmeye, cevap vermeye, geri dönmeye zorlayan hiçbir metin,
@@ -102,9 +102,15 @@ Kurallar:
 
 Önemli kararlar buraya tarihle eklenir (en yeni üstte).
 
+- **2026-11-10 — Yeni kesin bilgiler ve 365 notun yayında gelmesi.** Arda anlattı: ikisi de gartic.io oynuyordu
+  ama oyunda tanışmadılar; oyundan tanıdığı Nehir onu, içinde Dicle, Yusa ve Eln'in olduğu grubuna aldı. Birbirlerine
+  "Mosi" / "Posi" derler; sesli konuşurlar, hiç görüntülü konuşmadılar; Arda'nın dili aşk dolu, yer yer esprili.
+  Bunlar `FACTS` ve `ELN_CONTEXT.md`'ye işlendi, metinler buna göre kişiselleştirildi (testler: adı geçmeyen kimse
+  anılmaz, görüntülü görüşmeden söz edilmez). Şarkının adı resmî adıyla "Anılar". 365 not, Arda'nın isteğiyle
+  **taslak değil yayında** eklenir (mektuplar taslak kalır); not yine yalnızca kendi gününde görünür.
 - **2026-11-10 — Metinleri Claude yazar, Arda yayımlar.** Arda bütün cümlelerin ve paragrafların onun
   yerine, duygusal bir dille yazılmasını istedi. Hepsi `src/content/writing.ts` içinde: bölüm metinleri
-  (varsayılan olarak yayında), 8 mektup ve 365 not (Studio → Hazır metinler'den **taslak** olarak eklenir),
+  (varsayılan olarak yayında), 8 mektup (Studio → Hazır metinler'den **taslak** olarak eklenir), 365 not,
   iki dönüm noktası ve dört özel gün girişi (yalnızca boş sayfayı doldurur). Sınırlar değişmedi: olay/anı
   uydurulmaz, Eln adına his yazılmaz, baskı/özür dili yok, sayılar `FACTS`'ten hesaplanır. Bir birim testi
   bunları denetler. Oda girişleri ve boş durum metinleri `src/content/copy.ts`'te toplandı.

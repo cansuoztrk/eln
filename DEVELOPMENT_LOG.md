@@ -87,8 +87,24 @@ Arda bütün cümlelerin ve paragrafların onun yerine, duygusal bir dille yazı
   ya da kırgınlığa değinen tek cümle yok; sesli/görüntülü görüşme gibi bilinmeyen şeyler iddia
   edilmedi; "bugün şunu gördüm" gibi güne iliştirilmiş küçük olaylar bile yazılmadı; sayı ve tarihler elle
   yazılmadı, `FACTS`'ten hesaplanıyor. Bunların hepsi birim testiyle denetleniyor.
-- **Arda'nın elinde.** Mektuplar ve notlar `Studio → Hazır metinler`'den **taslak** olarak eklenir;
-  o okuyup yayımlamadan Eln görmez. Dönüm noktaları yalnızca boş sayfayı doldurur.
+- **Arda'nın elinde.** Mektuplar `Studio → Hazır metinler`'den **taslak** olarak eklenir; o okuyup
+  yayımlamadan Eln görmez. 365 not, Arda'nın isteğiyle doğrudan yayında gelir. Dönüm noktaları yalnızca boş sayfayı doldurur.
+
+### Ek — Arda'nın cevaplarıyla kişiselleştirme (aynı gün)
+
+Tur sonunda sorulan üç soruya Arda cevap verdi; üçü de işlendi.
+
+- **Şarkı:** adı resmî adıyla "Anılar" oldu (`FACTS.song.title`, dokümanlar, test).
+- **Yeni kesin bilgiler** `FACTS` ve `docs/ELN_CONTEXT.md`'ye eklendi: ikisi de gartic.io oynuyordu ama oyunda
+  tanışmadılar; Arda'nın oyundan tanıdığı Nehir onu, içinde Dicle, Yusa ve Eln'in olduğu grubuna aldı.
+  Birbirlerine "Mosi" / "Posi" derler. Sesli konuşurlar; hiç görüntülü konuşmadılar.
+- **Metinler kişiselleştirildi:** "Tanıştığımız gün" anısı artık bu hikâyeyi anlatıyor (anlatılandan fazlası yok);
+  mektupların hitapları Arda'nın kullandıkları oldu (aşkım, hayatım, sevgilim, Mosi'm, Posi'm) ve ton daha açık
+  sevgi dolu; 23 not ve üç minik mesaj, lakaplar, ses ve tanışma hikâyesiyle yeniden yazıldı. Not sayısı yine 365.
+- **365 not doğrudan yayında** eklenir (mektuplar taslak kalır). Not yine yalnızca kendi gününde görünür ve
+  takvim, Arda ilk günü seçince başlar.
+- **Yeni testler:** tanışma anlatısı `FACTS` ile birebir; metinlerde Arda'nın adını vermediği kimse anılmaz;
+  iki lakap da kullanılır; görüntülü görüşmeden söz edilmez.
 
 ### Test sonuçları
 
@@ -96,7 +112,7 @@ Arda bütün cümlelerin ve paragrafların onun yerine, duygusal bir dille yazı
 | --- | --- |
 | `tsc --noEmit`, `eslint .` | temiz |
 | `next build` | temiz |
-| Birim testleri | 56 / 56 (içerik kuralları + yazılan metinlerin kuralları dahil) |
+| Birim testleri | 58 / 58 (içerik kuralları + yazılan metinlerin kuralları dahil) |
 | RLS / güvenlik testleri | 27 / 27 (dosya sahipliği ve oda doluluğu testleri dahil) |
 | Uçtan uca (üretim derlemesi) | 12 / 12 — kurulum → içerik → davet → hediye → erişim sınırları → iki rol için bütün odalar |
 | Gerçek fotoğraflarla yükleme | 5 / 5 yüklendi, her biri 3 EXIF'siz WebP varyantı |
@@ -115,13 +131,13 @@ Arda bütün cümlelerin ve paragrafların onun yerine, duygusal bir dille yazı
 - **Animasyon kitaplığı küçültülmedi** (LazyMotion'a geçiş ~15–20 KB kazandırır ama bütün hareketli
   bileşenlere dokunur). Risk/kazanç dengesi nedeniyle ertelendi.
 - **Yayın ortamı kurulmadı.** Supabase bulut projesi ve barındırma Arda'nın hesaplarıyla yapılacak (`README.md`).
-- **Metinler Arda'yı tanımadan yazıldı.** Nasıl tanıştıkları, Eln'e nasıl seslendiği, sesli görüşüp
-  görüşmedikleri bilinmiyor; bu yüzden metinler bilerek genel kaldı. Kişisel ayrıntıyı yalnızca Arda ekleyebilir.
+- **Metinler Arda'nın anlattıklarıyla sınırlı.** Tanışma hikâyesi, lakaplar ve sesli konuşmalar işlendi; o günlerde
+  ne konuşulduğu, Eln'in huyları ve aradaki 166 günün anıları bilinmiyor. Bunları yalnızca Arda ekleyebilir.
 
 ### Sıradaki öneriler
 
 1. Yayına al, `/setup`'ı çalıştır, beş fotoğrafı yükle, hediye fotoğrafını seç.
-2. `Studio → Hazır metinler`: mektupları ve notları ekle, oku, sana benzemeyeni değiştir, yayımla.
+2. `Studio → Hazır metinler`: mektupları ekleyip oku ve yayımla; 365 notu ekle; `365 Not` sayfasından takvimin ilk gününü seç.
 3. Aradaki 166 güne ait en az birkaç gerçek anı yaz — sitenin en eksik ve en değerli yeri orası.
 4. Gerçek telefonda bir kez baştan sona gez (hediye dahil), sonra daveti gönder.
 5. İlk yedeği al ve geri yüklemeyi bir kez prova et.

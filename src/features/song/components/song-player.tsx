@@ -48,7 +48,7 @@ function Record({ spinning, title, artist }: { spinning: boolean; title: string;
 }
 
 /**
- * "Anılar Şarkısı". Nothing is hosted here and nothing plays by itself: the
+ * "Anılar". Nothing is hosted here and nothing plays by itself: the
  * official embed is created only when play is pressed. With a YouTube link the
  * page's own controls drive the embed; with only a Spotify link the official
  * Spotify player is shown; with neither, the card simply links out.

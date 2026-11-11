@@ -18,7 +18,7 @@ export default async function StudioWordsPage() {
   return (
     <StudioPage
       title="Hazır metinler"
-      description="Senin için, senin sesinden yazılmış metinler. Hepsi yalnızca hislerden ve kesin bilgilerden söz eder; hiçbir olay ya da anı uydurulmadı. Mektuplar ve notlar taslak olarak eklenir: sen okuyup yayımlamadan Eln hiçbirini görmez."
+      description="Senin için, senin sesinden yazılmış metinler. Yalnızca hislerinden ve senin anlattığın kesin bilgilerden söz ederler; hiçbir olay ya da anı uydurulmadı. Mektuplar taslak olarak eklenir; 365 not, istediğin gibi doğrudan yayında gelir."
     >
       <div className="space-y-6">
         <StudioCard>
@@ -60,8 +60,12 @@ export default async function StudioWordsPage() {
 
         <StudioCard title={`365 Not · ${status.notes.added} / ${status.notes.total} eklendi`}>
           <p className="text-[15px] leading-relaxed text-muted">
-            Bir yılın her gününe bir not. Yedi rafın her birinden sırayla gelirler, böylece art arda iki gün birbirine benzemez. Taslak
-            olarak eklenir; 365 Not sayfasında hepsini gözden geçirip tek tek ya da topluca yayımlayabilirsin.
+            Bir yılın her gününe bir not. Yedi rafın her birinden sırayla gelirler, böylece art arda iki gün birbirine benzemez.
+            Doğrudan <strong className="font-medium text-ink">yayında</strong> eklenirler; yine de her not yalnızca kendi gününde
+            görünür. Beğenmediğin olursa 365 Not sayfasından taslağa alabilir ya da değiştirebilirsin.
+            {status.calendarStarted
+              ? " Takvim başlamış; notlar gününde görünecek."
+              : " Takvim henüz başlamadı: 365 Not sayfasından ilk günü seçtiğinde notlar o günden itibaren sırayla görünür."}
           </p>
           <div className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
             {NOTE_CATEGORIES.map((category) => {
@@ -83,7 +87,7 @@ export default async function StudioWordsPage() {
               );
             })}
           </div>
-          <AddWords kind="notes" label="Notları taslak olarak ekle" done={status.notes.added >= status.notes.total} href="/studio/reasons" hrefLabel="365 Not'a git" />
+          <AddWords kind="notes" label="365 notu yayında ekle" done={status.notes.added >= status.notes.total} href="/studio/reasons" hrefLabel="365 Not'a git" />
         </StudioCard>
 
         <StudioCard title="Dönüm noktaları ve özel günler">
